@@ -4890,7 +4890,6 @@ def confirm_predicted_incident_by_id(
                 Incident.id == incident_id,
                 Incident.is_candidate == expression.true(),
             )
-            .options(joinedload(Incident.alerts))
         ).first()
 
         if not incident:
@@ -4903,6 +4902,7 @@ def confirm_predicted_incident_by_id(
         ).update(
             {
                 "is_visible": True,
+                "is_candidate": True,
             }
         )
 

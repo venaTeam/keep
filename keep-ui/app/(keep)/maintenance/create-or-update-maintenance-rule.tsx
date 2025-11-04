@@ -155,10 +155,6 @@ export default function CreateOrUpdateMaintenanceRule({
     return !!maintenanceName && !!celQuery && !!startTime;
   };
 
-  const ignoreText = !suppress
-    ? "Alerts will not show in feed"
-    : "Alerts will show in suppressed status";
-
   return (
     <form
       className="py-2"
@@ -240,18 +236,21 @@ export default function CreateOrUpdateMaintenanceRule({
       <div className="flex items-center space-x-3 mt-2.5 w-[300px] justify-between">
         <label
           htmlFor="ignoreSwitch"
-          className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
+          className="whitespace-nowrap text-tremor-default text-tremor-content dark:text-dark-tremor-content"
         >
-          {ignoreText}
+          Alerts Display Mode
         </label>
-        <Switch id="ignoreSwitch" checked={suppress} onChange={setSuppress} />
+        <Select value={suppress ? "true" : "false" onValueChange={(value) => setSuppress(value === "true")}}>
+          <SelectItem value="true">Show in Suppressed Status</SelectItem>
+          <SelectItem value="false">Hide From Feed</SelectItem>
+        <Select/>
       </div>
       <div className="flex items-center space-x-3 w-[300px] justify-between mt-2.5">
         <label
           htmlFor="enabledSwitch"
           className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
         >
-          Whether this rule is enabled or not
+          Enable Rule
         </label>
         <Switch id="enabledSwitch" checked={enabled} onChange={setEnabled} />
       </div>

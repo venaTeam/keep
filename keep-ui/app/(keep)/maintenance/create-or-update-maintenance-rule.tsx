@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import {
   TextInput,
   Textarea,

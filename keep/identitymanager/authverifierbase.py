@@ -333,7 +333,7 @@ class AuthVerifierBase:
             HTTPException: If the API key is invalid.
         """
         self.logger.debug("Verifying API key")
-        tenant_api_key = get_api_key(api_key,is_deleted=False)
+        tenant_api_key = get_api_key(api_key)
         if not tenant_api_key:
             self.logger.warning("Invalid API Key")
             raise HTTPException(status_code=401, detail="Invalid API Key")

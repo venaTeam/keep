@@ -337,6 +337,7 @@ def get_workflows_that_should_run():
         workflows_to_run = []
         # for each workflow:
         for workflow in workflows_with_interval:
+            # get the current time in Israel timezone, this should be done with an environment variable
             current_time = datetime.now(pytz.timezone('Asia/Jerusalem')).replace(tzinfo=None)
             last_execution = get_last_completed_execution(session, workflow.id)
             # if there no last execution, that's the first time we run the workflow

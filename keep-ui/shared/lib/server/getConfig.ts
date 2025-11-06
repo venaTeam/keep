@@ -36,6 +36,9 @@ export function getConfig(): InternalConfig {
 
   return {
     AUTH_TYPE: authType,
+    KEYCLOAK_SECRET: process.env.KEYCLOAK_SECRET,
+    KEYCLOAK_ID: process.env.KEYCLOAK_ID,
+    KEYCLOAK_ISSUER: process.env.KEYCLOAK_ISSUER,
     PUSHER_DISABLED: process.env.PUSHER_DISABLED === "true",
     // could be relative (for ingress) or absolute (e.g. Pusher)
     PUSHER_HOST: process.env.PUSHER_HOST,

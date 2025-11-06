@@ -1,5 +1,11 @@
 export interface InternalConfig {
   AUTH_TYPE: string;
+
+  // KEYCLOAK
+  KEYCLOAK_SECRET: string | undefined;
+  KEYCLOAK_ID: string | undefined;
+  KEYCLOAK_ISSUER: string | undefined;
+  
   // Pusher
   PUSHER_DISABLED: boolean;
   PUSHER_HOST: string | undefined;

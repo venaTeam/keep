@@ -7,7 +7,6 @@ when their dismissedUntil timestamp has passed.
 
 import datetime
 import logging
-import pytz
 from typing import List, Optional
 
 from sqlmodel import Session, select

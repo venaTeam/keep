@@ -24,6 +24,7 @@ import { HiMiniXMark } from "react-icons/hi2";
 import { useState } from "react";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
+import { useMaintenanceRules } from "utils/hooks/useMaintenanceRules";
 
 const columnHelper = createColumnHelper<MaintenanceRule>();
 
@@ -37,7 +38,7 @@ export default function MaintenanceRulesTable({
   editCallback,
 }: Props) {
   const api = useApi();
-
+  const { mutate } = useMaintenanceRules();
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const columns = [
@@ -128,6 +129,7 @@ export default function MaintenanceRulesTable({
         .delete(`/maintenance/${maintenanceRuleId}`)
         .then(() => {
           toast.success("Maintenance rule deleted successfully");
+          mutate();
         })
         .catch((error: any) => {
           showErrorToast(error, "Failed to delete maintenance rule");

@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 from typing import Any, Callable, Dict, Iterator, List, Tuple, Type, Union, Optional
 from uuid import UUID, uuid4
+import pytz
 
 from dateutil.parser import parse
 from dateutil.tz import tz
@@ -291,7 +292,7 @@ def get_last_completed_execution(
             | (WorkflowExecution.status == "error")
             | (WorkflowExecution.status == "providers_not_configured")
         )
-        .order_by(WorkflowExecution.execution_number.desc())
+        .order_by(WorkflowExecution.started.desc())
         .limit(1)
     ).first()
 
@@ -336,7 +337,7 @@ def get_workflows_that_should_run():
         workflows_to_run = []
         # for each workflow:
         for workflow in workflows_with_interval:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(pytz.timezone('Asia/Jerusalem')).replace(tzinfo=None)
             last_execution = get_last_completed_execution(session, workflow.id)
             # if there no last execution, that's the first time we run the workflow
             if not last_execution:

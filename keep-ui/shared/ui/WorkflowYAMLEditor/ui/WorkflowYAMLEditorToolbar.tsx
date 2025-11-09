@@ -21,7 +21,7 @@ export function WorkflowYAMLEditorToolbar({
   className,
 }: WorkflowYAMLEditorToolbarProps) {
   const [isCopied, setIsCopied] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {

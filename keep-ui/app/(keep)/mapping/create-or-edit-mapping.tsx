@@ -61,7 +61,7 @@ export default function CreateOrEditMapping({
   const { topologyData } = useTopology();
   const [priority, setPriority] = useState<number>(0);
   const editMode = editRuleId !== null;
-  const inputFile = useRef<HTMLInputElement>(null);
+  const inputFile = useRef<HTMLInputElement| null>(null);
   const [isMultiLevel, setIsMultiLevel] = useState<boolean>(false);
   const [newPropertyName, setNewPropertyName] = useState<string>("");
   const [prefixToRemove, setPrefixToRemove] = useState<string>("");

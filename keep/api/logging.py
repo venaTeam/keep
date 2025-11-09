@@ -7,7 +7,7 @@ import os
 import sys
 import threading
 import uuid
-from datetime import datetimes
+from datetime import datetime
 from threading import Timer
 
 # tb: small hack to avoid the InsecureRequestWarning logs

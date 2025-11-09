@@ -96,7 +96,7 @@ export default function CreateOrUpdateMaintenanceRule({
 
   const changeDatePicker = (date: Date):void => {
     const currentDate = new Date();
-    if (!isSameDay(date, startTime)) {
+    if (startTime && !isSameDay(date, startTime)) {
       if(isSameDay(date, currentDate) && 
       (date.getHours() < currentDate.getHours() || (date.getHours() == currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
         setStartTime(roundTime(currentDate));

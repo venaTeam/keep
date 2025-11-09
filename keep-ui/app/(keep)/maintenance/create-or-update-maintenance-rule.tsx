@@ -36,7 +36,7 @@ const DEFAULT_IGNORE_STATUSES = [
 ]
 
 const roundTime =(dateToRound: Date) =>{
-  if (dateToRound.getMinutes() % 15 === 0) {
+  if (dateToRound.getMinutes() % 15 != 0) {
     const minToadd = 15 - (dateToRound.getMinutes() % 15);
     dateToRound.setMinutes(dateToRound.getMinutes() + minToadd);
     dateToRound.setSeconds(0);
@@ -90,7 +90,7 @@ export default function CreateOrUpdateMaintenanceRule({
     router.replace("/maintenance");
   };
 
-  const isSameDay = (date1: Date, date2: Date) => {
+  const isSameDay = (date1: Date, date2: Date):boolean => {
     return date1.toDateString() === date2.toDateString();
   }
 
@@ -98,7 +98,7 @@ export default function CreateOrUpdateMaintenanceRule({
     const currentDate = new Date();
     if (!isSameDay(date, startTime)) {
       if(isSameDay(date, currentDate) && 
-      (date.getHours() < currentDate.getHours() || (date.getHours() === currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
+      (date.getHours() < currentDate.getHours() || (date.getHours() == currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
         setStartTime(roundTime(currentDate));
       }
       else{

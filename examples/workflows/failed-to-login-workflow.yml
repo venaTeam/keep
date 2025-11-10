@@ -1,7 +1,7 @@
 workflow:
   id: tiered-login-failure-response
   name: Tiered Login Failure Response
-  description: Handles user login failures by querying customer tier from BigQuery and routes notifications to appropriate channels - OpsGenie for enterprise customers and Slack for all tiers.
+  description: Handles user login failures by querying customer tier from MySQL and routes notifications to appropriate channels - Slack for enterprise customers and Slack for all tiers.
   triggers:
     - type: alert
       filters:
@@ -10,22 +10,22 @@ workflow:
   steps:
     - name: get-customer-tier-by-id
       provider:
-        type: bigquery
-        config: "{{ providers.bigquery-prod }}"
+        type: mysql
+        config: "{{ providers.mysql-prod }}"
         with:
-          query: "SELECT customer_name, tier FROM `bigquery-production.prod-db.customers` WHERE customer_id = {{ alert.customer_id }} LIMIT 1"
+          query: "SELECT customer_name, tier FROM customers WHERE customer_id = {{ alert.customer_id }} LIMIT 1"
   actions:
-    # for enterprise customer, open an incident in opsgenie
-    - name: opsgenie-alert
+    # for enterprise customer, send a slack message with higher priority
+    - name: slack-enterprise-alert
       condition:
         - name: enterprise-tier
           type: assert
           assert: "{{ steps.get-customer-tier-by-id.result.tier }} == 'enterprise'"
       provider:
-        type: opsgenie
-        config: " {{ providers.opsgenie-prod }} "
+        type: slack
+        config: " {{ providers.slack-prod }} "
         with:
-          message: "User of customer {{ steps.get-customer-tier-by-id.result.customer_name }} failed to login!"
+          message: "🚨 ENTERPRISE ALERT: User of customer {{ steps.get-customer-tier-by-id.result.customer_name }} failed to login!"
     # for every customer, send a slack message
     - name: trigger-slack
       provider:

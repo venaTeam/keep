@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 export type FacetState = Record<string, any | null>;
 
 export interface FacetConfig {

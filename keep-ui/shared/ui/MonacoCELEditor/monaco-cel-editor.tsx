@@ -38,10 +38,10 @@ export function MonacoCelEditor(props: MonacoCelProps) {
   const onFocusRef = useRef<MonacoCelProps["onFocus"]>(props.onFocus);
   onFocusRef.current = props.onFocus;
   const fieldsForSuggestionsRef =
-    useRef<MonacoCelProps["fieldsForSuggestions"]>();
+    useRef<MonacoCelProps["fieldsForSuggestions"] | null>(null);
   fieldsForSuggestionsRef.current = props.fieldsForSuggestions;
   const enteredTokensRef = useRef<Token[]>([]);
-  const suggestionsShownRef = useRef<boolean>();
+  const suggestionsShownRef = useRef<boolean>(false);
   const [value, setValue] = useState<string>(props.value);
 
   const validationErrors = useCelValidation(props.readOnly ? undefined : value);

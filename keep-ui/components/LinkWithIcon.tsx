@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Trashcan } from "@/components/icons";
 import clsx from "clsx";
 import { ShortNumber } from "./ui";
+import type { JSX } from "react";
 
 type LinkWithIconProps = {
   children: ReactNode;

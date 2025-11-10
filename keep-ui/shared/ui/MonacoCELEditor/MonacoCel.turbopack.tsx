@@ -14,9 +14,7 @@ export function MonacoCelBase(props: MonacoCelProps) {
     null
   );
   onMonacoLoadedRef.current = props.onMonacoLoaded;
-  const onMonacoLoadFailureRef = useRef<
-    MonacoCelProps["onMonacoLoadFailure"] | null
-  >();
+  const onMonacoLoadFailureRef = useRef<MonacoCelProps["onMonacoLoadFailure"] | null>(null);
   onMonacoLoadFailureRef.current = props.onMonacoLoadFailure;
 
   useEffect(() => {

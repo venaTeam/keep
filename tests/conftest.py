@@ -3,6 +3,7 @@ import json
 import os
 import random
 import time
+import types
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, Generator
@@ -24,7 +25,8 @@ from playwright.sync_api import Page
 from keep.api.bl.maintenance_windows_bl import MaintenanceWindowsBl
 from keep.api.core.dependencies import SINGLE_TENANT_UUID
 from keep.api.core.elastic import ElasticClient
-from keep.api.models.alert import AlertStatus
+from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.api.models.provider import Provider
 from keep.api.models.db.alert import *
 from keep.api.models.db.maintenance_window import MaintenanceWindowRule
 from keep.api.models.db.provider import *
@@ -35,9 +37,215 @@ from keep.api.models.db.workflow import *
 from keep.api.tasks.process_event_task import process_event
 from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.contextmanager.contextmanager import ContextManager
+from keep.providers.base.base_provider import BaseProvider
+from keep.providers.models.provider_config import ProviderConfig, ProviderScope
+from keep.providers.providers_factory import ProvidersFactory
 
 original_request = requests.Session.request  # noqa
 load_dotenv(find_dotenv())
+
+
+def _register_stub_providers() -> None:
+    """
+    Register lightweight stub implementations for removed SaaS providers that are
+    still referenced in tests. This keeps test coverage intact without restoring
+    the production provider code.
+    """
+
+    import sys
+    import dataclasses
+    import hashlib
+    from datetime import datetime as dt
+
+    def ensure_package(path: str):
+        if path not in sys.modules:
+            sys.modules[path] = types.ModuleType(path)
+        return sys.modules[path]
+
+    # Stub Datadog provider -------------------------------------------------
+    datadog_module_path = "keep.providers.datadog_provider.datadog_provider"
+    if datadog_module_path not in sys.modules:
+
+        @dataclasses.dataclass
+        class DatadogProviderAuthConfig:
+            api_key: str = dataclasses.field(
+                default="stub",
+                metadata={
+                    "required": False,
+                    "description": "Stub Datadog API key",
+                    "sensitive": False,
+                },
+            )
+
+        class DatadogProvider(BaseProvider):
+            PROVIDER_DISPLAY_NAME = "Stub Datadog"
+            PROVIDER_TAGS = ["alert"]
+            PROVIDER_CATEGORY = ["Monitoring"]
+            PROVIDER_SCOPES = [
+                ProviderScope(
+                    name="default",
+                    description="Stub scope for Datadog tests",
+                    mandatory=False,
+                )
+            ]
+            PROVIDER_METHODS = []
+            WEBHOOK_INSTALLATION_REQUIRED = False
+            FINGERPRINT_FIELDS = ["monitor_id", "title"]
+
+            def __init__(
+                self,
+                context_manager: ContextManager,
+                provider_id: str,
+                config: ProviderConfig,
+            ):
+                super().__init__(context_manager, provider_id, config)
+
+            def validate_config(self):
+                self.authentication_config = DatadogProviderAuthConfig()
+
+            def validate_scopes(self):
+                return {"default": True}
+
+            @staticmethod
+            def parse_event_raw_body(raw_body: bytes | dict) -> dict:
+                if isinstance(raw_body, (bytes, bytearray)):
+                    return json.loads(raw_body.decode("utf-8"))
+                return raw_body
+
+            @classmethod
+            def simulate_alert(cls) -> dict:
+                now = dt.utcnow()
+                monitor_id = str(random.randint(10**9, 10**10 - 1))
+                scopes = [
+                    f"stub-service-{random.randint(1, 3)}",
+                    f"team-{random.randint(1, 2)}",
+                ]
+                base_payload = {
+                    "title": "High CPU Usage (stub)",
+                    "message": "CPU usage is over 90% on stub-host.",
+                    "tags": "environment:production,team:infra,service:api",
+                    "priority": random.choice(["P1", "P2", "P3"]),
+                    "monitor_id": monitor_id,
+                    "scopes": scopes,
+                    "last_updated": int(now.timestamp() * 1000),
+                    "alert_transition": random.choice(["Triggered", "Recovered"]),
+                    "status": random.choice(["Alert", "Warn", "OK"]),
+                }
+                payload_id = hashlib.sha256(
+                    f"{monitor_id}-{now.timestamp()}-{random.random()}".encode()
+                ).hexdigest()
+                base_payload["id"] = payload_id
+                return base_payload
+
+            @staticmethod
+            def _map_status(status: str | None) -> AlertStatus:
+                mapping = {
+                    "Alert": AlertStatus.FIRING,
+                    "Triggered": AlertStatus.FIRING,
+                    "Warn": AlertStatus.WARNING,
+                    "Recovered": AlertStatus.RESOLVED,
+                    "OK": AlertStatus.RESOLVED,
+                }
+                return mapping.get(status, AlertStatus.FIRING)
+
+            @classmethod
+            def _format_alert(
+                cls,
+                event: dict | list[dict],
+                provider_instance: "BaseProvider" = None,
+            ) -> AlertDto | list[AlertDto]:
+                if isinstance(event, list):
+                    return [cls._format_alert(item, provider_instance) for item in event]
+
+                now_iso = datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
+                status = cls._map_status(
+                    event.get("alert_transition") or event.get("status")
+                )
+                alert = AlertDto(
+                    id=event.get("id") or str(uuid.uuid4()),
+                    name=event.get("title") or "Stub Datadog Alert",
+                    status=status,
+                    lastReceived=event.get("last_received", now_iso),
+                    source=["datadog"],
+                    message=event.get("message", ""),
+                    description=event.get("message", ""),
+                    groups=event.get("scopes") or ["*"],
+                    severity=AlertSeverity.CRITICAL,
+                    service="datadog-stub",
+                    url=event.get("url"),
+                    tags=event.get("tags", ""),
+                    monitor_id=event.get("monitor_id"),
+                    extra_details={
+                        "priority": event.get("priority"),
+                        "last_updated": event.get("last_updated"),
+                    },
+                )
+                alert.fingerprint = BaseProvider.get_alert_fingerprint(
+                    alert, cls.FINGERPRINT_FIELDS
+                )
+                return alert
+
+        package = ensure_package("keep.providers.datadog_provider")
+        module = types.ModuleType(datadog_module_path)
+        module.DatadogProvider = DatadogProvider
+        module.DatadogProviderAuthConfig = DatadogProviderAuthConfig
+        sys.modules["keep.providers.datadog_provider"] = package
+        sys.modules[datadog_module_path] = module
+        package.datadog_provider = module
+
+
+_register_stub_providers()
+
+
+_original_get_all_providers = ProvidersFactory.get_all_providers
+
+
+def _get_all_providers_with_stubs(ignore_cache_file: bool = False) -> list[Provider]:
+    providers = _original_get_all_providers(ignore_cache_file=ignore_cache_file)
+    if not any(provider.type == "datadog" for provider in providers):
+        providers.append(
+            Provider(
+                type="datadog",
+                display_name="Stub Datadog",
+                config={
+                    "api_key": {
+                        "required": False,
+                        "description": "Stub Datadog API key",
+                        "sensitive": False,
+                    }
+                },
+                can_notify=False,
+                can_query=False,
+                notify_params=None,
+                query_params=None,
+                can_setup_webhook=False,
+                webhook_required=False,
+                supports_webhook=False,
+                provider_description="Stub Datadog provider for tests",
+                oauth2_url=None,
+                scopes=[
+                    ProviderScope(
+                        name="default",
+                        description="Stub scope for Datadog tests",
+                        mandatory=False,
+                    )
+                ],
+                docs=None,
+                methods=[],
+                tags=["alert"],
+                alertExample=None,
+                default_fingerprint_fields=["monitor_id", "title"],
+                categories=["Monitoring"],
+                coming_soon=False,
+                health=True,
+                pulling_available=False,
+                pulling_enabled=False,
+            )
+        )
+    return providers
+
+
+ProvidersFactory.get_all_providers = staticmethod(_get_all_providers_with_stubs)
 
 
 class PusherMock:

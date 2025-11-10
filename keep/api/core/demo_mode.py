@@ -220,7 +220,7 @@ def get_or_create_topology(keep_api_key, keep_api_url):
     # Creating services
     if len(services_existing) == 0:
         process_topology(
-            SINGLE_TENANT_UUID, services_to_create, "Prod-Datadog", "datadog"
+            SINGLE_TENANT_UUID, services_to_create, "Prod-Prometheus", "prometheus"
         )
 
         # Create application
@@ -448,11 +448,8 @@ async def simulate_alerts_async(
     providers_config = [
         {"type": "prometheus", "weight": 3},
         {"type": "grafana", "weight": 1},
-        {"type": "cloudwatch", "weight": 1},
-        {"type": "datadog", "weight": 1},
+        {"type": "victoriametrics", "weight": 2},
         {"type": "sentry", "weight": 2},
-        # {"type": "signalfx", "weight": 1},
-        {"type": "gcpmonitoring", "weight": 1},
     ]
 
     # Normalize weights
@@ -461,10 +458,7 @@ async def simulate_alerts_async(
 
     providers = [p["type"] for p in providers_config]
 
-    providers_to_randomize_fingerprint_for = [
-        # "cloudwatch",
-        # "datadog",
-    ]
+    providers_to_randomize_fingerprint_for = []
 
     provider_classes = {
         provider: ProvidersFactory.get_provider_class(provider)

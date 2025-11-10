@@ -383,8 +383,8 @@ class IOHandler:
         except SyntaxError as e:
             if "unterminated string literal" in str(e):
                 # try to HTML escape the string
-                # this is happens when libraries such as datadog api client
-                # HTML escapes the string and then ast.parse fails ()
+                # this happens when some API clients HTML-escape the string
+                # and ast.parse fails ()
                 # https://github.com/keephq/keep/issues/137
                 try:
                     unescaped_token = html.unescape(

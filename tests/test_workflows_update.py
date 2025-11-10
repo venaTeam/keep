@@ -1,5 +1,6 @@
 # Mock S3 workflow data for testing S3 sync functionality
 from datetime import datetime
+import json
 
 import pytz
 
@@ -120,8 +121,23 @@ def get_manual_run_event(name: str):
     return manual_run_event
 
 
-def test_s3_workflow_sync_manual_trigger(db_session, workflow_manager, mocker):
+def test_s3_workflow_sync_manual_trigger(
+    db_session, workflow_manager, mocker, monkeypatch
+):
     """Test the S3 workflow sync functionality using manual trigger."""
+    monkeypatch.setenv(
+        "KEEP_PROVIDERS",
+        json.dumps(
+            {
+                "defaultConsole": {"type": "console", "authentication": {}},
+                "defaultKeep": {"type": "keep", "authentication": {}},
+                "defaultS3": {
+                    "type": "s3",
+                    "authentication": {"bucket": "keep-workflows"},
+                },
+            }
+        ),
+    )
     # Create the sync workflow
     sync_workflow = Workflow(
         id="s3-workflow-sync",
@@ -236,8 +252,23 @@ def test_s3_workflow_sync_manual_trigger(db_session, workflow_manager, mocker):
             assert_workflow_yaml(workflow_db.workflow_raw, workflow_yaml)
 
 
-def test_workflow_update_from_workflow(db_session, workflow_manager, mocker):
+def test_workflow_update_from_workflow(
+    db_session, workflow_manager, mocker, monkeypatch
+):
     """Test that workflow revision is incremented when content changes."""
+    monkeypatch.setenv(
+        "KEEP_PROVIDERS",
+        json.dumps(
+            {
+                "defaultConsole": {"type": "console", "authentication": {}},
+                "defaultKeep": {"type": "keep", "authentication": {}},
+                "defaultS3": {
+                    "type": "s3",
+                    "authentication": {"bucket": "keep-workflows"},
+                },
+            }
+        ),
+    )
     # Create initial workflow
     initial_workflow_yaml = """
     workflow:

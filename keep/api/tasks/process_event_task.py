@@ -15,6 +15,7 @@ from arq import Retry
 from fastapi.datastructures import FormData
 from opentelemetry import trace
 from sqlmodel import Session, select
+from sqlalchemy.orm import flag_modified
 
 # internals
 from keep.api.alert_deduplicator.alert_deduplicator import AlertDeduplicator
@@ -307,6 +308,8 @@ def __save_to_db(
                         # Update the event dict's lastReceived field
                         if existing_alert.event:
                             existing_alert.event["lastReceived"] = event.lastReceived
+                            # Mark the JSON field as modified so SQLAlchemy detects the change
+                            flag_modified(existing_alert, "event")
                             session.add(existing_alert)
                             session.flush()
                             logger.debug(

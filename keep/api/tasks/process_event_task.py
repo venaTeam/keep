@@ -273,6 +273,16 @@ def __save_to_db(
                     action_callee="system",
                     action_description="Alert lastReceived enriched on deduplication",
                 )
+                try:
+                    enrichments_bl.dispose_enrichments(event.fingerprint)
+                except Exception:
+                    logger.exception(
+                        "Failed to dispose enrichments for deduplicated alert",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "fingerprint": event.fingerprint,
+                        },
+                    )
 
         enriched_formatted_events = []
         saved_alerts = []

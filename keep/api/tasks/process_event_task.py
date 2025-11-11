@@ -15,7 +15,7 @@ from arq import Retry
 from fastapi.datastructures import FormData
 from opentelemetry import trace
 from sqlmodel import Session, select
-from sqlalchemy.orm import flag_modified
+from sqlalchemy.orm.attributes import flag_modified
 
 # internals
 from keep.api.alert_deduplicator.alert_deduplicator import AlertDeduplicator

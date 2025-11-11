@@ -7,7 +7,7 @@ import { AlertsQuery } from "@/entities/alerts/model";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
-import { usePathName } from "next/navigation"
+import { usePathname } from "next/navigation"
 
 interface PresetsNoiseProps {
   presets: Preset[];
@@ -15,7 +15,7 @@ interface PresetsNoiseProps {
 
 export const PresetsNoise = ({ presets }: PresetsNoiseProps) => {
   const api = useApi();
-  const pathname = usePathName();
+  const pathname = usePathname();
   const noisyPresets = useMemo(() => {
     const currentPath = (pathname || "").toLowerCase();
     const activePreset = presets?.find(

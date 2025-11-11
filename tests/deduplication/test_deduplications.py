@@ -1018,3 +1018,4 @@ def test_sort_keys_deduplication_fix(db_session, client, test_app):
     assert prometheus_rule is not None
     assert prometheus_rule.get("ingested") == 2
     assert prometheus_rule.get("dedup_ratio") == 50.0  # 1 out of 2 was deduplicated
+    

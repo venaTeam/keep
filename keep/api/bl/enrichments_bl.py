@@ -878,6 +878,13 @@ class EnrichmentsBl:
         disposed_keys = set(enrichments.enrichments.keys()) - set(
             new_enrichments.keys()
         )
+        if "dismissed" in disposed_keys:
+            # Ensure alerts are explicitly marked as not dismissed after disposal.
+            # Some alert payloads may still carry the dismissed flag, so we reset it here.
+            new_enrichments["dismissed"] = False
+        if "dismissUntil" in disposed_keys:
+            # Clear any lingering dismissal deadline metadata.
+            new_enrichments["dismissUntil"] = None
         if disposed:
             enrich_alert_db(
                 self.tenant_id,
@@ -889,7 +896,41 @@ class EnrichmentsBl:
                 action_description=f"Disposing enrichments from alert - {disposed_keys}",
                 force=True,
             )
-            self.elastic_client.enrich_alert(fingerprint, new_enrichments)
+
+            if self.elastic_client:
+                try:
+                    latest_alert = self.db_session.exec(
+                        select(Alert)
+                        .where(Alert.tenant_id == self.tenant_id)
+                        .where(Alert.fingerprint == fingerprint)
+                        .order_by(Alert.timestamp.desc())
+                        .limit(1)
+                    ).first()
+
+                    if latest_alert:
+                        alert_data = latest_alert.event.copy()
+                        alert_data.update(
+                            {
+                                key: value
+                                for key, value in new_enrichments.items()
+                                if value is not None
+                                or key in {"dismissed", "dismissUntil"}
+                            }
+                        )
+                        alert_dto = AlertDto(**alert_data)
+                        self.elastic_client.index_alert(alert_dto)
+                    else:
+                        self.elastic_client.enrich_alert(
+                            fingerprint, new_enrichments
+                        )
+                except Exception:
+                    self.logger.exception(
+                        "Failed to reindex alert after disposing enrichments",
+                        extra={
+                            "fingerprint": fingerprint,
+                            "tenant_id": self.tenant_id,
+                        },
+                    )
             self.logger.debug(
                 "enrichments disposed", extra={"fingerprint": fingerprint}
             )

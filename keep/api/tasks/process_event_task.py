@@ -14,7 +14,7 @@ import dateutil
 from arq import Retry
 from fastapi.datastructures import FormData
 from opentelemetry import trace
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 # internals
 from keep.api.alert_deduplicator.alert_deduplicator import AlertDeduplicator
@@ -281,6 +281,68 @@ def __save_to_db(
                         extra={
                             "tenant_id": tenant_id,
                             "fingerprint": event.fingerprint,
+                        },
+                    )
+                
+                # Update the existing alert record's lastReceived field
+                try:
+                    logger.debug(
+                        "Updating lastReceived for deduplicated alert",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "fingerprint": event.fingerprint,
+                            "lastReceived": event.lastReceived,
+                        },
+                    )
+                    # Query the most recent alert for this fingerprint using the existing session
+                    query = (
+                        select(Alert)
+                        .where(Alert.tenant_id == tenant_id)
+                        .where(Alert.fingerprint == event.fingerprint)
+                        .order_by(Alert.timestamp.desc())
+                        .limit(1)
+                    )
+                    existing_alert = session.exec(query).first()
+                    if existing_alert:
+                        # Update the event dict's lastReceived field
+                        if existing_alert.event:
+                            existing_alert.event["lastReceived"] = event.lastReceived
+                            session.add(existing_alert)
+                            session.flush()
+                            logger.debug(
+                                "Updated lastReceived for deduplicated alert",
+                                extra={
+                                    "tenant_id": tenant_id,
+                                    "fingerprint": event.fingerprint,
+                                    "alert_id": str(existing_alert.id),
+                                    "lastReceived": event.lastReceived,
+                                },
+                            )
+                        else:
+                            logger.warning(
+                                "Existing alert has no event dict",
+                                extra={
+                                    "tenant_id": tenant_id,
+                                    "fingerprint": event.fingerprint,
+                                    "alert_id": str(existing_alert.id),
+                                },
+                            )
+                    else:
+                        logger.warning(
+                            "No existing alert found to update lastReceived",
+                            extra={
+                                "tenant_id": tenant_id,
+                                "fingerprint": event.fingerprint,
+                            },
+                        )
+                except Exception as e:
+                    logger.exception(
+                        "Failed to update lastReceived for deduplicated alert",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "fingerprint": event.fingerprint,
+                            "error_type": type(e).__name__,
+                            "error_message": str(e),
                         },
                     )
 

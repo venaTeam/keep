@@ -79,6 +79,56 @@ KEEP_CALCULATE_START_FIRING_TIME_ENABLED = (
 logger = logging.getLogger(__name__)
 
 
+def _serialize_event_for_logging(event, max_size: int = 1000):
+    """
+    Safely serialize event for logging, truncating if too large.
+    
+    Args:
+        event: The event to serialize (AlertDto, dict, list, etc.)
+        max_size: Maximum size of serialized string before truncation
+        
+    Returns:
+        str: Serialized event representation
+    """
+    try:
+        if isinstance(event, AlertDto):
+            event_dict = event.dict()
+            # Include key fields
+            serialized = json.dumps({
+                "fingerprint": event_dict.get("fingerprint"),
+                "name": event_dict.get("name"),
+                "status": event_dict.get("status"),
+                "event_id": event_dict.get("event_id"),
+                "source": event_dict.get("source"),
+            }, default=str)
+        elif isinstance(event, dict):
+            serialized = json.dumps(event, default=str)
+        elif isinstance(event, list):
+            # For lists, include count and first few items
+            if len(event) > 0:
+                first_item = event[0]
+                if isinstance(first_item, AlertDto):
+                    serialized = json.dumps({
+                        "count": len(event),
+                        "first_item": {
+                            "fingerprint": first_item.fingerprint if hasattr(first_item, "fingerprint") else None,
+                            "name": first_item.name if hasattr(first_item, "name") else None,
+                        }
+                    }, default=str)
+                else:
+                    serialized = json.dumps({"count": len(event), "first_item": first_item}, default=str)
+            else:
+                serialized = json.dumps({"count": 0}, default=str)
+        else:
+            serialized = str(event)
+        
+        if len(serialized) > max_size:
+            return serialized[:max_size] + "... (truncated)"
+        return serialized
+    except Exception:
+        return str(type(event))
+
+
 def __internal_prepartion(
     alerts: list[AlertDto], fingerprint: str | None, api_key_name: str | None
 ):
@@ -137,20 +187,67 @@ def __save_to_db(
     provider_id: str | None = None,
     timestamp_forced: datetime.datetime | None = None,
 ):
+    logger.info(
+        "Starting __save_to_db",
+        extra={
+            "tenant_id": tenant_id,
+            "provider_type": provider_type,
+            "provider_id": provider_id,
+            "formatted_events_count": len(formatted_events),
+            "deduplicated_events_count": len(deduplicated_events),
+            "raw_events_count": len(raw_events) if isinstance(raw_events, list) else 1,
+            "session_active": session.is_active if hasattr(session, "is_active") else "unknown",
+        },
+    )
     try:
         # keep raw events in the DB if the user wants to
         # this is mainly for debugging and research purposes
         if KEEP_STORE_RAW_ALERTS:
+            logger.debug(
+                "Storing raw alerts",
+                extra={
+                    "tenant_id": tenant_id,
+                    "raw_events_count": len(raw_events) if isinstance(raw_events, list) else 1,
+                },
+            )
             if isinstance(raw_events, dict):
                 raw_events = [raw_events]
 
-            for raw_event in raw_events:
-                alert = AlertRaw(
-                    tenant_id=tenant_id,
-                    raw_alert=raw_event,
-                    provider_type=provider_type,
-                )
-                session.add(alert)
+            for idx, raw_event in enumerate(raw_events):
+                try:
+                    logger.debug(
+                        "Creating AlertRaw object",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "provider_type": provider_type,
+                            "raw_event_index": idx,
+                        },
+                    )
+                    alert = AlertRaw(
+                        tenant_id=tenant_id,
+                        raw_alert=raw_event,
+                        provider_type=provider_type,
+                    )
+                    session.add(alert)
+                    logger.debug(
+                        "AlertRaw object added to session",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "raw_event_index": idx,
+                        },
+                    )
+                except Exception as e:
+                    logger.exception(
+                        "Failed to create AlertRaw object",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "provider_type": provider_type,
+                            "raw_event_index": idx,
+                            "error_type": type(e).__name__,
+                            "error_message": str(e),
+                        },
+                    )
+                    raise
 
         enrichments_bl = EnrichmentsBl(tenant_id, session)
         # add audit to the deduplicated events
@@ -181,11 +278,54 @@ def __save_to_db(
         saved_alerts = []
 
         fingerprints = [event.fingerprint for event in formatted_events]
-        started_at_for_fingerprints = get_started_at_for_alerts(
-            tenant_id, fingerprints, session=session
+        logger.debug(
+            "Getting started_at for alerts",
+            extra={
+                "tenant_id": tenant_id,
+                "fingerprints_count": len(fingerprints),
+                "fingerprints": fingerprints[:10],  # Log first 10 to avoid huge logs
+            },
         )
+        try:
+            started_at_for_fingerprints = get_started_at_for_alerts(
+                tenant_id, fingerprints, session=session
+            )
+            logger.debug(
+                "Retrieved started_at for alerts",
+                extra={
+                    "tenant_id": tenant_id,
+                    "started_at_count": len(started_at_for_fingerprints),
+                },
+            )
+        except Exception as e:
+            logger.exception(
+                "Failed to get started_at for alerts",
+                extra={
+                    "tenant_id": tenant_id,
+                    "fingerprints_count": len(fingerprints),
+                    "error_type": type(e).__name__,
+                    "error_message": str(e),
+                },
+            )
+            raise
 
-        for formatted_event in formatted_events:
+        logger.info(
+            "Processing formatted events",
+            extra={
+                "tenant_id": tenant_id,
+                "formatted_events_count": len(formatted_events),
+            },
+        )
+        for idx, formatted_event in enumerate(formatted_events):
+            logger.debug(
+                "Processing formatted event",
+                extra={
+                    "tenant_id": tenant_id,
+                    "event_index": idx,
+                    "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    "event_name": formatted_event.name if hasattr(formatted_event, "name") else None,
+                },
+            )
             formatted_event.pushed = True
 
             started_at = started_at_for_fingerprints.get(
@@ -246,6 +386,14 @@ def __save_to_db(
 
             __validate_last_received(formatted_event)
 
+            logger.debug(
+                "Preparing alert arguments",
+                extra={
+                    "tenant_id": tenant_id,
+                    "event_index": idx,
+                    "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                },
+            )
             alert_args = {
                 "tenant_id": tenant_id,
                 "provider_type": (
@@ -260,30 +408,155 @@ def __save_to_db(
             if timestamp_forced is not None:
                 alert_args["timestamp"] = timestamp_forced
 
-            alert = Alert(**alert_args)
-            session.add(alert)
-            session.flush()
-            saved_alerts.append(alert)
-            alert_id = alert.id
-            formatted_event.event_id = str(alert_id)
+            logger.debug(
+                "Creating Alert object",
+                extra={
+                    "tenant_id": tenant_id,
+                    "event_index": idx,
+                    "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    "provider_type": alert_args.get("provider_type"),
+                },
+            )
+            try:
+                alert = Alert(**alert_args)
+                logger.debug(
+                    "Alert object created, adding to session",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    },
+                )
+                session.add(alert)
+                logger.debug(
+                    "Flushing session to get alert ID",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    },
+                )
+                session.flush()
+                saved_alerts.append(alert)
+                alert_id = alert.id
+                formatted_event.event_id = str(alert_id)
+                logger.debug(
+                    "Alert saved with ID",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "alert_id": alert_id,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    },
+                )
+            except Exception as e:
+                logger.exception(
+                    "Failed to create or save Alert object",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                        "error_type": type(e).__name__,
+                        "error_message": str(e),
+                        "alert_args_keys": list(alert_args.keys()),
+                    },
+                )
+                raise
 
             if KEEP_AUDIT_EVENTS_ENABLED:
-                audit = AlertAudit(
-                    tenant_id=tenant_id,
-                    fingerprint=formatted_event.fingerprint,
-                    action=(
-                        ActionType.AUTOMATIC_RESOLVE.value
-                        if formatted_event.status == AlertStatus.RESOLVED.value
-                        else ActionType.TIGGERED.value
-                    ),
-                    user_id="system",
-                    description=f"Alert recieved from provider with status {formatted_event.status}",
+                logger.debug(
+                    "Creating audit event",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                        "status": formatted_event.status if hasattr(formatted_event, "status") else None,
+                    },
                 )
-                session.add(audit)
+                try:
+                    audit = AlertAudit(
+                        tenant_id=tenant_id,
+                        fingerprint=formatted_event.fingerprint,
+                        action=(
+                            ActionType.AUTOMATIC_RESOLVE.value
+                            if formatted_event.status == AlertStatus.RESOLVED.value
+                            else ActionType.TIGGERED.value
+                        ),
+                        user_id="system",
+                        description=f"Alert recieved from provider with status {formatted_event.status}",
+                    )
+                    session.add(audit)
+                    logger.debug(
+                        "Audit event added to session",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "event_index": idx,
+                            "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                        },
+                    )
+                except Exception as e:
+                    logger.exception(
+                        "Failed to create audit event",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "event_index": idx,
+                            "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                            "error_type": type(e).__name__,
+                            "error_message": str(e),
+                        },
+                    )
 
-            session.commit()
-            session.flush()
-            set_last_alert(tenant_id, alert, session=session)
+            logger.debug(
+                "Committing session",
+                extra={
+                    "tenant_id": tenant_id,
+                    "event_index": idx,
+                    "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                },
+            )
+            try:
+                session.commit()
+                logger.debug(
+                    "Session committed, flushing again",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    },
+                )
+                session.flush()
+                logger.debug(
+                    "Setting last alert",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "alert_id": alert_id,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    },
+                )
+                set_last_alert(tenant_id, alert, session=session)
+                logger.debug(
+                    "Last alert set",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "alert_id": alert_id,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                    },
+                )
+            except Exception as e:
+                logger.exception(
+                    "Failed to commit session or set last alert",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "alert_id": alert_id if 'alert_id' in locals() else None,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                        "error_type": type(e).__name__,
+                        "error_message": str(e),
+                    },
+                )
+                raise
 
             # Mapping
             try:
@@ -291,25 +564,91 @@ def __save_to_db(
             except Exception:
                 logger.exception("Failed to run mapping rules")
 
-            alert_enrichment = get_enrichment_with_session(
-                session=session,
-                tenant_id=tenant_id,
-                fingerprint=formatted_event.fingerprint,
+            logger.debug(
+                "Getting enrichment for alert",
+                extra={
+                    "tenant_id": tenant_id,
+                    "event_index": idx,
+                    "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                },
             )
-            if alert_enrichment:
-                for enrichment in alert_enrichment.enrichments:
-                    # set the enrichment
-                    value = alert_enrichment.enrichments[enrichment]
-                    if isinstance(value, str):
-                        value = value.strip()
-                    setattr(formatted_event, enrichment, value)
+            try:
+                alert_enrichment = get_enrichment_with_session(
+                    session=session,
+                    tenant_id=tenant_id,
+                    fingerprint=formatted_event.fingerprint,
+                )
+                if alert_enrichment:
+                    logger.debug(
+                        "Enrichment found, applying to alert",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "event_index": idx,
+                            "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                            "enrichment_keys": list(alert_enrichment.enrichments.keys()) if hasattr(alert_enrichment, "enrichments") else None,
+                        },
+                    )
+                    for enrichment in alert_enrichment.enrichments:
+                        # set the enrichment
+                        value = alert_enrichment.enrichments[enrichment]
+                        if isinstance(value, str):
+                            value = value.strip()
+                        setattr(formatted_event, enrichment, value)
+                else:
+                    logger.debug(
+                        "No enrichment found for alert",
+                        extra={
+                            "tenant_id": tenant_id,
+                            "event_index": idx,
+                            "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                        },
+                    )
+            except Exception as e:
+                logger.exception(
+                    "Failed to get or apply enrichment",
+                    extra={
+                        "tenant_id": tenant_id,
+                        "event_index": idx,
+                        "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                        "error_type": type(e).__name__,
+                        "error_message": str(e),
+                    },
+                )
             enriched_formatted_events.append(formatted_event)
+            logger.debug(
+                "Completed processing formatted event",
+                extra={
+                    "tenant_id": tenant_id,
+                    "event_index": idx,
+                    "fingerprint": formatted_event.fingerprint if hasattr(formatted_event, "fingerprint") else None,
+                },
+            )
 
-        logger.info("Checking for incidents to resolve", extra={"tenant_id": tenant_id})
+        logger.info(
+            "Checking for incidents to resolve",
+            extra={
+                "tenant_id": tenant_id,
+                "saved_alerts_count": len(saved_alerts),
+            },
+        )
         try:
+            logger.debug(
+                "Enriching alerts with incidents",
+                extra={
+                    "tenant_id": tenant_id,
+                    "saved_alerts_count": len(saved_alerts),
+                },
+            )
             saved_alerts = enrich_alerts_with_incidents(
                 tenant_id, saved_alerts, session
             )  # note: this only enriches incidents that were not yet ended
+            logger.debug(
+                "Alerts enriched with incidents",
+                extra={
+                    "tenant_id": tenant_id,
+                    "saved_alerts_count": len(saved_alerts),
+                },
+            )
 
             session.expire_on_commit = False
             incident_bl = IncidentBl(tenant_id, session)
@@ -317,23 +656,65 @@ def __save_to_db(
                 if alert.event.get("status") == AlertStatus.RESOLVED.value:
                     logger.debug(
                         "Checking for alert with status resolved",
-                        extra={"alert_id": alert.id, "tenant_id": tenant_id},
+                        extra={
+                            "alert_id": alert.id,
+                            "tenant_id": tenant_id,
+                            "incidents_count": len(alert._incidents) if hasattr(alert, "_incidents") else 0,
+                        },
                     )
                     for incident in alert._incidents:
                         if incident.status in IncidentStatus.get_active(
                             return_values=True
                         ):
+                            logger.debug(
+                                "Resolving incident",
+                                extra={
+                                    "alert_id": alert.id,
+                                    "tenant_id": tenant_id,
+                                    "incident_id": incident.id if hasattr(incident, "id") else None,
+                                    "incident_status": incident.status if hasattr(incident, "status") else None,
+                                },
+                            )
                             incident_bl.resolve_incident_if_require(incident)
             logger.info(
                 "Completed checking for incidents to resolve",
                 extra={"tenant_id": tenant_id},
             )
-        except Exception:
+        except Exception as e:
             logger.exception(
                 "Failed to check for incidents to resolve",
-                extra={"tenant_id": tenant_id},
+                extra={
+                    "tenant_id": tenant_id,
+                    "error_type": type(e).__name__,
+                    "error_message": str(e),
+                },
             )
-        session.commit()
+        
+        logger.debug(
+            "Performing final commit",
+            extra={
+                "tenant_id": tenant_id,
+                "saved_alerts_count": len(saved_alerts),
+            },
+        )
+        try:
+            session.commit()
+            logger.debug(
+                "Final commit completed",
+                extra={
+                    "tenant_id": tenant_id,
+                },
+            )
+        except Exception as e:
+            logger.exception(
+                "Failed to perform final commit",
+                extra={
+                    "tenant_id": tenant_id,
+                    "error_type": type(e).__name__,
+                    "error_message": str(e),
+                },
+            )
+            raise
 
         logger.info(
             "Added new alerts to the DB",
@@ -342,10 +723,13 @@ def __save_to_db(
                 "num_of_alerts": len(formatted_events),
                 "provider_id": provider_id,
                 "tenant_id": tenant_id,
+                "enriched_formatted_events_count": len(enriched_formatted_events),
             },
         )
         return enriched_formatted_events
-    except Exception:
+    except Exception as e:
+        error_type = type(e).__name__
+        error_message = str(e)
         logger.exception(
             "Failed to add new alerts to the DB",
             extra={
@@ -353,6 +737,12 @@ def __save_to_db(
                 "num_of_alerts": len(formatted_events),
                 "provider_id": provider_id,
                 "tenant_id": tenant_id,
+                "error_type": error_type,
+                "error_message": error_message,
+                "session_exists": session is not None,
+                "session_active": session.is_active if session and hasattr(session, "is_active") else "N/A",
+                "formatted_events_count": len(formatted_events) if formatted_events else 0,
+                "formatted_events_summary": _serialize_event_for_logging(formatted_events[:5]) if formatted_events else "N/A",  # First 5 events
             },
         )
         raise
@@ -685,20 +1075,83 @@ def process_event(
 
     raw_event = copy.deepcopy(event)
     events_in_counter.inc()
+    session = None
     try:
+        logger.info(
+            "Starting event processing",
+            extra={
+                **extra_dict,
+                "event_summary": _serialize_event_for_logging(event),
+            },
+        )
+        
         with tracer.start_as_current_span("process_event_get_db_session"):
             # Create a session to be used across the processing task
-            session = get_session_sync()
+            logger.debug(
+                "Creating database session",
+                extra={
+                    **extra_dict,
+                },
+            )
+            try:
+                session = get_session_sync()
+                logger.info(
+                    "Database session created successfully",
+                    extra={
+                        **extra_dict,
+                        "session_active": session.is_active if hasattr(session, "is_active") else "unknown",
+                    },
+                )
+            except Exception as e:
+                logger.exception(
+                    "Failed to create database session",
+                    extra={
+                        **extra_dict,
+                        "error_type": type(e).__name__,
+                        "error_message": str(e),
+                    },
+                )
+                raise
 
         # Pre alert formatting extraction rules
         with tracer.start_as_current_span("process_event_pre_alert_formatting"):
+            logger.debug(
+                "Running pre-formatting extraction rules",
+                extra={
+                    **extra_dict,
+                    "event_summary": _serialize_event_for_logging(event),
+                },
+            )
             enrichments_bl = EnrichmentsBl(tenant_id, session)
             try:
                 event = enrichments_bl.run_extraction_rules(event, pre=True)
-            except Exception:
-                logger.exception("Failed to run pre-formatting extraction rules")
+                logger.debug(
+                    "Pre-formatting extraction rules completed",
+                    extra={
+                        **extra_dict,
+                        "event_summary": _serialize_event_for_logging(event),
+                    },
+                )
+            except Exception as e:
+                logger.exception(
+                    "Failed to run pre-formatting extraction rules",
+                    extra={
+                        **extra_dict,
+                        "error_type": type(e).__name__,
+                        "error_message": str(e),
+                        "event_summary": _serialize_event_for_logging(event),
+                    },
+                )
 
         with tracer.start_as_current_span("process_event_provider_formatting"):
+            logger.debug(
+                "Starting provider formatting",
+                extra={
+                    **extra_dict,
+                    "event_type": str(type(event)),
+                    "event_summary": _serialize_event_for_logging(event),
+                },
+            )
             if (
                 provider_type is not None
                 and isinstance(event, dict)
@@ -706,32 +1159,122 @@ def process_event(
                 or isinstance(event, list)
             ):
                 try:
+                    logger.debug(
+                        "Getting provider class",
+                        extra={
+                            **extra_dict,
+                            "provider_type": provider_type,
+                        },
+                    )
                     provider_class = ProvidersFactory.get_provider_class(provider_type)
-                except Exception:
+                    logger.debug(
+                        "Provider class retrieved",
+                        extra={
+                            **extra_dict,
+                            "provider_class": str(provider_class),
+                        },
+                    )
+                except Exception as e:
+                    logger.warning(
+                        "Failed to get provider class, falling back to 'keep'",
+                        extra={
+                            **extra_dict,
+                            "provider_type": provider_type,
+                            "error_type": type(e).__name__,
+                            "error_message": str(e),
+                        },
+                    )
                     provider_class = ProvidersFactory.get_provider_class("keep")
 
                 if isinstance(event, list):
+                    logger.debug(
+                        "Formatting list of events",
+                        extra={
+                            **extra_dict,
+                            "event_count": len(event),
+                        },
+                    )
                     event_list = []
-                    for event_item in event:
-                        if not isinstance(event_item, AlertDto):
-                            event_list.append(
-                                provider_class.format_alert(
+                    for idx, event_item in enumerate(event):
+                        try:
+                            if not isinstance(event_item, AlertDto):
+                                logger.debug(
+                                    "Formatting event item",
+                                    extra={
+                                        **extra_dict,
+                                        "item_index": idx,
+                                        "item_type": str(type(event_item)),
+                                    },
+                                )
+                                formatted_item = provider_class.format_alert(
                                     tenant_id=tenant_id,
                                     event=event_item,
                                     provider_id=provider_id,
                                     provider_type=provider_type,
                                 )
+                                event_list.append(formatted_item)
+                                logger.debug(
+                                    "Event item formatted",
+                                    extra={
+                                        **extra_dict,
+                                        "item_index": idx,
+                                        "formatted_summary": _serialize_event_for_logging(formatted_item),
+                                    },
+                                )
+                            else:
+                                event_list.append(event_item)
+                        except Exception as e:
+                            logger.exception(
+                                "Failed to format event item",
+                                extra={
+                                    **extra_dict,
+                                    "item_index": idx,
+                                    "error_type": type(e).__name__,
+                                    "error_message": str(e),
+                                },
                             )
-                        else:
-                            event_list.append(event_item)
+                            raise
                     event = event_list
-                else:
-                    event = provider_class.format_alert(
-                        tenant_id=tenant_id,
-                        event=event,
-                        provider_id=provider_id,
-                        provider_type=provider_type,
+                    logger.info(
+                        "Formatted list of events",
+                        extra={
+                            **extra_dict,
+                            "formatted_count": len(event),
+                        },
                     )
+                else:
+                    logger.debug(
+                        "Formatting single event",
+                        extra={
+                            **extra_dict,
+                            "event_summary": _serialize_event_for_logging(event),
+                        },
+                    )
+                    try:
+                        event = provider_class.format_alert(
+                            tenant_id=tenant_id,
+                            event=event,
+                            provider_id=provider_id,
+                            provider_type=provider_type,
+                        )
+                        logger.debug(
+                            "Single event formatted",
+                            extra={
+                                **extra_dict,
+                                "formatted_summary": _serialize_event_for_logging(event),
+                            },
+                        )
+                    except Exception as e:
+                        logger.exception(
+                            "Failed to format single event",
+                            extra={
+                                **extra_dict,
+                                "error_type": type(e).__name__,
+                                "error_message": str(e),
+                                "event_summary": _serialize_event_for_logging(event),
+                            },
+                        )
+                        raise
                 # SHAHAR: for aws cloudwatch, we get a subscription notification message that we should skip
                 #         todo: move it to be generic
                 if event is None and provider_type == "cloudwatch":
@@ -747,6 +1290,14 @@ def process_event(
                     )
 
         if event:
+            logger.debug(
+                "Processing formatted event",
+                extra={
+                    **extra_dict,
+                    "event_type": str(type(event)),
+                    "event_summary": _serialize_event_for_logging(event),
+                },
+            )
             if isinstance(event, str):
                 extra_dict["raw_event"] = event
                 logger.error(
@@ -757,19 +1308,64 @@ def process_event(
 
             # In case when provider_type is not set
             if isinstance(event, dict):
+                logger.debug(
+                    "Converting dict event to AlertDto",
+                    extra={
+                        **extra_dict,
+                        "event_keys": list(event.keys()) if isinstance(event, dict) else None,
+                    },
+                )
                 if not event.get("name"):
                     event["name"] = event.get("id", "unknown alert name")
                 event = [AlertDto(**event)]
                 raw_event = [raw_event]
+                logger.debug(
+                    "Converted dict to AlertDto list",
+                    extra={
+                        **extra_dict,
+                        "alert_count": len(event),
+                    },
+                )
 
             # Prepare the event for the digest
             if isinstance(event, AlertDto):
+                logger.debug(
+                    "Converting single AlertDto to list",
+                    extra={
+                        **extra_dict,
+                        "alert_fingerprint": event.fingerprint if hasattr(event, "fingerprint") else None,
+                    },
+                )
                 event = [event]
                 raw_event = [raw_event]
 
             with tracer.start_as_current_span("process_event_internal_preparation"):
+                logger.debug(
+                    "Running internal preparation",
+                    extra={
+                        **extra_dict,
+                        "alert_count": len(event) if isinstance(event, list) else 1,
+                        "fingerprint": fingerprint,
+                        "api_key_name": api_key_name,
+                    },
+                )
                 __internal_prepartion(event, fingerprint, api_key_name)
+                logger.debug(
+                    "Internal preparation completed",
+                    extra={
+                        **extra_dict,
+                        "alert_count": len(event) if isinstance(event, list) else 1,
+                    },
+                )
 
+            logger.info(
+                "Calling __handle_formatted_events",
+                extra={
+                    **extra_dict,
+                    "alert_count": len(event) if isinstance(event, list) else 1,
+                    "alerts_summary": _serialize_event_for_logging(event),
+                },
+            )
             formatted_events = __handle_formatted_events(
                 tenant_id,
                 provider_type,
@@ -782,22 +1378,45 @@ def process_event(
                 timestamp_forced,
                 job_id,
             )
+            logger.info(
+                "__handle_formatted_events completed",
+                extra={
+                    **extra_dict,
+                    "formatted_events_count": len(formatted_events) if formatted_events else 0,
+                },
+            )
 
             logger.info(
-                "Event processed",
-                extra={**extra_dict, "processing_time": time.time() - start_time},
+                "Event processed successfully",
+                extra={
+                    **extra_dict,
+                    "processing_time": time.time() - start_time,
+                    "formatted_events_count": len(formatted_events) if formatted_events else 0,
+                },
             )
             events_out_counter.inc()
             return formatted_events
-    except Exception:
+        else:
+            logger.info(
+                "Event is None or empty, skipping processing",
+                extra=extra_dict,
+            )
+            return []
+    except Exception as e:
+        error_type = type(e).__name__
+        error_message = str(e)
         stacktrace = traceback.format_exc()
         tb = traceback.extract_tb(sys.exc_info()[2])
 
         # Get the name of the last function in the traceback
         try:
             last_function = tb[-1].name if tb else ""
+            last_file = tb[-1].filename if tb else ""
+            last_line = tb[-1].lineno if tb else ""
         except Exception:
             last_function = ""
+            last_file = ""
+            last_line = ""
 
         # Check if the last function matches the pattern
         if "_format_alert" in last_function or "_format" in last_function:
@@ -809,16 +1428,103 @@ def process_event(
 
         logger.exception(
             "Error processing event",
-            extra={**extra_dict, "processing_time": time.time() - start_time},
+            extra={
+                **extra_dict,
+                "processing_time": time.time() - start_time,
+                "error_type": error_type,
+                "error_message": error_message,
+                "last_function": last_function,
+                "last_file": last_file,
+                "last_line": last_line,
+                "raw_event_summary": _serialize_event_for_logging(raw_event),
+                "event_summary": _serialize_event_for_logging(event),
+                "session_exists": session is not None,
+                "session_active": session.is_active if session and hasattr(session, "is_active") else "N/A",
+            },
         )
-        __save_error_alerts(tenant_id, provider_type, raw_event, error_msg)
+        
+        logger.error(
+            "Attempting to save error alerts",
+            extra={
+                **extra_dict,
+                "error_type": error_type,
+                "raw_event_summary": _serialize_event_for_logging(raw_event),
+            },
+        )
+        try:
+            __save_error_alerts(tenant_id, provider_type, raw_event, error_msg)
+            logger.info(
+                "Error alerts saved successfully",
+                extra={
+                    **extra_dict,
+                },
+            )
+        except Exception as save_error:
+            logger.exception(
+                "Failed to save error alerts",
+                extra={
+                    **extra_dict,
+                    "save_error_type": type(save_error).__name__,
+                    "save_error_message": str(save_error),
+                },
+            )
+        
         events_error_counter.inc()
 
         # Retrying only if context is present (running the job in arq worker)
         if bool(ctx):
-            raise Retry(defer=ctx["job_try"] * TIMES_TO_RETRY_JOB)
+            retry_defer = ctx["job_try"] * TIMES_TO_RETRY_JOB
+            logger.warning(
+                "Retrying job",
+                extra={
+                    **extra_dict,
+                    "job_try": ctx.get("job_try", 0),
+                    "retry_defer": retry_defer,
+                    "error_type": error_type,
+                },
+            )
+            raise Retry(defer=retry_defer)
+        else:
+            logger.warning(
+                "Not retrying job (no context)",
+                extra={
+                    **extra_dict,
+                    "error_type": error_type,
+                },
+            )
     finally:
-        session.close()
+        if session is not None:
+            try:
+                logger.debug(
+                    "Closing database session",
+                    extra={
+                        **extra_dict,
+                        "session_active": session.is_active if hasattr(session, "is_active") else "unknown",
+                    },
+                )
+                session.close()
+                logger.debug(
+                    "Database session closed",
+                    extra={
+                        **extra_dict,
+                    },
+                )
+            except Exception as close_error:
+                logger.exception(
+                    "Failed to close database session",
+                    extra={
+                        **extra_dict,
+                        "close_error_type": type(close_error).__name__,
+                        "close_error_message": str(close_error),
+                    },
+                )
+        else:
+            logger.debug(
+                "No database session to close",
+                extra={
+                    **extra_dict,
+                },
+            )
 
 
 def __save_error_alerts(

@@ -240,10 +240,10 @@ export default function CreateOrUpdateMaintenanceRule({
         >
           Alerts Display Mode
         </label>
-        <Select value={suppress ? "true" : "false" onValueChange={(value) => setSuppress(value === "true")}}>
+        <Select value={(suppress ? "true" : "false")} onValueChange={(value) => setSuppress(value === "true")}>
           <SelectItem value="true">Show in Suppressed Status</SelectItem>
           <SelectItem value="false">Hide From Feed</SelectItem>
-        <Select/>
+        </Select>
       </div>
       <div className="flex items-center space-x-3 w-[300px] justify-between mt-2.5">
         <label

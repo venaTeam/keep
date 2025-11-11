@@ -104,7 +104,7 @@ async def process_event_in_worker(
     )
     loop = asyncio.get_running_loop()
     # run the function in the thread pool
-    resp = await loop.run_in_executor(ctx["pool"], process_event_func_sync)
+    resp = loop.run_in_executor(ctx["pool"], process_event_func_sync)
     logger.info(
         "Event processed in worker",
         extra={
@@ -112,7 +112,7 @@ async def process_event_in_worker(
             "provider_type": provider_type,
             "provider_id": provider_id,
             "fingerprint": fingerprint,
-            "tract_id": trace_id,
+            "trace_id": trace_id,
         },
     )
     return resp

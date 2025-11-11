@@ -107,6 +107,7 @@ def fetch_alert_facet_options(
         "Fetching alert facets from DB",
         extra={
             "tenant_id": tenant_id,
+            
         },
     )
 
@@ -218,6 +219,7 @@ def query_alerts(
         "Fetching alerts from DB",
         extra={
             "tenant_id": tenant_id,
+            "cel_expression": query.cel
         },
     )
 
@@ -757,12 +759,16 @@ def get_alert(
             "tenant_id": tenant_id,
         },
     )
-    all_alerts = get_all_alerts(authenticated_entity=authenticated_entity)
-    alert = list(filter(lambda alert: alert.fingerprint == fingerprint, all_alerts))
-    if alert:
-        return alert[0]
-    else:
+    db_alerts = get_alerts_by_fingerprint(
+        tenant_id=tenant_id,
+        fingerprint=fingerprint,
+        limit=1,
+    )
+    if not db_alerts:
         raise HTTPException(status_code=404, detail="Alert not found")
+    
+    enriched_alerts_dto = convert_db_alerts_to_dto_alerts(db_alerts)
+    return enriched_alerts_dto[0]
 
 
 @router.post("/enrich/note", description="Enrich an alert note")

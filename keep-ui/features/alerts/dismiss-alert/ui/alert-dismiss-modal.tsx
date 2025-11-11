@@ -43,6 +43,7 @@ export function AlertDismissModal({
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
   const [showError, setShowError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [disposeOnNewAlert, setDisposeOnNewAlert] = useState<boolean>(true);
 
   const revalidateMultiple = useRevalidateMultiple();
   const presetsMutator = () => revalidateMultiple(["/preset"]);
@@ -106,7 +107,7 @@ export function AlertDismissModal({
 
     try {
       await api.post(
-        `/alerts/batch_enrich?dispose_on_new_alert=true`,
+        `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
         requestData
       );
       toast.success(`${alerts.length} alerts dismissed successfully!`, {
@@ -127,6 +128,7 @@ export function AlertDismissModal({
     setSelectedDateTime(null);
     setDismissComment("");
     setShowError(false);
+    setDisposeOnNewAlert(true);
     handleClose();
   };
 
@@ -167,6 +169,16 @@ export function AlertDismissModal({
               selectedTab === 1 ? ` or until ${selectedDateTime}.` : "."
             }`}
           </Callout>
+          <div className="flex justify-end mb-4">
+            <Button
+              variant={disposeOnNewAlert ? "primary" : "secondary"}
+              size="xs"
+              onClick={() => setDisposeOnNewAlert(!disposeOnNewAlert)}
+              tooltip={disposeOnNewAlert ? "Dispose the dismissal when a new alert comes in." : "Keep the dismissal when a new alert comes in."}
+            >
+              {disposeOnNewAlert ? "Disposing on new alerts" : "Keeping on new alerts"}
+            </Button>
+          </div>
           <TabGroup
             index={selectedTab}
             onIndexChange={(index: number) => handleTabChange(index)}

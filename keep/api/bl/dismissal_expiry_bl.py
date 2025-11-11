@@ -38,7 +38,7 @@ class DismissalExpiryBl:
             List of AlertEnrichment objects with expired dismissals
         """
         logger = logging.getLogger(__name__)
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now()
         
         logger.info("Searching for enrichments with expired dismissals")
         
@@ -87,7 +87,7 @@ class DismissalExpiryBl:
                 # Parse the dismissedUntil timestamp  
                 dismiss_until = datetime.datetime.strptime(
                     dismiss_until_str, "%Y-%m-%dT%H:%M:%S.%fZ"
-                ).replace(tzinfo=datetime.timezone.utc)
+                ).replace(tzinfo=None)
                 
                 # Check if it's expired (current time > dismissedUntil)
                 if now > dismiss_until:

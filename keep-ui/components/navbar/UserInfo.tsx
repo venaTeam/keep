@@ -68,7 +68,29 @@ const UserDropdown = ({ session }: UserDropdownProps) => {
               <Menu.Item
                 as="button"
                 className="ui-active:bg-orange-400 ui-active:text-white ui-not-active:text-gray-900 group flex w-full items-center rounded-md px-2 py-2 text-sm"
-                onClick={signOut}
+                onClick={async () => {
+                  if (configData?.AUTH_TYPE === AuthType.KEYCLOAK) {
+                    try {
+                      await fetch(`${configData?.KEYCLOAK_ISSUER}/protocol/openid-connect/logout`,
+                        {
+                          mode: 'no-cors', method: 'POST',
+                          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                          body: new URLSearchParams({
+                            client_id: `${configData?.KEYCLOAK_ID}`,
+                            client_secret: `${configData?.KEYCLOAK_SECRET}`,
+                            refresh_token:  session.refreshToken
+                          })
+                        }
+                      );
+                      signOut();
+                    }
+                    catch (e) {
+                      console.error("keycloak sign out failed", e);
+                    }
+                  } else {
+                    signOut();
+                  }
+                }}
               >
                 Sign out
               </Menu.Item>

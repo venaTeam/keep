@@ -17,7 +17,7 @@ import sys
 
 LOGO_DEV_PUBLISHABLE_KEY = "pk_dfXfZBoKQMGDTIgqu7LvYg"
 
-NON_DOCUMENTED_PROVIDERS = []
+NON_DOCUMENTED_PROVIDERS = ["datadog (stub)", "s3 (stub)"]
 
 
 def validate_overview_is_complete(documented_providers):

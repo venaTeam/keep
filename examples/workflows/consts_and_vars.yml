@@ -25,70 +25,70 @@ workflow:
       Please visit monitoring.keeohq.dev for more!
 
   actions:
-    # Sendgrid Tier 0 Alert
+    # SMTP Tier 0 Alert
     - if: "keep.get_firing_time('{{ alert }}', 'minutes') >= 0 and keep.get_firing_time('{{ alert }}', 'minutes') < 10"
-      name: Sendgrid_Tier_0_alert
+      name: SMTP_Tier_0_alert
       vars:
         alert_tier: "Alert 0"
       provider:
-        config: "{{ providers.Sendgrid }}"
-        type: sendgrid
+        config: "{{ providers.smtp }}"
+        type: smtp
         with:
           to:
             - "shahar@keephq.dev"
           subject: '"Tier 0 Alert: SA Pipelines are down"'
           html: "{{ consts.email_template }}"
 
-    # Sendgrid Tier 1 Alert
+    # SMTP Tier 1 Alert
     - if: "keep.get_firing_time('{{ alert }}', 'minutes') >= 10 and keep.get_firing_time('{{ alert }}', 'minutes') < 15"
-      name: Sendgrid_Tier_1_alert
+      name: SMTP_Tier_1_alert
       vars:
         alert_tier: "Alert 1"
       provider:
-        config: "{{ providers.Sendgrid }}"
-        type: sendgrid
+        config: "{{ providers.smtp }}"
+        type: smtp
         with:
           to:
             - "shahar@keephq.dev"
           subject: '"Tier 1 Alert: SA Pipelines are down"'
           html: "{{ consts.email_template }}"
 
-    # Sendgrid Tier 2 Alert
+    # SMTP Tier 2 Alert
     - if: "keep.get_firing_time('{{ alert }}', 'minutes') >= 60 and keep.get_firing_time('{{ alert }}', 'minutes') < 70"
-      name: Sendgrid_Tier_2_alert
+      name: SMTP_Tier_2_alert
       vars:
         alert_tier: "Alert 2"
       provider:
-        config: "{{ providers.Sendgrid }}"
-        type: sendgrid
+        config: "{{ providers.smtp }}"
+        type: smtp
         with:
           to:
             - "shahar@keephq.dev"
           subject: '"Tier 2 Alert: SA Pipelines are down"'
           html: "{{ consts.email_template }}"
 
-    # Sendgrid Tier 3 Alert
+    # SMTP Tier 3 Alert
     - if: "keep.get_firing_time('{{ alert }}', 'minutes') >= 120 and keep.get_firing_time('{{ alert }}', 'minutes') < 130"
-      name: Sendgrid_Tier_3_alert
+      name: SMTP_Tier_3_alert
       vars:
         alert_tier: "Alert 3"
       provider:
-        config: "{{ providers.Sendgrid }}"
-        type: sendgrid
+        config: "{{ providers.smtp }}"
+        type: smtp
         with:
           to:
             - "shahar@keephq.dev"
           subject: '"Tier 3 Alert: SA Pipelines are down"'
           html: "{{ consts.email_template }}"
 
-    # Sendgrid Tier 4 Alert
+    # SMTP Tier 4 Alert
     - if: "keep.get_firing_time('{{ alert }}', 'minutes') >= 1440 and keep.get_firing_time('{{ alert }}', 'minutes') < 1450"
-      name: Sendgrid_Tier_4_alert
+      name: SMTP_Tier_4_alert
       vars:
         alert_tier: "Alert 4"
       provider:
-        config: "{{ providers.Sendgrid }}"
-        type: sendgrid
+        config: "{{ providers.smtp }}"
+        type: smtp
         with:
           to:
             - "shahar@keephq.dev"

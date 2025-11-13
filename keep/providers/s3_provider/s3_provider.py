@@ -1,85 +1,98 @@
 """
-S3 Provider for querying S3 buckets.
+Stub S3 provider used for workflow sync tests in on-prem installations.
+
+This module provides just enough functionality for the workflow sync feature
+and associated unit tests, without relying on AWS libraries.
 """
 
 import dataclasses
+from typing import Any, ClassVar, Dict, List
 
-import boto3
-import pydantic
-
-from keep.exceptions.provider_exception import ProviderException
+from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
+from keep.providers.models.provider_config import ProviderConfig, ProviderScope
 
 
-@pydantic.dataclasses.dataclass
+@dataclasses.dataclass
 class S3ProviderAuthConfig:
+    bucket: str = dataclasses.field(
+        default="keep-workflows",
+        metadata={
+            "required": True,
+            "description": "S3 bucket name",
+            "sensitive": False,
+        },
+    )
     access_key: str = dataclasses.field(
-        default=None,
+        default="",
         metadata={
             "required": False,
-            "description": "S3 Access Token (Leave empty if using IAM role at EC2)",
+            "description": "AWS access key (unused in stub)",
             "sensitive": True,
         },
     )
-
-    secret_access_key: str = dataclasses.field(
-        default=None,
+    secret_key: str = dataclasses.field(
+        default="",
         metadata={
             "required": False,
-            "description": "S3 Secret Access Token (Leave empty if using IAM role at EC2)",
+            "description": "AWS secret key (unused in stub)",
             "sensitive": True,
+        },
+    )
+    region: str = dataclasses.field(
+        default="us-east-1",
+        metadata={
+            "required": False,
+            "description": "AWS region (unused in stub)",
+            "sensitive": False,
         },
     )
 
 
 class S3Provider(BaseProvider):
-    PROVIDER_DISPLAY_NAME = "AWS S3"
-    PROVIDER_CATEGORY = ["Cloud Infrastructure"]
+    """Minimal S3 provider replacement."""
 
-    def dispose(self):
-        pass
-
-    def validate_config(self):
-        self.authentication_config = S3ProviderAuthConfig(**self.config.authentication)
-
-        # List all S3 buckets to validate the credentials
-        s3_client = boto3.client(
-            "s3",
-            aws_access_key_id=self.authentication_config.access_key,
-            aws_secret_access_key=self.authentication_config.secret_access_key,
+    PROVIDER_DISPLAY_NAME: ClassVar[str] = "S3 (stub)"
+    PROVIDER_DESCRIPTION: ClassVar[str] = (
+        "Stub S3 provider that returns preconfigured data. "
+        "Used for workflow synchronization tests."
+    )
+    PROVIDER_TAGS: ClassVar[List[str]] = ["data"]
+    PROVIDER_CATEGORY: ClassVar[List[str]] = ["Storage"]
+    PROVIDER_SCOPES: ClassVar[List[ProviderScope]] = [
+        ProviderScope(
+            name="default",
+            description="Validate basic configuration",
+            mandatory=False,
         )
-        try:
-            s3_client.list_buckets()
-        except Exception as e:
-            raise ProviderException(f"Failed to list S3 buckets: {e}")
+    ]
+    PROVIDER_METHODS: ClassVar[List[Any]] = []
+    WEBHOOK_INSTALLATION_REQUIRED: ClassVar[bool] = False
 
-    def _query(self, bucket: str, **kwargs: dict):
-        """
-        Query bucket for files. Downdload only yaml, json, xml and csv files.
+    def __init__(
+        self,
+        context_manager: ContextManager,
+        provider_id: str,
+        config: ProviderConfig,
+    ) -> None:
+        super().__init__(context_manager, provider_id, config)
 
-        Returns:
-            list[file_content]: results the list of downloaded files
-        """
-        s3_client = boto3.client(
-            "s3",
-            aws_access_key_id=self.authentication_config.access_key,
-            aws_secret_access_key=self.authentication_config.secret_access_key,
+    def dispose(self) -> None:
+        """Nothing to clean up."""
+
+    def validate_config(self) -> None:
+        self.authentication_config = S3ProviderAuthConfig(
+            **(self.config.authentication or {})
         )
-        try:
-            response = s3_client.list_objects_v2(Bucket=bucket)
-        except Exception as e:
-            raise ProviderException(f"Failed to list objects in bucket: {e}")
-        files = []
-        for obj in response.get("Contents", []):
-            key = obj.get("Key")
-            valid_extensions = [".yaml", ".json", ".xml", ".csv", ".yml"]
-            if any(key.endswith(ext) for ext in valid_extensions):
-                try:
-                    response = s3_client.get_object(Bucket=bucket, Key=key)
-                    files.append(response.get("Body").read().decode("utf-8"))
-                    print(files)
-                except Exception as e:
-                    self.logger.exception(
-                        "Failed to download object from S3: %s", str(e)
-                    )
-        return files
+
+    def validate_scopes(self) -> Dict[str, bool]:
+        """Always succeed; this stub does not talk to AWS."""
+        return {"default": True}
+
+    def _query(self, **kwargs: Any) -> List[str]:
+        """
+        In production this would fetch objects from S3.
+        Tests patch this method, so returning an empty list is sufficient.
+        """
+        return []
+

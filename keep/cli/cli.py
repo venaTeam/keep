@@ -1307,7 +1307,7 @@ def get_alert(info: Info, fingerprint: str):
     "-f",
     type=str,
     multiple=True,
-    help="Filter alerts based on specific attributes. E.g., --filter source=datadog",
+    help="Filter alerts based on specific attributes. E.g., --filter source=prometheus",
 )
 @click.option(
     "--export", type=click.Path(), help="Export alerts to a specified JSON file."

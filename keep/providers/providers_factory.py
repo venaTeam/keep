@@ -286,6 +286,48 @@ class ProvidersFactory:
             "mock_provider",
             "file_provider",
             "github_workflows_provider",
+            # Deleted cloud/SaaS providers (on-premise only)
+            "aks_provider",
+            "amazonsqs_provider",
+            "appdynamics_provider",
+            "asana_provider",
+            "auth0_provider",
+            "axiom_provider",
+            "azuremonitoring_provider",
+            "bigquery_provider",
+            "cloudwatch_provider",
+            "coralogix_provider",
+            "dash0_provider",
+            "databend_provider",
+            "discord_provider",
+            "dynatrace_provider",
+            "eks_provider",
+            "gcpmonitoring_provider",
+            "gemini_provider",
+            "gke_provider",
+            "google_chat_provider",
+            "incidentio_provider",
+            "incidentmanager_provider",
+            "linear_provider",
+            "linearb_provider",
+            "mailgun_provider",
+            "monday_provider",
+            "newrelic_provider",
+            "opensearchserverless_provider",
+            "opsgenie_provider",
+            "pagerduty_provider",
+            "pagertree_provider",
+            "planner_provider",
+            "sendgrid_provider",
+            "signalfx_provider",
+            "snowflake_provider",
+            "sumologic_provider",
+            "teams_provider",
+            "telegram_provider",
+            "trello_provider",
+            "twilio_provider",
+            "zenduty_provider",
+            "zoom_provider",
         ]
 
         for provider_directory in os.listdir(
@@ -296,6 +338,19 @@ class ProvidersFactory:
                 continue
             elif provider_directory in blacklisted_providers:
                 continue
+            
+            # Check if provider file exists before trying to import
+            provider_file = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                provider_directory,
+                f"{provider_directory}.py"
+            )
+            if not os.path.exists(provider_file):
+                logger.debug(
+                    f"Skipping {provider_directory} - provider file does not exist"
+                )
+                continue
+            
             # import it
             try:
                 module = importlib.import_module(
@@ -454,15 +509,20 @@ class ProvidersFactory:
                         pulling_enabled=pulling_available,
                     )
                 )
-            except ModuleNotFoundError:
-                logger.error(
-                    f"Cannot import provider {provider_directory}, module not found."
+            except (ModuleNotFoundError, ImportError) as e:
+                logger.debug(
+                    f"Cannot import provider {provider_directory}, module not found or import error: {str(e)}"
                 )
                 continue
             # for some providers that depends on grpc like cilium provider, this might fail on imports not from Keep (such as the docs script)
-            except TypeError as e:
+            except (TypeError, AttributeError) as e:
                 logger.warning(
                     f"Cannot import provider {provider_directory}, unexpected error. ({str(e)})"
+                )
+                continue
+            except Exception as e:
+                logger.warning(
+                    f"Cannot import provider {provider_directory}, error: {str(e)}"
                 )
                 continue
 

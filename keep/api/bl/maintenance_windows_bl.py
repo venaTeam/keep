@@ -36,12 +36,13 @@ class MaintenanceWindowsBl:
         self.logger = logging.getLogger(__name__)
         self.tenant_id = tenant_id
         self.session = session if session else get_session_sync()
+        now_utc = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         self.maintenance_rules: list[MaintenanceWindowRule] = (
             self.session.query(MaintenanceWindowRule)
             .filter(MaintenanceWindowRule.tenant_id == tenant_id)
             .filter(MaintenanceWindowRule.enabled == True)
-            .filter(MaintenanceWindowRule.end_time >= datetime.datetime.now(datetime.UTC))
-            .filter(MaintenanceWindowRule.start_time <= datetime.datetime.now(datetime.UTC))
+            .filter(MaintenanceWindowRule.end_time >= now_utc)
+            .filter(MaintenanceWindowRule.start_time <= now_utc)
             .all()
         )
 
@@ -66,7 +67,7 @@ class MaintenanceWindowsBl:
                 )
                 continue
 
-            if maintenance_rule.end_time.replace(tzinfo=datetime.UTC) <= datetime.datetime.now(datetime.UTC):
+            if maintenance_rule.end_time <= datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None):
                 # this is wtf error, should not happen because of query in init
                 self.logger.error(
                     "Fetched maintenance window which already ended by mistake, should not happen!"
@@ -196,7 +197,7 @@ class MaintenanceWindowsBl:
                 if (
                     w_start < alert.timestamp
                     and alert.timestamp < w_end
-                    and w_end > datetime.datetime.utcnow()
+                    and w_end > datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
                     and is_enable
                 ):
                     logger.info("Checking alert %s in maintenance window %s", alert.id, window.id)

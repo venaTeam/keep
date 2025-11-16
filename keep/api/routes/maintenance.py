@@ -44,6 +44,7 @@ def create_maintenance_rule(
     ),
     session: Session = Depends(get_session),
 ) -> MaintenanceRuleRead:
+    rule_dto.start_time = rule_dto.start_time.astimezone(timezone.utc).replace(tzinfo=None)
     end_time = rule_dto.start_time + timedelta(seconds=rule_dto.duration_seconds)
     new_rule = MaintenanceWindowRule(
         **rule_dto.dict(),
@@ -82,7 +83,7 @@ def update_maintenance_rule(
         raise HTTPException(
             status_code=404, detail="Maintenance rule not found or access denied"
         )
-
+    rule_dto.start_time = rule_dto.start_time.astimezone(timezone.utc).replace(tzinfo=None)
     for key, value in rule_dto.dict().items():
         setattr(rule, key, value)
 

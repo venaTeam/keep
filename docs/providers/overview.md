@@ -116,6 +116,7 @@ By leveraging Keep Providers, users are able to deeply integrate Keep with the t
 - [Telegram](/providers/documentation/telegram-provider)
 - [Template](/providers/documentation/template)
 - [ThousandEyes](/providers/documentation/thousandeyes-provider)
+- [Ticket Count](/providers/documentation/ticket-count-provider)
 - [Trello](/providers/documentation/trello-provider)
 - [Twilio](/providers/documentation/twilio-provider)
 - [UptimeKuma](/providers/documentation/uptimekuma-provider)

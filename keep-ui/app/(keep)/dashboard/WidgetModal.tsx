@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Modal from "@/components/ui/Modal";
 import { Button, Select, SelectItem, Subtitle, TextInput } from "@tremor/react";
 import { WidgetData, WidgetType } from "./types";
@@ -8,6 +8,8 @@ import { Preset } from "@/entities/presets/model/types";
 import { PresetWidgetForm } from "./widget-types/preset/preset-widget-form";
 import { MetricWidgetForm } from "./widget-types/metric/metric-widget-form";
 import { GenericMetricsWidgetForm } from "./widget-types/generic-metrics/generic-metrics-widget-form";
+import { useProviders } from "@/utils/hooks/useProviders";
+import { ServiceNowWidgetForm } from "./widget-types/service-now/widget-service-now-form";
 
 interface WidgetForm {
   widgetName: string;
@@ -37,6 +39,15 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
     isValid: boolean;
     formValue: any;
   }>({ isValid: false, formValue: {} });
+  const { data: providersData } = useProviders();
+  
+  // Check if ticket_count provider exists
+  const hasTicketCountProvider = useMemo(() => {
+    if (!providersData?.installed_providers) return false;
+    return providersData.installed_providers.some(
+      (p) => p.type === "ticket_count"
+    );
+  }, [providersData]);
 
   const {
     control,
@@ -54,6 +65,12 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
     control,
     name: "widgetType",
   });
+
+  useEffect(() => {
+    if (widgetType === WidgetType.SERVICE_NOW) {
+      setInnerFormState({ formValue: {}, isValid: true });
+    }
+  }, [widgetType]);
 
   const onSubmit = (data: WidgetForm) => {
     if (editingItem) {
@@ -130,6 +147,9 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
                       value: "Generic Metrics",
                     },
                     { key: WidgetType.METRIC, value: "Metric" },
+                    ...(hasTicketCountProvider
+                      ? [{ key: WidgetType.SERVICE_NOW, value: "Service Now" }]
+                      : []),
                   ].map(({ key, value }) => (
                     <SelectItem key={key} value={key}>
                       {value}
@@ -167,6 +187,14 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
               setInnerFormState({ formValue, isValid })
             }
           ></MetricWidgetForm>
+        )}
+        {widgetType === WidgetType.SERVICE_NOW && (
+          <ServiceNowWidgetForm
+            editingItem={editingItem}
+            onChange={(formValue, isValid) =>
+              setInnerFormState({ formValue, isValid })
+            }
+          />
         )}
         <Button
           color="orange"

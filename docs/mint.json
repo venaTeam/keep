@@ -239,6 +239,7 @@
             "providers/documentation/sendgrid-provider",
             "providers/documentation/sentry-provider",
             "providers/documentation/service-now-provider",
+            "providers/documentation/ticket-count-provider",
             "providers/documentation/signalfx-provider",
             "providers/documentation/signl4-provider",
             "providers/documentation/site24x7-provider",
@@ -288,6 +289,7 @@
             "deployment/authentication/keycloak-auth",
             "deployment/authentication/oauth2proxy-auth",
             "deployment/authentication/oauth2-proxy-gitlab",
+            "deployment/authentication/okta-auth",
             "deployment/authentication/onelogin-auth"
           ]
         },

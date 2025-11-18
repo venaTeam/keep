@@ -61,6 +61,7 @@ const MenuComponent = React.forwardRef<
   const [isOpen, setIsOpen] = React.useState(false);
   const [hasFocusInside, setHasFocusInside] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const isOpenRef = React.useRef(false);
 
   const elementsRef = React.useRef<Array<HTMLButtonElement | null>>([]);
   const labelsRef = React.useRef<Array<string | null>>([]);
@@ -73,10 +74,16 @@ const MenuComponent = React.forwardRef<
 
   const isNested = parentId != null;
 
+  // Handle open state changes with ref to persist across re-renders
+  const handleOpenChange = React.useCallback((open: boolean) => {
+    isOpenRef.current = open;
+    setIsOpen(open);
+  }, []);
+
   const { floatingStyles, refs, context } = useFloating<HTMLButtonElement>({
     nodeId,
     open: isOpen,
-    onOpenChange: setIsOpen,
+    onOpenChange: handleOpenChange,
     placement: isNested ? "right-start" : "bottom-start",
     middleware: [
       offset({ mainAxis: isNested ? 0 : 4, alignmentAxis: isNested ? -4 : 0 }),
@@ -85,6 +92,23 @@ const MenuComponent = React.forwardRef<
     ],
     whileElementsMounted: autoUpdate,
   });
+
+  // Sync ref with state
+  React.useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  // Restore menu state when reference element is recreated (e.g., due to alerts updating)
+  // This ensures the menu stays open when the component re-renders
+  const prevIsOpenRef = React.useRef(isOpen);
+  React.useEffect(() => {
+    // If menu was open before and is now closed, but ref says it should be open, restore it
+    // This handles the case where the component re-renders and the menu state gets reset
+    if (prevIsOpenRef.current && !isOpen && isOpenRef.current) {
+      setIsOpen(true);
+    }
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen]);
 
   const hover = useHover(context, {
     enabled: isNested,
@@ -97,7 +121,12 @@ const MenuComponent = React.forwardRef<
     ignoreMouse: isNested,
   });
   const role = useRole(context, { role: "menu" });
-  const dismiss = useDismiss(context, { bubbles: true });
+  // Only dismiss on outside pointer down and escape key
+  const dismiss = useDismiss(context, { 
+    bubbles: true,
+    outsidePress: true,
+    escapeKey: true,
+  });
   const listNavigation = useListNavigation(context, {
     listRef: elementsRef,
     activeIndex,

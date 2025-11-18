@@ -29,8 +29,7 @@ const WidgetServiceNow: React.FC<WidgetServiceNowProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const params = useMemo(() => {
-    const stateParam =
-      status === "both" ? "all" : status === "open" ? "open" : "in_progress";
+    const stateParam = status === "both" ? "all" : status === "open" ? "new" : "in_progress";
     const query = new URLSearchParams();
     if (team) query.set("team", team);
     if (stateParam) query.set("state", stateParam);

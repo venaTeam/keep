@@ -1303,6 +1303,12 @@ def _enrich_entity(
             new_enrichment_data = enrichments
         else:
             new_enrichment_data = {**enrichment.enrichments, **enrichments}
+        # Preserve existing note if incoming note is empty/None/not provided
+        incoming_note = enrichments.get("note")
+        if not incoming_note or (isinstance(incoming_note, str) and not incoming_note.strip()):
+            existing_note = enrichment.enrichments.get("note")
+            if existing_note:
+                new_enrichment_data["note"] = existing_note
         # SQLAlchemy doesn't support updating JSON fields, so we need to do it manually
         # https://github.com/sqlalchemy/sqlalchemy/discussions/8396#discussion-4308891
         stmt = (
@@ -1398,7 +1404,7 @@ def batch_enrich(
         }
 
         # Prepare bulk update for existing enrichments
-        to_update = []
+        to_update = {}
         to_create = []
         audit_entries = []
 
@@ -1406,7 +1412,15 @@ def batch_enrich(
             existing = existing_enrichments.get(fingerprint)
 
             if existing:
-                to_update.append(existing.id)
+                merged_enrichments = {**existing.enrichments, **enrichments}
+                # Preserve existing note if incoming note is empty/None/not provided
+                incoming_note = enrichments.get("note")
+                if not incoming_note or (isinstance(incoming_note, str) and not incoming_note.strip()):
+                    existing_note = existing.enrichments.get("note")
+                    if existing_note:
+                        merged_enrichments["note"] = existing_note
+
+                to_update[existing.id] = merged_enrichments
             else:
                 # For new entries
                 to_create.append(
@@ -1428,14 +1442,15 @@ def batch_enrich(
                     )
                 )
 
-        # Bulk update in a single query
+        # Update each enrichment individually with merged data
         if to_update:
-            stmt = (
-                update(AlertEnrichment)
-                .where(AlertEnrichment.id.in_(to_update))
-                .values(enrichments=enrichments)
-            )
-            session.execute(stmt)
+            for enrichment_id, merged_enrichments in to_update.items():
+                stmt = (
+                    update(AlertEnrichment)
+                    .where(AlertEnrichment.id == enrichment_id)
+                    .values(enrichments=merged_enrichments)
+                )
+                session.execute(stmt)
 
         # Bulk insert new enrichments
         if to_create:

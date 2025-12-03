@@ -87,22 +87,17 @@ export function AlertDismissModal({
 
     setIsLoading(true);
 
-    const isRestoring = alerts[0]?.dismissed;
     const dismissUntil =
       selectedTab === 0 ? null : selectedDateTime?.toISOString();
 
-    // Strip HTML tags from dismissComment to store plain text
     const plainTextNote = dismissComment.replace(/<[^>]+>/g, '').trim();
-    
-    // When restoring, don't send note to preserve the existing one
+
     const enrichments: {
       dismissed: boolean;
-      note?: string;
-      dismissUntil?: string;
-    } = isRestoring
-      ? { dismissed: false }
-      : {
-          dismissed: true,
+      note: string;
+      dismissUntil: string;
+    } = {
+      dismissed: !alerts[0]?.dismissed,
       note: plainTextNote,
       dismissUntil: dismissUntil || "",
     };
@@ -117,16 +112,13 @@ export function AlertDismissModal({
         `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
         requestData
       );
-      toast.success(
-        isRestoring
-          ? `${alerts.length} alert(s) restored successfully!`
-          : `${alerts.length} alert(s) dismissed successfully!`,
-        { position: "top-right" }
-      );
+      toast.success(`${alerts.length} alerts dismissed successfully!`, {
+        position: "top-right",
+      });
       await alertsMutator();
       await presetsMutator();
     } catch (error) {
-      showErrorToast(error, isRestoring ? "Failed to restore alerts" : "Failed to dismiss alerts");
+      showErrorToast(error, "Failed to dismiss alerts");
     } finally {
       clearAndClose();
       setIsLoading(false);

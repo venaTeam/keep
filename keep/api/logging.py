@@ -131,7 +131,9 @@ class WorkflowDBHandler(logging.Handler):
 
     def close(self):
         self._stop_event.set()  # Signal the timer to stop
-        self._timer_thread.join()  # Wait for timer thread to finish
+        # Wait for timer thread to finish with a timeout to prevent hanging during test teardown
+        if self._timer_thread.is_alive():
+            self._timer_thread.join(timeout=2.0)  # Wait up to 2 seconds
         super().close()
 
     def emit(self, record):

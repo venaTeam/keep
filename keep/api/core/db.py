@@ -1309,6 +1309,11 @@ def _enrich_entity(
             existing_note = enrichment.enrichments.get("note")
             if existing_note:
                 new_enrichment_data["note"] = existing_note
+        # Remove keys with None values (e.g., status=None when undismissing)
+        # This allows the alert to revert to its original value from event data
+        for key, value in enrichments.items():
+            if value is None and key in new_enrichment_data:
+                del new_enrichment_data[key]
         # SQLAlchemy doesn't support updating JSON fields, so we need to do it manually
         # https://github.com/sqlalchemy/sqlalchemy/discussions/8396#discussion-4308891
         stmt = (
@@ -1419,6 +1424,12 @@ def batch_enrich(
                     existing_note = existing.enrichments.get("note")
                     if existing_note:
                         merged_enrichments["note"] = existing_note
+
+                # Remove keys with None values (e.g., status=None when undismissing)
+                # This allows the alert to revert to its original value from event data
+                for key, value in enrichments.items():
+                    if value is None and key in merged_enrichments:
+                        del merged_enrichments[key]
 
                 to_update[existing.id] = merged_enrichments
             else:

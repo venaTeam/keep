@@ -589,7 +589,6 @@ export function AlertMenu({
     <div className="flex items-center justify-end relative group">
       {quickActions}
       <DropdownMenu.Menu
-        key={`menu-${alert.fingerprint}`}
         icon={EllipsisHorizontalIcon}
         iconClassName={rowStyle !== "relaxed" ? "!rounded-none" : undefined}
         label=""

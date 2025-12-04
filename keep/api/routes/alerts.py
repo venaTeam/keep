@@ -820,7 +820,8 @@ def batch_enrich_alerts(
         elif enrich_data.enrichments["dismissed"].lower() == "false":
             # When restoring (undismissing), remove the suppressed status
             # This allows the alert to revert to its original status from the event data
-            enrich_data.enrichments["status"] = None
+            if "status" not in enrich_data.enrichments:
+                enrich_data.enrichments["status"] = None
 
     if not enrich_data.fingerprints and not enrich_data.cel:
         raise HTTPException(
@@ -1020,7 +1021,8 @@ def enrich_alert(
         elif enrich_data.enrichments["dismissed"].lower() == "false":
             # When restoring (undismissing), remove the suppressed status
             # This allows the alert to revert to its original status from the event data
-            enrich_data.enrichments["status"] = None
+            if "status" not in enrich_data.enrichments:
+                enrich_data.enrichments["status"] = None
 
     tenant_id = authenticated_entity.tenant_id
     logger.info(

@@ -1311,7 +1311,7 @@ def _enrich_entity(
                 new_enrichment_data["note"] = existing_note
         # Remove keys with None values (e.g., status=None when undismissing)
         # This allows the alert to revert to its original value from event data
-        for key, value in enrichments.items():
+        for key, value in list(enrichments.items()):
             if value is None and key in new_enrichment_data:
                 del new_enrichment_data[key]
         # SQLAlchemy doesn't support updating JSON fields, so we need to do it manually

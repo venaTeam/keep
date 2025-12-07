@@ -814,11 +814,14 @@ def batch_enrich_alerts(
         },
     )
 
-    if (
-        "dismissed" in enrich_data.enrichments
-        and enrich_data.enrichments["dismissed"].lower() == "true"
-    ):
-        enrich_data.enrichments["status"] = AlertStatus.SUPPRESSED.value
+    if "dismissed" in enrich_data.enrichments:
+        if enrich_data.enrichments["dismissed"].lower() == "true":
+            enrich_data.enrichments["status"] = AlertStatus.SUPPRESSED.value
+        elif enrich_data.enrichments["dismissed"].lower() == "false":
+            # When restoring (undismissing), remove the suppressed status
+            # This allows the alert to revert to its original status from the event data
+            if "status" not in enrich_data.enrichments:
+                enrich_data.enrichments["status"] = None
 
     if not enrich_data.fingerprints and not enrich_data.cel:
         raise HTTPException(
@@ -1012,11 +1015,14 @@ def enrich_alert(
     ),
     session: Session = Depends(get_session),
 ) -> dict[str, str]:
-    if (
-        "dismissed" in enrich_data.enrichments
-        and enrich_data.enrichments["dismissed"].lower() == "true"
-    ):
-        enrich_data.enrichments["status"] = AlertStatus.SUPPRESSED.value
+    if "dismissed" in enrich_data.enrichments:
+        if enrich_data.enrichments["dismissed"].lower() == "true":
+            enrich_data.enrichments["status"] = AlertStatus.SUPPRESSED.value
+        elif enrich_data.enrichments["dismissed"].lower() == "false":
+            # When restoring (undismissing), remove the suppressed status
+            # This allows the alert to revert to its original status from the event data
+            if "status" not in enrich_data.enrichments:
+                enrich_data.enrichments["status"] = None
 
     tenant_id = authenticated_entity.tenant_id
     logger.info(

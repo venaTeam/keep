@@ -90,13 +90,15 @@ export function AlertDismissModal({
     const dismissUntil =
       selectedTab === 0 ? null : selectedDateTime?.toISOString();
 
+    const plainTextNote = dismissComment.replace(/<[^>]+>/g, '').trim();
+
     const enrichments: {
       dismissed: boolean;
       note: string;
       dismissUntil: string;
     } = {
       dismissed: !alerts[0]?.dismissed,
-      note: dismissComment,
+      note: plainTextNote,
       dismissUntil: dismissUntil || "",
     };
 

@@ -437,7 +437,10 @@ def __save_to_db(
 
             # Dispose enrichments that needs to be disposed
             try:
-                enrichments_bl.dispose_enrichments(formatted_event.fingerprint)
+                if formatted_event.status == AlertStatus.RESOLVED.value:
+                    enrichments_bl.make_enrichments_permanent(formatted_event.fingerprint, dispose_keys=["assignees"])
+                else:
+                    enrichments_bl.dispose_enrichments(formatted_event.fingerprint)
             except Exception:
                 logger.exception(
                     "Failed to dispose enrichments",

@@ -37,6 +37,7 @@ from keep.api.core.db import (
     get_alerts_by_ids,
     get_alerts_metrics_by_provider,
     get_enrichment,
+    get_session,
 )
 from keep.api.core.db import get_error_alerts as get_error_alerts_db
 from keep.api.core.db import (
@@ -55,6 +56,7 @@ from keep.api.models.alert import (
     AlertErrorDto,
     AlertStatus,
     BatchEnrichAlertRequestBody,
+    AssignAlertRequestBody,
     DeleteRequestBody,
     DismissAlertRequest,
     EnrichAlertNoteRequestBody,
@@ -392,14 +394,19 @@ def assign_alert(
     fingerprint: str,
     last_received: str,
     unassign: bool = False,
+    body: AssignAlertRequestBody = None,
     authenticated_entity: AuthenticatedEntity = Depends(
         # @tb: this is read because NOC users can also assign alerts to themselves
         # anyway, this function needs to be refactored
         IdentityManagerFactory.get_auth_verifier(["read:alert"])
     ),
+    session: Session = Depends(get_session),
 ) -> dict[str, str]:
     tenant_id = authenticated_entity.tenant_id
     user_email = authenticated_entity.email
+    if body is None:
+        body = AssignAlertRequestBody()
+
     logger.info(
         "Assigning alert",
         extra={
@@ -414,58 +421,59 @@ def assign_alert(
     if enrichment:
         assignees_last_receievd = enrichment.enrichments.get("assignees", {})
         status = enrichment.enrichments.get("status")
-    if unassign:
-        assignees_last_receievd.pop(last_received, None)
-    else:
-        assignees_last_receievd[last_received] = user_email
-
-    enrichments = {"assignees": assignees_last_receievd}
-    if not status:
-        enrichments["status"] = "acknowledged"
-
-    enrichment_bl = EnrichmentsBl(tenant_id)
-    enrichment_bl.enrich_entity(
-        fingerprint=fingerprint,
-        enrichments=enrichments,
-        action_type=ActionType.ACKNOWLEDGE,
-        action_description=f"Alert assigned to {user_email}, status: {status}",
-        action_callee=user_email,
-        dispose_on_new_alert=True,
-    )
-
-    try:
-        if not unassign:  # if we're assigning the alert to someone, send email
-            logger.info("Sending assign alert email to user")
-            # TODO: this should be changed to dynamic url but we don't know what's the frontend URL
-            keep_platform_url = config(
-                "KEEP_PLATFORM_URL", default="https://platform.keephq.dev"
-            )
-            url = f"{keep_platform_url}/alerts?fingerprint={fingerprint}"
-            send_email(
-                to_email=user_email,
-                template_id=EmailTemplates.ALERT_ASSIGNED_TO_USER,
-                url=url,
-            )
-            logger.info("Sent assign alert email to user")
-    except Exception as e:
-        logger.exception(
-            "Failed to send email to user",
-            extra={
-                "error": str(e),
-                "tenant_id": tenant_id,
-                "user_email": user_email,
-            },
-        )
-
     logger.info(
-        "Assigned alert successfully",
+        "Assigning alert",
         extra={
-            "tenant_id": tenant_id,
             "fingerprint": fingerprint,
+            "tenant_id": tenant_id,
+            "last_received": last_received,
+            "assignee": user_email,
         },
     )
-    return {"status": "ok"}
+    
+    # If the user wants to dispose the assignment on new alert, we need to add a disposable enrichment
+    dispose_on_new_alert = False
+    note = None
+    if body:
+        dispose_on_new_alert = body.dispose_on_new_alert
+        note = body.note
 
+    enrichments_bl = EnrichmentsBl(tenant_id, session)
+    if dispose_on_new_alert:
+        enrichments_bl.enrich_entity(
+            fingerprint=fingerprint,
+            enrichments={
+                "assignees": {last_received: user_email},
+            },
+            action_type=ActionType.ACKNOWLEDGE,
+            action_callee=user_email,
+            action_description=f"Alert assigned to {user_email}",
+            dispose_on_new_alert=True,
+        )
+        if note:
+            enrichments_bl.enrich_entity(
+                fingerprint=fingerprint,
+                enrichments={
+                    "note": note,
+                },
+                action_type=ActionType.ACKNOWLEDGE,
+                action_callee=user_email,
+                action_description=f"Note added by {user_email}",
+                dispose_on_new_alert=False,
+            )
+    else:
+        enrichments_bl.enrich_entity(
+            fingerprint=fingerprint,
+            enrichments={
+                "assignees": {last_received: user_email},
+                "note": note,
+            },
+            action_type=ActionType.ACKNOWLEDGE,
+            action_callee=user_email,
+            action_description=f"Alert assigned to {user_email}",
+            dispose_on_new_alert=False,
+        )
+    return {"status": "ok"}
 
 def discard_future(
     trace_id: str,
@@ -901,6 +909,10 @@ def batch_enrich_alerts(
 
         enrichments = deepcopy(enrich_data.enrichments)
 
+        if enrichments.get("status") == AlertStatus.RESOLVED.value:
+            for fingerprint in fingerprints:
+                enrichment_bl.make_enrichments_permanent(fingerprint, dispose_keys=["assignees"])
+
         enrichment_bl.batch_enrich(
             fingerprints=fingerprints,
             enrichments=enrichments,
@@ -1062,6 +1074,9 @@ def _enrich_alert(
         )
 
         enrichments = deepcopy(enrich_data.enrichments)
+
+        if enrichments.get("status") == AlertStatus.RESOLVED.value:
+            enrichement_bl.make_enrichments_permanent(enrich_data.fingerprint, dispose_keys=["assignees"])
 
         enrichment_kwargs = {
             "fingerprint": enrich_data.fingerprint,

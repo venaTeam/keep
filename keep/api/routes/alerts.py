@@ -72,7 +72,7 @@ from keep.api.models.search_alert import SearchAlertsRequest
 from keep.api.models.time_stamp import TimeStampFilter
 from keep.api.routes.preset import pull_data_from_providers
 from keep.api.tasks.process_event_task import process_event
-from keep.api.utils.email_utils import EmailTemplates, send_email
+
 from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.api.utils.time_stamp_helpers import get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
@@ -415,12 +415,7 @@ def assign_alert(
         },
     )
 
-    assignees_last_receievd = {}  # the last received(s) that are assigned to someone
-    status = None
-    enrichment = get_enrichment(tenant_id, fingerprint)
-    if enrichment:
-        assignees_last_receievd = enrichment.enrichments.get("assignees", {})
-        status = enrichment.enrichments.get("status")
+
     logger.info(
         "Assigning alert",
         extra={

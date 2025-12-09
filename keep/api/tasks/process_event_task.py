@@ -438,9 +438,83 @@ def __save_to_db(
             # Dispose enrichments that needs to be disposed
             try:
                 if formatted_event.status == AlertStatus.RESOLVED.value:
-                    enrichments_bl.make_enrichments_permanent(formatted_event.fingerprint, dispose_keys=["assignees"])
+                    enrichments_bl.make_enrichments_permanent(formatted_event.fingerprint, dispose_keys=["assignees", "status"])
                 else:
                     enrichments_bl.dispose_enrichments(formatted_event.fingerprint)
+                    # Propagate permanent assignments to the new event
+                    try:
+                        current_enrichment = get_enrichment_with_session(session, tenant_id, formatted_event.fingerprint)
+                        if current_enrichment:
+                            assignees = current_enrichment.enrichments.get("assignees", {})
+                            if assignees:
+                                # Find the latest assignment
+                                sorted_timestamps = sorted(assignees.keys())
+                                latest_ts = sorted_timestamps[-1]
+                                latest_assignee = assignees[latest_ts]
+                                
+                                # If we have a valid assignee and it's not already assigned for this timestamp
+                                if latest_assignee and formatted_event.lastReceived not in assignees:
+                                    logger.info(
+                                        f"Propagating assignment for {formatted_event.fingerprint} to {latest_assignee}",
+                                        extra={
+                                            "tenant_id": tenant_id,
+                                            "fingerprint": formatted_event.fingerprint,
+                                            "assignee": latest_assignee
+                                        }
+                                    )
+                                    enrichments_bl.enrich_entity(
+                                        fingerprint=formatted_event.fingerprint,
+                                        enrichments={"assignees": {formatted_event.lastReceived: latest_assignee}},
+                                        action_type=ActionType.GENERIC_ENRICH,
+                                        action_callee="system",
+                                        action_description="Propagating assignment to new event",
+                                        dispose_on_new_alert=False
+                                    )
+                    except Exception:
+                        logger.exception(
+                            "Failed to propagate assignment",
+                            extra={
+                                "tenant_id": tenant_id,
+                                "fingerprint": formatted_event.fingerprint,
+                            }
+                        )
+                    # Propagate permanent assignments to the new event
+                    try:
+                        current_enrichment = get_enrichment_with_session(session, tenant_id, formatted_event.fingerprint)
+                        if current_enrichment:
+                            assignees = current_enrichment.enrichments.get("assignees", {})
+                            if assignees:
+                                # Find the latest assignment
+                                sorted_timestamps = sorted(assignees.keys())
+                                latest_ts = sorted_timestamps[-1]
+                                latest_assignee = assignees[latest_ts]
+                                
+                                # If we have a valid assignee and it's not already assigned for this timestamp
+                                if latest_assignee and formatted_event.lastReceived not in assignees:
+                                    logger.info(
+                                        f"Propagating assignment for {formatted_event.fingerprint} to {latest_assignee}",
+                                        extra={
+                                            "tenant_id": tenant_id,
+                                            "fingerprint": formatted_event.fingerprint,
+                                            "assignee": latest_assignee
+                                        }
+                                    )
+                                    enrichments_bl.enrich_entity(
+                                        fingerprint=formatted_event.fingerprint,
+                                        enrichments={"assignees": {formatted_event.lastReceived: latest_assignee}},
+                                        action_type=ActionType.GENERIC_ENRICH,
+                                        action_callee="system",
+                                        action_description="Propagating assignment to new event",
+                                        dispose_on_new_alert=False
+                                    )
+                    except Exception:
+                        logger.exception(
+                            "Failed to propagate assignment",
+                            extra={
+                                "tenant_id": tenant_id,
+                                "fingerprint": formatted_event.fingerprint,
+                            }
+                        )
             except Exception:
                 logger.exception(
                     "Failed to dispose enrichments",

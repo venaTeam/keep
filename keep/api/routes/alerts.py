@@ -439,6 +439,7 @@ def assign_alert(
             fingerprint=fingerprint,
             enrichments={
                 "assignees": {last_received: user_email},
+                "status": AlertStatus.ACKNOWLEDGED.value,
             },
             action_type=ActionType.ACKNOWLEDGE,
             action_callee=user_email,
@@ -462,6 +463,7 @@ def assign_alert(
             enrichments={
                 "assignees": {last_received: user_email},
                 "note": note,
+                "status": AlertStatus.ACKNOWLEDGED.value,
             },
             action_type=ActionType.ACKNOWLEDGE,
             action_callee=user_email,

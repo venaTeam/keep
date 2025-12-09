@@ -1314,6 +1314,17 @@ def _enrich_entity(
         for key, value in list(enrichments.items()):
             if value is None and key in new_enrichment_data:
                 del new_enrichment_data[key]
+        
+        # When forcing update (e.g. making enrichments permanent/disposing), 
+        # ensure we don't accidentally keep status if it's not in the new enrichments
+        if force and "status" not in enrichments and "status" in enrichment.enrichments:
+            # If we are forcing and status is NOT in the new enrichments, it means we want to remove it
+            # But new_enrichment_data = enrichments (line 1303), so it's already not there.
+            # However, we need to make sure we don't re-add it from existing if we are forcing?
+            # No, if force=True, new_enrichment_data IS enrichments.
+            # So if 'status' is not in 'enrichments', it won't be in 'new_enrichment_data'.
+            # BUT, we have logic above that preserves note.
+            pass
         # SQLAlchemy doesn't support updating JSON fields, so we need to do it manually
         # https://github.com/sqlalchemy/sqlalchemy/discussions/8396#discussion-4308891
         stmt = (

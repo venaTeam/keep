@@ -314,6 +314,14 @@ actions:
                 yield session
 
     import logging
+    from keep.api.logging import WorkflowDBHandler
+
+    # Close WorkflowDBHandler to stop background thread before dropping tables
+    root_logger = logging.getLogger()
+    for handler in root_logger.handlers[:]:
+        if isinstance(handler, WorkflowDBHandler):
+            handler.close()
+            break
 
     logger = logging.getLogger(__name__)
     logger.info("Dropping all tables")

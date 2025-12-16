@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Card } from "@tremor/react";
 import MenuButton from "./MenuButton";
-import { WidgetData } from "./types";
+import { WidgetData, WidgetType } from "./types";
 import PresetGridItem from "./widget-types/preset/preset-grid-item";
 import MetricGridItem from "./widget-types/metric/metric-grid-item";
 import GenericMetricsGridItem from "./widget-types/generic-metrics/generic-metrics-grid-item";
+import WidgetServiceNow from "./widget-types/service-now/widget-service-now";
 
 interface GridItemProps {
   item: WidgetData;
@@ -47,6 +48,15 @@ const GridItem: React.FC<GridItemProps> = ({
             item={item}
             onEdit={setUpdatedItem}
           ></GenericMetricsGridItem>
+        )}
+        {item.widgetType === WidgetType.SERVICE_NOW && (
+          <WidgetServiceNow
+            thresholds={item.thresholds}
+            team={item.serviceNowTeam}
+            status={item.serviceNowStatus}
+            detection={item.serviceNowDetection}
+            customLink={item.customLink}
+          />
         )}
       </div>
     </Card>

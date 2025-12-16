@@ -4,6 +4,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
+import requests
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -20,6 +21,7 @@ from keep.api.core.db import update_dashboard as update_dashboard_db
 from keep.api.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
+from keep.providers.providers_factory import ProvidersFactory
 
 
 class DashboardCreateDTO(BaseModel):
@@ -180,3 +182,83 @@ def get_metric_widgets(
             tenant_id=tenant_id, timestamp_filter=time_stamp
         )
     return data
+
+
+@router.get("/ticket-count")
+def get_ticket_count(
+    authenticated_entity: AuthenticatedEntity = Depends(
+        IdentityManagerFactory.get_auth_verifier(["read:dashboards"])
+    ),
+    team: str | None = None,
+    state: str | None = None,  # expected: open, in_progress, all
+    detection: str | None = None,  # expected: direct, hamal, all
+):
+    """
+    Get ticket count from ticket_count provider.
+    Returns the count from the provider's count_url endpoint.
+    """
+    tenant_id = authenticated_entity.tenant_id
+    
+    installed_providers = ProvidersFactory.get_installed_providers(
+        tenant_id, include_details=True
+    )
+    
+    ticket_count_provider = None
+    for provider in installed_providers:
+        if provider.type == "ticket_count":
+            ticket_count_provider = provider
+            break
+    
+    if not ticket_count_provider:
+        raise HTTPException(
+            status_code=404, detail="ticket_count provider not found"
+        )
+    
+    ticket_url = ticket_count_provider.details.get("authentication", {}).get(
+        "count_url"
+    )
+    
+    if not ticket_url:
+        raise HTTPException(
+            status_code=400,
+            detail="ticket_count provider missing count_url configuration",
+        )
+    
+    try:
+        from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
+
+        params: dict[str, str] = {}
+        if team:
+            params["team"] = team
+        if state:
+            params["state"] = state
+        if detection and detection in ("direct", "hamal"):
+            params["system_failure"] = "true" if detection == "hamal" else "false"
+
+        parsed = urlparse(ticket_url)
+        existing_qs = dict(parse_qsl(parsed.query)) if parsed.query else {}
+        merged_qs = {**existing_qs, **params}
+        new_query = urlencode(merged_qs)
+        composed_url = urlunparse(parsed._replace(query=new_query))
+
+        response = requests.get(composed_url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        try:
+            if isinstance(data, dict) and "Team not found" in data:
+                return data
+        except Exception:
+            pass
+
+        count = data.get("count", 0)
+        return {"count": count}
+    except requests.exceptions.RequestException as e:
+        logger.exception(
+            "Failed to fetch ticket count from provider URL",
+            extra={"tenant_id": tenant_id, "url": ticket_url},
+        )
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch ticket count: {str(e)}",
+        )

@@ -8,6 +8,7 @@ import hashlib
 import json
 import logging
 import random
+import time
 import uuid
 from collections import defaultdict
 from contextlib import contextmanager
@@ -1945,31 +1946,29 @@ def get_alerts_by_fingerprint(
         List[Alert]: A list of Alert objects.
     """
     with Session(engine) as session:
-        # Create the query
-        query = session.query(Alert)
-
-        # Apply subqueryload to force-load the alert_enrichment relationship
-        query = query.options(subqueryload(Alert.alert_enrichment))
+        # Create the query using select() instead of session.query()
+        query = select(Alert).options(subqueryload(Alert.alert_enrichment))
 
         if with_alert_instance_enrichment:
             query = query.options(subqueryload(Alert.alert_instance_enrichment))
 
         # Filter by tenant_id
-        query = query.filter(Alert.tenant_id == tenant_id)
+        query = query.where(Alert.tenant_id == tenant_id)
 
-        query = query.filter(Alert.fingerprint == fingerprint)
+        query = query.where(Alert.fingerprint == fingerprint)
 
         query = query.order_by(Alert.timestamp.desc())
 
         if status:
-            query = query.filter(get_json_extract_field(session, Alert.event, "status") == status)
+            query = query.where(get_json_extract_field(session, Alert.event, "status") == status)
 
         if limit:
             query = query.limit(limit)
-        # Execute the query
-        alerts = query.all()
+        
+        # Execute the query using exec() instead of execute()
+        alerts = session.exec(query).all()
 
-    return alerts
+        return alerts
 
 
 def get_all_alerts_by_fingerprints(
@@ -2597,8 +2596,8 @@ def get_custom_deduplication_rule(tenant_id, provider_id, provider_type):
             .where(AlertDeduplicationRule.tenant_id == tenant_id)
             .where(AlertDeduplicationRule.provider_id == provider_id)
             .where(AlertDeduplicationRule.provider_type == provider_type)
-        ).first()
-    return rule
+        ).one_or_none()
+        return rule
 
 
 def create_deduplication_rule(
@@ -2859,15 +2858,15 @@ def get_last_alert_hashes_by_fingerprints(
             .where(LastAlert.fingerprint.in_(fingerprints))
         )
 
-        results = session.execute(query).all()
+        results = session.exec(query).all()
 
-    # Create a dictionary from the results
-    alert_hash_dict = {
-        fingerprint: alert_hash
-        for fingerprint, alert_hash in results
-        if alert_hash is not None
-    }
-    return alert_hash_dict
+        # Create a dictionary from the results
+        alert_hash_dict = {
+            fingerprint: alert_hash
+            for fingerprint, alert_hash in results
+            if alert_hash is not None
+        }
+        return alert_hash_dict
 
 
 def update_key_last_used(
@@ -5718,7 +5717,7 @@ def set_last_alert(
     fingerprint = alert.fingerprint
     logger.info(f"Setting last alert for `{fingerprint}`")
     with existed_or_new_session(session) as session:
-        for attempt in range(max_retries):
+        for attempt in range(1, max_retries + 1):
             logger.info(
                 f"Attempt {attempt} to set last alert for `{fingerprint}`",
                 extra={
@@ -5762,29 +5761,54 @@ def set_last_alert(
                         alert_id=alert.id,
                         alert_hash=alert.alert_hash,
                     )
+                    session.add(last_alert)
 
-                session.add(last_alert)
                 session.commit()
-                break
+            except IntegrityError as ex:
+                session.rollback()
+                logger.warning(
+                    f"Integrity error while updating lastalert for `{fingerprint}`, retry #{attempt}",
+                    extra={
+                        "alert_id": alert.id,
+                        "tenant_id": tenant_id,
+                        "fingerprint": fingerprint,
+                        "error": str(ex),
+                    },
+                )
+                if attempt == max_retries:
+                    raise
+                # Small delay before retry to avoid hammering the database
+                time.sleep(0.1 * attempt)
+                continue
             except OperationalError as ex:
-                if "no such savepoint" in ex.args[0]:
+                session.rollback()
+                message = ex.args[0] if ex.args else ""
+                if "no such savepoint" in message:
                     logger.info(
                         f"No such savepoint while updating lastalert for `{fingerprint}`, retry #{attempt}"
                     )
-                    session.rollback()
-                    if attempt >= max_retries:
-                        raise ex
-                    continue
-
-                if "Deadlock found" in ex.args[0]:
+                elif "Deadlock found" in message:
                     logger.info(
                         f"Deadlock found while updating lastalert for `{fingerprint}`, retry #{attempt}"
                     )
-                    session.rollback()
-                    if attempt >= max_retries:
-                        raise ex
-                    continue
-            except NoActiveSqlTransaction:
+                else:
+                    logger.exception(
+                        f"Operational error while updating lastalert for `{fingerprint}`",
+                        extra={
+                            "alert_id": alert.id,
+                            "tenant_id": tenant_id,
+                            "fingerprint": fingerprint,
+                        },
+                    )
+                    raise
+
+                if attempt == max_retries:
+                    raise
+                # Small delay before retry to avoid hammering the database
+                time.sleep(0.1 * attempt)
+                continue
+            except NoActiveSqlTransaction as ex:
+                session.rollback()
                 logger.exception(
                     f"No active sql transaction while updating lastalert for `{fingerprint}`, retry #{attempt}",
                     extra={
@@ -5793,17 +5817,25 @@ def set_last_alert(
                         "fingerprint": fingerprint,
                     },
                 )
+                if attempt == max_retries:
+                    raise ex
+                # Small delay before retry to avoid hammering the database
+                time.sleep(0.1 * attempt)
                 continue
-            logger.debug(
-                f"Successfully updated lastalert for `{fingerprint}`",
-                extra={
-                    "alert_id": alert.id,
-                    "tenant_id": tenant_id,
-                    "fingerprint": fingerprint,
-                },
+            else:
+                logger.debug(
+                    f"Successfully updated lastalert for `{fingerprint}`",
+                    extra={
+                        "alert_id": alert.id,
+                        "tenant_id": tenant_id,
+                        "fingerprint": fingerprint,
+                    },
+                )
+                break
+        else:
+            raise RuntimeError(
+                f"Failed to set last alert for `{fingerprint}` after {max_retries} attempts"
             )
-            # break the retry loop
-            break
 
 def set_maintenance_windows_trace(alert: Alert, maintenance_w: MaintenanceWindowRule,  session: Optional[Session] = None):
     mw_id = str(maintenance_w.id)

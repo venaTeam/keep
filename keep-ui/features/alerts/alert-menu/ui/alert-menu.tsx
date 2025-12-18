@@ -55,6 +55,7 @@ interface Props {
   setRunWorkflowModalAlert?: (alert: AlertDto) => void;
   setDismissModalAlert?: (alert: AlertDto[]) => void;
   setChangeStatusAlert?: (alert: AlertDto) => void;
+  setAssignModalAlert?: (alert: AlertDto) => void;
   presetName: string;
   isInSidebar?: boolean;
   setIsIncidentSelectorOpen?: (open: boolean) => void;
@@ -78,6 +79,7 @@ export function AlertMenu({
   setRunWorkflowModalAlert,
   setDismissModalAlert,
   setChangeStatusAlert,
+  setAssignModalAlert,
   presetName,
   isInSidebar,
   setIsIncidentSelectorOpen,
@@ -223,10 +225,10 @@ export function AlertMenu({
         "flex items-center",
         showActionsOnHover
           ? [
-              "transition-opacity duration-100",
-              "opacity-0 bg-orange-100",
-              "group-hover:opacity-100",
-            ]
+            "transition-opacity duration-100",
+            "opacity-0 bg-orange-100",
+            "group-hover:opacity-100",
+          ]
           : "opacity-100"
       )}
     >
@@ -246,9 +248,9 @@ export function AlertMenu({
         tooltip={
           viewedAlert
             ? `Viewed ${format(
-                new Date(viewedAlert.viewedAt),
-                "MMM d, yyyy HH:mm"
-              )}`
+              new Date(viewedAlert.viewedAt),
+              "MMM d, yyyy HH:mm"
+            )}`
             : "View Alert Payload"
         }
       />
@@ -318,17 +320,15 @@ export function AlertMenu({
           className={actionIconButtonClassName}
           tooltip={
             ticketUrl
-              ? `Ticket Assigned ${
-                  ticketStatus ? `(status: ${ticketStatus})` : ""
-                }`
+              ? `Ticket Assigned ${ticketStatus ? `(status: ${ticketStatus})` : ""
+              }`
               : "Assign Ticket"
           }
           icon={() => (
             <Icon
               icon={TbTicket}
-              className={`w-4 h-4 ${
-                ticketUrl ? "text-green-500" : "text-gray-500"
-              }`}
+              className={`w-4 h-4 ${ticketUrl ? "text-green-500" : "text-gray-500"
+                }`}
             />
           )}
         />
@@ -375,12 +375,11 @@ export function AlertMenu({
             );
           }}
           className={actionIconButtonClassName}
-          tooltip={`Workflow ${
-            relevantWorkflowExecution.workflow_status
-          } at ${format(
-            new Date(relevantWorkflowExecution.workflow_started),
-            "MMM d, yyyy HH:mm"
-          )}`}
+          tooltip={`Workflow ${relevantWorkflowExecution.workflow_status
+            } at ${format(
+              new Date(relevantWorkflowExecution.workflow_started),
+              "MMM d, yyyy HH:mm"
+            )}`}
           icon={() => (
             <Icon
               icon={
@@ -390,13 +389,12 @@ export function AlertMenu({
                     ? XCircleIcon
                     : ClockIcon
               }
-              className={`w-4 h-4 ${
-                relevantWorkflowExecution.workflow_status === "success"
+              className={`w-4 h-4 ${relevantWorkflowExecution.workflow_status === "success"
                   ? "text-green-500"
                   : relevantWorkflowExecution.workflow_status === "error"
                     ? "text-red-500"
                     : "text-gray-500"
-              }`}
+                }`}
             />
           )}
         />
@@ -414,20 +412,24 @@ export function AlertMenu({
 
   const callAssignEndpoint = useCallback(
     async (unassign: boolean = false) => {
-      if (
-        confirm(
-          "After assigning this alert to yourself, you won't be able to unassign it until someone else assigns it to himself. Are you sure you want to continue?"
-        )
-      ) {
-        const lastReceived =
-          typeof alert.lastReceived === "string"
-            ? alert.lastReceived
-            : alert.lastReceived.toISOString();
-        await api.post(`/alerts/${fingerprint}/assign/${lastReceived}`);
-        await mutate();
+      if (setAssignModalAlert) {
+        setAssignModalAlert(alert);
+      } else {
+        if (
+          confirm(
+            "After assigning this alert to yourself, you won't be able to unassign it until someone else assigns it to himself. Are you sure you want to continue?"
+          )
+        ) {
+          const lastReceived =
+            typeof alert.lastReceived === "string"
+              ? alert.lastReceived
+              : alert.lastReceived.toISOString();
+          await api.post(`/alerts/${fingerprint}/assign/${lastReceived}`);
+          await mutate();
+        }
       }
     },
-    [alert, fingerprint, api, mutate]
+    [alert, fingerprint, api, mutate, setAssignModalAlert]
   );
 
   const isMethodEnabled = useCallback(

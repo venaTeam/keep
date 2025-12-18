@@ -35,6 +35,7 @@ type AlertSidebarProps = {
   setRunWorkflowModalAlert?: (alert: AlertDto) => void;
   setDismissModalAlert?: (alert: AlertDto[] | null) => void;
   setChangeStatusAlert?: (alert: AlertDto) => void;
+  setAssignModalAlert?: (alert: AlertDto | null) => void;
   setIsIncidentSelectorOpen: (open: boolean) => void;
 };
 
@@ -45,6 +46,7 @@ export const AlertSidebar = ({
   setRunWorkflowModalAlert,
   setDismissModalAlert,
   setChangeStatusAlert,
+  setAssignModalAlert,
   setIsIncidentSelectorOpen,
 }: AlertSidebarProps) => {
   const { useAlertAudit } = useAlerts();
@@ -154,6 +156,7 @@ export const AlertSidebar = ({
                     setRunWorkflowModalAlert={setRunWorkflowModalAlert}
                     setDismissModalAlert={setDismissModalAlert}
                     setChangeStatusAlert={setChangeStatusAlert}
+                    setAssignModalAlert={setAssignModalAlert}
                     setIsIncidentSelectorOpen={setIsIncidentSelectorOpen}
                     toggleSidebar={toggle}
                   />
@@ -205,10 +208,9 @@ export const AlertSidebar = ({
                             alert instances in Keep. Each provider declares the
                             fields fingerprints are calculated based on.{" "}
                             <Link
-                              href={`${
-                                config?.KEEP_DOCS_URL ||
+                              href={`${config?.KEEP_DOCS_URL ||
                                 "https://docs.keephq.dev"
-                              }/overview/fingerprints`}
+                                }/overview/fingerprints`}
                               className="text-white"
                             >
                               Read more about it here.
@@ -239,31 +241,31 @@ export const AlertSidebar = ({
                     </div>
                   </p>
                   {alert.url && (
-                  <p>
-                    <FieldHeader>URL</FieldHeader>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={alert.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline truncate max-w-[calc(100%-40px)] inline-block"
-                      >
-                        {alert.url}
-                      </Link>
-                      <Button
-                        icon={ClipboardDocumentIcon}
-                        size="xs"
-                        color="orange"
-                        variant="light"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleCopyUrl(alert.url);
-                        }}
-                        tooltip="Copy URL"
-                      />
-                    </div>
-                  </p>
+                    <p>
+                      <FieldHeader>URL</FieldHeader>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={alert.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline truncate max-w-[calc(100%-40px)] inline-block"
+                        >
+                          {alert.url}
+                        </Link>
+                        <Button
+                          icon={ClipboardDocumentIcon}
+                          size="xs"
+                          color="orange"
+                          variant="light"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCopyUrl(alert.url);
+                          }}
+                          tooltip="Copy URL"
+                        />
+                      </div>
+                    </p>
                   )}
                 </div>
                 {alert.incident_dto && (

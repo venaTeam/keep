@@ -935,6 +935,87 @@ class EnrichmentsBl:
                 "enrichments disposed", extra={"fingerprint": fingerprint}
             )
 
+    def make_enrichments_permanent(self, fingerprint: str, dispose_keys: list[str] = None):
+        """
+        Convert disposable enrichments to permanent enrichments
+        """
+        if EnrichmentsBl.ENRICHMENT_DISABLED:
+            return
+
+        self.logger.debug("making enrichments permanent", extra={"fingerprint": fingerprint})
+        enrichments = get_enrichment_with_session(
+            self.db_session, self.tenant_id, fingerprint
+        )
+        if not enrichments or not enrichments.enrichments:
+            return
+
+        dispose_keys = dispose_keys or []
+        new_enrichments = {}
+        changed = False
+        for key, val in enrichments.enrichments.items():
+            if key in dispose_keys:
+                changed = True
+                continue
+
+            if key.startswith("disposable_"):
+                # Remove prefix
+                real_key = key.replace("disposable_", "")
+                if real_key in dispose_keys:
+                    changed = True
+                    continue
+
+                # Extract the actual value from the disposable wrapper
+                if isinstance(val, dict) and "value" in val:
+                    new_enrichments[real_key] = val["value"]
+                else:
+                    new_enrichments[real_key] = val
+                changed = True
+            else:
+                new_enrichments[key] = val
+        
+        if changed:
+            enrich_alert_db(
+                self.tenant_id,
+                fingerprint,
+                new_enrichments,
+                session=self.db_session,
+                action_callee="system",
+                action_type=ActionType.GENERIC_ENRICH,
+                action_description="Enrichments made permanent due to resolution",
+                force=True,
+            )
+
+            if self.elastic_client:
+                try:
+                    latest_alert = self.db_session.exec(
+                        select(Alert)
+                        .where(Alert.tenant_id == self.tenant_id)
+                        .where(Alert.fingerprint == fingerprint)
+                        .order_by(Alert.timestamp.desc())
+                        .limit(1)
+                    ).first()
+
+                    if latest_alert:
+                        alert_data = latest_alert.event.copy()
+                        alert_data.update(new_enrichments)
+                        alert_dto = AlertDto(**alert_data)
+                        self.elastic_client.index_alert(alert_dto)
+                    else:
+                        self.elastic_client.enrich_alert(
+                            fingerprint, new_enrichments
+                        )
+                except Exception:
+                    self.logger.exception(
+                        "Failed to reindex alert after making enrichments permanent",
+                        extra={
+                            "fingerprint": fingerprint,
+                            "tenant_id": self.tenant_id,
+                        },
+                    )
+            self.logger.debug(
+                "enrichments made permanent", extra={"fingerprint": fingerprint}
+            )
+
     def _track_enrichment_event(
         self,
         alert_id: UUID | None,

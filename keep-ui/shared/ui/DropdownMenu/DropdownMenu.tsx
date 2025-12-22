@@ -61,8 +61,6 @@ const MenuComponent = React.forwardRef<
   const [isOpen, setIsOpen] = React.useState(false);
   const [hasFocusInside, setHasFocusInside] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
-  const wasOpenRef = React.useRef(false);
-  const userInitiatedCloseRef = React.useRef(false);
 
   const elementsRef = React.useRef<Array<HTMLButtonElement | null>>([]);
   const labelsRef = React.useRef<Array<string | null>>([]);
@@ -75,45 +73,10 @@ const MenuComponent = React.forwardRef<
 
   const isNested = parentId != null;
 
-  // Track if menu was open before potential re-render
-  React.useEffect(() => {
-    const wasOpen = wasOpenRef.current;
-    wasOpenRef.current = isOpen;
-    
-    // If menu was open and is now closed, but it wasn't user-initiated,
-    // restore it (this handles re-renders from data updates)
-    if (wasOpen && !isOpen && !userInitiatedCloseRef.current) {
-      // Use requestAnimationFrame to avoid state updates during render
-      requestAnimationFrame(() => {
-        setIsOpen(true);
-      });
-    }
-    
-    if (!isOpen) {
-      // Reset user initiated close flag after a short delay
-      // This allows the menu to be reopened after a user-initiated close
-      const timeout = setTimeout(() => {
-        userInitiatedCloseRef.current = false;
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
-  }, [isOpen]);
-
-  const handleOpenChange = React.useCallback((open: boolean) => {
-    if (open) {
-      userInitiatedCloseRef.current = false;
-      setIsOpen(true);
-    } else {
-      // Mark as user-initiated close
-      userInitiatedCloseRef.current = true;
-      setIsOpen(false);
-    }
-  }, []);
-
   const { floatingStyles, refs, context } = useFloating<HTMLButtonElement>({
     nodeId,
     open: isOpen,
-    onOpenChange: handleOpenChange,
+    onOpenChange: setIsOpen,
     placement: isNested ? "right-start" : "bottom-start",
     middleware: [
       offset({ mainAxis: isNested ? 0 : 4, alignmentAxis: isNested ? -4 : 0 }),
@@ -134,17 +97,7 @@ const MenuComponent = React.forwardRef<
     ignoreMouse: isNested,
   });
   const role = useRole(context, { role: "menu" });
-  const dismiss = useDismiss(context, {
-    bubbles: true,
-    escapeKey: (event) => {
-      userInitiatedCloseRef.current = true;
-      return true;
-    },
-    outsidePress: (event) => {
-      userInitiatedCloseRef.current = true;
-      return true;
-    },
-  });
+  const dismiss = useDismiss(context, { bubbles: true });
   const listNavigation = useListNavigation(context, {
     listRef: elementsRef,
     activeIndex,
@@ -168,15 +121,11 @@ const MenuComponent = React.forwardRef<
     if (!tree) return;
 
     function handleTreeClick() {
-      // Mark as user-initiated close when menu item is clicked
-      userInitiatedCloseRef.current = true;
       setIsOpen(false);
     }
 
     function onSubMenuOpen(event: { nodeId: string; parentId: string }) {
       if (event.nodeId !== nodeId && event.parentId === parentId) {
-        // Opening a submenu closes the parent - this is user-initiated
-        userInitiatedCloseRef.current = true;
         setIsOpen(false);
       }
     }

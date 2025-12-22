@@ -40,6 +40,7 @@ from keep.api.core.metrics import (
     events_error_counter,
     events_in_counter,
     events_out_counter,
+    failed_alerts_counter,
     processing_time_summary,
 )
 from keep.api.models.action_type import ActionType
@@ -897,6 +898,12 @@ def __save_to_db(
                 "formatted_events_summary": _serialize_event_for_logging(formatted_events[:5]) if formatted_events else "N/A",  # First 5 events
             },
         )
+        # Count failed alerts for each event that failed to save to DB
+        # Note: This exception will propagate to process_event which will also increment,
+        # but we want to track DB-specific failures separately
+        failed_count = len(formatted_events) if formatted_events else 1
+        for _ in range(failed_count):
+            failed_alerts_counter.inc()
         raise
 
 
@@ -1061,6 +1068,7 @@ def __handle_formatted_events(
                             "tenant_id": tenant_id,
                         },
                     )
+                    failed_alerts_counter.inc()
                     continue
 
     if MAINTENANCE_WINDOW_ALERT_STRATEGY == "recover_previous_status":
@@ -1622,6 +1630,13 @@ def process_event(
             )
         
         events_error_counter.inc()
+        # Count failed alerts - determine count based on event type
+        if isinstance(raw_event, list):
+            failed_count = len(raw_event)
+        else:
+            failed_count = 1
+        for _ in range(failed_count):
+            failed_alerts_counter.inc()
 
         # Retrying only if context is present (running the job in arq worker)
         if bool(ctx):

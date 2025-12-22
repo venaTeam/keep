@@ -20,6 +20,10 @@ events_error_counter = Counter(
     f"{METRIC_PREFIX}events_error_total",
     "Total number of events with error",
 )
+failed_alerts_counter = Counter(
+    f"{METRIC_PREFIX}failed_alerts",
+    "Total number of alerts that failed to reach Keep UI",
+)
 processing_time_summary = Summary(
     f"{METRIC_PREFIX}processing_time_seconds",
     "Average time spent processing events",

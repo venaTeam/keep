@@ -49,7 +49,11 @@ from keep.api.core.db import (
 )
 from keep.api.core.dependencies import extract_generic_body, get_pusher_client
 from keep.api.core.elastic import ElasticClient
-from keep.api.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
+from keep.api.core.metrics import (
+    failed_alerts_counter,
+    running_tasks_by_process_gauge,
+    running_tasks_gauge,
+)
 from keep.api.models.action_type import ActionType
 from keep.api.models.alert import (
     AlertDto,
@@ -585,27 +589,40 @@ async def receive_generic_event(
     """
     running_tasks: set = request.state.background_tasks
     if REDIS:
-        redis: ArqRedis = await get_pool()
-        job = await redis.enqueue_job(
-            "process_event_in_worker",
-            authenticated_entity.tenant_id,
-            None,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            request.state.trace_id,
-            event,
-            _queue_name=KEEP_ARQ_QUEUE_BASIC,
-        )
-        logger.info(
-            "Enqueued job",
-            extra={
-                "job_id": job.job_id,
-                "tenant_id": authenticated_entity.tenant_id,
-                "queue": KEEP_ARQ_QUEUE_BASIC,
-            },
-        )
-        task_name = job.job_id
+        try:
+            redis: ArqRedis = await get_pool()
+            job = await redis.enqueue_job(
+                "process_event_in_worker",
+                authenticated_entity.tenant_id,
+                None,
+                provider_id,
+                fingerprint,
+                authenticated_entity.api_key_name,
+                request.state.trace_id,
+                event,
+                _queue_name=KEEP_ARQ_QUEUE_BASIC,
+            )
+            logger.info(
+                "Enqueued job",
+                extra={
+                    "job_id": job.job_id,
+                    "tenant_id": authenticated_entity.tenant_id,
+                    "queue": KEEP_ARQ_QUEUE_BASIC,
+                },
+            )
+            task_name = job.job_id
+        except Exception as e:
+            logger.exception(
+                "Failed to enqueue job to Redis",
+                extra={
+                    "tenant_id": authenticated_entity.tenant_id,
+                    "error": str(e),
+                },
+            )
+            failed_alerts_counter.inc()
+            raise HTTPException(
+                status_code=500, detail="Failed to process alert"
+            ) from e
     else:
         task_name = create_process_event_task(
             authenticated_entity.tenant_id,
@@ -678,10 +695,12 @@ async def receive_event(
             },
         )
     except ModuleNotFoundError:
+        failed_alerts_counter.inc()
         raise HTTPException(
             status_code=400, detail=f"Provider {provider_type} not found"
         )
     if not provider_class:
+        failed_alerts_counter.inc()
         raise HTTPException(
             status_code=400, detail=f"Provider {provider_type} not found"
         )
@@ -696,6 +715,7 @@ async def receive_event(
             "Failed to parse event raw body",
             extra={"tenant_id": authenticated_entity.tenant_id, "event": event},
         )
+        failed_alerts_counter.inc()
         raise HTTPException(status_code=400, detail="Malformed event")
     logger.debug("Parsed event raw body", extra={"time": time.time() - t})
 
@@ -711,27 +731,41 @@ async def receive_event(
         provider_id = provider.id
 
     if REDIS:
-        redis: ArqRedis = await get_pool()
-        job = await redis.enqueue_job(
-            "process_event_in_worker",
-            authenticated_entity.tenant_id,
-            provider_type,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            trace_id,
-            event,
-            _queue_name=KEEP_ARQ_QUEUE_BASIC,
-        )
-        logger.info(
-            "Enqueued job",
-            extra={
-                "job_id": job.job_id,
-                "tenant_id": authenticated_entity.tenant_id,
-                "queue": KEEP_ARQ_QUEUE_BASIC,
-            },
-        )
-        task_name = job.job_id
+        try:
+            redis: ArqRedis = await get_pool()
+            job = await redis.enqueue_job(
+                "process_event_in_worker",
+                authenticated_entity.tenant_id,
+                provider_type,
+                provider_id,
+                fingerprint,
+                authenticated_entity.api_key_name,
+                trace_id,
+                event,
+                _queue_name=KEEP_ARQ_QUEUE_BASIC,
+            )
+            logger.info(
+                "Enqueued job",
+                extra={
+                    "job_id": job.job_id,
+                    "tenant_id": authenticated_entity.tenant_id,
+                    "queue": KEEP_ARQ_QUEUE_BASIC,
+                },
+            )
+            task_name = job.job_id
+        except Exception as e:
+            logger.exception(
+                "Failed to enqueue job to Redis",
+                extra={
+                    "tenant_id": authenticated_entity.tenant_id,
+                    "provider_type": provider_type,
+                    "error": str(e),
+                },
+            )
+            failed_alerts_counter.inc()
+            raise HTTPException(
+                status_code=500, detail="Failed to process alert"
+            ) from e
     else:
         task_name = create_process_event_task(
             authenticated_entity.tenant_id,

@@ -193,6 +193,7 @@ interface GenerateAlertTableColsArg {
   setRunWorkflowModalAlert?: (alert: AlertDto) => void;
   setDismissModalAlert?: (alert: AlertDto[]) => void;
   setChangeStatusAlert?: (alert: AlertDto) => void;
+  setAssignModalAlert?: (alert: AlertDto) => void;
   presetName: string;
   presetNoisy?: boolean;
   MenuComponent?: (alert: AlertDto) => React.ReactNode;
@@ -209,6 +210,7 @@ export const useAlertTableCols = (
     setRunWorkflowModalAlert,
     setDismissModalAlert,
     setChangeStatusAlert,
+    setAssignModalAlert,
     presetName,
     presetNoisy = false,
     MenuComponent,
@@ -244,7 +246,7 @@ export const useAlertTableCols = (
         enableGrouping: true,
         getGroupingValue: (row) => {
           const value = getNestedValue(row, colName);
-          
+
           if (typeof value === "object" && value !== null) {
             return "object"; // Group all objects together
           }
@@ -345,7 +347,7 @@ export const useAlertTableCols = (
                   "whitespace-pre-wrap",
                   // Only apply line clamp if not expanded
                   !isExpanded &&
-                    (rowStyle === "default" ? "line-clamp-1" : "line-clamp-3")
+                  (rowStyle === "default" ? "line-clamp-1" : "line-clamp-3")
                 )}
               >
                 {value.toString()}
@@ -376,70 +378,70 @@ export const useAlertTableCols = (
     }),
     ...(isCheckboxDisplayed
       ? [
-          columnHelper.display({
-            id: "checkbox",
-            maxSize: 16,
-            minSize: 16,
-            header: (context) => (
-              <TableIndeterminateCheckbox
-                checked={context.table.getIsAllRowsSelected()}
-                indeterminate={context.table.getIsSomeRowsSelected()}
-                onChange={context.table.getToggleAllRowsSelectedHandler()}
-              />
-            ),
-            cell: (context) => (
-              <TableIndeterminateCheckbox
-                checked={context.row.getIsSelected()}
-                indeterminate={context.row.getIsSomeSelected()}
-                onChange={context.row.getToggleSelectedHandler()}
-              />
-            ),
-          }),
-        ]
+        columnHelper.display({
+          id: "checkbox",
+          maxSize: 16,
+          minSize: 16,
+          header: (context) => (
+            <TableIndeterminateCheckbox
+              checked={context.table.getIsAllRowsSelected()}
+              indeterminate={context.table.getIsSomeRowsSelected()}
+              onChange={context.table.getToggleAllRowsSelectedHandler()}
+            />
+          ),
+          cell: (context) => (
+            <TableIndeterminateCheckbox
+              checked={context.row.getIsSelected()}
+              indeterminate={context.row.getIsSomeSelected()}
+              onChange={context.row.getToggleSelectedHandler()}
+            />
+          ),
+        }),
+      ]
       : ([] as ColumnDef<AlertDto>[])),
     // noisy column
     ...(noisyAlertsEnabled
       ? [
-          columnHelper.display({
-            id: "noise",
-            size: 5,
-            header: () => <></>,
-            cell: (context) => {
-              // Get the status of the alert
-              const status = context.row.original.status;
-              const isNoisy = context.row.original.isNoisy;
+        columnHelper.display({
+          id: "noise",
+          size: 5,
+          header: () => <></>,
+          cell: (context) => {
+            // Get the status of the alert
+            const status = context.row.original.status;
+            const isNoisy = context.row.original.isNoisy;
 
-              // Return null if presetNoisy is not true
-              if (!presetNoisy && !isNoisy) {
+            // Return null if presetNoisy is not true
+            if (!presetNoisy && !isNoisy) {
+              return null;
+            } else if (presetNoisy) {
+              // Decide which icon to display based on the status
+              if (status === "firing") {
+                return (
+                  <Icon icon={MdOutlineNotificationsActive} color="red" />
+                );
+              } else {
+                return <Icon icon={MdOutlineNotificationsOff} color="red" />;
+              }
+            }
+            // else, noisy alert in non noisy preset
+            else {
+              if (status === "firing") {
+                return (
+                  <Icon icon={MdOutlineNotificationsActive} color="red" />
+                );
+              } else {
                 return null;
-              } else if (presetNoisy) {
-                // Decide which icon to display based on the status
-                if (status === "firing") {
-                  return (
-                    <Icon icon={MdOutlineNotificationsActive} color="red" />
-                  );
-                } else {
-                  return <Icon icon={MdOutlineNotificationsOff} color="red" />;
-                }
               }
-              // else, noisy alert in non noisy preset
-              else {
-                if (status === "firing") {
-                  return (
-                    <Icon icon={MdOutlineNotificationsActive} color="red" />
-                  );
-                } else {
-                  return null;
-                }
-              }
-            },
-            meta: {
-              tdClassName: "p-0",
-              thClassName: "p-0",
-            },
-            enableSorting: false,
-          }),
-        ]
+            }
+          },
+          meta: {
+            tdClassName: "p-0",
+            thClassName: "p-0",
+          },
+          enableSorting: false,
+        }),
+      ]
       : []),
     columnHelper.accessor("status", {
       id: "status",
@@ -574,9 +576,9 @@ export const useAlertTableCols = (
                 "whitespace-pre-wrap",
                 // Only truncate when not expanded
                 !expanded &&
-                  (rowStyle === "default"
-                    ? "truncate line-clamp-1"
-                    : "truncate line-clamp-3")
+                (rowStyle === "default"
+                  ? "truncate line-clamp-1"
+                  : "truncate line-clamp-3")
               )}
             >
               {value}
@@ -646,29 +648,30 @@ export const useAlertTableCols = (
     ...extraColumns,
     ...((isMenuDisplayed
       ? [
-          columnHelper.display({
-            id: "alertMenu",
-            minSize: 120,
-            cell: (context) =>
-              MenuComponent ? (
-                MenuComponent(context.row.original)
-              ) : (
-                <AlertMenu
-                  presetName={presetName.toLowerCase()}
-                  alert={context.row.original}
-                  setRunWorkflowModalAlert={setRunWorkflowModalAlert}
-                  setDismissModalAlert={setDismissModalAlert}
-                  setChangeStatusAlert={setChangeStatusAlert}
-                  setTicketModalAlert={setTicketModalAlert}
-                  setNoteModalAlert={setNoteModalAlert}
-                />
-              ),
-            meta: {
-              tdClassName: "p-0 md:p-2",
-              thClassName: "p-0 md:p-2",
-            },
-          }),
-        ]
+        columnHelper.display({
+          id: "alertMenu",
+          minSize: 120,
+          cell: (context) =>
+            MenuComponent ? (
+              MenuComponent(context.row.original)
+            ) : (
+              <AlertMenu
+                presetName={presetName.toLowerCase()}
+                alert={context.row.original}
+                setRunWorkflowModalAlert={setRunWorkflowModalAlert}
+                setDismissModalAlert={setDismissModalAlert}
+                setChangeStatusAlert={setChangeStatusAlert}
+                setTicketModalAlert={setTicketModalAlert}
+                setNoteModalAlert={setNoteModalAlert}
+                setAssignModalAlert={setAssignModalAlert}
+              />
+            ),
+          meta: {
+            tdClassName: "p-0 md:p-2",
+            thClassName: "p-0 md:p-2",
+          },
+        }),
+      ]
       : []) as ColumnDef<AlertDto>[]),
   ] as ColumnDef<AlertDto>[];
 };

@@ -359,6 +359,11 @@ class DismissRequestBody(BaseModel):
     restore: bool = False
 
 
+class AssignAlertRequestBody(BaseModel):
+    dispose_on_new_alert: bool = True
+    note: Optional[str] = None
+
+
 class EnrichAlertNoteRequestBody(BaseModel):
     note: str
     fingerprint: str

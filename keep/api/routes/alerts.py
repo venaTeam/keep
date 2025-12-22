@@ -1128,7 +1128,11 @@ def _enrich_alert(
         else:
             enrichement_bl.enrich_entity(**enrichment_kwargs)
 
-        # get the alert with the new enrichment
+        # Commit the session to ensure enrichments are persisted before querying
+        # Note: enrich_entity already commits, but this ensures everything is committed
+        session.commit()
+        
+        # get the alert with the new enrichment (get_alerts_by_fingerprint creates its own session)
         alert = get_alerts_by_fingerprint(
             authenticated_entity.tenant_id, enrich_data.fingerprint, limit=1
         )

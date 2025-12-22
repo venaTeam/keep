@@ -1,7 +1,7 @@
 import logging
 import os
 
-from elasticsearch import ApiError, BadRequestError, Elasticsearch
+from elasticsearch import ApiError, BadRequestError, Elasticsearch, NotFoundError
 from elasticsearch.helpers import BulkIndexError, bulk
 
 from keep.api.core.db import get_enrichments
@@ -265,10 +265,11 @@ class ElasticClient:
 
         self.logger.debug(f"Enriching alert {alert_fingerprint}")
         # get the alert, enrich it and index it
-        alert = self._client.get(index=self.alerts_index, id=alert_fingerprint)
-        if not alert:
-            self.logger.error(f"Alert with fingerprint {alert_fingerprint} not found")
-            return
+        try:
+            alert = self._client.get(index=self.alerts_index, id=alert_fingerprint)
+        except NotFoundError:
+            self.logger.error(f"Alert with fingerprint {alert_fingerprint} not found in Elasticsearch")
+            raise
 
         # enrich the alert
         alert["_source"].update(alert_enrichments)

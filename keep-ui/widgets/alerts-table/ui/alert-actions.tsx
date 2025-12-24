@@ -15,6 +15,7 @@ import { useConfig } from "@/utils/hooks/useConfig";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDoubleRightIcon } from "@heroicons/react/24/solid";
 import { AlertChangeStatusModal } from "@/features/alerts/alert-change-status/ui/alert-change-status-modal";
+import { CreatePresetModal } from "./create-preset-modal";
 
 interface Props {
   selectedAlertsFingerprints: string[];
@@ -45,6 +46,7 @@ export default function AlertActions({
   const revalidateMultiple = useRevalidateMultiple();
   const presetsMutator = () => revalidateMultiple(["/preset"]);
   const [modalAlert, setModalAlert] = useState<AlertDto | AlertDto[] | null>(null);
+  const [isCreatePresetModalOpen, setIsCreatePresetModalOpen] = useState(false);
 
   // TODO: refactor
   const searchParams = useSearchParams();
@@ -56,8 +58,7 @@ export default function AlertActions({
     .getSelectedRowModel()
     .rows.map((row) => row.original);
 
-  async function addOrUpdatePreset() {
-    const newPresetName = prompt("Enter new preset name");
+  async function addOrUpdatePreset(newPresetName: string) {
     if (newPresetName) {
       const distinctAlertNames = Array.from(
         new Set(selectedAlerts.map((alert) => alert.name))
@@ -164,7 +165,7 @@ export default function AlertActions({
         icon={PlusIcon}
         size="xs"
         color="orange"
-        onClick={async () => await addOrUpdatePreset()}
+        onClick={() => setIsCreatePresetModalOpen(true)}
         tooltip="Save current filter as a view"
       >
         Create Preset
@@ -202,6 +203,11 @@ export default function AlertActions({
         isOpen={isCreateIncidentWithAIOpen}
         alerts={selectedAlerts}
         handleClose={hideCreateIncidentWithAI}
+      />
+      <CreatePresetModal
+        isOpen={isCreatePresetModalOpen}
+        handleClose={() => setIsCreatePresetModalOpen(false)}
+        handleCreate={addOrUpdatePreset}
       />
     </div>
   );

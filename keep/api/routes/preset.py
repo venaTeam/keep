@@ -378,6 +378,13 @@ def update_preset(
     options_dict = [option.dict() for option in body.options]
     if not options_dict:
         raise HTTPException(400, "Options cannot be empty")
+
+    # preserve existing options that are not in the new options (merge)
+    # this allows us to update only specific options (like CEL/SQL) without losing others (like column config/tabs)
+    incoming_labels = {o.get("label") for o in options_dict}
+    for option in preset.options:
+        if option.get("label") not in incoming_labels:
+            options_dict.append(option)
     preset.options = options_dict
 
     # Handle tags

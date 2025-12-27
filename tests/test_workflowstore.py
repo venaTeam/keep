@@ -1,4 +1,10 @@
+import time
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
+
+import pytest
+
+from keep.api.core.db import get_all_provisioned_workflows
 from keep.api.core.dependencies import SINGLE_TENANT_UUID
 from keep.api.models.db.workflow import (
     Workflow,
@@ -6,11 +12,7 @@ from keep.api.models.db.workflow import (
     WorkflowExecutionLog,
 )
 from keep.workflowmanager.workflowstore import WorkflowStore
-from keep.api.core.db import get_all_provisioned_workflows
 from tests.fixtures.client import test_app  # noqa
-import pytest
-import time
-from uuid import uuid4
 
 VALID_WORKFLOW = """
 workflow:
@@ -338,9 +340,9 @@ def test_workflow_execution_large_results_many_logs_performance(db_session):
 
     # Performance assertion: Should complete in reasonable time (under 500ms)
     # The old implementation would either OOM or take much longer due to massive result duplication
-    assert (
-        query_time < 500
-    ), f"Query took too long: {query_time:.2f}ms. Expected < 500ms"
+    assert query_time < 500, (
+        f"Query took too long: {query_time:.2f}ms. Expected < 500ms"
+    )
 
     # Test the original function to ensure it still works (but without accessing logs)
     start_time = time.time_ns()

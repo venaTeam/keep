@@ -75,7 +75,6 @@ def test_get_rules_api(db_session, client, test_app):
 
 @pytest.mark.parametrize("test_app", ["NO_AUTH"], indirect=True)
 def test_create_rule_api(db_session, client, test_app):
-
     rule_data = {
         "ruleName": "test rule",
         "sqlQuery": {
@@ -149,7 +148,6 @@ def test_delete_rule_api(db_session, client, test_app):
 
 @pytest.mark.parametrize("test_app", ["NO_AUTH"], indirect=True)
 def test_update_rule_api(db_session, client, test_app):
-
     rule = create_rule_db(**TEST_RULE_DATA)
 
     rule_data = {

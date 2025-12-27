@@ -71,7 +71,7 @@ alert_field_configurations = [
     FieldMappingConfiguration(
         map_from_pattern="startedAt",
         map_to="lastalert.first_timestamp",
-        data_type=DataType.DATETIME
+        data_type=DataType.DATETIME,
     ),
     FieldMappingConfiguration(
         map_from_pattern="incident.id",
@@ -279,12 +279,9 @@ def __build_query_for_filtering(
             select(LastAlert.fingerprint)
             .join(
                 LastAlertToIncident,
-                LastAlert.fingerprint == LastAlertToIncident.fingerprint
+                LastAlert.fingerprint == LastAlertToIncident.fingerprint,
             )
-            .join(
-                Incident,
-                LastAlertToIncident.incident_id == Incident.id
-            )
+            .join(Incident, LastAlertToIncident.incident_id == Incident.id)
             .where(Incident.status == IncidentStatus.FIRING.value)
             .distinct()
         ).subquery()
@@ -300,7 +297,7 @@ def __build_query_for_filtering(
             and_(
                 LastAlertToIncident.tenant_id == Incident.tenant_id,
                 LastAlertToIncident.incident_id == Incident.id,
-                LastAlert.fingerprint.in_(select(firing_subq.c.fingerprint))
+                LastAlert.fingerprint.in_(select(firing_subq.c.fingerprint)),
             ),
         )
 

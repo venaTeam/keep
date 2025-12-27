@@ -148,13 +148,13 @@ class SmtpProvider(BaseProvider):
             msg["From"] = from_email
         else:
             msg["From"] = f"{from_name} <{from_email}>"
-        
+
         if isinstance(to_email, str):
             msg["To"] = to_email
         else:
             msg["To"] = ", ".join(to_email)
         msg["Subject"] = subject
-        
+
         # Prefer HTML content if provided, otherwise use plain text
         if html:
             msg.attach(MIMEText(html, "html"))
@@ -168,13 +168,20 @@ class SmtpProvider(BaseProvider):
         smtp.quit()
 
     def _notify(
-        self, from_email: str, from_name: str, to_email: str, subject: str, body: str = None, html: str = None, **kwargs
+        self,
+        from_email: str,
+        from_name: str,
+        to_email: str,
+        subject: str,
+        body: str = None,
+        html: str = None,
+        **kwargs,
     ):
         """
         Send an email using SMTP protocol.
         """
         self.send_email(from_email, from_name, to_email, subject, body, html)
-        
+
         # Return the notification details
         result = {"from": from_email, "to": to_email, "subject": subject}
         if html:

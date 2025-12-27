@@ -354,14 +354,14 @@ class AISuggestionBl:
         """Prepare system and user prompts for AI."""
         alert_descriptions = "\n".join(
             [
-                f"Alert {idx+1}: {json.dumps(alert.dict())}"
+                f"Alert {idx + 1}: {json.dumps(alert.dict())}"
                 for idx, alert in enumerate(alerts_dto)
             ]
         )
 
         topology_text = "\n".join(
             [
-                f"Topology {idx+1}: {json.dumps(topology.dict(), default=str)}"
+                f"Topology {idx + 1}: {json.dumps(topology.dict(), default=str)}"
                 for idx, topology in enumerate(topology_data)
             ]
         )

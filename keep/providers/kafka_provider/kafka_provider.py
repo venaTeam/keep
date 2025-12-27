@@ -7,6 +7,7 @@ import inspect
 import logging
 
 import pydantic
+
 # from confluent_kafka import Consumer, KafkaError, KafkaException
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError, NoBrokersAvailable
@@ -29,7 +30,7 @@ class KafkaProviderAuthConfig:
             "required": True,
             "description": "Kafka host",
             "hint": "e.g. localhost:9092 or localhost:9092,localhost:8093",
-            "validation": "no_scheme_multihost_url"
+            "validation": "no_scheme_multihost_url",
         },
     )
     topic: str = dataclasses.field(

@@ -1,32 +1,36 @@
 from typing import Any, List
 
+from celpy import CELParseError
 from sqlalchemy import Dialect, String
 
 from keep.api.core.cel_to_sql.ast_nodes import (
+    ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
     DataType,
+    LogicalNode,
     LogicalNodeOperator,
     MemberAccessNode,
     Node,
-    LogicalNode,
-    ComparisonNode,
-    UnaryNode,
-    PropertyAccessNode,
     ParenthesisNode,
+    PropertyAccessNode,
+    UnaryNode,
     UnaryNodeOperator,
     from_type_to_data_type,
 )
 from keep.api.core.cel_to_sql.cel_ast_converter import CelToAstConverter
-
-from keep.api.core.cel_to_sql.properties_mapper import JsonPropertyAccessNode, MultipleFieldsNode, PropertiesMapper, PropertiesMappingException
+from keep.api.core.cel_to_sql.properties_mapper import (
+    JsonPropertyAccessNode,
+    MultipleFieldsNode,
+    PropertiesMapper,
+    PropertiesMappingException,
+)
 from keep.api.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
     PropertiesMetadata,
     PropertyMetadataInfo,
     SimpleFieldMapping,
 )
-from celpy import CELParseError
 
 
 class CelToSqlException(Exception):
@@ -34,7 +38,6 @@ class CelToSqlException(Exception):
 
 
 class CelToSqlResult:
-
     def __init__(self, sql: str, involved_fields: List[PropertyMetadataInfo]):
         self.sql = sql
         self.involved_fields = involved_fields
@@ -138,7 +141,9 @@ class BaseCelToSqlProvider:
             sql_filter = self._build_sql_filter(with_mapped_props, [])
             return CelToSqlResult(sql=sql_filter, involved_fields=involved_fields)
         except NotImplementedError as e:
-            raise CelToSqlException(f"Error while converting CEL expression tree to SQL: {str(e)}") from e
+            raise CelToSqlException(
+                f"Error while converting CEL expression tree to SQL: {str(e)}"
+            ) from e
 
     def get_order_by_expression(self, sort_options: list[tuple[str, str]]) -> str:
         sort_expressions: list[str] = []
@@ -222,7 +227,9 @@ class BaseCelToSqlProvider:
         )
 
     def json_extract_as_text(self, column: str, path: list[str]) -> str:
-        raise NotImplementedError("Extracting JSON is not implemented. Must be implemented in the child class.")
+        raise NotImplementedError(
+            "Extracting JSON is not implemented. Must be implemented in the child class."
+        )
 
     def _json_contains_path(self, column: str, path: list[str]) -> str:
         raise NotImplementedError(
@@ -236,7 +243,9 @@ class BaseCelToSqlProvider:
         return f"COALESCE({', '.join(args)})"
 
     def cast(self, expression_to_cast: str, to_type: DataType, force=False) -> str:
-        raise NotImplementedError("CAST is not implemented. Must be implemented in the child class.")
+        raise NotImplementedError(
+            "CAST is not implemented. Must be implemented in the child class."
+        )
 
     def _visit_parentheses(self, node: str) -> str:
         return f"({node})"
@@ -264,7 +273,9 @@ class BaseCelToSqlProvider:
     # endregion
 
     # region Comparison Visitors
-    def _visit_comparison_node(self, comparison_node: ComparisonNode, stack: list[Node]) -> str:
+    def _visit_comparison_node(
+        self, comparison_node: ComparisonNode, stack: list[Node]
+    ) -> str:
         first_operand = None
         second_operand = None
         should_cast = comparison_node.operator not in [
@@ -401,7 +412,9 @@ class BaseCelToSqlProvider:
     def _visit_greater_than(self, first_operand: str, second_operand: str) -> str:
         return f"{first_operand} > {second_operand}"
 
-    def _visit_greater_than_or_equal(self, first_operand: str, second_operand: str) -> str:
+    def _visit_greater_than_or_equal(
+        self, first_operand: str, second_operand: str
+    ) -> str:
         return f"{first_operand} >= {second_operand}"
 
     def _visit_less_than(self, first_operand: str, second_operand: str) -> str:
@@ -410,7 +423,9 @@ class BaseCelToSqlProvider:
     def _visit_less_than_or_equal(self, first_operand: str, second_operand: str) -> str:
         return f"{first_operand} <= {second_operand}"
 
-    def _visit_in(self, first_operand: Node, array: list[ConstantNode], stack: list[Node]) -> str:
+    def _visit_in(
+        self, first_operand: Node, array: list[ConstantNode], stack: list[Node]
+    ) -> str:
         constant_value_type = type(array[0].value)
         cast_to = None
 
@@ -462,7 +477,7 @@ class BaseCelToSqlProvider:
 
         if len(constant_nodes_without_none) > 0:
             or_queries.append(
-                f"{first_operand_str} in ({ ', '.join([self._visit_constant_node(c.value, self._get_data_type_to_convert(first_operand)) for c in constant_nodes_without_none])})"
+                f"{first_operand_str} in ({', '.join([self._visit_constant_node(c.value, self._get_data_type_to_convert(first_operand)) for c in constant_nodes_without_none])})"
             )
 
         if is_none_found:
@@ -520,7 +535,9 @@ class BaseCelToSqlProvider:
         if isinstance(value, float) or isinstance(value, int):
             return str(value)
 
-        raise NotImplementedError(f"{type(value).__name__} constant type is not supported yet. Consider implementing this support in child class.")
+        raise NotImplementedError(
+            f"{type(value).__name__} constant type is not supported yet. Consider implementing this support in child class."
+        )
 
     def _get_data_type_to_convert(self, node: Node) -> DataType:
         """
@@ -557,7 +574,9 @@ class BaseCelToSqlProvider:
 
         return self.coalesce(coalesce_args)
 
-    def _visit_member_access_node(self, member_access_node: MemberAccessNode, stack) -> str:
+    def _visit_member_access_node(
+        self, member_access_node: MemberAccessNode, stack
+    ) -> str:
         if isinstance(member_access_node, PropertyAccessNode):
             return self._visit_property_access_node(member_access_node, stack)
 
@@ -565,14 +584,20 @@ class BaseCelToSqlProvider:
             f"{type(member_access_node).__name__} member access node is not supported yet"
         )
 
-    def _visit_property_access_node(self, property_access_node: PropertyAccessNode, stack: list[Node]) -> str:
-        if (isinstance(property_access_node, JsonPropertyAccessNode)):
-            return self.json_extract_as_text(property_access_node.json_property_name, property_access_node.property_to_extract)
+    def _visit_property_access_node(
+        self, property_access_node: PropertyAccessNode, stack: list[Node]
+    ) -> str:
+        if isinstance(property_access_node, JsonPropertyAccessNode):
+            return self.json_extract_as_text(
+                property_access_node.json_property_name,
+                property_access_node.property_to_extract,
+            )
 
         return ".".join([f"{item}" for item in property_access_node.path])
 
     def _visit_index_property(self, property_path: str) -> str:
         raise NotImplementedError("Index property is not supported yet")
+
     # endregion
 
     # region Unary Visitors

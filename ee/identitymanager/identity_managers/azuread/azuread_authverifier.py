@@ -186,7 +186,6 @@ class AzureadAuthVerifier(AuthVerifierBase):
             }
 
             try:
-
                 payload = jwt.decode(
                     token,
                     key=signing_key,

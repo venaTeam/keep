@@ -10,8 +10,8 @@ from pydantic import (
     Extra,
     Field,
     PrivateAttr,
-    validator,
     root_validator,
+    validator,
 )
 from sqlmodel import col, desc
 
@@ -23,13 +23,15 @@ class IncidentStatusChangeDto(BaseModel):
     status: IncidentStatus
     comment: str | None
     tagged_users: list[str] = []
-    
-    @validator('tagged_users')
+
+    @validator("tagged_users")
     @classmethod
     def validate_no_duplicate_users(cls, value):
         """Ensure there are no duplicate users in the tagged_users list."""
         if len(value) != len(set(value)):
-            unique_users = list(dict.fromkeys(value))  # Preserves order while removing duplicates
+            unique_users = list(
+                dict.fromkeys(value)
+            )  # Preserves order while removing duplicates
             return unique_users
         return value
 
@@ -115,7 +117,6 @@ class IncidentDto(IncidentDtoIn):
         if "tenant_id" in data:
             self._tenant_id = data.pop("tenant_id")
 
-
     def __str__(self) -> str:
         # Convert the model instance to a dictionary
         model_dict = self.dict()
@@ -171,7 +172,6 @@ class IncidentDto(IncidentDtoIn):
 
     @classmethod
     def from_db_incident(cls, db_incident: "Incident", rule: "Rule" = None):
-
         severity = (
             IncidentSeverity.from_number(db_incident.severity)
             if isinstance(db_incident.severity, int)

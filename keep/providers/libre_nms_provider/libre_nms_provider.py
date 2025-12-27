@@ -181,7 +181,6 @@ To send alerts from LibreNMS to Keep, Use the following webhook url to configure
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> AlertDto | list[AlertDto]:
-
         if event.get("description") == "":
             description = event.get("title", "Could not fetch description")
         else:

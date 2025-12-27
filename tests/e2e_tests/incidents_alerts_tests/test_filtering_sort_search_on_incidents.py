@@ -1,7 +1,9 @@
-from datetime import datetime, timedelta, timezone
 import re
+from datetime import datetime, timedelta, timezone
+
 import pytest
-from playwright.sync_api import expect, Page
+from playwright.sync_api import Page, expect
+
 from tests.e2e_tests.incidents_alerts_tests.incidents_alerts_setup import (
     query_incidents,
     setup_incidents_alerts,

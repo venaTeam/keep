@@ -1,7 +1,7 @@
-import json
 import dataclasses
-import pydantic
+import json
 
+import pydantic
 from openai import OpenAI
 
 from keep.contextmanager.contextmanager import ContextManager
@@ -92,8 +92,8 @@ class DeepseekProvider(BaseProvider):
 
 
 if __name__ == "__main__":
-    import os
     import logging
+    import os
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
     context_manager = ContextManager(

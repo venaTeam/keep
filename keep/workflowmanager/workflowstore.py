@@ -9,6 +9,7 @@ import celpy
 import requests
 import validators
 from fastapi import HTTPException
+from sqlalchemy.exc import NoResultFound
 
 from keep.api.core.db import (
     add_or_update_workflow,
@@ -29,7 +30,6 @@ from keep.functions import cyaml
 from keep.parser.parser import Parser
 from keep.providers.providers_factory import ProvidersFactory
 from keep.workflowmanager.workflow import Workflow
-from sqlalchemy.exc import NoResultFound
 
 
 class WorkflowStore:
@@ -454,7 +454,6 @@ class WorkflowStore:
 
         ### Provisioning from the directory
         if provisioned_workflows_dir is not None:
-
             logger.info(
                 f"Provisioning workflows from directory {provisioned_workflows_dir}"
             )

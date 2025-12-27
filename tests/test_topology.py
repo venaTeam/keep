@@ -1,5 +1,6 @@
-from datetime import datetime
 import uuid
+from datetime import datetime
+
 import pytest
 from sqlmodel import select
 
@@ -12,13 +13,12 @@ from keep.api.models.db.topology import (
     TopologyServiceDtoIn,
 )
 from keep.topologies.topologies_service import (
-    TopologiesService,
     ApplicationNotFoundException,
     InvalidApplicationDataException,
     ServiceNotFoundException,
+    TopologiesService,
 )
-from tests.fixtures.client import setup_api_key, client, test_app  # noqa: F401
-
+from tests.fixtures.client import client, setup_api_key, test_app  # noqa: F401
 
 VALID_API_KEY = "valid_api_key"
 
@@ -94,6 +94,7 @@ def test_get_applications_by_tenant_id(db_session):
     assert len(result[0].services) == 2
     assert result[1].name == "Test Application 2"
     assert len(result[1].services) == 1
+
 
 def test_create_application_by_tenant_id(db_session):
     application_dto = TopologyApplicationDtoIn(name="New Application", services=[])
@@ -313,16 +314,24 @@ def test_clean_before_import(db_session):
     db_session.commit()
 
     # Assert data exists before cleaning
-    assert db_session.exec(select(TopologyService).where(TopologyService.tenant_id == tenant_id)).all()
-    assert db_session.exec(select(TopologyApplication).where(TopologyApplication.tenant_id == tenant_id)).all()
+    assert db_session.exec(
+        select(TopologyService).where(TopologyService.tenant_id == tenant_id)
+    ).all()
+    assert db_session.exec(
+        select(TopologyApplication).where(TopologyApplication.tenant_id == tenant_id)
+    ).all()
     assert db_session.exec(select(TopologyServiceDependency)).all()
 
     # Act: Call the clean_before_import function
     TopologiesService.clean_before_import(tenant_id, db_session)
 
     # Assert: Ensure all data is deleted for this tenant
-    assert not db_session.exec(select(TopologyService).where(TopologyService.tenant_id == tenant_id)).all()
-    assert not db_session.exec(select(TopologyApplication).where(TopologyApplication.tenant_id == tenant_id)).all()
+    assert not db_session.exec(
+        select(TopologyService).where(TopologyService.tenant_id == tenant_id)
+    ).all()
+    assert not db_session.exec(
+        select(TopologyApplication).where(TopologyApplication.tenant_id == tenant_id)
+    ).all()
     assert not db_session.exec(select(TopologyServiceDependency)).all()
 
 
@@ -373,12 +382,18 @@ def test_import_to_db(db_session):
 
         TopologiesService.import_to_db(topology_data, db_session, tenant_id)
 
-        services = db_session.exec(select(TopologyService).where(TopologyService.tenant_id == tenant_id)).all()
+        services = db_session.exec(
+            select(TopologyService).where(TopologyService.tenant_id == tenant_id)
+        ).all()
         assert len(services) == 2
         assert services[0].service == "test_service_1"
         assert services[1].service == "test_service_2"
 
-        applications = db_session.exec(select(TopologyApplication).where(TopologyApplication.tenant_id == tenant_id)).all()
+        applications = db_session.exec(
+            select(TopologyApplication).where(
+                TopologyApplication.tenant_id == tenant_id
+            )
+        ).all()
         assert len(applications) == 2
         assert applications[0].name == "Test Application 1"
         assert applications[1].name == "Test Application 2"

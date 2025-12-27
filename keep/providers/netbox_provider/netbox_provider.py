@@ -46,7 +46,6 @@ class NetboxProvider(BaseProvider):
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> AlertDto:
-
         data = event.get("data", {})
         snapshots = event.get("snapshots", {})
 

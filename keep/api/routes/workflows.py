@@ -27,12 +27,16 @@ from keep.api.core.db import (
     get_last_workflow_workflow_to_alert_executions,
     get_or_create_dummy_workflow,
     get_session,
-    get_workflow_by_id as get_workflow_by_id_db,
     get_workflow_version,
     get_workflow_versions,
-    update_workflow_by_id as update_workflow_by_id_db,
+)
+from keep.api.core.db import (
+    get_workflow_by_id as get_workflow_by_id_db,
 )
 from keep.api.core.db import get_workflow_executions as get_workflow_executions_db
+from keep.api.core.db import (
+    update_workflow_by_id as update_workflow_by_id_db,
+)
 from keep.api.core.workflows import (
     get_workflow_facets,
     get_workflow_facets_data,

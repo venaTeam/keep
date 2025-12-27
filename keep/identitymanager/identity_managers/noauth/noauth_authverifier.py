@@ -47,7 +47,6 @@ class NoAuthVerifier(AuthVerifierBase):
         api_key: str,
         authorization: Optional[HTTPAuthorizationCredentials],
     ) -> AuthenticatedEntity:
-
         tenant_api_key = get_api_key(api_key)
         # this is ok, since we are in noauth mode
         if not tenant_api_key:

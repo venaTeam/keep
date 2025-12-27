@@ -145,12 +145,12 @@ class Site24X7Provider(BaseProvider):
             data=data,
         ).json()
         return {
-            "Authorization": f'Bearer {response["access_token"]}',
+            "Authorization": f"Bearer {response['access_token']}",
         }
 
     def validate_scopes(self) -> dict[str, bool | str]:
         response = requests.get(
-            f'{self.__get_url(paths=["monitors"])}', headers=self.__get_headers()
+            f"{self.__get_url(paths=['monitors'])}", headers=self.__get_headers()
         )
         if response.status_code == 401:
             authentication_scope = response.json()
@@ -169,10 +169,7 @@ class Site24X7Provider(BaseProvider):
                 "Error while authenticating user",
                 extra={"status_code": response.status_code},
             )
-        return {
-            "authenticated": authentication_scope,
-            "valid_tld": True
-        }
+        return {"authenticated": authentication_scope, "valid_tld": True}
 
     def setup_webhook(
         self, tenant_id: str, keep_api_url: str, api_key: str, setup_alerts: bool = True

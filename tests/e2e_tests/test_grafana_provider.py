@@ -27,7 +27,7 @@ def get_grafana_access_token(role: str):
         "Content-Type": "application/json",
     }
     json_data_service_account = {
-        "name": f'test-{role}-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+        "name": f"test-{role}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "role": role,
     }
     auth = ("admin", "admin")
@@ -40,11 +40,11 @@ def get_grafana_access_token(role: str):
     service_account = service_account.json()
 
     json_data__token = {
-        "name": f'test-token-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+        "name": f"test-token-{datetime.now().strftime('%Y%m%d%H%M%S')}",
     }
 
     token_response = requests.post(
-        f'{GRAFANA_HOST_LOCAL}/api/serviceaccounts/{service_account["id"]}/tokens',
+        f"{GRAFANA_HOST_LOCAL}/api/serviceaccounts/{service_account['id']}/tokens",
         headers=headers,
         json=json_data__token,
         auth=("admin", "admin"),

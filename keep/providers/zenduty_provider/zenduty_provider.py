@@ -47,7 +47,7 @@ class ZendutyProvider(BaseProvider):
         service: str = "",
         user: str = "",
         policy: str = "",
-        **kwargs: dict
+        **kwargs: dict,
     ):
         """
         Create incident Zenduty using the Zenduty API

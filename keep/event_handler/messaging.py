@@ -2,12 +2,12 @@ import abc
 import asyncio
 import json
 import logging
-from typing import Optional
 
 from aiokafka import AIOKafkaConsumer
 
 from keep.api.core.config import config
 from keep.api.tasks.process_event_task import process_event
+
 
 class EventConsumer(abc.ABC):
     @abc.abstractmethod
@@ -22,10 +22,12 @@ class EventConsumer(abc.ABC):
 class KafkaEventConsumer(EventConsumer):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.bootstrap_servers = config("KAFKA_BOOTSTRAP_SERVERS", default="localhost:9092")
+        self.bootstrap_servers = config(
+            "KAFKA_BOOTSTRAP_SERVERS", default="localhost:9092"
+        )
         self.topic = "keep-events"
         self.group_id = "keep-event-handler"
-        
+
         # SASL config
         self.security_protocol = config("KAFKA_SECURITY_PROTOCOL", default="PLAINTEXT")
         self.sasl_mechanism = config("KAFKA_SASL_MECHANISM", default="PLAIN")
@@ -42,7 +44,7 @@ class KafkaEventConsumer(EventConsumer):
             sasl_mechanism=self.sasl_mechanism,
             sasl_plain_username=self.sasl_plain_username,
             sasl_plain_password=self.sasl_plain_password,
-            api_version="auto"
+            api_version="auto",
         )
         self._running = False
         self._task = None
@@ -50,11 +52,11 @@ class KafkaEventConsumer(EventConsumer):
     async def start(self):
         if self._running:
             return
-        
+
         self.logger.info(f"Starting Kafka Consumer on topic {self.topic}")
         await self.consumer.start()
         self._running = True
-        
+
         # Create a background task to consume messages
         loop = asyncio.get_running_loop()
         self._task = loop.create_task(self._consume_loop())
@@ -71,7 +73,7 @@ class KafkaEventConsumer(EventConsumer):
                 await self._task
             except asyncio.CancelledError:
                 pass
-        
+
         await self.consumer.stop()
         self.logger.info("Kafka Consumer stopped")
 
@@ -80,11 +82,13 @@ class KafkaEventConsumer(EventConsumer):
             async for msg in self.consumer:
                 if not self._running:
                     break
-                
+
                 try:
                     payload = json.loads(msg.value.decode("utf-8"))
-                    self.logger.info(f"Received event from Kafka: {payload.get('trace_id')}")
-                    
+                    self.logger.info(
+                        f"Received event from Kafka: {payload.get('trace_id')}"
+                    )
+
                     # Extract arguments matching process_event's expectation
                     event = payload.get("event")
                     tenant_id = payload.get("tenant_id")
@@ -94,13 +98,13 @@ class KafkaEventConsumer(EventConsumer):
                     api_key_name = payload.get("api_key_name")
                     trace_id = payload.get("trace_id")
                     provider_name = payload.get("provider_name")
-                    
+
                     self.logger.info(f"Processing event in Kafka Consumer: {trace_id}")
                     # Run logic in loop/thread since process_event is sync
                     # We pass an empty dict as ctx since we are not in ARQ
                     await asyncio.to_thread(
                         process_event,
-                        {}, # ctx
+                        {},  # ctx
                         tenant_id,
                         provider_type,
                         provider_id,
@@ -108,7 +112,7 @@ class KafkaEventConsumer(EventConsumer):
                         api_key_name,
                         trace_id,
                         event,
-                        provider_name=provider_name
+                        provider_name=provider_name,
                     )
                     self.logger.info(f"Finished processing event: {trace_id}")
 

@@ -144,8 +144,8 @@ def get_metrics(
     export += "\n\n"
     export += "# HELP workflows_executions_total The total number of workflows.\r\n"
     export += "# TYPE workflows_executions_total counter\n"
-    export += f"workflows_executions_total {{status=\"success\"}} {workflow_execution_counts['success']}\n"
-    export += f"workflows_executions_total {{status=\"other\"}} {workflow_execution_counts['other']}\n"
+    export += f'workflows_executions_total {{status="success"}} {workflow_execution_counts["success"]}\n'
+    export += f'workflows_executions_total {{status="other"}} {workflow_execution_counts["other"]}\n'
 
     return Response(content=export, media_type=CONTENT_TYPE_LATEST)
 

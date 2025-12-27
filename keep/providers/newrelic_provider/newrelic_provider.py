@@ -42,7 +42,7 @@ class NewrelicProviderAuthConfig:
         metadata={
             "required": False,
             "description": "New Relic API URL",
-            "validation": "https_url"
+            "validation": "https_url",
         },
         default="https://api.newrelic.com",
     )
@@ -695,7 +695,7 @@ class NewrelicProvider(BaseProvider):
                 extra={
                     "name": name,
                     "channel_id": channel_id,
-                }
+                },
             )
 
     def __add_new_worflow(

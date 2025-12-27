@@ -60,7 +60,6 @@ To send alerts from Dash0 to Keep, Use the following webhook url to configure Da
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> AlertDto:
-
         data = event.get("data")
         issue = data.get("issue")
 

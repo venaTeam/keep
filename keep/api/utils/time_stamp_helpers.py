@@ -1,14 +1,12 @@
-from keep.api.models.time_stamp import TimeStampFilter
-from fastapi import (
-    HTTPException,
-    Query
-)
-from typing import Optional
 import json
+from typing import Optional
 
-def get_time_stamp_filter(
-    time_stamp: Optional[str] = Query(None)
-) -> TimeStampFilter:
+from fastapi import HTTPException, Query
+
+from keep.api.models.time_stamp import TimeStampFilter
+
+
+def get_time_stamp_filter(time_stamp: Optional[str] = Query(None)) -> TimeStampFilter:
     if time_stamp:
         try:
             # Parse the JSON string

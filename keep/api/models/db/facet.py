@@ -9,8 +9,10 @@ from sqlmodel import Field, Index, SQLModel
 class FacetEntityType(enum.Enum):
     INCIDENT = "incident"
 
+
 class FacetType(enum.Enum):
     str = "string"
+
 
 class Facet(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -26,6 +28,10 @@ class Facet(SQLModel, table=True):
     user_id: str = Field(nullable=False)
 
     __table_args__ = (
-        Index("ix_facet_tenant_id", "tenant_id"), # we need to be able to query facets by tenant_id quickly
-        Index("ix_entity_type", "entity_type"), # we need to be able to query facets by entity_type quickly
+        Index(
+            "ix_facet_tenant_id", "tenant_id"
+        ),  # we need to be able to query facets by tenant_id quickly
+        Index(
+            "ix_entity_type", "entity_type"
+        ),  # we need to be able to query facets by entity_type quickly
     )

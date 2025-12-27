@@ -16,9 +16,8 @@ from sqlalchemy_utils import UUIDType
 from sqlmodel import Session, select
 
 from keep.api.core.config import config
-from keep.api.core.db import batch_enrich
-from keep.api.core.db import enrich_entity as enrich_alert_db
 from keep.api.core.db import (
+    batch_enrich,
     get_alert_by_event_id,
     get_enrichment_with_session,
     get_extraction_rule_by_id,
@@ -29,6 +28,7 @@ from keep.api.core.db import (
     get_topology_data_by_dynamic_matcher,
     is_all_alerts_resolved,
 )
+from keep.api.core.db import enrich_entity as enrich_alert_db
 from keep.api.core.elastic import ElasticClient
 from keep.api.models.action_type import ActionType
 from keep.api.models.alert import AlertDto
@@ -89,7 +89,6 @@ def get_nested_attribute(obj: AlertDto, attr_path: str):
 
 
 class EnrichmentsBl:
-
     ENRICHMENT_DISABLED = config("KEEP_ENRICHMENT_DISABLED", default="false", cast=bool)
 
     def __init__(self, tenant_id: str, db: Session | None = None):
@@ -691,7 +690,6 @@ class EnrichmentsBl:
         force=False,
         audit_enabled=True,
     ):
-
         common_kwargs = {
             "enrichments": enrichments,
             "action_type": action_type,
@@ -920,9 +918,7 @@ class EnrichmentsBl:
                         alert_dto = AlertDto(**alert_data)
                         self.elastic_client.index_alert(alert_dto)
                     else:
-                        self.elastic_client.enrich_alert(
-                            fingerprint, new_enrichments
-                        )
+                        self.elastic_client.enrich_alert(fingerprint, new_enrichments)
                 except Exception:
                     self.logger.exception(
                         "Failed to reindex alert after disposing enrichments",
@@ -935,14 +931,18 @@ class EnrichmentsBl:
                 "enrichments disposed", extra={"fingerprint": fingerprint}
             )
 
-    def make_enrichments_permanent(self, fingerprint: str, dispose_keys: list[str] = None):
+    def make_enrichments_permanent(
+        self, fingerprint: str, dispose_keys: list[str] = None
+    ):
         """
         Convert disposable enrichments to permanent enrichments
         """
         if EnrichmentsBl.ENRICHMENT_DISABLED:
             return
 
-        self.logger.debug("making enrichments permanent", extra={"fingerprint": fingerprint})
+        self.logger.debug(
+            "making enrichments permanent", extra={"fingerprint": fingerprint}
+        )
         enrichments = get_enrichment_with_session(
             self.db_session, self.tenant_id, fingerprint
         )
@@ -972,7 +972,7 @@ class EnrichmentsBl:
                 changed = True
             else:
                 new_enrichments[key] = val
-        
+
         if changed:
             enrich_alert_db(
                 self.tenant_id,
@@ -1001,9 +1001,7 @@ class EnrichmentsBl:
                         alert_dto = AlertDto(**alert_data)
                         self.elastic_client.index_alert(alert_dto)
                     else:
-                        self.elastic_client.enrich_alert(
-                            fingerprint, new_enrichments
-                        )
+                        self.elastic_client.enrich_alert(fingerprint, new_enrichments)
                 except Exception:
                     self.logger.exception(
                         "Failed to reindex alert after making enrichments permanent",

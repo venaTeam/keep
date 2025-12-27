@@ -54,9 +54,9 @@ def test_parse_sanity_check(db_session):
         SINGLE_TENANT_UUID, workflow_path, providers_path
     )
     assert parsed_workflows is not None
-    assert (
-        len(parsed_workflows) > 0
-    ), "caution: the expected output is a list with at least one alert, instead got non "
+    assert len(parsed_workflows) > 0, (
+        "caution: the expected output is a list with at least one alert, instead got non "
+    )
     for index, parse_workflow in enumerate(parsed_workflows):
         print(
             "validating parsed alert #"
@@ -73,7 +73,7 @@ def test_parse_sanity_check(db_session):
             isinstance(item, str) for item in parse_workflow.workflow_tags
         )
         assert len(parse_workflow.workflow_steps) > 0 and all(
-            type(item) == Step for item in parse_workflow.workflow_steps
+            isinstance(item, Step) for item in parse_workflow.workflow_steps
         )
 
 
@@ -302,7 +302,6 @@ reusable_actions_path = str(path_to_test_resources / "reusable_actions_for_testi
 
 
 class TestReusableActionWithWorkflow:
-
     def test_if_action_is_expanded(self, db_session):
         workflow_store = WorkflowStore()
         workflows = workflow_store.get_workflows_from_path(
@@ -392,7 +391,6 @@ class TestReusableActionWithWorkflow:
 
 
 class TestParserUtils:
-
     def test_deep_merge_dict(self):
         """Dictionary: if the merge combines recursively and prioritize values of source"""
         source = {"1": {"s11": "s11", "s12": "s12"}, "2": {"s21": "s21"}}

@@ -42,5 +42,3 @@ class TicketCountProvider(BaseProvider):
     def dispose(self):
         """Nothing to clean up."""
         return
-
-

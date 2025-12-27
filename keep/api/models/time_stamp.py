@@ -1,9 +1,9 @@
 import json
+from datetime import datetime
 from typing import Optional
 
-from fastapi import Query, HTTPException
+from fastapi import HTTPException, Query
 from pydantic import BaseModel, Field
-from datetime import datetime
 
 
 class TimeStampFilter(BaseModel):

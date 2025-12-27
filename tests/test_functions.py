@@ -41,9 +41,9 @@ from keep.iohandler.iohandler import IOHandler
     ],
 )
 def test_functions_diff(test_description, given, expected):
-    assert (
-        functions.diff(given) == expected
-    ), f"{test_description}: Expected {given} to return {expected}"
+    assert functions.diff(given) == expected, (
+        f"{test_description}: Expected {given} to return {expected}"
+    )
 
 
 def test_keep_add_function():
@@ -68,6 +68,7 @@ def test_keep_mul_function():
     """
     assert functions.mul(1, 2) == 2
     assert functions.mul(1, 2, 3) == 6
+
 
 def test_keep_mul_function_with_zero():
     """

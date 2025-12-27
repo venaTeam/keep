@@ -41,7 +41,6 @@ workflow_test = """workflow:
 def test_workflow(
     db_session,
 ):
-
     workflow_db = Workflow(
         id="alert-time-check",
         name="alert-time-check",

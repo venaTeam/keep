@@ -92,7 +92,8 @@ def test_alert_dto_different_timezone():
 def test_alert_dto_microsecond_precision():
     """Test timestamp with different microsecond precision"""
     alert = create_basic_alert(
-        name="Precision Alert", last_received="1739550225.735604"  # Less precision
+        name="Precision Alert",
+        last_received="1739550225.735604",  # Less precision
     )
     assert alert.lastReceived.endswith("Z")
     assert "." in alert.lastReceived  # Should still include milliseconds

@@ -12,6 +12,7 @@ from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
 
+
 @pydantic.dataclasses.dataclass
 class ChecklyProviderAuthConfig:
     """
@@ -34,10 +35,12 @@ class ChecklyProviderAuthConfig:
         },
     )
 
+
 class ChecklyProvider(BaseProvider):
     """
     Get alerts from Checkly into Keep.
     """
+
     webhook_documentation_here_differs_from_general_documentation = True
     webhook_description = ""
     webhook_template = ""
@@ -74,7 +77,7 @@ To send alerts from Checkly to Keep, Use the following webhook url to configure 
         "ALERT_DEGRADED_FAILURE": AlertStatus.FIRING,
         "ALERT_FAILURE_REMAIN": AlertStatus.ACKNOWLEDGED,
         "ALERT_FAILURE_DEGRADED": AlertStatus.ACKNOWLEDGED,
-        "ALERT_RECOVERY": AlertStatus.RESOLVED
+        "ALERT_RECOVERY": AlertStatus.RESOLVED,
     }
 
     SEVERITY_MAP = {
@@ -86,7 +89,7 @@ To send alerts from Checkly to Keep, Use the following webhook url to configure 
         "ALERT_DEGRADED_FAILURE": AlertSeverity.HIGH,
         "ALERT_FAILURE_REMAIN": AlertSeverity.CRITICAL,
         "ALERT_FAILURE_DEGRADED": AlertSeverity.WARNING,
-        "ALERT_RECOVERY": AlertSeverity.INFO
+        "ALERT_RECOVERY": AlertSeverity.INFO,
     }
 
     def __init__(
@@ -99,7 +102,7 @@ To send alerts from Checkly to Keep, Use the following webhook url to configure 
         Dispose the provider.
         """
         pass
-    
+
     def validate_config(self):
         """
         Validates required configuration for ilert provider.
@@ -122,10 +125,12 @@ To send alerts from Checkly to Keep, Use the following webhook url to configure 
             if response.status_code != 200:
                 response.raise_for_status()
 
-            self.logger.info("Successfully validated scopes", extra={"response": response.json()})
+            self.logger.info(
+                "Successfully validated scopes", extra={"response": response.json()}
+            )
 
             return {"read_alerts": True}
-            
+
         except Exception as e:
             self.logger.exception("Failed to validate scopes", extra={"error": e})
             return {"read_alerts": str(e)}
@@ -152,10 +157,11 @@ To send alerts from Checkly to Keep, Use the following webhook url to configure 
                 statusCode=alert["statusCode"],
                 created_at=alert["created_at"],
                 startedAt=alert["startedAt"],
-                source=["checkly"]
-            ) for alert in alerts
+                source=["checkly"],
+            )
+            for alert in alerts
         ]
-    
+
     @staticmethod
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
@@ -183,19 +189,18 @@ To send alerts from Checkly to Keep, Use the following webhook url to configure 
             tags=event["tags"],
             url=event["link"],
             region=event["region"],
-            source=["checkly"]
+            source=["checkly"],
         )
 
         return alert
 
-        
     def __get_auth_headers(self):
         return {
             "Authorization": f"Bearer {self.authentication_config.checklyApiKey}",
             "X-Checkly-Account": self.authentication_config.accountId,
-            "accept": "application/json"
+            "accept": "application/json",
         }
-    
+
     def __get_paginated_data(self, query_params: dict = {}) -> list:
         data = []
         page = 1
@@ -218,16 +223,17 @@ To send alerts from Checkly to Keep, Use the following webhook url to configure 
                 self.logger.error(f"Error getting data from page {page}: {e}")
                 break
         return data
-    
+
     def __get_url(self, query_params: dict = {}):
         url = "https://api.checklyhq.com/v1/check-alerts"
         if query_params:
-          url += "?"
-          for key, value in query_params.items():
-            url += f"{key}={value}&"
-          url = url[:-1]
+            url += "?"
+            for key, value in query_params.items():
+                url += f"{key}={value}&"
+            url = url[:-1]
         return url
-    
+
+
 if __name__ == "__main__":
     import logging
 
@@ -247,7 +253,7 @@ if __name__ == "__main__":
         authentication={
             "checklyApiKey": checkly_api_key,
             "accountId": checkly_account_id,
-        }
+        },
     )
 
     provider = ChecklyProvider(context_manager, "checkly", config)

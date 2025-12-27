@@ -50,7 +50,7 @@ class AppdynamicsProviderAuthConfig:
             "required": True,
             "description": "AppDynamics host",
             "hint": "e.g. https://baseball202404101029219.saas.appdynamics.com",
-            "validation": "any_http_url"
+            "validation": "any_http_url",
         },
     )
 

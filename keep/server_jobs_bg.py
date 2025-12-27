@@ -1,6 +1,7 @@
+import logging
 import os
 import time
-import logging
+
 import requests
 
 from keep.api.core.demo_mode import launch_demo_mode_thread
@@ -32,7 +33,7 @@ def main():
     threads.append(launch_uptime_reporting_thread())
 
     logger.info("Background server jobs threads launched, joining them.")
-    
+
     for thread in threads:
         if thread is not None:
             thread.join()

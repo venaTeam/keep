@@ -546,9 +546,10 @@ class ProvidersService:
 
             for provider_name, provider_config in env_providers.items():
                 provider_info = provider_config.get("authentication", {})
-                install_webhook_env = os.environ.get(
-                    "KEEP_PROVIDERS_INSTALL_WEBHOOKS", "true"
-                ).lower() == "true"
+                install_webhook_env = (
+                    os.environ.get("KEEP_PROVIDERS_INSTALL_WEBHOOKS", "true").lower()
+                    == "true"
+                )
                 install_webhook = provider_config.get(
                     "install_webhook", install_webhook_env
                 )
@@ -620,9 +621,12 @@ class ProvidersService:
                             provider_type = provider_yaml["type"]
                             provider_config = provider_yaml.get("authentication", {})
 
-                            install_webhook_env = os.environ.get(
-                                "KEEP_PROVIDERS_INSTALL_WEBHOOKS", "false"
-                            ).lower() == "true"
+                            install_webhook_env = (
+                                os.environ.get(
+                                    "KEEP_PROVIDERS_INSTALL_WEBHOOKS", "false"
+                                ).lower()
+                                == "true"
+                            )
                             install_webhook = provider_yaml.get(
                                 "install_webhook", install_webhook_env
                             )
@@ -668,11 +672,16 @@ class ProvidersService:
                                         provider_type=installed_provider["type"],
                                         provider_id=installed_provider["id"],
                                     )
-                                    logger.info(f"Webhook installed for {provider_name}")
+                                    logger.info(
+                                        f"Webhook installed for {provider_name}"
+                                    )
                                 except Exception as e:
                                     logger.error(
                                         "Error installing webhook for provider from directory",
-                                        extra={"provider_name": provider_name, "exception": e},
+                                        extra={
+                                            "provider_name": provider_name,
+                                            "exception": e,
+                                        },
                                     )
                             else:
                                 logger.info(

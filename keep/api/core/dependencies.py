@@ -5,12 +5,13 @@ from fastapi import Request
 from fastapi.datastructures import FormData
 from pusher import Pusher
 
-from keep.api.core.config import config
-from fastapi import Depends
-from arq import ArqRedis
-
 from keep.api.arq_pool import get_pool
-from keep.api.core.messaging import EventProducer, RedisEventProducer, KafkaEventProducer
+from keep.api.core.config import config
+from keep.api.core.messaging import (
+    EventProducer,
+    KafkaEventProducer,
+    RedisEventProducer,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,9 @@ async def extract_generic_body(request: Request) -> dict | bytes | FormData:
     content_type = request.headers.get("Content-Type")
     if content_type == "application/x-www-form-urlencoded":
         return await request.form()
-    elif isinstance(content_type, str) and content_type.startswith("multipart/form-data"):
+    elif isinstance(content_type, str) and content_type.startswith(
+        "multipart/form-data"
+    ):
         return await request.form()
     else:
         try:

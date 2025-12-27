@@ -69,9 +69,7 @@ class BaseProvider(metaclass=abc.ABCMeta):
             "Orchestration",
             "Others",
         ]
-    ] = [
-        "Others"
-    ]  # tb: Default category for providers that don't declare a category
+    ] = ["Others"]  # tb: Default category for providers that don't declare a category
     PROVIDER_TAGS: list[
         Literal[
             "alert", "ticketing", "messaging", "data", "queue", "topology", "incident"
@@ -796,7 +794,7 @@ class BaseProvider(metaclass=abc.ABCMeta):
             providerId=self.provider_id,
         )
         # push the alert to the provider
-        url = f'{os.environ["KEEP_API_URL"]}/alerts/event'
+        url = f"{os.environ['KEEP_API_URL']}/alerts/event"
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -938,7 +936,6 @@ class BaseIncidentProvider(BaseProvider):
 
 
 class ProviderHealthMixin:
-
     HAS_HEALTH_CHECK = True
 
     def get_health_report(self):

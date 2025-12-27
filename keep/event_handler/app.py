@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import signal
 import sys
 from contextlib import asynccontextmanager
 
@@ -11,7 +10,6 @@ from fastapi.responses import JSONResponse
 
 import keep.api.logging
 import keep.api.observability
-from keep.event_handler.worker import get_arq_worker, safe_run_worker
 from keep.api.consts import (
     KEEP_ARQ_QUEUE_BASIC,
     KEEP_ARQ_TASK_POOL,
@@ -19,6 +17,7 @@ from keep.api.consts import (
     KEEP_ARQ_TASK_POOL_BASIC_PROCESSING,
 )
 from keep.api.core.config import config
+from keep.event_handler.worker import get_arq_worker, safe_run_worker
 from keep.workflowmanager.workflowmanager import WorkflowManager
 
 # Load environment variables
@@ -102,6 +101,7 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Event Handler Service")
     # Initialize DB and other resources (similar to API startup)
     from keep.api.config import on_starting
+
     try:
         print("DEBUG: Calling on_starting")
         # Run sync on_starting in a separate thread to avoid "loop already running" issues with Alembic/SQLAlchemy
@@ -117,10 +117,11 @@ async def lifespan(app: FastAPI):
 
     if messaging_type == "KAFKA":
         from keep.event_handler.messaging import KafkaEventConsumer
+
         logger.info("MESSAGING_TYPE is KAFKA - starting Kafka Consumer")
         consumer = KafkaEventConsumer()
         await consumer.start()
-    
+
     else:
         # Default to REDIS / ARQ
         logger.info(f"MESSAGING_TYPE is {messaging_type} - starting ARQ Worker")
@@ -130,15 +131,15 @@ async def lifespan(app: FastAPI):
         print(f"DEBUG: Creating worker task for {worker_id}")
         worker_task = loop.create_task(run_arq_worker(worker_id))
         print("DEBUG: Worker task created")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down Event Handler Service")
-    
+
     if consumer:
         await consumer.stop()
-        
+
     if worker_task:
         if not worker_task.done():
             worker_task.cancel()
@@ -146,14 +147,14 @@ async def lifespan(app: FastAPI):
                 await worker_task
             except asyncio.CancelledError:
                 pass
-    
+
     logger.info("Event Handler Service stopped")
 
 
 app = FastAPI(
     title="Keep ARQ Worker",
     description="Microservice for handling background tasks and events",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 if config("KEEP_OTEL_ENABLED", default="true", cast=bool):
@@ -179,4 +180,5 @@ def get_status():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8080)

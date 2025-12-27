@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
-from sqlalchemy import DateTime, JSON
+from sqlalchemy import JSON, DateTime
 
 # third-parties
 from sqlmodel import Column, Field, Index, SQLModel, func
@@ -14,6 +14,7 @@ DEFAULT_ALERT_STATUSES_TO_IGNORE = [
     AlertStatus.RESOLVED.value,
     AlertStatus.ACKNOWLEDGED.value,
 ]
+
 
 class MaintenanceWindowRule(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

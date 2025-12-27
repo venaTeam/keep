@@ -48,14 +48,16 @@ class BaseIdentityManager(metaclass=abc.ABCMeta):
 
     def get_sso_providers(self) -> list[str]:
         raise NotImplementedError(
-            "get_sso_providers() method not implemented"
-            " for {}".format(self.__class__.__name__)
+            "get_sso_providers() method not implemented for {}".format(
+                self.__class__.__name__
+            )
         )
 
     def get_sso_wizard_url(self, authenticated_entity: AuthenticatedEntity) -> str:
         raise NotImplementedError(
-            "get_sso_wizard_url() method not implemented"
-            " for {}".format(self.__class__.__name__)
+            "get_sso_wizard_url() method not implemented for {}".format(
+                self.__class__.__name__
+            )
         )
 
     @abc.abstractmethod
@@ -67,8 +69,7 @@ class BaseIdentityManager(metaclass=abc.ABCMeta):
             list: The list of users.
         """
         raise NotImplementedError(
-            "get_users() method not implemented"
-            " for {}".format(self.__class__.__name__)
+            "get_users() method not implemented for {}".format(self.__class__.__name__)
         )
 
     def get_groups(self) -> str | dict:
@@ -124,8 +125,9 @@ class BaseIdentityManager(metaclass=abc.ABCMeta):
             dict: The authentication verifier.
         """
         raise NotImplementedError(
-            "get_auth_verifier() method not implemented"
-            " for {}".format(self.__class__.__name__)
+            "get_auth_verifier() method not implemented for {}".format(
+                self.__class__.__name__
+            )
         )
 
     def create_resource(

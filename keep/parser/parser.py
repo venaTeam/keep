@@ -1,10 +1,10 @@
 import copy
 import json
+import keyword
 import logging
 import os
 import re
 import typing
-import keyword
 
 from keep.actions.actions_factory import ActionsCRUD
 from keep.api.core.config import config

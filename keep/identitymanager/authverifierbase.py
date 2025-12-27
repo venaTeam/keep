@@ -126,7 +126,9 @@ class AuthVerifierBase:
                     detail="Read only instance, but non-read scopes requested",
                 )
 
-        authenticated_entity = self.authenticate(request, api_key, authorization, token, body)
+        authenticated_entity = self.authenticate(
+            request, api_key, authorization, token, body
+        )
         self.logger.debug(
             f"Authentication successful for entity: {authenticated_entity}"
         )
@@ -195,7 +197,7 @@ class AuthVerifierBase:
             extra={
                 "headers": request.headers,
                 "body": body,
-            }
+            },
         )
         raise HTTPException(
             status_code=401, detail="Missing authentication credentials"
@@ -262,7 +264,6 @@ class AuthVerifierBase:
                 and "Amazon Simple Notification Service Agent"
                 in request.headers.get("user-agent", "")
             ):
-
                 self.logger.warning("Got an SNS request without any auth")
                 allow_unauth = config("KEEP_CLOUDWATCH_DISABLE_API_KEY", default=False)
                 if allow_unauth and request.url.path.endswith(
@@ -427,8 +428,7 @@ class AuthVerifierBase:
             role: The role of the user to create.
         """
         raise NotImplementedError(
-            "User provisioning not implemented"
-            " for {}".format(self.__class__.__name__)
+            "User provisioning not implemented for {}".format(self.__class__.__name__)
         )
 
     def _verify_bearer_token(self, token: str) -> AuthenticatedEntity:
@@ -446,6 +446,7 @@ class AuthVerifierBase:
         """
         self.logger.error("_verify_bearer_token() method not implemented")
         raise NotImplementedError(
-            "_verify_bearer_token() method not implemented"
-            " for {}".format(self.__class__.__name__)
+            "_verify_bearer_token() method not implemented for {}".format(
+                self.__class__.__name__
+            )
         )

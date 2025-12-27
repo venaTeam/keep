@@ -168,7 +168,7 @@ class OpensearchserverlessProvider(BaseProvider, ProviderHealthMixin):
                 scopes[res["EvalActionName"]] = (
                     True
                     if res["EvalDecision"] == "allowed"
-                    else f'{res["EvalActionName"]} is not allowed'
+                    else f"{res['EvalActionName']} is not allowed"
                 )
 
         if not all_allowed:

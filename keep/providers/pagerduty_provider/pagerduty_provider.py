@@ -184,7 +184,7 @@ class PagerdutyProvider(
                     "grant_type": "refresh_token",
                     "client_id": PagerdutyProvider.PAGERDUTY_CLIENT_ID,
                     "client_secret": PagerdutyProvider.PAGERDUTY_CLIENT_SECRET,
-                    "refresh_token": f'{self.authentication_config.oauth_data["refresh_token"]}',
+                    "refresh_token": f"{self.authentication_config.oauth_data['refresh_token']}",
                 },
             )
             access_token_response.raise_for_status()
@@ -305,7 +305,6 @@ class PagerdutyProvider(
         headers = self.__get_headers()
         scopes = {}
         for scope in self.PROVIDER_SCOPES:
-
             # If the provider is installed using a routing key, we skip scopes validation for now.
             if self.authentication_config.routing_key:
                 if scope.name == "incidents_read":
@@ -717,9 +716,11 @@ class PagerdutyProvider(
             resolution (str): Resolution note for resolved incidents
             kwargs (dict): Additional event/incident fields
         """
-        if not routing_key: # If routing_key not specified in workflow, fallback to config routing_key
+        if (
+            not routing_key
+        ):  # If routing_key not specified in workflow, fallback to config routing_key
             routing_key = self.authentication_config.routing_key
-        if  routing_key:
+        if routing_key:
             return self._send_alert(
                 title,
                 dedup=dedup,
@@ -744,7 +745,7 @@ class PagerdutyProvider(
     def _query(self, incident_id: str = None, incident_key: str = None):
         if incident_id:
             return self._get_specific_incident(incident_id)
-        elif incident_key: # Query Incident via incident_key (dedup_key)
+        elif incident_key:  # Query Incident via incident_key (dedup_key)
             return self._get_specific_incident_with_incident_key(incident_key)
         else:
             return self.__get_all_incidents_or_alerts()
@@ -870,7 +871,9 @@ class PagerdutyProvider(
         response.raise_for_status()
         return response.json()
 
-    def _get_specific_incident_with_incident_key(self, incident_key: str): # Query Incident via incident_key (dedup_key)
+    def _get_specific_incident_with_incident_key(
+        self, incident_key: str
+    ):  # Query Incident via incident_key (dedup_key)
         self.logger.info("Getting Incident", extra={"incident_key": incident_key})
         url = f"{self.BASE_API_URL}/incidents"
         params = {
@@ -887,7 +890,7 @@ class PagerdutyProvider(
                 "services",
                 "teams",
                 "users",
-            ]
+            ],
         }
         response = requests.get(url, headers=self.__get_headers(), params=params)
         response.raise_for_status()
@@ -1119,7 +1122,6 @@ class PagerdutyProvider(
     def _format_incident(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> IncidentDto | list[IncidentDto]:
-
         event = event["event"]["data"]
 
         # This will be the same for the same incident
@@ -1164,7 +1166,7 @@ class PagerdutyProvider(
         return IncidentDto(
             id=incident_id,
             creation_time=created_at,
-            user_generated_name=f'PD-{event.get("title", "unknown")}-{original_incident_id}',
+            user_generated_name=f"PD-{event.get('title', 'unknown')}-{original_incident_id}",
             status=status,
             severity=severity,
             alert_sources=["pagerduty"],

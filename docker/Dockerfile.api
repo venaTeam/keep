@@ -24,6 +24,9 @@ ENV PATH="/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/venv"
 ENV POSTHOG_DISABLED="true"
 
+# Copy application code
+COPY keep /app/keep
+
 # Entrypoint script
 COPY keep/entrypoint.sh /app/keep/entrypoint.sh
 RUN chmod +x /app/keep/entrypoint.sh

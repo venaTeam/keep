@@ -40,6 +40,7 @@ def test_with_function(context_manager):
     s = iohandler.render("hello keep.len({{ steps.some_list }})")
     assert s == "hello 3"
 
+
 @pytest.mark.parametrize(
     "test_input, expected_output",
     [
@@ -52,12 +53,13 @@ def test_with_function(context_manager):
         ("res keep.exp(2, 3)", "res 8"),
         ("res keep.eq(2, 2)", "res True"),
         ("res keep.eq(1, 2)", "res False"),
-    ]
+    ],
 )
 def test_with_arithmetic_functions(context_manager, test_input, expected_output):
     iohandler = IOHandler(context_manager)
     s = iohandler.render(test_input)
     assert s == expected_output
+
 
 def test_with_function_is_business_hours_args(context_manager):
     iohandler = IOHandler(context_manager)
@@ -92,9 +94,9 @@ def test_with_function_is_business_hours_kwargs(context_manager):
     )
     result = iohandler.render(template)
     # Assuming the function returns True if the time is within business hours
-    assert (
-        result == "Business hours check: True"
-    ), f"Expected 'Business hours check: True', but got {result}"
+    assert result == "Business hours check: True", (
+        f"Expected 'Business hours check: True', but got {result}"
+    )
 
 
 def test_with_function_2(context_manager):
@@ -598,8 +600,8 @@ def test_unrecognized_function_call(context_manager):
     with pytest.raises(Exception) as excinfo:
         iohandler.render(template_with_unrecognized_function)
 
-    assert "module 'keep.functions' has no attribute" in str(
-        excinfo.value
+    assert (
+        "module 'keep.functions' has no attribute" in str(excinfo.value)
     )  # This assertion depends on the specific error handling and messaging in your application
 
 
@@ -607,9 +609,9 @@ def test_missing_closing_parenthesis(context_manager):
     iohandler = IOHandler(context_manager)
     malformed_template = "keep.len({{ steps.some_list }"
     extracted_functions = iohandler.extract_keep_functions(malformed_template)
-    assert (
-        len(extracted_functions) == 0
-    ), "Expected no functions to be extracted due to missing closing parenthesis."
+    assert len(extracted_functions) == 0, (
+        "Expected no functions to be extracted due to missing closing parenthesis."
+    )
 
 
 def test_nested_malformed_function_calls(context_manager):
@@ -618,9 +620,9 @@ def test_nested_malformed_function_calls(context_manager):
         "keep.first(keep.len({{ steps.some_list }, keep.lowercase('TEXT')"
     )
     extracted_functions = iohandler.extract_keep_functions(malformed_template)
-    assert (
-        len(extracted_functions) == 0
-    ), "Expected no functions to be extracted due to malformed nested calls."
+    assert len(extracted_functions) == 0, (
+        "Expected no functions to be extracted due to malformed nested calls."
+    )
 
 
 def test_extra_closing_parenthesis(context_manager):
@@ -628,9 +630,9 @@ def test_extra_closing_parenthesis(context_manager):
     malformed_template = "keep.len({{ steps.some_list }}))"
     extracted_functions = iohandler.extract_keep_functions(malformed_template)
     # Assuming the method can ignore the extra closing parenthesis and still extract the function correctly
-    assert (
-        len(extracted_functions) == 1
-    ), "Expected one function to be extracted despite an extra closing parenthesis."
+    assert len(extracted_functions) == 1, (
+        "Expected one function to be extracted despite an extra closing parenthesis."
+    )
 
 
 def test_incorrect_function_name(context_manager):
@@ -638,18 +640,18 @@ def test_incorrect_function_name(context_manager):
     malformed_template = "keep.lenght({{ steps.some_list }})"
     extracted_functions = iohandler.extract_keep_functions(malformed_template)
     # Assuming the method extracts the function call regardless of the function name being valid
-    assert (
-        len(extracted_functions) == 1
-    ), "Expected one function to be extracted despite the incorrect function name."
+    assert len(extracted_functions) == 1, (
+        "Expected one function to be extracted despite the incorrect function name."
+    )
 
 
 def test_keep_in_string_not_as_function_call(context_manager):
     iohandler = IOHandler(context_manager)
     template = "Here is a sentence with keep. not as a function call: 'Let's keep. moving forward.'"
     extracted_functions = iohandler.extract_keep_functions(template)
-    assert (
-        len(extracted_functions) == 0
-    ), "Expected no functions to be extracted when 'keep.' is part of a string."
+    assert len(extracted_functions) == 0, (
+        "Expected no functions to be extracted when 'keep.' is part of a string."
+    )
 
 
 def test_no_function_calls(context_manager):
@@ -685,9 +687,9 @@ def test_endless_loop_potential(context_manager):
     iohandler = IOHandler(context_manager)
     template = "keep.() empty function call followed by text keep. not as a call."
     functions = iohandler.extract_keep_functions(template)
-    assert (
-        len(functions) == 1
-    ), "Should not enter an endless loop with empty function calls."
+    assert len(functions) == 1, (
+        "Should not enter an endless loop with empty function calls."
+    )
 
 
 def test_edge_case_with_escaped_quotes(context_manager):
@@ -696,9 +698,9 @@ def test_edge_case_with_escaped_quotes(context_manager):
         r"Edge case keep.function('argument with an escaped quote\\') and more text."
     )
     functions = iohandler.extract_keep_functions(template)
-    assert (
-        len(functions) == 1
-    ), "Should correctly handle escaped quotes within function arguments."
+    assert len(functions) == 1, (
+        "Should correctly handle escaped quotes within function arguments."
+    )
 
 
 def test_consecutive_function_calls(context_manager):
@@ -712,18 +714,18 @@ def test_function_call_at_end(context_manager):
     iohandler = IOHandler(context_manager)
     template = "Function call at the very end keep.end()"
     functions = iohandler.extract_keep_functions(template)
-    assert (
-        len(functions) == 1
-    ), "Should correctly handle a function call at the end of the string."
+    assert len(functions) == 1, (
+        "Should correctly handle a function call at the end of the string."
+    )
 
 
 def test_complex_mixture(context_manager):
     iohandler = IOHandler(context_manager)
     template = "Mix keep.start() some text keep.in('middle') and malformed keep. and valid keep.end()."
     functions = iohandler.extract_keep_functions(template)
-    assert (
-        len(functions) == 3
-    ), "Should correctly handle a complex mixture of text and function calls."
+    assert len(functions) == 3, (
+        "Should correctly handle a complex mixture of text and function calls."
+    )
 
 
 def test_escaped_quotes_inside_function_arguments(context_manager):
@@ -731,9 +733,9 @@ def test_escaped_quotes_inside_function_arguments(context_manager):
     template = "keep.split('some,string,with,escaped\\\\'quotes', ',')"
     extracted_functions = iohandler.extract_keep_functions(template)
     # Assuming the method can handle escaped quotes within function arguments
-    assert (
-        len(extracted_functions) == 1
-    ), "Expected one function to be extracted with escaped quotes inside arguments."
+    assert len(extracted_functions) == 1, (
+        "Expected one function to be extracted with escaped quotes inside arguments."
+    )
 
 
 def test_double_function_call(context_manager):
@@ -743,9 +745,9 @@ def test_double_function_call(context_manager):
       This {{ vars.alert_tier }} alert is triggered keep.get_firing_time('{{ alert }}', 'minutes') because the pipelines for {{ alert.host }} are down for more than keep.get_firing_time('{{ alert }}', 'minutes') minutes.
       Please visit monitoring.keeohq.dev for more!"""
     extracted_functions = iohandler.extract_keep_functions(template)
-    assert (
-        len(extracted_functions) == 2
-    ), "Should handle nested function calls correctly."
+    assert len(extracted_functions) == 2, (
+        "Should handle nested function calls correctly."
+    )
 
 
 def test_if_else_in_template_existing(mocked_context_manager):
@@ -777,9 +779,9 @@ def test_escaped_quotes_with_with_space(context_manager):
     template = "keep.split('some string with 'quotes and with space' after', ',')"
     extracted_functions = iohandler.extract_keep_functions(template)
     # Assuming the method can handle escaped quotes within function arguments
-    assert (
-        len(extracted_functions) == 1
-    ), "Expected one function to be extracted with escaped quotes inside arguments."
+    assert len(extracted_functions) == 1, (
+        "Expected one function to be extracted with escaped quotes inside arguments."
+    )
 
 
 def test_escaped_quotes_with_with_newlines(context_manager):
@@ -787,9 +789,9 @@ def test_escaped_quotes_with_with_newlines(context_manager):
     template = "keep.split('some string with 'quotes and with space' \r\n after', ',')"
     extracted_functions = iohandler.extract_keep_functions(template)
     # Assuming the method can handle escaped quotes within function arguments
-    assert (
-        len(extracted_functions) == 1
-    ), "Expected one function to be extracted with escaped quotes inside arguments."
+    assert len(extracted_functions) == 1, (
+        "Expected one function to be extracted with escaped quotes inside arguments."
+    )
 
 
 def test_add_time_to_date_function(context_manager):
@@ -905,9 +907,9 @@ def test_recursive_rendering_nested(context_manager):
     }
     template = "{{ steps.message }}"
     result = iohandler.render(template)
-    assert (
-        result == "Hello World! How are you?"
-    ), f"Expected 'Hello World! How are you?', but got {result}"
+    assert result == "Hello World! How are you?", (
+        f"Expected 'Hello World! How are you?', but got {result}"
+    )
 
 
 def test_recursive_rendering_with_functions(context_manager):
@@ -926,9 +928,9 @@ def test_recursive_rendering_max_iterations(context_manager):
     context_manager.steps_context = {"loop": "{{ steps.loop }}"}
     template = "{{ steps.loop }}"
     result = iohandler.render(template)
-    assert (
-        result == "{{ steps.loop }}"
-    ), "Expected no change due to max iterations limit"
+    assert result == "{{ steps.loop }}", (
+        "Expected no change due to max iterations limit"
+    )
 
 
 def test_dont_render_providers(context_manager):
@@ -974,6 +976,6 @@ def test_render_with_consts(context_manager):
         "Regards,<br>"
         "KeepHQ dev Monitoring</strong>"
     )
-    assert (
-        result == expected_result
-    ), f"Expected '{expected_result}', but got '{result}'"
+    assert result == expected_result, (
+        f"Expected '{expected_result}', but got '{result}'"
+    )

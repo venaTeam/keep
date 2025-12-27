@@ -95,24 +95,14 @@ def __get_conn_impersonate() -> pymysql.connections.Connection:
 #   becuase somehow in gunicorn it doesn't load the .env file
 load_dotenv(find_dotenv())
 
-DB_CONNECTION_STRING = config(
-    "DATABASE_CONNECTION_STRING", default=None
-)  # pylint: disable=invalid-name
-DB_POOL_SIZE = config(
-    "DATABASE_POOL_SIZE", default=5, cast=int
-)  # pylint: disable=invalid-name
-DB_MAX_OVERFLOW = config(
-    "DATABASE_MAX_OVERFLOW", default=10, cast=int
-)  # pylint: disable=invalid-name
-DB_ECHO = config(
-    "DATABASE_ECHO", default=False, cast=bool
-)  # pylint: disable=invalid-name
+DB_CONNECTION_STRING = config("DATABASE_CONNECTION_STRING", default=None)  # pylint: disable=invalid-name
+DB_POOL_SIZE = config("DATABASE_POOL_SIZE", default=5, cast=int)  # pylint: disable=invalid-name
+DB_MAX_OVERFLOW = config("DATABASE_MAX_OVERFLOW", default=10, cast=int)  # pylint: disable=invalid-name
+DB_ECHO = config("DATABASE_ECHO", default=False, cast=bool)  # pylint: disable=invalid-name
 KEEP_FORCE_CONNECTION_STRING = config(
     "KEEP_FORCE_CONNECTION_STRING", default=False, cast=bool
 )  # pylint: disable=invalid-name
-KEEP_DB_PRE_PING_ENABLED = config(
-    "KEEP_DB_PRE_PING_ENABLED", default=False, cast=bool
-)  # pylint: disable=invalid-name
+KEEP_DB_PRE_PING_ENABLED = config("KEEP_DB_PRE_PING_ENABLED", default=False, cast=bool)  # pylint: disable=invalid-name
 
 
 def dumps(_json) -> str:

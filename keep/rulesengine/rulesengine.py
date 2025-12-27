@@ -19,9 +19,9 @@ from keep.api.core.db import (
     enrich_incidents_with_alerts,
     get_alerts_by_fingerprint,
     get_incident_for_grouping_rule,
+    is_all_alerts_in_status,
 )
 from keep.api.core.db import get_rules as get_rules_db
-from keep.api.core.db import is_all_alerts_in_status
 from keep.api.core.dependencies import get_pusher_client
 from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.api.models.db.alert import Incident
@@ -118,16 +118,25 @@ class RulesEngine:
                     for rule_fingerprint in rule_fingerprints:
                         # #If the alert recover its previous status, we need to check if there are any alerts with the same fingerprint that were resolved
                         creation_allowed = True
-                        if hasattr(event, "previous_status") and (event.previous_status == AlertStatus.MAINTENANCE.value):
-                            alerts_solved = get_alerts_by_fingerprint(self.tenant_id, event.fingerprint, status=AlertStatus.RESOLVED.value)
-                            if alerts_solved and any(event.lastReceived < solved_alert.event["lastReceived"] for solved_alert in alerts_solved):
+                        if hasattr(event, "previous_status") and (
+                            event.previous_status == AlertStatus.MAINTENANCE.value
+                        ):
+                            alerts_solved = get_alerts_by_fingerprint(
+                                self.tenant_id,
+                                event.fingerprint,
+                                status=AlertStatus.RESOLVED.value,
+                            )
+                            if alerts_solved and any(
+                                event.lastReceived < solved_alert.event["lastReceived"]
+                                for solved_alert in alerts_solved
+                            ):
                                 creation_allowed = False
                         incident, send_created_event = self._get_or_create_incident(
                             rule=rule,
                             rule_fingerprint=",".join(rule_fingerprint),
                             session=session,
                             event=event,
-                            creation_allowed=creation_allowed
+                            creation_allowed=creation_allowed,
                         )
                         if incident:
                             incident = assign_alert_to_incident(
@@ -138,7 +147,6 @@ class RulesEngine:
                             )
 
                             if not incident.is_visible:
-
                                 self.logger.info(
                                     f"No existing incidents for rule {rule.name}. Checking incident creation conditions"
                                 )
@@ -249,7 +257,6 @@ class RulesEngine:
     def _get_or_create_incident(
         self, rule: Rule, rule_fingerprint, session, event, creation_allowed=True
     ) -> (Optional[Incident], bool):
-
         existed_incident, expired = get_incident_for_grouping_rule(
             self.tenant_id,
             rule,

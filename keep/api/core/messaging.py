@@ -1,7 +1,6 @@
 import abc
 import json
 import logging
-from typing import Optional
 
 from aiokafka import AIOKafkaProducer
 from arq import ArqRedis
@@ -31,7 +30,7 @@ class RedisEventProducer(EventProducer):
         fingerprint = kwargs.get("fingerprint")
         api_key_name = kwargs.get("api_key_name")
         provider_name = kwargs.get("provider_name")
-        
+
         # Enqueue job matching the signature in alerts.py
         job = await self.arq_pool.enqueue_job(
             "process_event_in_worker",
@@ -52,9 +51,11 @@ class RedisEventProducer(EventProducer):
 class KafkaEventProducer(EventProducer):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.bootstrap_servers = config("KAFKA_BOOTSTRAP_SERVERS", default="localhost:9092")
+        self.bootstrap_servers = config(
+            "KAFKA_BOOTSTRAP_SERVERS", default="localhost:9092"
+        )
         self.topic = "keep-events"
-        
+
         # SASL config
         self.security_protocol = config("KAFKA_SECURITY_PROTOCOL", default="PLAINTEXT")
         self.sasl_mechanism = config("KAFKA_SASL_MECHANISM", default="PLAIN")
@@ -67,7 +68,7 @@ class KafkaEventProducer(EventProducer):
             sasl_mechanism=self.sasl_mechanism,
             sasl_plain_username=self.sasl_plain_username,
             sasl_plain_password=self.sasl_plain_password,
-            api_version="auto"
+            api_version="auto",
         )
         self._started = False
 
@@ -76,12 +77,11 @@ class KafkaEventProducer(EventProducer):
             await self.producer.start()
             self._started = True
 
-        
     async def produce(self, event: dict, **kwargs):
         trace_id = kwargs.get("trace_id")
         self.logger.info(f"Producing event to Kafka: {trace_id}")
         await self._ensure_started()
-        
+
         # Enrich event with metadata that ARQ passed as args
         # We put everything in the payload for Kafka
         payload = {
@@ -94,12 +94,11 @@ class KafkaEventProducer(EventProducer):
             "trace_id": trace_id,
             "provider_name": kwargs.get("provider_name"),
         }
-        
+
         try:
             # Serialize payload, handling Pydantic models (like AlertDto) and other objects
             val = json.dumps(
-                payload, 
-                default=lambda o: o.dict() if hasattr(o, "dict") else str(o)
+                payload, default=lambda o: o.dict() if hasattr(o, "dict") else str(o)
             ).encode("utf-8")
             await self.producer.send_and_wait(self.topic, val)
             self.logger.info(f"Successfully produced event to Kafka: {trace_id}")

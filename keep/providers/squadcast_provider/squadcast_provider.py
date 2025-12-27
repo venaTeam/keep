@@ -144,7 +144,7 @@ class SquadcastProvider(BaseProvider):
         except json.JSONDecodeError as e:
             raise ProviderConfigException(
                 f"Invalid additional_json format: {str(e)}",
-                provider_id=self.provider_id
+                provider_id=self.provider_id,
             )
 
         return requests.post(

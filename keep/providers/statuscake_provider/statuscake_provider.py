@@ -340,7 +340,6 @@ class StatuscakeProvider(BaseProvider):
 
         alert_dtos = []
         for alert in response:
-
             if alert.get("status").lower() == "up":
                 status = AlertStatus.RESOLVED
             else:

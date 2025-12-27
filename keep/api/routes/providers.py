@@ -9,8 +9,8 @@ from typing import Any, Callable, Dict, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
+from sqlmodel import Session, select
 from starlette.datastructures import UploadFile
 
 from keep.api.core.config import config
@@ -350,7 +350,8 @@ def test_provider(
     # 1. provider_type and provider id is valid
     # 2. the provider config is valid
     context_manager = ContextManager(
-        tenant_id=tenant_id, workflow_id=""  # this is not in a workflow scope
+        tenant_id=tenant_id,
+        workflow_id="",  # this is not in a workflow scope
     )
     provider = ProvidersFactory.get_provider(
         context_manager, provider_id, provider_type, provider_config

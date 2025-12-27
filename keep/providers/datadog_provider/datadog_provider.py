@@ -1597,8 +1597,8 @@ class DatadogProvider(BaseTopologyProvider, ProviderHealthMixin):
 
         # Construct the span search query
         query_parts = [
-            f'service:{tags_dict["service"]}',
-            f'env:{tags_dict["env"]}',
+            f"service:{tags_dict['service']}",
+            f"env:{tags_dict['env']}",
             f"operation_name:{operation_name}",
             f"@duration:>{threshold_seconds}s",  # @ is used to indicate a span attribute
         ]

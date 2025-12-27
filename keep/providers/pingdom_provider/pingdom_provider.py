@@ -24,6 +24,7 @@ class PingdomProviderAuthConfig:
 
 class PingdomProvider(BaseProvider):
     "Get alerts from Pingdom."
+
     webhook_description = """Install Keep as Pingdom webhook
     1. Go to Settings > Integrations.
     2. Click Add Integration.

@@ -5,11 +5,12 @@ This module contains the CRUD database functions for Keep.
 """
 
 from datetime import datetime, timedelta, timezone
-from typing import TypedDict, Tuple
+from typing import Tuple, TypedDict
 
 from sqlalchemy import and_, case, desc, func, literal_column, select, text
 from sqlmodel import Session
 
+from keep.api.core.cel_to_sql.ast_nodes import DataType
 from keep.api.core.cel_to_sql.properties_metadata import (
     FieldMappingConfiguration,
     PropertiesMetadata,
@@ -23,7 +24,6 @@ from keep.api.core.facets import get_facet_options, get_facets
 from keep.api.models.db.facet import FacetType
 from keep.api.models.db.workflow import Workflow, WorkflowExecution
 from keep.api.models.facet import FacetDto, FacetOptionDto, FacetOptionsQueryDto
-from keep.api.core.cel_to_sql.ast_nodes import DataType
 
 workflow_field_configurations = [
     FieldMappingConfiguration(

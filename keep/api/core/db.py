@@ -14,10 +14,10 @@ from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-from typing import Any, Callable, Dict, Iterator, List, Tuple, Type, Union, Optional
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union
 from uuid import UUID, uuid4
-import pytz
 
+import pytz
 from dateutil.parser import parse
 from dateutil.tz import tz
 from dotenv import find_dotenv, load_dotenv
@@ -42,11 +42,11 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm import foreign, joinedload, subqueryload
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm.exc import StaleDataError
 from sqlalchemy.sql import exists, expression
 from sqlalchemy.sql.functions import count
 from sqlmodel import Session, SQLModel, col, or_, select, text
-from sqlalchemy.orm.attributes import flag_modified
 
 from keep.api.consts import STATIC_PRESETS
 from keep.api.core.config import config
@@ -180,7 +180,6 @@ def retry_on_db_error(f):
         try:
             return f(*args, **kwargs)
         except (OperationalError, IntegrityError, StaleDataError) as e:
-
             if hasattr(e, "session") and not e.session.is_active:
                 e.session.rollback()
 
@@ -339,7 +338,9 @@ def get_workflows_that_should_run():
         # for each workflow:
         for workflow in workflows_with_interval:
             # get the current time in Israel timezone, this should be done with an environment variable
-            current_time = datetime.now(pytz.timezone('Asia/Jerusalem')).replace(tzinfo=None)
+            current_time = datetime.now(pytz.timezone("Asia/Jerusalem")).replace(
+                tzinfo=None
+            )
             last_execution = get_last_completed_execution(session, workflow.id)
             # if there no last execution, that's the first time we run the workflow
             if not last_execution:
@@ -1306,7 +1307,9 @@ def _enrich_entity(
             new_enrichment_data = {**enrichment.enrichments, **enrichments}
         # Preserve existing note if incoming note is empty/None/not provided
         incoming_note = enrichments.get("note")
-        if not incoming_note or (isinstance(incoming_note, str) and not incoming_note.strip()):
+        if not incoming_note or (
+            isinstance(incoming_note, str) and not incoming_note.strip()
+        ):
             existing_note = enrichment.enrichments.get("note")
             if existing_note:
                 new_enrichment_data["note"] = existing_note
@@ -1315,8 +1318,8 @@ def _enrich_entity(
         for key, value in list(enrichments.items()):
             if value is None and key in new_enrichment_data:
                 del new_enrichment_data[key]
-        
-        # When forcing update (e.g. making enrichments permanent/disposing), 
+
+        # When forcing update (e.g. making enrichments permanent/disposing),
         # ensure we don't accidentally keep status if it's not in the new enrichments
         if force and "status" not in enrichments and "status" in enrichment.enrichments:
             # If we are forcing and status is NOT in the new enrichments, it means we want to remove it
@@ -1432,7 +1435,9 @@ def batch_enrich(
                 merged_enrichments = {**existing.enrichments, **enrichments}
                 # Preserve existing note if incoming note is empty/None/not provided
                 incoming_note = enrichments.get("note")
-                if not incoming_note or (isinstance(incoming_note, str) and not incoming_note.strip()):
+                if not incoming_note or (
+                    isinstance(incoming_note, str) and not incoming_note.strip()
+                ):
                     existing_note = existing.enrichments.get("note")
                     if existing_note:
                         merged_enrichments["note"] = existing_note
@@ -1803,7 +1808,6 @@ def get_last_alerts(
     with_incidents=False,
     fingerprints=None,
 ) -> list[Alert]:
-
     with Session(engine) as session:
         dialect_name = session.bind.dialect.name
 
@@ -1971,11 +1975,13 @@ def get_alerts_by_fingerprint(
         query = query.order_by(Alert.timestamp.desc())
 
         if status:
-            query = query.where(get_json_extract_field(session, Alert.event, "status") == status)
+            query = query.where(
+                get_json_extract_field(session, Alert.event, "status") == status
+            )
 
         if limit:
             query = query.limit(limit)
-        
+
         # Execute the query using exec() instead of execute()
         alerts = session.exec(query).all()
 
@@ -2059,10 +2065,7 @@ def get_alerts_by_status(
 ) -> List[Alert]:
     with existed_or_new_session(session) as session:
         status_field = get_json_extract_field(session, Alert.event, "status")
-        query = (
-            select(Alert).
-            where(status_field == status.value)
-        )
+        query = select(Alert).where(status_field == status.value)
         return session.exec(query).all()
 
 
@@ -2440,7 +2443,6 @@ def create_incident_for_grouping_rule(
     assignee: str | None = None,
     session: Optional[Session] = None,
 ):
-
     with existed_or_new_session(session) as session:
         # Create and add a new incident if it doesn't exist
         incident = Incident(
@@ -2850,9 +2852,9 @@ def get_all_deduplication_stats(tenant_id):
             if key in stats:
                 hours_ago = int((current_hour - date_hour).total_seconds() / 3600)
                 if 0 <= hours_ago < 24:
-                    stats[key]["alerts_last_24_hours"][23 - hours_ago][
-                        "number"
-                    ] = hourly_count
+                    stats[key]["alerts_last_24_hours"][23 - hours_ago]["number"] = (
+                        hourly_count
+                    )
 
     return stats
 
@@ -3097,7 +3099,6 @@ def get_provider_distribution(
                         "last_alert_received": last_alert_timestamp,
                     }
                 else:
-
                     provider_distribution[provider_key]["last_alert_received"] = max(
                         provider_distribution[provider_key]["last_alert_received"],
                         last_alert_timestamp,
@@ -3681,9 +3682,7 @@ def get_alert_audit(
 
 def get_incidents_meta_for_tenant(tenant_id: str) -> dict:
     with Session(engine) as session:
-
         if session.bind.dialect.name == "sqlite":
-
             sources_join = func.json_each(Incident.sources).table_valued("value")
             affected_services_join = func.json_each(
                 Incident.affected_services
@@ -3720,7 +3719,6 @@ def get_incidents_meta_for_tenant(tenant_id: str) -> dict:
             }
 
         elif session.bind.dialect.name == "mysql":
-
             sources_join = func.json_table(
                 Incident.sources, Column("value", String(127))
             ).table_valued("value")
@@ -3761,7 +3759,6 @@ def get_incidents_meta_for_tenant(tenant_id: str) -> dict:
                 ),
             }
         elif session.bind.dialect.name == "postgresql":
-
             sources_join = func.json_array_elements_text(Incident.sources).table_valued(
                 "value"
             )
@@ -4244,7 +4241,6 @@ def get_incident_alerts_and_links_by_incident_id(
     include_unlinked: bool = False,
 ) -> tuple[List[tuple[Alert, LastAlertToIncident]], int]:
     with existed_or_new_session(session) as session:
-
         query = (
             session.query(
                 Alert,
@@ -4334,7 +4330,6 @@ def get_alerts_data_for_incident(
     Returns: dict {sources: list[str], services: list[str], count: int}
     """
     with existed_or_new_session(session) as session:
-
         fields = (
             get_json_extract_field(session, Alert.event, "service"),
             Alert.provider_type,
@@ -4397,9 +4392,7 @@ def add_alerts_to_incident(
     )
 
     with existed_or_new_session(session) as session:
-
         with session.no_autoflush:
-
             # Use a set for faster membership checks
             existing_fingerprints = set(
                 session.exec(
@@ -4922,8 +4915,7 @@ def confirm_predicted_incident_by_id(
         incident_id = __convert_to_uuid(incident_id)
     with Session(engine) as session:
         incident = session.exec(
-            select(Incident)
-            .where(
+            select(Incident).where(
                 Incident.tenant_id == tenant_id,
                 Incident.id == incident_id,
                 Incident.is_candidate == expression.true(),
@@ -5336,12 +5328,10 @@ def is_all_alerts_in_status(
     status: AlertStatus = AlertStatus.RESOLVED,
     session: Optional[Session] = None,
 ):
-
     if incident and incident.alerts_count == 0:
         return False
 
     with existed_or_new_session(session) as session:
-
         enriched_status_field = get_json_extract_field(
             session, AlertEnrichment.enrichments, "status"
         )
@@ -5417,12 +5407,10 @@ def is_first_incident_alert_resolved(
 def is_edge_incident_alert_resolved(
     incident: Incident, direction: Callable, session: Optional[Session] = None
 ) -> bool:
-
     if incident.alerts_count == 0:
         return False
 
     with existed_or_new_session(session) as session:
-
         enriched_status_field = get_json_extract_field(
             session, AlertEnrichment.enrichments, "status"
         )
@@ -5462,7 +5450,6 @@ def get_alerts_metrics_by_provider(
     end_date: Optional[datetime] = None,
     fields: Optional[List[str]] = [],
 ) -> Dict[str, Dict[str, Any]]:
-
     dynamic_field_sums = [
         func.sum(
             case(
@@ -5748,7 +5735,6 @@ def set_last_alert(
                 if last_alert and last_alert.timestamp.replace(
                     tzinfo=tz.UTC
                 ) < alert.timestamp.replace(tzinfo=tz.UTC):
-
                     logger.info(
                         f"Update last alert for `{fingerprint}`: {last_alert.alert_id} -> {alert.id}",
                         extra={
@@ -5848,19 +5834,25 @@ def set_last_alert(
                 f"Failed to set last alert for `{fingerprint}` after {max_retries} attempts"
             )
 
-def set_maintenance_windows_trace(alert: Alert, maintenance_w: MaintenanceWindowRule,  session: Optional[Session] = None):
+
+def set_maintenance_windows_trace(
+    alert: Alert,
+    maintenance_w: MaintenanceWindowRule,
+    session: Optional[Session] = None,
+):
     mw_id = str(maintenance_w.id)
     if mw_id in alert.event.get("maintenance_windows_trace", []):
         return
     with existed_or_new_session(session) as session:
         if "maintenance_windows_trace" in alert.event:
-            if mw_id not in alert.event['maintenance_windows_trace']:
-                alert.event['maintenance_windows_trace'].append(mw_id)
+            if mw_id not in alert.event["maintenance_windows_trace"]:
+                alert.event["maintenance_windows_trace"].append(mw_id)
         else:
-            alert.event['maintenance_windows_trace'] = [mw_id]
+            alert.event["maintenance_windows_trace"] = [mw_id]
         flag_modified(alert, "event")
         session.add(alert)
         session.commit()
+
 
 def get_provider_logs(
     tenant_id: str, provider_id: str, limit: int = 100
@@ -6011,16 +6003,19 @@ def create_single_tenant_for_e2e(tenant_id: str) -> None:
             logger.exception("Failed to create single tenant")
             pass
 
-def get_maintenance_windows_started(session: Optional[Session] = None) -> List[MaintenanceWindowRule]:
+
+def get_maintenance_windows_started(
+    session: Optional[Session] = None,
+) -> List[MaintenanceWindowRule]:
     """
     It will return all windows started, i.e start_time < currentTime
     """
     with existed_or_new_session(session) as session:
-        query = (
-            select(MaintenanceWindowRule)
-            .where(MaintenanceWindowRule.start_time <= datetime.now(tz=timezone.utc))
+        query = select(MaintenanceWindowRule).where(
+            MaintenanceWindowRule.start_time <= datetime.now(tz=timezone.utc)
         )
         return session.exec(query).all()
+
 
 def recover_prev_alert_status(alert: Alert, session: Optional[Session] = None):
     """
@@ -6034,12 +6029,6 @@ def recover_prev_alert_status(alert: Alert, session: Optional[Session] = None):
             alert.event["previous_status"] = status
         except KeyError:
             logger.warning(f"Alert {alert.id} does not have previous status.")
-        query = (
-            update(Alert)
-            .where(Alert.id == alert.id)
-            .values(
-                event = alert.event
-            )
-        )
+        query = update(Alert).where(Alert.id == alert.id).values(event=alert.event)
         session.exec(query)
         session.commit()

@@ -1,5 +1,6 @@
 import enum
 import logging
+from datetime import datetime, timedelta, timezone
 
 from keep.api.core.alerts import query_last_alerts
 from keep.api.core.db import get_last_alerts
@@ -12,7 +13,7 @@ from keep.api.models.query import QueryDto
 from keep.api.models.time_stamp import TimeStampFilter
 from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.rulesengine.rulesengine import RulesEngine
-from datetime import datetime, timedelta, timezone
+
 
 class SearchMode(enum.Enum):
     """The search mode for the search engine"""

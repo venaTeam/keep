@@ -52,7 +52,7 @@ class AlertStatus(Enum):
     SUPPRESSED = "suppressed"
     # No Data
     PENDING = "pending"
-    #Affected by Maintenance Windows
+    # Affected by Maintenance Windows
     MAINTENANCE = "maintenance"
 
 
@@ -96,9 +96,7 @@ class AlertDto(BaseModel):
     fingerprint: str | None = (
         None  # The fingerprint of the alert (used for alert de-duplication)
     )
-    deleted: bool = (
-        False  # @tal: Obselete field since we have dismissed, but kept for backwards compatibility
-    )
+    deleted: bool = False  # @tal: Obselete field since we have dismissed, but kept for backwards compatibility
     dismissUntil: str | None = None  # The time until the alert is dismissed
     # DO NOT MOVE DISMISSED ABOVE dismissedUntil since it is used in root_validator
     dismissed: bool = False  # Whether the alert has been dismissed

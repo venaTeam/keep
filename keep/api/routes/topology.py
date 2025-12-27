@@ -8,19 +8,20 @@ from sqlmodel import Session
 
 from keep.api.core.db import get_session, get_session_sync
 from keep.api.models.db.topology import (
+    DeleteServicesRequest,
     TopologyApplicationDtoIn,
     TopologyApplicationDtoOut,
+    TopologyService,
+    TopologyServiceCreateRequestDTO,
+    TopologyServiceDependencyCreateRequestDto,
+    TopologyServiceDependencyDto,
+    TopologyServiceDependencyUpdateRequestDto,
     TopologyServiceDtoIn,
     TopologyServiceDtoOut,
-    TopologyServiceCreateRequestDTO,
     TopologyServiceUpdateRequestDTO,
-    TopologyServiceDependencyCreateRequestDto,
-    TopologyServiceDependencyUpdateRequestDto,
-    TopologyServiceDependencyDto,
-    TopologyService,
-    DeleteServicesRequest,
 )
 from keep.api.tasks.process_topology_task import process_topology
+from keep.functions import cyaml
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 from keep.providers.base.base_provider import BaseTopologyProvider
@@ -28,13 +29,12 @@ from keep.providers.providers_factory import ProvidersFactory
 from keep.topologies.topologies_service import (
     ApplicationNotFoundException,
     ApplicationParseException,
+    DependencyNotFoundException,
     InvalidApplicationDataException,
     ServiceNotFoundException,
-    TopologiesService,
-    DependencyNotFoundException,
     ServiceNotManualException,
+    TopologiesService,
 )
-from keep.functions import cyaml
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -475,14 +475,18 @@ async def export_topology_yaml(
         services_dict = data.model_dump()
         del services_dict["updated_at"]
         del services_dict["tenant_id"]
-        services_dict["is_manual"] = True if services_dict["is_manual"] is True else False
+        services_dict["is_manual"] = (
+            True if services_dict["is_manual"] is True else False
+        )
         full_data["services"].append(services_dict)
         for application in data.applications:
             application_dict = application.model_dump()
             del application_dict["tenant_id"]
             application_dict["id"] = str(application_dict["id"])
             if application_dict["id"] in full_data["applications"]:
-                full_data["applications"][application_dict["id"]]["services"].append(data.id)
+                full_data["applications"][application_dict["id"]]["services"].append(
+                    data.id
+                )
             else:
                 application_dict["services"] = [data.id]
                 full_data["applications"][application_dict["id"]] = application_dict

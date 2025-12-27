@@ -4,6 +4,8 @@ import os
 import requests
 from fastapi import HTTPException
 from fastapi.routing import APIRoute
+from keycloak.exceptions import KeycloakDeleteError, KeycloakGetError, KeycloakPostError
+from keycloak.openid_connection import KeycloakOpenIDConnection
 from starlette.routing import Route
 
 from ee.identitymanager.identity_managers.keycloak.keycloak_authverifier import (
@@ -17,8 +19,6 @@ from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase, get_all_scopes
 from keep.identitymanager.identitymanager import PREDEFINED_ROLES, BaseIdentityManager
 from keycloak import KeycloakAdmin
-from keycloak.exceptions import KeycloakDeleteError, KeycloakGetError, KeycloakPostError
-from keycloak.openid_connection import KeycloakOpenIDConnection
 
 # Some good sources on this topic:
 # 1. https://stackoverflow.com/questions/42186537/resources-scopes-permissions-and-policies-in-keycloak
@@ -68,8 +68,8 @@ class KeycloakIdentityManager(BaseIdentityManager):
                 verify=self.keycloak_verify_cert,
             )
 
-            self.admin_url = f'{os.environ["KEYCLOAK_URL"]}/admin/realms/{os.environ["KEYCLOAK_REALM"]}/clients/{self.client_id}'
-            self.admin_url_without_client = f'{os.environ["KEYCLOAK_URL"]}/admin/realms/{os.environ["KEYCLOAK_REALM"]}'
+            self.admin_url = f"{os.environ['KEYCLOAK_URL']}/admin/realms/{os.environ['KEYCLOAK_REALM']}/clients/{self.client_id}"
+            self.admin_url_without_client = f"{os.environ['KEYCLOAK_URL']}/admin/realms/{os.environ['KEYCLOAK_REALM']}"
             self.realm = os.environ["KEYCLOAK_REALM"]
             # if Keep controls the Keycloak server so it have event listener
             # for future use

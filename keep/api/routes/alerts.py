@@ -11,16 +11,13 @@ from copy import deepcopy
 from typing import List, Optional
 
 import celpy
-from arq import ArqRedis
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from pusher import Pusher
 from sqlalchemy_utils import UUIDType
 from sqlmodel import Session
 
-from keep.api.arq_pool import get_pool
 from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.consts import KEEP_ARQ_QUEUE_BASIC
 from keep.api.core.alerts import (
     get_alert_facets,
     get_alert_facets_data,
@@ -30,34 +27,34 @@ from keep.api.core.alerts import (
 from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
 from keep.api.core.config import config
 from keep.api.core.db import dismiss_error_alerts as dismiss_error_alerts_db
-from keep.api.core.db import enrich_alerts_with_incidents
-from keep.api.core.db import get_alert_audit as get_alert_audit_db
 from keep.api.core.db import (
+    enrich_alerts_with_incidents,
     get_alerts_by_fingerprint,
     get_alerts_by_ids,
     get_alerts_metrics_by_provider,
     get_enrichment,
-    get_session,
-)
-from keep.api.core.db import get_error_alerts as get_error_alerts_db
-from keep.api.core.db import (
     get_last_alerts,
     get_last_alerts_by_fingerprints,
-    get_provider_by_name,
     get_session,
     is_all_alerts_resolved,
 )
-from keep.api.core.dependencies import extract_generic_body, get_pusher_client, get_event_producer
-from keep.api.core.messaging import EventProducer
+from keep.api.core.db import get_alert_audit as get_alert_audit_db
+from keep.api.core.db import get_error_alerts as get_error_alerts_db
+from keep.api.core.dependencies import (
+    extract_generic_body,
+    get_event_producer,
+    get_pusher_client,
+)
 from keep.api.core.elastic import ElasticClient
+from keep.api.core.messaging import EventProducer
 from keep.api.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
 from keep.api.models.action_type import ActionType
 from keep.api.models.alert import (
     AlertDto,
     AlertErrorDto,
     AlertStatus,
-    BatchEnrichAlertRequestBody,
     AssignAlertRequestBody,
+    BatchEnrichAlertRequestBody,
     DeleteRequestBody,
     DismissAlertRequest,
     EnrichAlertNoteRequestBody,
@@ -73,12 +70,10 @@ from keep.api.models.search_alert import SearchAlertsRequest
 from keep.api.models.time_stamp import TimeStampFilter
 from keep.api.routes.preset import pull_data_from_providers
 from keep.api.tasks.process_event_task import process_event
-
 from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.api.utils.time_stamp_helpers import get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
-from keep.providers.providers_factory import ProvidersFactory
 from keep.searchengine.searchengine import SearchEngine
 from keep.workflowmanager.workflowmanager import WorkflowManager
 
@@ -110,7 +105,6 @@ def fetch_alert_facet_options(
         "Fetching alert facets from DB",
         extra={
             "tenant_id": tenant_id,
-            
         },
     )
 
@@ -220,10 +214,7 @@ def query_alerts(
     tenant_id = authenticated_entity.tenant_id
     logger.info(
         "Fetching alerts from DB",
-        extra={
-            "tenant_id": tenant_id,
-            "cel_expression": query.cel
-        },
+        extra={"tenant_id": tenant_id, "cel_expression": query.cel},
     )
 
     try:
@@ -416,7 +407,6 @@ def assign_alert(
         },
     )
 
-
     logger.info(
         "Assigning alert",
         extra={
@@ -426,7 +416,7 @@ def assign_alert(
             "assignee": user_email,
         },
     )
-    
+
     # If the user wants to dispose the assignment on new alert, we need to add a disposable enrichment
     dispose_on_new_alert = False
     note = None
@@ -472,6 +462,7 @@ def assign_alert(
             dispose_on_new_alert=False,
         )
     return {"status": "ok"}
+
 
 def discard_future(
     trace_id: str,
@@ -550,7 +541,7 @@ def create_process_event_task(
         provider_id,
         fingerprint,
         api_key_name,
-    trace_id,
+        trace_id,
         event,
         provider_name=provider_name,
     )
@@ -595,7 +586,7 @@ async def receive_generic_event(
             task_name = await event_producer.produce(
                 event=event,
                 tenant_id=authenticated_entity.tenant_id,
-                provider_type=None, # Generic event
+                provider_type=None,  # Generic event
                 provider_id=provider_id,
                 fingerprint=fingerprint,
                 api_key_name=authenticated_entity.api_key_name,
@@ -707,42 +698,45 @@ async def receive_event(
         # `get_event_producer` logic:
         # if MESSAGING_TYPE == REDIS: return RedisEventProducer
         # if MESSAGING_TYPE == KAFKA: return KafkaEventProducer
-        
+
         # If `MESSAGING_TYPE=KAFKA`, then `REDIS` env var might be confusing.
         # I should probably change the condition to:
         # if REDIS or config("MESSAGING_TYPE") == "KAFKA": use producer
         # else: use threadpool.
-        
+
         # Or better: check if producer is available/supported?
         # Let's assume:
         # If `MESSAGING_TYPE == KAFKA`, we use it regardless of `REDIS` var.
         # If `MESSAGING_TYPE == REDIS`, we respect `REDIS` var?
-        
+
         # Ideally, `EventProducer` handles everything.
         # But threadpool logic is specific to `alerts.py` (it imports `process_event_executor`).
-        
+
         # I will change the logic to:
         # messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
         # if messaging_type == "KAFKA" or REDIS:
         #    await event_producer.produce(...)
         # else:
         #    threadpool...
-        
+
         # BUT I also need `task_name`.
         # I will update `EventProducer` to return `task_name`.
         # `RedisEventProducer` returns `job.job_id`.
         # `KafkaEventProducer` returns `None` or string.
-        
-        task_name = await event_producer.produce(
-            event=event,
-            tenant_id=authenticated_entity.tenant_id,
-            provider_type=provider_type,
-            provider_id=provider_id,
-            fingerprint=fingerprint,
-            api_key_name=authenticated_entity.api_key_name,
-            trace_id=trace_id,
-            provider_name=provider_name,
-        ) or "async-task"
+
+        task_name = (
+            await event_producer.produce(
+                event=event,
+                tenant_id=authenticated_entity.tenant_id,
+                provider_type=provider_type,
+                provider_id=provider_id,
+                fingerprint=fingerprint,
+                api_key_name=authenticated_entity.api_key_name,
+                trace_id=trace_id,
+                provider_name=provider_name,
+            )
+            or "async-task"
+        )
 
     return JSONResponse(content={"task_name": task_name}, status_code=202)
 
@@ -772,7 +766,7 @@ def get_alert(
     )
     if not db_alerts:
         raise HTTPException(status_code=404, detail="Alert not found")
-    
+
     enriched_alerts_dto = convert_db_alerts_to_dto_alerts(db_alerts)
     return enriched_alerts_dto[0]
 
@@ -912,7 +906,9 @@ def batch_enrich_alerts(
 
         if enrichments.get("status") == AlertStatus.RESOLVED.value:
             for fingerprint in fingerprints:
-                enrichment_bl.make_enrichments_permanent(fingerprint, dispose_keys=["assignees"])
+                enrichment_bl.make_enrichments_permanent(
+                    fingerprint, dispose_keys=["assignees"]
+                )
 
         enrichment_bl.batch_enrich(
             fingerprints=fingerprints,
@@ -1080,7 +1076,9 @@ def _enrich_alert(
         enrichments = deepcopy(enrich_data.enrichments)
 
         if enrichments.get("status") == AlertStatus.RESOLVED.value:
-            enrichement_bl.make_enrichments_permanent(enrich_data.fingerprint, dispose_keys=["assignees"])
+            enrichement_bl.make_enrichments_permanent(
+                enrich_data.fingerprint, dispose_keys=["assignees"]
+            )
 
         enrichment_kwargs = {
             "fingerprint": enrich_data.fingerprint,

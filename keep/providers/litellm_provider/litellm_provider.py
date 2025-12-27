@@ -1,8 +1,9 @@
-import json
 import dataclasses
+import json
+from typing import Any, Dict, List, Optional
+
 import pydantic
 import requests
-from typing import Optional, Dict, Any, List
 
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_exception import ProviderException
@@ -123,8 +124,8 @@ class LitellmProvider(BaseProvider):
 
 
 if __name__ == "__main__":
-    import os
     import logging
+    import os
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
     context_manager = ContextManager(

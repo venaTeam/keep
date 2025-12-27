@@ -1,5 +1,6 @@
-import json
 import dataclasses
+import json
+
 import pydantic
 import requests
 
@@ -51,7 +52,7 @@ class GrokProvider(BaseProvider):
     ):
         headers = {
             "Authorization": f"Bearer {self.authentication_config.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         # Prepare payload with structured output if needed
@@ -66,9 +67,7 @@ class GrokProvider(BaseProvider):
 
         try:
             response = requests.post(
-                f"{self.API_BASE}/chat/completions",
-                headers=headers,
-                json=payload
+                f"{self.API_BASE}/chat/completions", headers=headers, json=payload
             )
             response.raise_for_status()
             content = response.json()["choices"][0]["message"]["content"]
@@ -89,8 +88,8 @@ class GrokProvider(BaseProvider):
 
 
 if __name__ == "__main__":
-    import os
     import logging
+    import os
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
     context_manager = ContextManager(

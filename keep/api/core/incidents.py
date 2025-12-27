@@ -3,10 +3,11 @@ from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
 from sqlalchemy import String, and_, case, cast, func, select
+from sqlalchemy.orm import aliased, foreign
 from sqlmodel import Session, col, text
-from sqlalchemy.orm import foreign, aliased
 
 from keep.api.core.alerts import get_alert_potential_facet_fields
+from keep.api.core.cel_to_sql.ast_nodes import DataType
 from keep.api.core.cel_to_sql.properties_mapper import (
     PropertiesMappingException,
 )
@@ -32,7 +33,6 @@ from keep.api.models.db.facet import FacetType
 from keep.api.models.facet import FacetDto, FacetOptionDto, FacetOptionsQueryDto
 from keep.api.models.incident import IncidentSorting
 from keep.api.models.query import SortOptionsDto
-from keep.api.core.cel_to_sql.ast_nodes import DataType
 
 logger = logging.getLogger(__name__)
 

@@ -3,8 +3,8 @@ AxiomProvider is a class that allows to ingest/digest data from Axiom.
 """
 
 import dataclasses
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 import pydantic
 import requests
@@ -129,7 +129,6 @@ class AxiomProvider(BaseProvider):
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> AlertDto | list[AlertDto]:
-
         action = event.get("action", "Unable to fetch action")
         axiom_event = event.get("event")
         monitorId = axiom_event.get("monitorID")

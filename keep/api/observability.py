@@ -63,7 +63,6 @@ def setup(app: FastAPI):
     provider = TracerProvider(resource=resource)
 
     if otlp_collector_endpoint:
-
         logger.info(f"OTLP endpoint set to {otlp_collector_endpoint}")
 
         if otlp_traces_endpoint:

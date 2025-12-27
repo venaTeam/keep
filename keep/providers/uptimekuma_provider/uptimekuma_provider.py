@@ -25,7 +25,7 @@ class UptimekumaProviderAuthConfig:
             "required": True,
             "description": "UptimeKuma Host URL",
             "sensitive": False,
-            "validation": "any_http_url"
+            "validation": "any_http_url",
         },
     )
 
@@ -65,7 +65,6 @@ class UptimekumaProvider(BaseProvider):
         "firing": AlertStatus.FIRING.value,
         "0": AlertStatus.FIRING.value,
         0: AlertStatus.FIRING.value,
-
         # RESOLVED
         "up": AlertStatus.RESOLVED.value,
         "available": AlertStatus.RESOLVED.value,
@@ -124,7 +123,7 @@ class UptimekumaProvider(BaseProvider):
                 monitor_id = heartbeat.get("monitor_id", heartbeat.get("monitorID"))
                 try:
                     name = api.get_monitor(monitor_id)["name"]
-                except BadNamespaceError: # Most likely connection issues
+                except BadNamespaceError:  # Most likely connection issues
                     try:
                         api.disconnect()
                     except Exception:
@@ -139,7 +138,9 @@ class UptimekumaProvider(BaseProvider):
                     monitor_id=heartbeat["monitor_id"],
                     description=heartbeat["msg"],
                     status=self.STATUS_MAP.get(heartbeat["status"], "firing"),
-                    lastReceived=self._format_datetime(heartbeat["localDateTime"], heartbeat["timezoneOffset"]),
+                    lastReceived=self._format_datetime(
+                        heartbeat["localDateTime"], heartbeat["timezoneOffset"]
+                    ),
                     ping=heartbeat["ping"],
                     source=["uptimekuma"],
                 )
@@ -159,7 +160,6 @@ class UptimekumaProvider(BaseProvider):
             self.logger.error("Error getting alerts from UptimeKuma: %s", e)
             raise Exception(f"Error getting alerts from UptimeKuma: {e}")
 
-
     @classmethod
     def _format_alert(
         cls, event: dict, provider_instance: "BaseProvider" = None
@@ -170,7 +170,10 @@ class UptimekumaProvider(BaseProvider):
             monitor_url=event["monitor"]["url"],
             status=cls.STATUS_MAP.get(event["heartbeat"]["status"], "firing"),
             description=event["msg"],
-            lastReceived=cls._format_datetime(event["heartbeat"]["localDateTime"], event["heartbeat"]["timezoneOffset"]),
+            lastReceived=cls._format_datetime(
+                event["heartbeat"]["localDateTime"],
+                event["heartbeat"]["timezoneOffset"],
+            ),
             msg=event["heartbeat"]["msg"],
             source=["uptimekuma"],
         )
@@ -180,6 +183,7 @@ class UptimekumaProvider(BaseProvider):
     @staticmethod
     def _format_datetime(dt, offset):
         return dt + offset
+
 
 if __name__ == "__main__":
     import logging

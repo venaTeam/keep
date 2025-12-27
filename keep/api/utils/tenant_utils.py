@@ -3,9 +3,9 @@ import logging
 from typing import Optional
 from uuid import uuid4
 
-from sqlmodel import Session, select
-from sqlalchemy.exc import IntegrityError as SqlalchemyIntegrityError
 from google.api_core.exceptions import InvalidArgument as GoogleAPIInvalidArgument
+from sqlalchemy.exc import IntegrityError as SqlalchemyIntegrityError
+from sqlmodel import Session, select
 
 from keep.api.core.config import config
 from keep.api.models.db.tenant import TenantApiKey

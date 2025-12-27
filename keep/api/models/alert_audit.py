@@ -23,7 +23,7 @@ class AlertAuditDto(BaseModel):
     @classmethod
     def from_orm(cls, alert_audit: AlertAudit) -> "AlertAuditDto":
         mentions_data = None
-        if hasattr(alert_audit, 'mentions') and alert_audit.mentions:
+        if hasattr(alert_audit, "mentions") and alert_audit.mentions:
             mentions_data = [
                 CommentMentionDto(mentioned_user_id=mention.mentioned_user_id)
                 for mention in alert_audit.mentions

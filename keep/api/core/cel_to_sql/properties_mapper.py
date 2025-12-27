@@ -1,4 +1,5 @@
 from typing import Optional
+
 from keep.api.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
@@ -14,13 +15,13 @@ from keep.api.core.cel_to_sql.ast_nodes import (
     UnaryNode,
     UnaryNodeOperator,
 )
-
 from keep.api.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
     PropertiesMetadata,
     PropertyMetadataInfo,
     SimpleFieldMapping,
 )
+
 
 class JsonPropertyAccessNode(PropertyAccessNode):
     """
@@ -34,6 +35,7 @@ class JsonPropertyAccessNode(PropertyAccessNode):
         property_to_extract (str): The specific property to extract from the JSON object.
         method_access_node (MethodAccessNode): The method access node used for extraction. (*.contains, *.startsWith, etc)
     """
+
     def __init__(
         self,
         json_property_name: str,
@@ -52,6 +54,7 @@ class JsonPropertyAccessNode(PropertyAccessNode):
     method_access_node: Optional[MethodAccessNode]
     data_type: Optional[DataType]
 
+
 class MultipleFieldsNode(Node):
     """
     A node representing multiple fields in a property access structure.
@@ -59,12 +62,14 @@ class MultipleFieldsNode(Node):
 
     Attributes:
         fields (list[PropertyAccessNode]): A list of PropertyAccessNode instances representing the fields.
-    
+
     Args:
         fields (list[PropertyAccessNode]): A list of PropertyAccessNode instances to initialize the node with.
     """
+
     fields: list[PropertyAccessNode]
     data_type: Optional[DataType]
+
 
 class PropertiesMappingException(Exception):
     """
@@ -73,7 +78,9 @@ class PropertiesMappingException(Exception):
     Attributes:
         message (str): Explanation of the error.
     """
+
     pass
+
 
 class PropertiesMapper:
     """
@@ -98,6 +105,7 @@ class PropertiesMapper:
         _map_property(property_access_node: PropertyAccessNode) -> tuple[MultipleFieldsNode, PropertyMetadataInfo]:
             Maps a property access node to its corresponding database fields based on the metadata.
     """
+
     def __init__(self, properties_metadata: PropertiesMetadata):
         self.properties_metadata = properties_metadata
 
@@ -357,7 +365,9 @@ class PropertiesMapper:
                 data_type=data_type,
             )
 
-        raise NotImplementedError(f"Mapping type {type(mapping).__name__} is not supported yet")
+        raise NotImplementedError(
+            f"Mapping type {type(mapping).__name__} is not supported yet"
+        )
 
     def _map_property(
         self, property_access_node: PropertyAccessNode, throw_mapping_error=True

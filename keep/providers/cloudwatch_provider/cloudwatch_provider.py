@@ -687,9 +687,9 @@ class CloudwatchProvider(BaseProvider, ProviderHealthMixin):
                 target[param_parts[-1]] = choices[param_index]
 
         # Set StateChangeTime to current time
-        simulated_alert["Message"][
-            "StateChangeTime"
-        ] = datetime.datetime.now().isoformat()
+        simulated_alert["Message"]["StateChangeTime"] = (
+            datetime.datetime.now().isoformat()
+        )
 
         # Provider expects all keys as string
         for key in simulated_alert:

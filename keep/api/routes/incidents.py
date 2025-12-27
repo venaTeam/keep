@@ -27,6 +27,7 @@ from keep.api.core.db import (
     DestinationIncidentNotFound,
     add_audit,
     confirm_predicted_incident_by_id,
+    get_enrichment,
     get_future_incidents_by_incident_id,
     get_incident_alerts_and_links_by_incident_id,
     get_incident_by_id,
@@ -36,7 +37,6 @@ from keep.api.core.db import (
     get_session,
     get_workflow_executions_for_incident_or_alert,
     merge_incidents_to_id,
-    get_enrichment,
 )
 from keep.api.core.dependencies import extract_generic_body, get_pusher_client
 from keep.api.core.incidents import (

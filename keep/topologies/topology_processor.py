@@ -27,7 +27,6 @@ from keep.topologies.topologies_service import TopologiesService
 
 
 class TopologyProcessor:
-
     @staticmethod
     def get_instance() -> "TopologyProcessor":
         if not hasattr(TopologyProcessor, "_instance"):

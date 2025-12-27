@@ -199,8 +199,10 @@ def test_smtp_connection(settings: SMTPSettings) -> Tuple[bool, str, str]:
                 </div>
             </body>
         </html>
-        """.format(settings.host, settings.port, "TLS/STARTTLS" if settings.secure else "None")
-        
+        """.format(
+            settings.host, settings.port, "TLS/STARTTLS" if settings.secure else "None"
+        )
+
         # Create MIMEText with HTML content
         message = MIMEText(html_content, "html")
         message["From"] = settings.from_email

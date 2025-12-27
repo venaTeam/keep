@@ -639,11 +639,11 @@ class KibanaProvider(BaseProvider):
                 url = None
             if not isinstance(service, str):
                 logger.warning(
-                    "Could not extract service in SIEM Kibana alert", extra={"service": service}
+                    "Could not extract service in SIEM Kibana alert",
+                    extra={"service": service},
                 )
                 service = None
 
-            
             alert_dto = AlertDto(
                 name=name,
                 description=description,
@@ -656,7 +656,7 @@ class KibanaProvider(BaseProvider):
             )
             if fingerprint:
                 alert_dto.fingerprint = fingerprint
-                
+
             logger.info("Finished to parse SIEM Kibana alert")
             return alert_dto
         # Check if this is the new webhook format

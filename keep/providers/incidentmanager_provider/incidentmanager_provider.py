@@ -322,7 +322,6 @@ class IncidentmanagerProvider(BaseProvider):
         )
 
     def add_hook_to_topic(self, topic: str, keep_api_url: str, api_key: str):
-
         sns_client = self.__generate_client("sns")
 
         subscriptions = []

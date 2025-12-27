@@ -211,7 +211,7 @@ To send alerts from Graylog to Keep, Use the following webhook url to configure 
         }
 
         search_response = requests.post(
-            url=self.__get_url(paths=["views", "search","sync"]),
+            url=self.__get_url(paths=["views", "search", "sync"]),
             headers=self._headers,
             auth=self._auth,
             json=search_body,
@@ -232,7 +232,6 @@ To send alerts from Graylog to Keep, Use the following webhook url to configure 
             self.logger.info(f"message[{i}] type: {type(msg)}, content: {msg}")
 
         return messages
-
 
     @property
     def graylog_host(self):
@@ -817,11 +816,21 @@ To send alerts from Graylog to Keep, Use the following webhook url to configure 
         if query:
             return self.search(
                 query=query,
-                query_type=kwargs.get("query_type", events_search_parameters.get("query_type", "elastic")),
-                timerange_seconds=kwargs.get("timerange_seconds", events_search_parameters.get("timerange_seconds", 300)),
-                timerange_type=kwargs.get("timerange_type", events_search_parameters.get("timerange_type", "relative")),
+                query_type=kwargs.get(
+                    "query_type", events_search_parameters.get("query_type", "elastic")
+                ),
+                timerange_seconds=kwargs.get(
+                    "timerange_seconds",
+                    events_search_parameters.get("timerange_seconds", 300),
+                ),
+                timerange_type=kwargs.get(
+                    "timerange_type",
+                    events_search_parameters.get("timerange_type", "relative"),
+                ),
                 page=kwargs.get("page", events_search_parameters.get("page", 0)),
-                per_page=kwargs.get("per_page", events_search_parameters.get("per_page", 150)),
+                per_page=kwargs.get(
+                    "per_page", events_search_parameters.get("per_page", 150)
+                ),
             )
 
         # If no query specified, then run the get_alerts method

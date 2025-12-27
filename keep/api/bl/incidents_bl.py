@@ -56,7 +56,6 @@ else:
 
 
 class IncidentBl:
-
     def __init__(
         self,
         tenant_id: str,
@@ -317,7 +316,6 @@ class IncidentBl:
         return self.__postprocess_incident_change(incident)
 
     def __postprocess_alerts_change(self, incident, alert_fingerprints):
-
         self.__update_elastic(alert_fingerprints)
         self.logger.info(
             "Alerts pushed to elastic",
@@ -432,7 +430,6 @@ class IncidentBl:
     def resolve_incident_if_require(
         self, incident: Incident, max_retries=3
     ) -> Incident:
-
         should_resolve = False
 
         if incident.resolve_on == ResolveOn.ALL.value and is_all_alerts_resolved(
@@ -477,7 +474,6 @@ class IncidentBl:
         new_status: IncidentStatus,
         change_by: AuthenticatedEntity,
     ) -> IncidentDto:
-
         self.logger.info(
             "Fetching incident",
             extra={

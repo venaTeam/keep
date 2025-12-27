@@ -198,7 +198,6 @@ def convert_db_alerts_to_dto_alerts(
         with tracer.start_as_current_span("alerts_enrichment"):
             # enrich the alerts with the enrichment data
             for _object in alerts:
-
                 # We may have an Alert only or and Alert with an LastAlertToIncident
                 if isinstance(_object, Alert):
                     alert, alert_to_incident = _object, None

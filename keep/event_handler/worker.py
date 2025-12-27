@@ -77,7 +77,9 @@ async def process_event_in_worker(
     event,
     notify_client=True,
     timestamp_forced=None,
+    provider_name: str | None = None,
 ):
+    print(f"DEBUG: process_event_in_worker called for {tenant_id} / {provider_type}")
     logger.info(
         "Processing event in worker",
         extra={
@@ -101,6 +103,7 @@ async def process_event_in_worker(
         event=event,
         notify_client=notify_client,
         timestamp_forced=timestamp_forced,
+        provider_name=provider_name,
     )
     loop = asyncio.get_running_loop()
     # run the function in the thread pool

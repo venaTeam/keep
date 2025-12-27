@@ -17,6 +17,8 @@ services:
       file: docker-compose.common.yml
       service: keep-backend-common
     image: us-central1-docker.pkg.dev/keephq/keep/keep-api
+    ports:
+      - "8080:8080"
     environment:
       - AUTH_TYPE=NO_AUTH
       - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus

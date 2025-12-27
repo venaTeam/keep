@@ -1,0 +1,224 @@
+version: "3"
+services:
+  keep-frontend:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-frontend-common
+    build:
+      dockerfile: docker/Dockerfile.dev.ui
+    environment:
+      - AUTH_TYPE=NOAUTH
+      - API_URL=http://keep-backend:8080
+    volumes:
+      - ./keep-ui:/app
+      - /app/node_modules
+      - /app/.next
+      - ./state:/state
+    depends_on:
+      - keep-backend
+
+  keep-backend:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-backend-common
+    build:
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTH_TYPE=NOAUTH
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
+      - KEEP_METRICS=true
+      # Postgres
+      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@postgres:5432/keep
+      # Redis/ARQ
+      - REDIS=true
+      - REDIS_HOST=keep-arq-redis
+      - REDIS_PORT=6379
+      - DISABLE_ARQ_WORKER=true
+      # OTEL
+      - OTEL_SERVICE_NAME=keephq
+      - OTLP_ENDPOINT=http://otel-collector:4317
+      - METRIC_OTEL_ENABLED=true
+    volumes:
+      - .:/app
+      - ./state:/state
+    labels:
+      - "vector_scrape=true"
+      - "service=keep-backend"
+    depends_on:
+      - postgres
+      - keep-arq-redis
+      - otel-collector
+
+  keep-event-handler:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-backend-common
+    build:
+      dockerfile: docker/Dockerfile.event_handler
+    command: uvicorn keep.event_handler.app:app --host 0.0.0.0 --port 8080 --reload
+    ports:
+      - "8081:8080"
+    environment:
+      - AUTH_TYPE=NOAUTH
+      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@postgres:5432/keep
+      - REDIS=true
+      - REDIS_HOST=keep-arq-redis
+      - REDIS_PORT=6379
+      - DISABLE_ARQ_WORKER=true
+      - KEEP_ARQ_TASK_POOL=all
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+      - keep-arq-redis
+
+  keep-websocket-server:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-websocket-server-common
+
+  # Redis for ARQ
+  keep-arq-redis:
+    image: redis/redis-stack
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+
+  keep-arq-dashboard:
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-arq-dashboard
+    ports:
+      - "8082:8000"
+    entrypoint:
+      - "uvicorn"
+      - "--host"
+      - "0.0.0.0"
+      - "arq_dashboard:app"
+    environment:
+      - ARQ_DASHBOARD_REDIS_URL=redis://keep-arq-redis:6379
+    depends_on:
+      - keep-arq-redis
+
+  # Database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: keep
+      POSTGRES_USER: keep
+      POSTGRES_PASSWORD: keep
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keep" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  # Observability
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.81.0
+    command: [ "--config=/etc/otelcol-contrib/config.yaml" ]
+    volumes:
+      - ./otel-shared/otel-collector-config-elastic.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    depends_on:
+      - apm
+
+  log_collector:
+    image: timberio/vector:0.32.2-debian
+    volumes:
+      - ./otel-shared/vector-otel.toml:/etc/vector/vector.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - otel-collector
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/etc/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+
+  # Elastic Stack
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    labels:
+      co.elastic.logs/module: elasticsearch
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    environment:
+      - node.name=elastic
+      - cluster.name=keep-elk
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=elastic
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.license.self_generated.type=basic
+
+  kibana:
+    depends_on:
+      - elastic
+    image: docker.elastic.co/kibana/kibana:8.17.0
+    labels:
+      co.elastic.logs/module: kibana
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "5601:5601"
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elastic:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=kibana
+      - XPACK_APM_SERVICEMAPENABLED="true"
+
+  apm:
+    image: docker.elastic.co/apm/apm-server:8.17.0
+    depends_on:
+      - elastic
+      - kibana
+    ports:
+      - "8200:8200"
+    command: >
+      apm-server -e
+        -E apm-server.rum.enabled=true
+        -E setup.kibana.host=kibana:5601
+        -E setup.template.settings.index.number_of_shards=1
+        -E apm-server.kibana.enabled=true
+        -E apm-server.kibana.host=kibana:5601
+        -E output.elasticsearch.hosts=["elastic:9200"]
+        -E output.elasticsearch.username=elastic
+        -E output.elasticsearch.password=elastic
+
+volumes:
+  state:
+  postgres_data:
+  elastic_data:
+  kibana_data:

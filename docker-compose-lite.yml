@@ -1,0 +1,99 @@
+version: "3"
+services:
+  keep-frontend:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-frontend-common
+    build:
+      dockerfile: docker/Dockerfile.dev.ui
+    environment:
+      - AUTH_TYPE=NOAUTH
+      - API_URL=http://keep-backend:8080
+    volumes:
+      - ./keep-ui:/app
+      - /app/node_modules
+      - /app/.next
+      - ./state:/state
+    depends_on:
+      - keep-backend
+
+  keep-backend:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-backend-common
+    build:
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTH_TYPE=NOAUTH
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
+      - KEEP_METRICS=false
+      # Postgres
+      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@postgres:5432/keep
+      # Redis/ARQ
+      - REDIS=true
+      - REDIS_HOST=keep-arq-redis
+      - REDIS_PORT=6379
+      - DISABLE_ARQ_WORKER=true
+      # Disable OTEL
+      - METRIC_OTEL_ENABLED=false
+    volumes:
+      - .:/app
+      - ./state:/state
+    depends_on:
+      - postgres
+      - keep-arq-redis
+
+  keep-event-handler:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-backend-common
+    build:
+      dockerfile: docker/Dockerfile.event_handler
+    command: uvicorn keep.event_handler.app:app --host 0.0.0.0 --port 8080
+    ports:
+      - "8081:8080"
+    environment:
+      - AUTH_TYPE=NOAUTH
+      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@postgres:5432/keep
+      - REDIS=true
+      - REDIS_HOST=keep-arq-redis
+      - REDIS_PORT=6379
+      - DISABLE_ARQ_WORKER=true
+      - KEEP_ARQ_TASK_POOL=all
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+      - keep-arq-redis
+
+  keep-websocket-server:
+    extends:
+      file: docker-compose.common.yml
+      service: keep-websocket-server-common
+
+  keep-arq-redis:
+    image: redis/redis-stack
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: keep
+      POSTGRES_USER: keep
+      POSTGRES_PASSWORD: keep
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keep" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

@@ -19,7 +19,7 @@ python "$SCRIPT_DIR/server_jobs_bg.py" &
 }
 
 # Check for REDIS env variable == true
-if [ "$REDIS" != "true" ]; then
+if [ "$REDIS" != "true" ] || [ "$DISABLE_ARQ_WORKER" == "true" ]; then
     # Just run gunicorn for the API
     exec "$@"
 # else, we want different workers for API and for processing
@@ -43,15 +43,15 @@ else
     gunicorn \
         --bind "0.0.0.0:$ARQ_WORKER_PORT" \
         --workers $KEEP_WORKERS \
-        --worker-class "keep.api.arq_worker_gunicorn.ARQGunicornWorker" \
+        --worker-class "uvicorn.workers.UvicornWorker" \
         --timeout $ARQ_WORKER_TIMEOUT \
         --log-level $LOG_LEVEL \
         --access-logfile - \
         --error-logfile - \
         --name "arq_worker" \
-        -c "/venv/lib/python3.13/site-packages/keep/api/config.py" \
+        -c "/app/keep/api/config.py" \
         "--preload" \
-        "keep.api.arq_worker_gunicorn:create_app()" &
+        "keep.event_handler.app:app" &
 
     KEEP_ARQ_PID=$!
 

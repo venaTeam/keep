@@ -29,6 +29,5 @@ COPY keep/entrypoint.sh /app/keep/entrypoint.sh
 RUN chmod +x /app/keep/entrypoint.sh
 ENTRYPOINT ["/app/keep/entrypoint.sh"]
 
-# For API, we theoretically only need keep/api, but due to monorepo structure it's safest to rely on imports.
-# In dev mode, volume mount overrides this.
-CMD ["gunicorn", "keep.api.api:get_app", "--bind" , "0.0.0.0:8080" , "--workers", "1" , "-k" , "uvicorn.workers.UvicornWorker", "-c", "./keep/api/config.py", "--reload"]
+# Worker command
+CMD ["uvicorn", "keep.event_handler.app:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]

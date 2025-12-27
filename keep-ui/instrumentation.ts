@@ -1,6 +1,18 @@
 // @ts-nocheck
 import * as Sentry from "@sentry/nextjs";
 
+// Workaround for broken localStorage in some environments (e.g. dev/docker)
+// where it exists but getItem is not a function
+if (
+  typeof global !== "undefined" &&
+  typeof global.localStorage !== "undefined" &&
+  typeof global.localStorage.getItem !== "function"
+) {
+  console.log("Blocking broken localStorage in instrumentation");
+  // @ts-ignore
+  delete global.localStorage;
+}
+
 export async function register() {
   if (
     process.env.SENTRY_DISABLED === "true" ||

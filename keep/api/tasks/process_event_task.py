@@ -30,6 +30,7 @@ from keep.api.core.db import (
     get_all_presets_dtos,
     get_enrichment_with_session,
     get_last_alert_hashes_by_fingerprints,
+    get_provider_by_name,
     get_session_sync,
     get_started_at_for_alerts,
     set_last_alert,
@@ -1205,6 +1206,7 @@ def process_event(
     ),  # the event to process, either plain (generic) or from a specific provider
     notify_client: bool = True,
     timestamp_forced: datetime.datetime | None = None,
+    provider_name: str | None = None,
 ) -> list[Alert]:
     start_time = time.time()
     job_id = ctx.get("job_id")
@@ -1264,6 +1266,52 @@ def process_event(
                     },
                 )
                 raise
+        
+        # If we have a provider name but no provider id, we need to get the provider
+        if provider_name and not provider_id:
+            logger.info("Resolving provider by name", extra={"provider_name": provider_name})
+            provider = get_provider_by_name(tenant_id, provider_name)
+            if provider:
+                provider_id = provider.id
+                provider_type = provider.type
+                extra_dict.update({
+                    "provider_id": provider_id,
+                    "provider_type": provider_type
+                })
+                logger.info("Provider resolved", extra={"provider_id": provider_id, "provider_type": provider_type})
+            else:
+                logger.warning(
+                    "Provider not found by name", 
+                    extra={"provider_name": provider_name, "tenant_id": tenant_id}
+                )
+
+        # If we have a provider type and the event needs parsing (it's a dict but we might want to let the provider parse it if it has specific logic)
+        # Note: currently the API does extract_generic_body which returns dict/bytes/Form. 
+        # If we moved that here, 'event' is that raw body.
+        if provider_type and provider_id:
+            try:
+                provider_class = ProvidersFactory.get_installed_provider(
+                    tenant_id=tenant_id,
+                    provider_id=provider_id,
+                    provider_type=provider_type,
+                )
+                if hasattr(provider_class, "parse_event_raw_body"):
+                    # This allows providers to parse the raw body (e.g. bytes to dict, or dict to dict)
+                    # Before this change, the API did this.
+                    logger.info("Parsing event raw body using provider", extra={"provider_type": provider_type})
+                    event = provider_class.parse_event_raw_body(event)
+                    # update summary
+                    extra_dict["event_summary"] = _serialize_event_for_logging(event)
+            except Exception as e:
+                # If we fail to load the provider or parse, we just continue with the event as is,
+                # but log the error. This mimics previous "best effort" or "generic" behavior if provider fails?
+                # Actually, if parsing fails, formatting might fail later. But we shouldn't stop processing entirely if possible.
+                logger.warning(
+                    "Failed to parse event with provider", 
+                    extra={"error": str(e), "provider_type": provider_type}
+                )
+        
+
 
         # Pre alert formatting extraction rules
         with tracer.start_as_current_span("process_event_pre_alert_formatting"):

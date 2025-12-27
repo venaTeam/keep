@@ -533,6 +533,7 @@ def create_process_event_task(
     trace_id: str,
     event: AlertDto | list[AlertDto] | dict,
     running_tasks: set,
+    provider_name: str | None = None,
 ) -> str:
     logger.info("Adding task", extra={"trace_id": trace_id})
     started_time = time.time()
@@ -548,8 +549,9 @@ def create_process_event_task(
         provider_id,
         fingerprint,
         api_key_name,
-        trace_id,
+    trace_id,
         event,
+        provider_name=provider_name,
     )
     running_tasks.add(future)
     future.add_done_callback(
@@ -664,51 +666,9 @@ async def receive_event(
     ),
 ) -> dict[str, str]:
     trace_id = request.state.trace_id
-    running_tasks: set = request.state.background_tasks
-    provider_class = None
-    try:
-        t = time.time()
-        logger.debug(f"Getting provider class for {provider_type}")
-        provider_class = ProvidersFactory.get_provider_class(provider_type)
-        logger.debug(
-            "Got provider class",
-            extra={
-                "provider_type": provider_type,
-                "time": time.time() - t,
-            },
-        )
-    except ModuleNotFoundError:
-        raise HTTPException(
-            status_code=400, detail=f"Provider {provider_type} not found"
-        )
-    if not provider_class:
-        raise HTTPException(
-            status_code=400, detail=f"Provider {provider_type} not found"
-        )
-
-    # Parse the raw body
-    t = time.time()
-    logger.debug("Parsing event raw body")
-    try:
-        event = provider_class.parse_event_raw_body(event)
-    except Exception:
-        logger.exception(
-            "Failed to parse event raw body",
-            extra={"tenant_id": authenticated_entity.tenant_id, "event": event},
-        )
-        raise HTTPException(status_code=400, detail="Malformed event")
-    logger.debug("Parsed event raw body", extra={"time": time.time() - t})
-
-    # If provider_name is provided, try to get provider_id from it
-    if provider_name and not provider_id:
-        provider = get_provider_by_name(authenticated_entity.tenant_id, provider_name)
-        if not provider or provider.type != provider_type:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Provider with name '{provider_name}' not found",
-            )
-
-        provider_id = provider.id
+    # If provider_name is provided, we pass it to the worker to resolve it
+    # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
+    # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
 
     if REDIS:
         redis: ArqRedis = await get_pool()
@@ -722,6 +682,7 @@ async def receive_event(
             trace_id,
             event,
             _queue_name=KEEP_ARQ_QUEUE_BASIC,
+            provider_name=provider_name,
         )
         logger.info(
             "Enqueued job",
@@ -742,6 +703,7 @@ async def receive_event(
             trace_id,
             event,
             running_tasks,
+            provider_name=provider_name,
         )
     return JSONResponse(content={"task_name": task_name}, status_code=202)
 

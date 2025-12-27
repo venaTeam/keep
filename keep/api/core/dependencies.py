@@ -94,7 +94,13 @@ def get_pusher_client() -> Pusher | None:
 
 
 async def get_event_producer() -> EventProducer:
-    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
+    messaging_type = config("MESSAGING_TYPE", default=None)
+    # If MESSAGING_TYPE is explicitly set, use it
+    if messaging_type:
+        messaging_type = messaging_type.upper()
+    # Otherwise check legacy REDIS env var
+    elif config("REDIS", default="false") == "true":
+        messaging_type = "REDIS"
 
     if messaging_type == "REDIS":
         arq_pool = await get_pool()

@@ -21,6 +21,7 @@ def test_app(monkeypatch, request, db_session):
 
     try:
         monkeypatch.setenv("KEEP_USE_LIMITER", "false")
+        monkeypatch.setenv("REDIS", "false")
         # Check if request.param is a dict or a string
         if isinstance(request.param, dict):
             # Set environment variables based on the provided dictionary
@@ -49,6 +50,9 @@ def test_app(monkeypatch, request, db_session):
 
         if "keep.api.config" in sys.modules:
             importlib.reload(sys.modules["keep.api.config"])
+
+        if "keep.api.consts" in sys.modules:
+            importlib.reload(sys.modules["keep.api.consts"])
 
         # Import and return the app instance
         from keep.api.api import get_app

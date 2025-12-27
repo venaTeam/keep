@@ -667,8 +667,13 @@ async def receive_event(
     # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
     # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
 
-    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
-    if REDIS or messaging_type == "KAFKA":
+    messaging_type = config("MESSAGING_TYPE", default=None)
+    if messaging_type:
+        messaging_type = messaging_type.upper()
+    elif REDIS:
+        messaging_type = "REDIS"
+
+    if messaging_type == "KAFKA" or messaging_type == "REDIS":
         # Use the abstract event producer (Redis or Kafka)
         task_name = await event_producer.produce(
             event=event,
@@ -684,7 +689,7 @@ async def receive_event(
         # Fallback to local threadpool execution
         task_name = create_process_event_task(
             authenticated_entity.tenant_id,
-            None,
+            provider_type,
             provider_id,
             fingerprint,
             authenticated_entity.api_key_name,
@@ -695,48 +700,6 @@ async def receive_event(
 
     if not task_name:
         task_name = "async-task"
-        # `get_event_producer` logic:
-        # if MESSAGING_TYPE == REDIS: return RedisEventProducer
-        # if MESSAGING_TYPE == KAFKA: return KafkaEventProducer
-
-        # If `MESSAGING_TYPE=KAFKA`, then `REDIS` env var might be confusing.
-        # I should probably change the condition to:
-        # if REDIS or config("MESSAGING_TYPE") == "KAFKA": use producer
-        # else: use threadpool.
-
-        # Or better: check if producer is available/supported?
-        # Let's assume:
-        # If `MESSAGING_TYPE == KAFKA`, we use it regardless of `REDIS` var.
-        # If `MESSAGING_TYPE == REDIS`, we respect `REDIS` var?
-
-        # Ideally, `EventProducer` handles everything.
-        # But threadpool logic is specific to `alerts.py` (it imports `process_event_executor`).
-
-        # I will change the logic to:
-        # messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
-        # if messaging_type == "KAFKA" or REDIS:
-        #    await event_producer.produce(...)
-        # else:
-        #    threadpool...
-
-        # BUT I also need `task_name`.
-        # I will update `EventProducer` to return `task_name`.
-        # `RedisEventProducer` returns `job.job_id`.
-        # `KafkaEventProducer` returns `None` or string.
-
-        task_name = (
-            await event_producer.produce(
-                event=event,
-                tenant_id=authenticated_entity.tenant_id,
-                provider_type=provider_type,
-                provider_id=provider_id,
-                fingerprint=fingerprint,
-                api_key_name=authenticated_entity.api_key_name,
-                trace_id=trace_id,
-                provider_name=provider_name,
-            )
-            or "async-task"
-        )
 
     return JSONResponse(content={"task_name": task_name}, status_code=202)
 

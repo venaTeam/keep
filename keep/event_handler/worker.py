@@ -81,7 +81,7 @@ async def process_event_in_worker(
 ):
     print(f"DEBUG: process_event_in_worker called for {tenant_id} / {provider_type}")
     logger.info(
-        "Processing event in worker",
+        f"Processing event in Redis Worker (ARQ): {trace_id}",
         extra={
             "tenant_id": tenant_id,
             "provider_type": provider_type,

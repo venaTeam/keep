@@ -99,7 +99,7 @@ async def run_arq_worker(worker_id, number_of_errors_before_restart=0):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    logger.info("Starting ARQ Worker Service")
+    logger.info("Starting Event Handler Service")
     # Initialize DB and other resources (similar to API startup)
     from keep.api.config import on_starting
     try:
@@ -111,25 +111,43 @@ async def lifespan(app: FastAPI):
         logger.exception("Failed to run on_starting")
         print(f"DEBUG: on_starting failed: {e}")
 
-    worker_id = "worker-service"
+    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
+    consumer = None
+    worker_task = None
+
+    if messaging_type == "KAFKA":
+        from keep.event_handler.messaging import KafkaEventConsumer
+        logger.info("MESSAGING_TYPE is KAFKA - starting Kafka Consumer")
+        consumer = KafkaEventConsumer()
+        await consumer.start()
     
-    # Create background task for the worker
-    loop = asyncio.get_running_loop()
-    print(f"DEBUG: Creating worker task for {worker_id}")
-    worker_task = loop.create_task(run_arq_worker(worker_id))
-    print("DEBUG: Worker task created")
+    else:
+        # Default to REDIS / ARQ
+        logger.info(f"MESSAGING_TYPE is {messaging_type} - starting ARQ Worker")
+        worker_id = "worker-service"
+        # Create background task for the worker
+        loop = asyncio.get_running_loop()
+        print(f"DEBUG: Creating worker task for {worker_id}")
+        worker_task = loop.create_task(run_arq_worker(worker_id))
+        print("DEBUG: Worker task created")
     
     yield
     
     # Shutdown
-    logger.info("Shutting down ARQ Worker Service")
-    if not worker_task.done():
-        worker_task.cancel()
-        try:
-            await worker_task
-        except asyncio.CancelledError:
-            pass
-    logger.info("ARQ Worker Service stopped")
+    logger.info("Shutting down Event Handler Service")
+    
+    if consumer:
+        await consumer.stop()
+        
+    if worker_task:
+        if not worker_task.done():
+            worker_task.cancel()
+            try:
+                await worker_task
+            except asyncio.CancelledError:
+                pass
+    
+    logger.info("Event Handler Service stopped")
 
 
 app = FastAPI(

@@ -30,4 +30,4 @@ RUN chmod +x /app/keep/entrypoint.sh
 ENTRYPOINT ["/app/keep/entrypoint.sh"]
 
 # Worker command
-CMD ["uvicorn", "keep.event_handler.app:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+CMD ["uvicorn", "keep.event_handler.app:app", "--host", "0.0.0.0", "--port", "8080"]

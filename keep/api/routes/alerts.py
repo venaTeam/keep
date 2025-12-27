@@ -47,7 +47,8 @@ from keep.api.core.db import (
     get_session,
     is_all_alerts_resolved,
 )
-from keep.api.core.dependencies import extract_generic_body, get_pusher_client
+from keep.api.core.dependencies import extract_generic_body, get_pusher_client, get_event_producer
+from keep.api.core.messaging import EventProducer
 from keep.api.core.elastic import ElasticClient
 from keep.api.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
 from keep.api.models.action_type import ActionType
@@ -576,6 +577,7 @@ async def receive_generic_event(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:alert"])
     ),
+    event_producer: EventProducer = Depends(get_event_producer),
 ):
     """
     A generic webhook endpoint that can be used by any provider to send alerts to Keep.
@@ -586,29 +588,24 @@ async def receive_generic_event(
         tenant_id (str, optional): Defaults to Depends(verify_api_key).
     """
     running_tasks: set = request.state.background_tasks
-    if REDIS:
-        redis: ArqRedis = await get_pool()
-        job = await redis.enqueue_job(
-            "process_event_in_worker",
-            authenticated_entity.tenant_id,
-            None,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            request.state.trace_id,
-            event,
-            _queue_name=KEEP_ARQ_QUEUE_BASIC,
-        )
-        logger.info(
-            "Enqueued job",
-            extra={
-                "job_id": job.job_id,
-                "tenant_id": authenticated_entity.tenant_id,
-                "queue": KEEP_ARQ_QUEUE_BASIC,
-            },
-        )
-        task_name = job.job_id
+    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
+    if REDIS or messaging_type == "KAFKA":
+        # Use the abstract event producer (Redis or Kafka)
+        try:
+            task_name = await event_producer.produce(
+                event=event,
+                tenant_id=authenticated_entity.tenant_id,
+                provider_type=None, # Generic event
+                provider_id=provider_id,
+                fingerprint=fingerprint,
+                api_key_name=authenticated_entity.api_key_name,
+                trace_id=request.state.trace_id,
+                provider_name=None,
+            )
+        except Exception:
+            raise
     else:
+        # Fallback to local threadpool execution
         task_name = create_process_event_task(
             authenticated_entity.tenant_id,
             None,
@@ -619,6 +616,10 @@ async def receive_generic_event(
             event,
             running_tasks,
         )
+
+    if not task_name:
+        task_name = "async-task"
+
     return JSONResponse(content={"task_name": task_name}, status_code=202)
 
 
@@ -664,47 +665,85 @@ async def receive_event(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:alert"])
     ),
+    event_producer: EventProducer = Depends(get_event_producer),
 ) -> dict[str, str]:
     trace_id = request.state.trace_id
     # If provider_name is provided, we pass it to the worker to resolve it
     # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
     # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
 
-    if REDIS:
-        redis: ArqRedis = await get_pool()
-        job = await redis.enqueue_job(
-            "process_event_in_worker",
-            authenticated_entity.tenant_id,
-            provider_type,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            trace_id,
-            event,
-            _queue_name=KEEP_ARQ_QUEUE_BASIC,
+    # If provider_name is provided, we pass it to the worker to resolve it
+    # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
+    # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
+
+    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
+    if REDIS or messaging_type == "KAFKA":
+        # Use the abstract event producer (Redis or Kafka)
+        task_name = await event_producer.produce(
+            event=event,
+            tenant_id=authenticated_entity.tenant_id,
+            provider_type=provider_type,
+            provider_id=provider_id,
+            fingerprint=fingerprint,
+            api_key_name=authenticated_entity.api_key_name,
+            trace_id=trace_id,
             provider_name=provider_name,
         )
-        logger.info(
-            "Enqueued job",
-            extra={
-                "job_id": job.job_id,
-                "tenant_id": authenticated_entity.tenant_id,
-                "queue": KEEP_ARQ_QUEUE_BASIC,
-            },
-        )
-        task_name = job.job_id
     else:
+        # Fallback to local threadpool execution
         task_name = create_process_event_task(
             authenticated_entity.tenant_id,
-            provider_type,
+            None,
             provider_id,
             fingerprint,
             authenticated_entity.api_key_name,
             trace_id,
             event,
-            running_tasks,
-            provider_name=provider_name,
+            request.state.background_tasks,
         )
+
+    if not task_name:
+        task_name = "async-task"
+        # `get_event_producer` logic:
+        # if MESSAGING_TYPE == REDIS: return RedisEventProducer
+        # if MESSAGING_TYPE == KAFKA: return KafkaEventProducer
+        
+        # If `MESSAGING_TYPE=KAFKA`, then `REDIS` env var might be confusing.
+        # I should probably change the condition to:
+        # if REDIS or config("MESSAGING_TYPE") == "KAFKA": use producer
+        # else: use threadpool.
+        
+        # Or better: check if producer is available/supported?
+        # Let's assume:
+        # If `MESSAGING_TYPE == KAFKA`, we use it regardless of `REDIS` var.
+        # If `MESSAGING_TYPE == REDIS`, we respect `REDIS` var?
+        
+        # Ideally, `EventProducer` handles everything.
+        # But threadpool logic is specific to `alerts.py` (it imports `process_event_executor`).
+        
+        # I will change the logic to:
+        # messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
+        # if messaging_type == "KAFKA" or REDIS:
+        #    await event_producer.produce(...)
+        # else:
+        #    threadpool...
+        
+        # BUT I also need `task_name`.
+        # I will update `EventProducer` to return `task_name`.
+        # `RedisEventProducer` returns `job.job_id`.
+        # `KafkaEventProducer` returns `None` or string.
+        
+        task_name = await event_producer.produce(
+            event=event,
+            tenant_id=authenticated_entity.tenant_id,
+            provider_type=provider_type,
+            provider_id=provider_id,
+            fingerprint=fingerprint,
+            api_key_name=authenticated_entity.api_key_name,
+            trace_id=trace_id,
+            provider_name=provider_name,
+        ) or "async-task"
+
     return JSONResponse(content={"task_name": task_name}, status_code=202)
 
 

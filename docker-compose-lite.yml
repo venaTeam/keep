@@ -51,11 +51,12 @@ services:
       service: keep-backend-common
     build:
       dockerfile: docker/Dockerfile.event_handler
-    command: uvicorn keep.event_handler.app:app --host 0.0.0.0 --port 8080
+    command: uvicorn keep.event_handler.main:app --host 0.0.0.0 --port 8080
     ports:
       - "8081:8080"
     environment:
       - AUTH_TYPE=NOAUTH
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
       - DATABASE_CONNECTION_STRING=postgresql://keep:keep@postgres:5432/keep
       - REDIS=true
       - REDIS_HOST=keep-arq-redis

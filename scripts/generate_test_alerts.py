@@ -11,7 +11,8 @@ import uuid
 DEFAULT_URL = "http://localhost:8080/alerts/event"
 
 
-def generate_alert():
+
+def generate_alert(error=False):
     # Use timezone-aware UTC datetime
     now = (
         datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
@@ -41,12 +42,16 @@ def generate_alert():
         "ticket_url": "https://www.keephq.dev?enrichedTicketId=456",
         "fingerprint": str(uuid.uuid4()),
     }
+    
+    if error:
+        alert = {"foo": "bar"}
+        
     return alert
 
 
 def send_alert(url, alert, api_key):
     data = json.dumps(alert).encode("utf-8")
-    headers = {"Content-Type": "application/json", "x-api-key": api_key}
+    headers = {"Content-Type": "application/json", "x-api-key": api_key} #, 
     req = urllib.request.Request(url, data=data, headers=headers)
 
     try:
@@ -74,11 +79,11 @@ def send_alert(url, alert, api_key):
         )
 
 
-def main(url, interval, api_key):
+def main(url, interval, api_key, error):
     print(f"Starting alert generator. Target: {url}, Interval: {interval}s")
     try:
         while True:
-            alert = generate_alert()
+            alert = generate_alert(error)
             send_alert(url, alert, api_key)
             time.sleep(interval)
     except KeyboardInterrupt:
@@ -96,6 +101,11 @@ if __name__ == "__main__":
         default="dummy-api-key",
         help="API Key to include in the request headers",
     )
+    parser.add_argument(
+        "--error",
+        action="store_true",
+        help="Generate false alerts with foo:bar",
+    )
     args = parser.parse_args()
 
-    main(args.url, args.interval, args.api_key)
+    main(args.url, args.interval, args.api_key, args.error)

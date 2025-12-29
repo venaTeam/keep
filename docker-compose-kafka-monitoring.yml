@@ -13,6 +13,7 @@ services:
       - MESSAGING_TYPE=KAFKA
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - REDIS=false
+      - KEEP_OTEL_ENABLED=true
     depends_on:
       kafka:
         condition: service_healthy
@@ -24,6 +25,10 @@ services:
     environment:
       - MESSAGING_TYPE=KAFKA
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS=false
+      - KEEP_OTEL_ENABLED=true
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
+
     depends_on:
       kafka:
         condition: service_healthy

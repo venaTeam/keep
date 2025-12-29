@@ -51,7 +51,7 @@ else
         --name "arq_worker" \
         -c "/app/keep/api/config.py" \
         "--preload" \
-        "keep.event_handler.app:app" &
+        "keep.event_handler.main:app" &
 
     KEEP_ARQ_PID=$!
 

@@ -6,7 +6,7 @@ import logging
 from aiokafka import AIOKafkaConsumer
 
 from keep.api.core.config import config
-from keep.api.tasks.process_event_task import process_event
+from keep.event_handler.controllers.event_controller import process_event_wrapper
 
 
 class EventConsumer(abc.ABC):
@@ -85,7 +85,7 @@ class KafkaEventConsumer(EventConsumer):
 
                 try:
                     payload = json.loads(msg.value.decode("utf-8"))
-                    self.logger.info(
+                    self.logger.debug(
                         f"Received event from Kafka: {payload.get('trace_id')}"
                     )
 
@@ -99,22 +99,19 @@ class KafkaEventConsumer(EventConsumer):
                     trace_id = payload.get("trace_id")
                     provider_name = payload.get("provider_name")
 
-                    self.logger.info(f"Processing event in Kafka Consumer: {trace_id}")
-                    # Run logic in loop/thread since process_event is sync
+                    # Run logic via controller
                     # We pass an empty dict as ctx since we are not in ARQ
-                    await asyncio.to_thread(
-                        process_event,
-                        {},  # ctx
-                        tenant_id,
-                        provider_type,
-                        provider_id,
-                        fingerprint,
-                        api_key_name,
-                        trace_id,
-                        event,
+                    await process_event_wrapper(
+                        ctx={}, 
+                        tenant_id=tenant_id,
+                        provider_type=provider_type,
+                        provider_id=provider_id,
+                        fingerprint=fingerprint,
+                        api_key_name=api_key_name,
+                        trace_id=trace_id,
+                        event=event,
                         provider_name=provider_name,
                     )
-                    self.logger.info(f"Finished processing event: {trace_id}")
 
                 except Exception as e:
                     self.logger.exception(f"Error processing Kafka message: {e}")

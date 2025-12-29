@@ -1,5 +1,4 @@
 import asyncio
-import functools
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
@@ -22,7 +21,7 @@ from keep.api.consts import (
 )
 from keep.api.core.config import config
 from keep.api.redis_settings import get_redis_settings
-from keep.api.tasks.process_event_task import process_event
+from keep.event_handler.controllers.event_controller import process_event_wrapper
 
 # Load environment variables
 load_dotenv(find_dotenv())
@@ -65,61 +64,10 @@ FUNCTIONS: list = (
     else list()
 )
 
-
-async def process_event_in_worker(
-    ctx,
-    tenant_id,
-    provider_type,
-    provider_id,
-    fingerprint,
-    api_key_name,
-    trace_id,
-    event,
-    notify_client=True,
-    timestamp_forced=None,
-    provider_name: str | None = None,
-):
-    print(f"DEBUG: process_event_in_worker called for {tenant_id} / {provider_type}")
-    logger.info(
-        f"Processing event in Redis Worker (ARQ): {trace_id}",
-        extra={
-            "tenant_id": tenant_id,
-            "provider_type": provider_type,
-            "provider_id": provider_id,
-            "fingerprint": fingerprint,
-            "tract_id": trace_id,
-        },
-    )
-    # Create a new context that includes both the arq ctx and any other parameters
-    process_event_func_sync = functools.partial(
-        process_event,
-        ctx=ctx,  # Pass ctx as a named parameter
-        tenant_id=tenant_id,
-        provider_type=provider_type,
-        provider_id=provider_id,
-        fingerprint=fingerprint,
-        api_key_name=api_key_name,
-        trace_id=trace_id,
-        event=event,
-        notify_client=notify_client,
-        timestamp_forced=timestamp_forced,
-        provider_name=provider_name,
-    )
-    loop = asyncio.get_running_loop()
-    # run the function in the thread pool
-    resp = loop.run_in_executor(ctx["pool"], process_event_func_sync)
-    logger.info(
-        "Event processed in worker",
-        extra={
-            "tenant_id": tenant_id,
-            "provider_type": provider_type,
-            "provider_id": provider_id,
-            "fingerprint": fingerprint,
-            "trace_id": trace_id,
-        },
-    )
-    return resp
-
+# Register the event controller as the ARQ function
+# We alias it to 'process_event_in_worker' to match what the producer enqueues
+async def process_event_in_worker(ctx, *args, **kwargs):
+    return await process_event_wrapper(ctx, *args, **kwargs)
 
 FUNCTIONS.append(process_event_in_worker)
 
@@ -139,14 +87,6 @@ async def shutdown(ctx):
     # Clean up any resources if needed
     if "pool" in ctx:
         ctx["pool"].shutdown(wait=True)
-
-
-def at_every_x_minutes(x: int, start: int = 0, end: int = 59):
-    """Helper function to generate cron-like minute intervals"""
-    return {*list(range(start, end, x))}
-
-
-# Redis settings are now imported from shared module
 
 
 class WorkerSettings:
@@ -176,19 +116,13 @@ class WorkerSettings:
 def get_arq_worker(queue_name: str) -> Worker:
     """
     Create and configure an ARQ worker for the specified queue.
-
-    Args:
-        queue_name: The name of the queue to which the worker will listen
-
-    Returns:
-        A configured ARQ worker
     """
     keep_result = config(
         "ARQ_KEEP_RESULT", cast=int, default=3600
-    )  # duration to keep job results for
+    )
     expires = config(
         "ARQ_EXPIRES", cast=int, default=3600
-    )  # the default length of time from when a job is expected to start after which the job expires, making it shorter to avoid clogging
+    )
 
     # generate a worker id so each worker will have a different health check key
     worker_id = str(uuid4()).replace("-", "")

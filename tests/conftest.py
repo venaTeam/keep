@@ -96,6 +96,18 @@ def context_manager():
     return ContextManager(tenant_id=SINGLE_TENANT_UUID, workflow_id="1234")
 
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_prometheus_multiproc_dir(tmp_path_factory):
+    """
+    Sets up the PROMETHEUS_MULTIPROC_DIR environment variable for the session.
+    """
+    # Create a temporary directory specific for prometheus multiproc
+    prom_dir = tmp_path_factory.mktemp("prometheus_multiproc")
+    os.environ["PROMETHEUS_MULTIPROC_DIR"] = str(prom_dir)
+    return str(prom_dir)
+
+
+
 @pytest.fixture(scope="session")
 def docker_services(
     docker_compose_command,

@@ -667,13 +667,8 @@ async def receive_event(
     # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
     # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
 
-    messaging_type = config("MESSAGING_TYPE", default=None)
-    if messaging_type:
-        messaging_type = messaging_type.upper()
-    elif REDIS:
-        messaging_type = "REDIS"
-
-    if messaging_type == "KAFKA" or messaging_type == "REDIS":
+    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
+    if REDIS or messaging_type == "KAFKA":
         # Use the abstract event producer (Redis or Kafka)
         task_name = await event_producer.produce(
             event=event,

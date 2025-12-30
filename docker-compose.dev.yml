@@ -24,6 +24,8 @@ services:
     volumes:
       - .:/app
       - ./state:/state
+    environment:
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
 
   keep-websocket-server:
     extends:

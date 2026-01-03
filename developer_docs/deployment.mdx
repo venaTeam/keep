@@ -1,0 +1,19 @@
+---
+title: "Deployment & Docker"
+description: "Understanding Keep's Dockerfiles and Build Process"
+---
+
+## Backend (`docker/Dockerfile.api`)
+
+The backend is built as an installable Python SDK.
+
+*   **SDK Build**: We copy the `keep` directory and `pyproject.toml` and run `pip install .`. This installs Keep as a package, making imports absolute (e.g., `from keep.api...`) and reliable.
+*   **Multi-Stage Build**:
+    *   `builder` stage: Installs build dependencies (gcc, etc.) and compiles wheels.
+    *   `final` stage: Copies only the necessary artifacts and virtual environment (`/venv`) to a slim Alpine image to keep the footprint small.
+*   **Entrypoint**: The `ENTRYPOINT` is set to `entrypoint.sh`, ensuring our orchestrator logic always runs.
+
+## Frontend (`docker/Dockerfile.ui`)
+
+*   **Next.js Standalone**: We build with `output: "standalone"` in `next.config.js`. This creates a minimal folder with only the necessary files to run the server, drastically reducing the image size compared to copying the entire `node_modules`.
+*   **Optimization**: We use a multi-stage build to separate dependency installation (`npm ci`) from the build process (`npm run build`).

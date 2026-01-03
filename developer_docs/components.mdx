@@ -1,0 +1,20 @@
+---
+title: "Core Components"
+description: "Deep dive into Alert Manager, Workflow Engine, and Providers"
+---
+
+## Alert Manager
+*   **Files**: `keep/api/routes/alerts.py`, `keep/api/core/alerts.py`.
+*   **Responsibility**: CRUD operations for alerts, grouping logic, and history tracking.
+
+## Workflow Engine
+*   **Files**: `keep/workflowmanager`.
+*   **Concepts**:
+    *   **Step**: A single unit of work (e.g., "Send Slack Message").
+    *   **Context**: Data passed between steps (available as `{{ steps.step_id.results }}`).
+    *   **Providers**: The bridge to external tools.
+
+## Providers System
+*   **Factory Pattern**: `ProvidersFactory` dynamically loads providers based on configuration.
+*   **BaseProvider**: All providers inherit from `BaseProvider`, ensuring a consistent interface (`notify`, `query`).
+*   **Adding a Provider**: Create a new class in `keep/providers`, implement the standard methods, and register it.

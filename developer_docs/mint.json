@@ -1,0 +1,49 @@
+{
+    "$schema": "https://mintlify.com/schema.json",
+    "name": "Keep Developer Guide",
+    "logo": {
+        "light": "/logo/light.png",
+        "dark": "/logo/dark.png"
+    },
+    "favicon": "/favicon.svg",
+    "colors": {
+        "primary": "#FA9E34",
+        "light": "#FA9E34",
+        "dark": "#FF9F36"
+    },
+    "topbarCtaButton": {
+        "type": "github",
+        "url": "https://github.com/keephq/keep"
+    },
+    "navigation": [
+        {
+            "group": "Getting Started",
+            "pages": [
+                "introduction",
+                "architecture"
+            ]
+        },
+        {
+            "group": "Core Concepts",
+            "pages": [
+                "data-flow",
+                "authentication"
+            ]
+        },
+        {
+            "group": "Operations",
+            "pages": [
+                "deployment",
+                "stories"
+            ]
+        },
+        {
+            "group": "Core Components",
+            "pages": [
+                "components/alert-manager",
+                "components/workflow-engine",
+                "components/rules-engine"
+            ]
+        }
+    ]
+}

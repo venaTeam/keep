@@ -1,0 +1,29 @@
+---
+title: "Introduction"
+description: "Welcome to the KeepHQ Developer Guide"
+---
+
+Welcome to the KeepHQ Developer Guide. This document is designed to help new team members understand the architecture, core components, and development workflows of the KeepHQ alerting and event management system.
+
+## What is Keep?
+
+**Keep** is an open-source alerting and on-call management platform. It centralizes alerts from various providers, deduplicates them, runs automated workflows, and manages incidents.
+
+### High-Level Tech Stack
+
+*   **Backend**: Python 3.11+, FastAPI, SQLModel (SQLAlchemy).
+*   **Frontend**: Next.js (React), TailwindCSS, TypeScript.
+*   **Database**: PostgreSQL.
+*   **Task Queue**: Redis + ARQ.
+*   **Authentication**: Keycloak (OIDC).
+*   **Deployment**: Docker & Docker Compose.
+ 
+ <CardGroup cols={2}>
+   <Card title="Architecture" icon="sitemap" href="/architecture">
+     Understand how Keep's components interact
+   </Card>
+   <Card title="Core Components" icon="cubes" href="/components">
+     Deep dive into Alert Manager and Workflow Engine
+   </Card>
+ </CardGroup>
+

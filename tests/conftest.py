@@ -34,6 +34,7 @@ from keep.api.models.db.workflow import *
 from keep.api.tasks.process_event_task import process_event
 from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.contextmanager.contextmanager import ContextManager
+from tests.fixtures.workflow_manager import workflow_manager
 
 original_request = requests.Session.request  # noqa
 load_dotenv(find_dotenv())

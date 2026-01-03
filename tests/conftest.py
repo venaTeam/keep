@@ -34,7 +34,6 @@ from keep.api.models.db.workflow import *
 from keep.api.tasks.process_event_task import process_event
 from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.contextmanager.contextmanager import ContextManager
-from tests.fixtures.client import client
 from tests.fixtures.workflow_manager import workflow_manager
 
 original_request = requests.Session.request  # noqa
@@ -103,12 +102,6 @@ def setup_prometheus_multiproc_dir(tmp_path_factory):
     prom_dir = tmp_path_factory.mktemp("prometheus_multiproc")
     os.environ["PROMETHEUS_MULTIPROC_DIR"] = str(prom_dir)
     return str(prom_dir)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def disable_db_logging():
-    with patch("keep.api.logging.KEEP_STORE_WORKFLOW_LOGS", False):
-        yield
 
 
 

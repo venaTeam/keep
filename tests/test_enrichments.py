@@ -17,6 +17,7 @@ from keep.api.models.db.extraction import ExtractionRule
 from keep.api.models.db.mapping import MappingRule
 from keep.api.models.db.topology import TopologyService
 from keep.api.models.db.workflow import Workflow
+from tests.fixtures.client import client, test_app
 from tests.fixtures.workflow_manager import (
     wait_for_workflow_execution,
     wait_for_workflow_in_run_queue,

@@ -54,7 +54,7 @@ class KafkaEventProducer(EventProducer):
         self.bootstrap_servers = config(
             "KAFKA_BOOTSTRAP_SERVERS", default="localhost:9092"
         )
-        self.topic = "keep-events"
+        self.topic = config("KAFKA_TOPIC", default="keep-events")
 
         # SASL config
         self.security_protocol = config("KAFKA_SECURITY_PROTOCOL", default="PLAINTEXT")
@@ -62,12 +62,33 @@ class KafkaEventProducer(EventProducer):
         self.sasl_plain_username = config("KAFKA_SASL_USERNAME", default=None)
         self.sasl_plain_password = config("KAFKA_SASL_PASSWORD", default=None)
 
+        # SSL config
+        self.ssl_cafile = config("KAFKA_SSL_CAFILE", default=None)
+        self.ssl_certfile = config("KAFKA_SSL_CERTFILE", default=None)
+        self.ssl_keyfile = config("KAFKA_SSL_KEYFILE", default=None)
+
+        ssl_context = None
+        if self.security_protocol in ["SSL", "SASL_SSL"]:
+            import ssl
+            ssl_context = ssl.create_default_context(cafile=self.ssl_cafile)
+            if self.ssl_certfile and self.ssl_keyfile:
+                ssl_context.load_cert_chain(
+                    certfile=self.ssl_certfile, keyfile=self.ssl_keyfile
+                )
+            # If user didn't provide CA file, we rely on system CAs or strict verification off?
+            # Typically for self-signed or internal CAs, user provides cafile.
+            # We don't force check_hostname=False unless requested, but standard is often strict.
+            if not self.ssl_cafile and not self.ssl_certfile:
+                # Fallback or specific logic if needed. For now standard default context.
+                pass
+
         self.producer = AIOKafkaProducer(
             bootstrap_servers=self.bootstrap_servers,
             security_protocol=self.security_protocol,
             sasl_mechanism=self.sasl_mechanism,
             sasl_plain_username=self.sasl_plain_username,
             sasl_plain_password=self.sasl_plain_password,
+            ssl_context=ssl_context,
             api_version="auto",
         )
         self._started = False

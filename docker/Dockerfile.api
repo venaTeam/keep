@@ -26,6 +26,7 @@ ENV POSTHOG_DISABLED="true"
 
 # Copy application code
 COPY keep /app/keep
+COPY ee /app/ee
 
 # Entrypoint script
 COPY keep/entrypoint.sh /app/keep/entrypoint.sh

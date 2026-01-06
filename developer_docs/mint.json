@@ -20,7 +20,8 @@
             "group": "Getting Started",
             "pages": [
                 "introduction",
-                "architecture"
+                "architecture",
+                "event-handler-architecture"
             ]
         },
         {

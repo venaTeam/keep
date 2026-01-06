@@ -51,9 +51,16 @@ class RedisEventProducer(EventProducer):
 class KafkaEventProducer(EventProducer):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.bootstrap_servers = config(
+        bootstrap_servers = config(
             "KAFKA_BOOTSTRAP_SERVERS", default="localhost:9092"
         )
+        try:
+            self.bootstrap_servers = json.loads(bootstrap_servers)
+            if not isinstance(self.bootstrap_servers, list):
+                self.bootstrap_servers = str(self.bootstrap_servers).split(",")
+        except json.JSONDecodeError:
+            self.bootstrap_servers = bootstrap_servers.split(",")
+        
         self.topic = config("KAFKA_TOPIC", default="keep-events")
 
         # SASL config

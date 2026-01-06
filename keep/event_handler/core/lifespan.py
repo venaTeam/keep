@@ -78,9 +78,18 @@ async def lifespan(app: FastAPI):
     # Initialize DB and other resources (similar to API startup)
     try:
         from keep.api.config import on_starting
+        def on_starting_helper():
+            # Create a new event loop for this thread
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                on_starting()
+            finally:
+                loop.close()
+
         print("DEBUG: Calling on_starting")
         # Run sync on_starting in a separate thread to avoid "loop already running" issues with Alembic/SQLAlchemy
-        await asyncio.to_thread(on_starting)
+        await asyncio.to_thread(on_starting_helper)
         print("DEBUG: on_starting finished")
     except Exception as e:
         logger.exception("Failed to run on_starting")

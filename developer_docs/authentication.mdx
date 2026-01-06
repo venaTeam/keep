@@ -1,0 +1,69 @@
+---
+title: "Authentication"
+description: "Authentication with Keycloak"
+---
+
+## What is Keycloak?
+**Keycloak** is an open-source Identity and Access Management (IAM) solution. It acts as an Identity Broker:
+*   **User Management**: Handles user registration, storage, and passwords.
+*   **SSO**: Allows users to log in once and access multiple applications.
+*   **Standard Protocols**: We use **OIDC (OpenID Connect)** for authentication.
+
+For a developer new to Keycloak: Think of it as "Auth0 but self-hosted". It issues **JWTs (Access Tokens)** that the Frontend sends to the Backend.
+
+## Keycloak Core Concepts
+
+To manage Keep properly, you need to understand these standard Keycloak terms:
+
+*   **Realm**: The highest level of isolation. A realm contains users, roles, and clients.
+    *   *Analogy*: Like a strict "tenant" or "namespace". Users in Realm A cannot log into clients in Realm B.
+    *   *In Keep*: We typically use a single realm (e.g., `keep`) for the application, or separate realms for multi-tenant SaaS setups.
+*   **Client**: An entity that can request authentication.
+    *   *In Keep*: We have a `keep-ui` client (for the frontend) and potentially others. The client configuration holds the `Client ID` and `Client Secret` used for OIDC handshakes.
+*   **User**: Entities that can log in. They can have attributes (email, name) and group memberships.
+*   **Role**: Permissions assigned to users.
+    *   **Realm Roles**: Global roles (e.g., `admin`, `user`).
+    *   **Client Roles**: Specific to a client. Keep uses these to map to internal permissions (e.g., `admin`, `noc`, `webhook`).
+*   **Group**: A collection of users. Groups can have roles assigned to them, so any user added to the group inherits those roles.
+
+## How to Manage Keycloak
+
+You can manage Keycloak via its **Admin Console** (at `/auth/admin/`) or via the `Keycloak Admin API` (which Keep uses internally).
+
+1.  **Creating a Realm**: Always start by creating a new realm (never use the default `master` realm for your app).
+2.  **Configuring the Client**:
+    *   Create a client (e.g., `keep-frontend`).
+    *   Set **Access Type** to `confidential` (requires a secret) or `public` (for SPAs), depending on the flow. Keep uses `confidential` for server-side validation.
+    *   Set **Valid Redirect URIs**: Where Keycloak is allowed to return tokens (e.g., `http://localhost:3000/*`).
+3.  **Assigning Roles**:
+    *   Create roles like `admin` and `noc`.
+    *   Assign these roles to users explicitly or via Groups.
+    *   *Tip*: Use **Composite Roles** to create a "Super Admin" role that contains all other roles.
+
+## IdentityManager Abstraction
+Keep abstract authentication to support multiple modes (`NO_AUTH`, `KEYCLOAK`, `AUTH0`).
+
+*   **AuthVerifier**: Middleware that intercepts requests, checks the `Authorization: Bearer <token>` header, and validates the token against the configured Identity Provider (IdP).
+*   **IdentityManager**: Handles higher-level logic like getting user details or roles.
+
+**File Reference**: `keep/identitymanager/identitymanagerfactory.py`
+Note: The concrete implementation for Keycloak resides in `ee/identitymanager/identity_managers/keycloak`.
+
+## Keycloak Integration Flow
+To enable: set `AUTH_TYPE=KEYCLOAK`.
+
+**Required Environment Variables**:
+*   `KEYCLOAK_URL`: URL of the Keycloak server.
+*   `KEYCLOAK_REALM`: The realm name.
+*   `KEYCLOAK_CLIENT_ID`: The client ID for Keep.
+*   `KEYCLOAK_CLIENT_SECRET`: The client secret.
+*   `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`: For admin operations (creating roles/users).
+
+1.  **Login**: User clicks "Login" on Frontend -> Redirected to Keycloak Login Page.
+2.  **Callback**: Keycloak redirects back to Frontend with an Authorization Code.
+3.  **Token Exchange**: Frontend exchanges code for an Access Token.
+4.  **API Request**: Frontend calls Backend with `Authorization: Bearer <token>`.
+5.  **Validation**: Backend validates the token signature using Keycloak's public keys.
+
+## RBAC (Role-Based Access Control)
+Roles and scopes are mapped from Keycloak claims to internal Keep permissions. For example, a Keycloak role `admin` might map to full system access in Keep.

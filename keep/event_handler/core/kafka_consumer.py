@@ -5,6 +5,7 @@ import logging
 
 from aiokafka import AIOKafkaConsumer
 
+from keep.common.consts import MAX_PROCESSING_RETRIES
 from keep.common.core.config import config
 from keep.event_handler.controllers.event_controller import process_event_wrapper
 from keep.event_handler.models.event_dto import EventDTO
@@ -60,8 +61,8 @@ class KafkaEventConsumer(EventConsumer):
             self.topic,
             bootstrap_servers=self.bootstrap_servers,
             group_id=self.group_id,
-            auto_offset_reset="earliest", 
-            enable_auto_commit=False, # Critical: Disable auto-commit to prevent data loss
+            # auto_offset_reset="earliest", # or latest? Default is latest.
+            enable_auto_commit=False,
             security_protocol=self.security_protocol,
             sasl_mechanism=self.sasl_mechanism,
             sasl_plain_username=self.sasl_plain_username,
@@ -124,21 +125,53 @@ class KafkaEventConsumer(EventConsumer):
                         provider_name=payload.get("provider_name"),
                     )
 
-                    # Run logic via controller
+                    # Run logic via controller with retries
                     # We pass an empty dict as ctx since we are not in ARQ
-                    await process_event_wrapper(
-                        ctx={}, 
-                        event_dto=event_dto,
-                    )
-                    
-                    # Critical: Only commit if processing succeeded
+                    # Retry using config
+                    for i in range(MAX_PROCESSING_RETRIES):
+                        try:
+                            await process_event_wrapper(
+                                ctx={},
+                                tenant_id=tenant_id,
+                                provider_type=provider_type,
+                                provider_id=provider_id,
+                                fingerprint=fingerprint,
+                                api_key_name=api_key_name,
+                                trace_id=trace_id,
+                                event=event,
+                                provider_name=provider_name,
+                            )
+                            # If successful, break retry loop
+                            break
+                        except Exception as e:
+                            self.logger.warning(
+                                f"Error processing Kafka message (attempt {i+1}/{MAX_PROCESSING_RETRIES}): {e}"
+                            )
+                            if i == MAX_PROCESSING_RETRIES - 1:
+                                # if this was the last attempt, re-raise
+                                raise e
+                            # otherwise wait a bit
+                            await asyncio.sleep(1)
+
+                    # Manually commit offset after successful processing
                     await self.consumer.commit()
 
                 except Exception as e:
                     # Critical: Do NOT commit. Log exception.
-                    # In a real scenario, this should likely trigger a circuit breaker or DLQ.
+                    # TODO: this should trigger a DLQ.
                     # For now, we ensure we don't lose the message by not committing.
                     self.logger.exception(f"Error processing Kafka message (trace_id={payload.get('trace_id', 'unknown')}): {e} - Message will be reprocessed on restart.")
+                    # CRITICAL: We want to crash the loop so the pod restarts or alerts trigger
+                    # rather than skipping the message silently.
+                    raise e
+
 
         except Exception as e:
             self.logger.exception(f"Kafka consumer loop crashed: {e}")
+            # Ensure we mark as not running so we know it stopped
+            self._running = False
+            # Re-raising might not crash the whole app because it's in a background task,
+            # but it will stop consumption.
+            # In a real K8s scenario, liveness probe should fail or we should explicitly exit.
+            # For now, logging exception and stopping loop is what we requested.
+            raise e

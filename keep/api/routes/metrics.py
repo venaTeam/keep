@@ -10,15 +10,15 @@ from prometheus_client import (
     multiprocess,
 )
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     get_last_alerts_for_incidents,
     get_last_incidents,
     get_workflow_executions_count,
 )
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.api.core.limiter import limiter
-from keep.api.models.alert import AlertDto
+from keep.common.models.alert import AlertDto
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

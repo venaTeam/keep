@@ -291,7 +291,7 @@ if __name__ == "__main__":
     topic = "alert"
     username = "admin"
     password = "admin-secret"
-    from keep.api.core.dependencies import SINGLE_TENANT_UUID
+    from keep.common.core.dependencies import SINGLE_TENANT_UUID
 
     context_manager = ContextManager(tenant_id=SINGLE_TENANT_UUID)
     config = {

@@ -11,9 +11,9 @@ from fastapi.security import (
 )
 from starlette.datastructures import FormData
 
-from keep.api.core.config import config
-from keep.api.core.db import get_api_key, update_key_last_used
-from keep.api.core.dependencies import extract_generic_body
+from keep.common.core.config import config
+from keep.common.core.db import get_api_key, update_key_last_used
+from keep.common.core.dependencies import extract_generic_body
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.rbac import Admin as AdminRole
 from keep.identitymanager.rbac import get_role_by_role_name

@@ -1,14 +1,14 @@
 import logging
 import os
 
-import keep.api.logging
-from keep.api.alert_deduplicator.deduplication_rules_provisioning import (
+import keep.common.logging
+from keep.common.alert_deduplicator.deduplication_rules_provisioning import (
     provision_deduplication_rules_from_env,
 )
 from keep.api.api import AUTH_TYPE
-from keep.api.core.db_on_start import migrate_db, try_create_single_tenant
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.tenant_configuration import TenantConfiguration
+from keep.common.core.db_on_start import migrate_db, try_create_single_tenant
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.tenant_configuration import TenantConfiguration
 from keep.api.routes.dashboard import provision_dashboards
 from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes
 from keep.providers.providers_factory import ProvidersFactory
@@ -18,7 +18,7 @@ from keep.workflowmanager.workflowstore import WorkflowStore
 PORT = int(os.environ.get("PORT", 8080))
 PROVISION_RESOURCES = os.environ.get("PROVISION_RESOURCES", "true") == "true"
 
-keep.api.logging.setup_logging()
+keep.common.logging.setup_logging()
 logger = logging.getLogger(__name__)
 
 
@@ -101,7 +101,7 @@ def post_worker_init(worker):
     # We need to reinitialize logging in each worker because gunicorn forks the worker processes
     print("Init logging in worker")
     logging.getLogger().handlers = []  # noqa
-    keep.api.logging.setup_logging()  # noqa
+    keep.common.logging.setup_logging()  # noqa
     print("Logging initialized in worker")
 
 

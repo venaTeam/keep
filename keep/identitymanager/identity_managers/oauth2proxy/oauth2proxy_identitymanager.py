@@ -1,5 +1,5 @@
-from keep.api.core.db import get_users as get_users_from_db
-from keep.api.models.user import User
+from keep.common.core.db import get_users as get_users_from_db
+from keep.common.models.user import User
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.identity_managers.oauth2proxy.oauth2proxy_authverifier import (
     Oauth2proxyAuthVerifier,

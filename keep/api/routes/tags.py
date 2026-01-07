@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from keep.api.core.db import get_tags as get_tags_db
+from keep.common.core.db import get_tags as get_tags_db
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

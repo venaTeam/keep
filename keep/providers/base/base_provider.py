@@ -21,19 +21,19 @@ import opentelemetry.trace as trace
 import requests
 from dateutil.parser import parse
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.db import (
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.db import (
     get_custom_deduplication_rule,
     get_enrichments,
     get_provider_by_name,
     is_linked_provider,
 )
-from keep.api.logging import ProviderLoggerAdapter
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.topology import TopologyServiceInDto
-from keep.api.models.incident import IncidentDto
-from keep.api.utils.enrichment_helpers import parse_and_enrich_deleted_and_assignees
+from keep.common.logging import ProviderLoggerAdapter
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.topology import TopologyServiceInDto
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.enrichment_helpers import parse_and_enrich_deleted_and_assignees
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
 from keep.providers.models.provider_method import ProviderMethod

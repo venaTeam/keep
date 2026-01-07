@@ -7,8 +7,8 @@ import re
 import typing
 
 from keep.actions.actions_factory import ActionsCRUD
-from keep.api.core.config import config
-from keep.api.core.db import get_installed_providers, get_workflow_id
+from keep.common.core.config import config
+from keep.common.core.db import get_installed_providers, get_workflow_id
 from keep.contextmanager.contextmanager import ContextManager
 from keep.functions import cyaml
 from keep.providers.providers_factory import ProvidersFactory

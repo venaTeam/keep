@@ -9,17 +9,17 @@ from threading import Lock
 
 from sqlalchemy.exc import IntegrityError
 
-from keep.api.consts import RUNNING_IN_CLOUD_RUN
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.consts import RUNNING_IN_CLOUD_RUN
+from keep.common.core.config import config
+from keep.common.core.db import (
     create_workflow_execution,
     get_enrichment,
     get_previous_execution_id,
     get_timeouted_workflow_exections,
     get_workflows_that_should_run,
 )
-from keep.api.core.db import finish_workflow_execution as finish_workflow_execution_db
-from keep.api.core.db import get_workflow_by_id as get_workflow_db
+from keep.common.core.db import finish_workflow_execution as finish_workflow_execution_db
+from keep.common.core.db import get_workflow_by_id as get_workflow_db
 from keep.api.core.metrics import (
     workflow_execution_errors_total,
     workflow_execution_status,
@@ -27,9 +27,9 @@ from keep.api.core.metrics import (
     workflow_queue_size,
     workflows_running,
 )
-from keep.api.models.alert import AlertDto
-from keep.api.models.incident import IncidentDto
-from keep.api.utils.email_utils import KEEP_EMAILS_ENABLED, EmailTemplates, send_email
+from keep.common.models.alert import AlertDto
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.email_utils import KEEP_EMAILS_ENABLED, EmailTemplates, send_email
 from keep.providers.providers_factory import ProviderConfigurationException
 from keep.workflowmanager.workflow import Workflow, WorkflowStrategy
 from keep.workflowmanager.workflowstore import WorkflowStore

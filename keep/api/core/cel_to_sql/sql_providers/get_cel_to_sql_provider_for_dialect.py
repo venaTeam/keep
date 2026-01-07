@@ -3,7 +3,7 @@ from keep.api.core.cel_to_sql.sql_providers.base import BaseCelToSqlProvider
 from keep.api.core.cel_to_sql.sql_providers.mysql import CelToMySqlProvider
 from keep.api.core.cel_to_sql.sql_providers.postgresql import CelToPostgreSqlProvider
 from keep.api.core.cel_to_sql.sql_providers.sqlite import CelToSqliteProvider
-from keep.api.core.db import engine
+from keep.common.core.db import engine
 
 
 def get_cel_to_sql_provider(

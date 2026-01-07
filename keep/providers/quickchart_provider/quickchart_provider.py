@@ -9,8 +9,8 @@ import pydantic
 from quickchart import QuickChart
 
 # internals
-from keep.api.core.db import get_alerts_by_fingerprint
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.db import get_alerts_by_fingerprint
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig

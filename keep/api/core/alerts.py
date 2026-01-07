@@ -17,12 +17,12 @@ from keep.api.core.cel_to_sql.properties_metadata import (
 from keep.api.core.cel_to_sql.sql_providers.get_cel_to_sql_provider_for_dialect import (
     get_cel_to_sql_provider,
 )
-from keep.api.core.db import engine
+from keep.common.core.db import engine
 
 # This import is required to create the tables
 from keep.api.core.facets import get_facet_options, get_facets
-from keep.api.models.alert import AlertSeverity, AlertStatus
-from keep.api.models.db.alert import (
+from keep.common.models.alert import AlertSeverity, AlertStatus
+from keep.common.models.db.alert import (
     Alert,
     AlertEnrichment,
     AlertField,
@@ -30,10 +30,10 @@ from keep.api.models.db.alert import (
     LastAlert,
     LastAlertToIncident,
 )
-from keep.api.models.db.facet import FacetType
-from keep.api.models.db.incident import IncidentStatus
-from keep.api.models.facet import FacetDto, FacetOptionDto, FacetOptionsQueryDto
-from keep.api.models.query import QueryDto, SortOptionsDto
+from keep.common.models.db.facet import FacetType
+from keep.common.models.db.incident import IncidentStatus
+from keep.common.models.facet import FacetDto, FacetOptionDto, FacetOptionsQueryDto
+from keep.common.models.query import QueryDto, SortOptionsDto
 
 logger = logging.getLogger(__name__)
 

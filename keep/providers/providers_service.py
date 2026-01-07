@@ -9,20 +9,20 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
-from keep.api.alert_deduplicator.deduplication_rules_provisioning import (
+from keep.common.alert_deduplicator.deduplication_rules_provisioning import (
     provision_deduplication_rules,
 )
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     engine,
     existed_or_new_session,
     get_all_provisioned_providers,
     get_provider_by_name,
     get_provider_logs,
 )
-from keep.api.models.db.provider import Provider, ProviderExecutionLog
-from keep.api.models.provider import Provider as ProviderModel
-from keep.api.utils.tenant_utils import get_or_create_api_key
+from keep.common.models.db.provider import Provider, ProviderExecutionLog
+from keep.common.models.provider import Provider as ProviderModel
+from keep.common.utils.tenant_utils import get_or_create_api_key
 from keep.contextmanager.contextmanager import ContextManager
 from keep.event_subscriber.event_subscriber import EventSubscriber
 from keep.functions import cyaml

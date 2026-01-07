@@ -223,7 +223,7 @@ def apply_arq_debug_patches():
 # Patch process_event_task.py to track possible Retry exceptions
 def patch_process_event():
     try:
-        from keep.api.tasks.process_event_task import process_event
+        from keep.common.event_management.process_event_task import process_event
 
         original_process_event = process_event
 
@@ -239,7 +239,7 @@ def patch_process_event():
                 debug_logger.exception(f"❌ PROCESS_EVENT failed: {e}")
                 raise
 
-        from keep.api.tasks import process_event_task
+        from keep.common.event_management import process_event_task
 
         process_event_task.process_event = patched_process_event
         debug_logger.info("✅ Patched process_event function")

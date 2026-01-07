@@ -11,7 +11,7 @@ from keep.api.core.cel_to_sql.properties_metadata import (
 )
 from keep.api.core.cel_to_sql.sql_providers.base import BaseCelToSqlProvider
 from keep.api.core.facets_query_builder.utils import get_facet_key
-from keep.api.models.facet import FacetDto, FacetOptionsQueryDto
+from keep.common.models.facet import FacetDto, FacetOptionsQueryDto
 
 
 class BaseFacetsQueryBuilder:

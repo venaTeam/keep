@@ -5,8 +5,9 @@ import logging
 
 from aiokafka import AIOKafkaConsumer
 
-from keep.api.core.config import config
+from keep.common.core.config import config
 from keep.event_handler.controllers.event_controller import process_event_wrapper
+from keep.event_handler.models.event_dto import EventDTO
 
 
 class EventConsumer(abc.ABC):
@@ -59,7 +60,8 @@ class KafkaEventConsumer(EventConsumer):
             self.topic,
             bootstrap_servers=self.bootstrap_servers,
             group_id=self.group_id,
-            # auto_offset_reset="earliest", # or latest? Default is latest.
+            auto_offset_reset="earliest", 
+            enable_auto_commit=False, # Critical: Disable auto-commit to prevent data loss
             security_protocol=self.security_protocol,
             sasl_mechanism=self.sasl_mechanism,
             sasl_plain_username=self.sasl_plain_username,
@@ -110,32 +112,33 @@ class KafkaEventConsumer(EventConsumer):
                         f"Received event from Kafka: {payload.get('trace_id')}"
                     )
 
-                    # Extract arguments matching process_event's expectation
-                    event = payload.get("event")
-                    tenant_id = payload.get("tenant_id")
-                    provider_type = payload.get("provider_type")
-                    provider_id = payload.get("provider_id")
-                    fingerprint = payload.get("fingerprint")
-                    api_key_name = payload.get("api_key_name")
-                    trace_id = payload.get("trace_id")
-                    provider_name = payload.get("provider_name")
+                    # Construct DTO
+                    event_dto = EventDTO(
+                        tenant_id=payload.get("tenant_id"),
+                        trace_id=payload.get("trace_id"),
+                        event=payload.get("event"),
+                        provider_type=payload.get("provider_type"),
+                        provider_id=payload.get("provider_id"),
+                        fingerprint=payload.get("fingerprint"),
+                        api_key_name=payload.get("api_key_name"),
+                        provider_name=payload.get("provider_name"),
+                    )
 
                     # Run logic via controller
                     # We pass an empty dict as ctx since we are not in ARQ
                     await process_event_wrapper(
                         ctx={}, 
-                        tenant_id=tenant_id,
-                        provider_type=provider_type,
-                        provider_id=provider_id,
-                        fingerprint=fingerprint,
-                        api_key_name=api_key_name,
-                        trace_id=trace_id,
-                        event=event,
-                        provider_name=provider_name,
+                        event_dto=event_dto,
                     )
+                    
+                    # Critical: Only commit if processing succeeded
+                    await self.consumer.commit()
 
                 except Exception as e:
-                    self.logger.exception(f"Error processing Kafka message: {e}")
+                    # Critical: Do NOT commit. Log exception.
+                    # In a real scenario, this should likely trigger a circuit breaker or DLQ.
+                    # For now, we ensure we don't lose the message by not committing.
+                    self.logger.exception(f"Error processing Kafka message (trace_id={payload.get('trace_id', 'unknown')}): {e} - Message will be reprocessed on restart.")
 
         except Exception as e:
             self.logger.exception(f"Kafka consumer loop crashed: {e}")

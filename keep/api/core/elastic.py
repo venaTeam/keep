@@ -4,12 +4,12 @@ import os
 from elasticsearch import ApiError, BadRequestError, Elasticsearch
 from elasticsearch.helpers import BulkIndexError, bulk
 
-from keep.api.core.db import get_enrichments
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.tenant_configuration import TenantConfiguration
-from keep.api.models.alert import AlertDto, AlertSeverity
-from keep.api.utils.cel_utils import preprocess_cel_expression
-from keep.api.utils.enrichment_helpers import parse_and_enrich_deleted_and_assignees
+from keep.common.core.db import get_enrichments
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.tenant_configuration import TenantConfiguration
+from keep.common.models.alert import AlertDto, AlertSeverity
+from keep.common.utils.cel_utils import preprocess_cel_expression
+from keep.common.utils.enrichment_helpers import parse_and_enrich_deleted_and_assignees
 
 
 class ElasticClient:

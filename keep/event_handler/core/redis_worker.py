@@ -11,21 +11,21 @@ from dotenv import find_dotenv, load_dotenv
 from pydantic.utils import import_string
 from starlette.datastructures import CommaSeparatedStrings
 
-import keep.api.logging
-from keep.api.consts import (
+import keep.common.logging
+from keep.common.consts import (
     KEEP_ARQ_QUEUE_BASIC,
     KEEP_ARQ_TASK_POOL,
     KEEP_ARQ_TASK_POOL_ALL,
     KEEP_ARQ_TASK_POOL_BASIC_PROCESSING,
     WATCHER_LAPSED_TIME,
 )
-from keep.api.core.config import config
-from keep.api.redis_settings import get_redis_settings
+from keep.common.core.config import config
+from keep.common.redis_settings import get_redis_settings
 from keep.event_handler.controllers.event_controller import process_event_wrapper
 
 # Load environment variables
 load_dotenv(find_dotenv())
-keep.api.logging.setup_logging()
+keep.common.logging.setup_logging()
 logger = logging.getLogger(__name__)
 
 # Current worker will pick up tasks only according to its execution pool:
@@ -37,13 +37,13 @@ if KEEP_ARQ_TASK_POOL in [KEEP_ARQ_TASK_POOL_ALL, KEEP_ARQ_TASK_POOL_BASIC_PROCE
         extra={"task_pool": KEEP_ARQ_TASK_POOL},
     )
     all_tasks_for_the_worker += [
-        ("keep.api.tasks.process_event_task.async_process_event", KEEP_ARQ_QUEUE_BASIC),
+        ("keep.common.event_management.process_event_task.async_process_event", KEEP_ARQ_QUEUE_BASIC),
         (
-            "keep.api.tasks.process_topology_task.async_process_topology",
+            "keep.common.event_management.process_topology_task.async_process_topology",
             KEEP_ARQ_QUEUE_BASIC,
         ),
         (
-            "keep.api.tasks.process_incident_task.async_process_incident",
+            "keep.common.event_management.process_incident_task.async_process_incident",
             KEEP_ARQ_QUEUE_BASIC,
         ),
     ]
@@ -64,10 +64,25 @@ FUNCTIONS: list = (
     else list()
 )
 
+from keep.event_handler.models.event_dto import EventDTO
+
 # Register the event controller as the ARQ function
 # We alias it to 'process_event_in_worker' to match what the producer enqueues
 async def process_event_in_worker(ctx, *args, **kwargs):
-    return await process_event_wrapper(ctx, *args, **kwargs)
+    # Map ARQ kwargs to DTO
+    event_dto = EventDTO(
+        tenant_id=kwargs.get("tenant_id"),
+        trace_id=kwargs.get("trace_id"),
+        event=kwargs.get("event"),
+        provider_type=kwargs.get("provider_type"),
+        provider_id=kwargs.get("provider_id"),
+        fingerprint=kwargs.get("fingerprint"),
+        api_key_name=kwargs.get("api_key_name"),
+        provider_name=kwargs.get("provider_name"),
+        timestamp_forced=kwargs.get("timestamp_forced"),
+        notify_client=kwargs.get("notify_client", True),
+    )
+    return await process_event_wrapper(ctx, event_dto=event_dto)
 
 FUNCTIONS.append(process_event_in_worker)
 
@@ -101,7 +116,7 @@ class WorkerSettings:
     functions: list = FUNCTIONS
     cron_jobs: list = [
         cron(
-            "keep.api.tasks.process_watcher_task.async_process_watcher",
+            "keep.common.event_management.process_watcher_task.async_process_watcher",
             second=max(0, WATCHER_LAPSED_TIME - 1),
         )
     ]

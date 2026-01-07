@@ -2,22 +2,15 @@ import asyncio
 import functools
 import logging
 
-from keep.api.tasks.process_event_task import process_event
+from keep.common.event_management.process_event_task import process_event
+
+from keep.event_handler.models.event_dto import EventDTO
 
 logger = logging.getLogger(__name__)
 
 async def process_event_wrapper(
     ctx: dict,
-    tenant_id: str,
-    provider_type: str,
-    provider_id: str | None,
-    fingerprint: str | None,
-    api_key_name: str | None,
-    trace_id: str | None,
-    event: dict,
-    notify_client: bool = True,
-    timestamp_forced: str | None = None,
-    provider_name: str | None = None,
+    event_dto: EventDTO,
 ):
     """
     Wrapper controller for processing events. 
@@ -25,13 +18,13 @@ async def process_event_wrapper(
     and the Kafka Consumer (ctx is empty/dummy).
     """
     logger.info(
-        f"Processing event: {trace_id}",
+        f"Processing event: {event_dto.trace_id}",
         extra={
-            "tenant_id": tenant_id,
-            "provider_type": provider_type,
-            "provider_id": provider_id,
-            "fingerprint": fingerprint,
-            "trace_id": trace_id,
+            "tenant_id": event_dto.tenant_id,
+            "provider_type": event_dto.provider_type,
+            "provider_id": event_dto.provider_id,
+            "fingerprint": event_dto.fingerprint,
+            "trace_id": event_dto.trace_id,
         },
     )
 
@@ -39,16 +32,16 @@ async def process_event_wrapper(
     process_event_func_sync = functools.partial(
         process_event,
         ctx=ctx,
-        tenant_id=tenant_id,
-        provider_type=provider_type,
-        provider_id=provider_id,
-        fingerprint=fingerprint,
-        api_key_name=api_key_name,
-        trace_id=trace_id,
-        event=event,
-        notify_client=notify_client,
-        timestamp_forced=timestamp_forced,
-        provider_name=provider_name,
+        tenant_id=event_dto.tenant_id,
+        provider_type=event_dto.provider_type,
+        provider_id=event_dto.provider_id,
+        fingerprint=event_dto.fingerprint,
+        api_key_name=event_dto.api_key_name,
+        trace_id=event_dto.trace_id,
+        event=event_dto.event,
+        notify_client=event_dto.notify_client,
+        timestamp_forced=event_dto.timestamp_forced,
+        provider_name=event_dto.provider_name,
     )
 
     loop = asyncio.get_running_loop()

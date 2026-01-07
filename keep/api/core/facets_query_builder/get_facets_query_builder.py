@@ -2,7 +2,7 @@ from keep.api.core.cel_to_sql.properties_metadata import PropertiesMetadata
 from keep.api.core.cel_to_sql.sql_providers.get_cel_to_sql_provider_for_dialect import (
     get_cel_to_sql_provider,
 )
-from keep.api.core.db import engine
+from keep.common.core.db import engine
 from keep.api.core.facets_query_builder.base_facets_query_builder import (
     BaseFacetsQueryBuilder,
 )

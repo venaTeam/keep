@@ -6,22 +6,22 @@ from typing import Dict, Optional, Set
 
 from sqlmodel import select
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     add_alerts_to_incident,
     assign_alert_to_incident,
     enrich_incidents_with_alerts,
     existed_or_new_session,
     get_last_alerts,
 )
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.tenant_configuration import TenantConfiguration
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.alert import Incident
-from keep.api.models.db.incident import IncidentStatus
-from keep.api.models.db.topology import TopologyServiceApplication
-from keep.api.models.incident import IncidentDto
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.tenant_configuration import TenantConfiguration
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.alert import Incident
+from keep.common.models.db.incident import IncidentStatus
+from keep.common.models.db.topology import TopologyServiceApplication
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.rulesengine.rulesengine import RulesEngine
 from keep.topologies.topologies_service import TopologiesService
 

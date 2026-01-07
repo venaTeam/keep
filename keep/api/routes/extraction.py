@@ -5,15 +5,15 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.db import get_alert_by_event_id, get_session
-from keep.api.models.db.enrichment_event import EnrichmentEventWithLogs, EnrichmentType
-from keep.api.models.db.extraction import (
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.db import get_alert_by_event_id, get_session
+from keep.common.models.db.enrichment_event import EnrichmentEventWithLogs, EnrichmentType
+from keep.common.models.db.extraction import (
     ExtractionRule,
     ExtractionRuleDtoBase,
     ExtractionRuleDtoOut,
 )
-from keep.api.utils.pagination import EnrichmentEventPaginatedResultsDto
+from keep.common.utils.pagination import EnrichmentEventPaginatedResultsDto
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

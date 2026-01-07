@@ -1,6 +1,6 @@
 import os
 
-from keep.api.models.user import Group, Role, User
+from keep.common.models.user import Group, Role, User
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase

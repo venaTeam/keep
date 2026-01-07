@@ -7,16 +7,16 @@ import uuid
 
 import celpy
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     get_enrichment,
     get_previous_alert_by_fingerprint,
     save_workflow_results,
 )
 from keep.api.core.metrics import workflow_execution_duration
-from keep.api.models.alert import AlertDto, AlertSeverity
-from keep.api.models.incident import IncidentDto
-from keep.api.utils.cel_utils import preprocess_cel_expression
+from keep.common.models.alert import AlertDto, AlertSeverity
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.cel_utils import preprocess_cel_expression
 from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes
 from keep.providers.providers_factory import ProviderConfigurationException
 from keep.workflowmanager.workflow import Workflow
@@ -525,8 +525,8 @@ class WorkflowManager:
                         try:
                             self.logger.info("Adding workflow to REDIS")
                             from arq import ArqRedis
-                            from keep.api.arq_pool import get_pool
-                            from keep.api.consts import KEEP_ARQ_QUEUE_WORKFLOWS
+                            from keep.common.arq_pool import get_pool
+                            from keep.common.consts import KEEP_ARQ_QUEUE_WORKFLOWS
 
                             # We need to run this asynchronously
                             async def enqueue_workflow():

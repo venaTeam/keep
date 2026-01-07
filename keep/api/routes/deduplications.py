@@ -3,8 +3,8 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from keep.api.alert_deduplicator.alert_deduplicator import AlertDeduplicator
-from keep.api.models.alert import DeduplicationRuleRequestDto as DeduplicationRule
+from keep.common.alert_deduplicator.alert_deduplicator import AlertDeduplicator
+from keep.common.models.alert import DeduplicationRuleRequestDto as DeduplicationRule
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

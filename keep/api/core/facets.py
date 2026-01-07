@@ -11,13 +11,13 @@ from sqlmodel import Session
 
 from keep.api.core.cel_to_sql.ast_nodes import DataType
 from keep.api.core.cel_to_sql.properties_metadata import PropertiesMetadata
-from keep.api.core.db import engine
+from keep.common.core.db import engine
 from keep.api.core.facets_query_builder.get_facets_query_builder import (
     get_facets_query_builder,
 )
 from keep.api.core.facets_query_builder.utils import get_facet_key
-from keep.api.models.db.facet import Facet, FacetType
-from keep.api.models.facet import (
+from keep.common.models.db.facet import Facet, FacetType
+from keep.common.models.facet import (
     CreateFacetDto,
     FacetDto,
     FacetOptionDto,

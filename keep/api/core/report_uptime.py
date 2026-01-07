@@ -5,7 +5,7 @@ import threading
 import time
 from datetime import datetime
 
-from keep.api.core.db import get_activity_report, get_or_creat_posthog_instance_id
+from keep.common.core.db import get_activity_report, get_or_creat_posthog_instance_id
 from keep.api.core.posthog import (
     KEEP_VERSION,
     POSTHOG_DISABLED,

@@ -438,7 +438,10 @@ def __save_to_db(
             # Dispose enrichments that needs to be disposed
             try:
                 if formatted_event.status == AlertStatus.RESOLVED.value:
-                    enrichments_bl.make_enrichments_permanent(formatted_event.fingerprint, dispose_keys=["assignees", "status"])
+                    enrichments_bl.make_enrichments_permanent(
+                        formatted_event.fingerprint,
+                        dispose_keys=["assignees", "status", "dismissed", "dismissUntil"],
+                    )
                 else:
                     enrichments_bl.dispose_enrichments(formatted_event.fingerprint)
                     # Propagate permanent assignments to the new event

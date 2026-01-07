@@ -1,0 +1,20 @@
+name: Build Developer Docs
+
+on:
+  pull_request:
+    branches:
+      - development
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-developer-docs:
+    # Only run if the source branch is docs/developer_docs
+    if: github.head_ref == 'docs/developer_docs'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Developer Docs Image
+        run: |
+          docker build -t developer-docs -f developer_docs/Dockerfile developer_docs

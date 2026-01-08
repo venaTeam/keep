@@ -19,6 +19,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 from starlette_context import context, request_cycle_context
+import tempfile
+
+# Ensure PROMETHEUS_MULTIPROC_DIR is set before any keep imports
+if "PROMETHEUS_MULTIPROC_DIR" not in os.environ:
+    os.environ["PROMETHEUS_MULTIPROC_DIR"] = tempfile.mkdtemp(prefix="prometheus_multiproc_")
 
 # This import is required to create the tables
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
@@ -97,10 +102,7 @@ def setup_prometheus_multiproc_dir(tmp_path_factory):
     """
     Sets up the PROMETHEUS_MULTIPROC_DIR environment variable for the session.
     """
-    # Create a temporary directory specific for prometheus multiproc
-    prom_dir = tmp_path_factory.mktemp("prometheus_multiproc")
-    os.environ["PROMETHEUS_MULTIPROC_DIR"] = str(prom_dir)
-    return str(prom_dir)
+    return os.environ["PROMETHEUS_MULTIPROC_DIR"]
 
 
 

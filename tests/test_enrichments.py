@@ -9,6 +9,7 @@ from sqlalchemy import text
 from tenacity import sleep
 
 from keep.common.bl.enrichments_bl import EnrichmentsBl
+from tests.fixtures.client import client, test_app  # noqa
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus

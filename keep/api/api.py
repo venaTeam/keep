@@ -23,6 +23,7 @@ from starlette_context import plugins
 from starlette_context.middleware import RawContextMiddleware
 
 import keep.common.logging
+import keep.common.core.metrics
 import keep.common.observability
 import keep.common.utils.import_ee
 from keep.common.arq_pool import get_pool

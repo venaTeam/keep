@@ -42,6 +42,7 @@ from keep.common.core.metrics import (
     events_in_counter,
     events_out_counter,
     processing_time_summary,
+    alert_enrichment_duration_seconds,
 )
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
@@ -1815,6 +1816,9 @@ def process_event(
                 },
             )
     finally:
+        alert_enrichment_duration_seconds.labels(
+            source=provider_type or "unknown"
+        ).observe(time.time() - start_time)
         if session is not None:
             try:
                 logger.debug(

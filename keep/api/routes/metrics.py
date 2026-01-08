@@ -115,10 +115,17 @@ def get_metrics(
     export += f'workflows_executions_total {{status="other"}} {workflow_execution_counts["other"]}\n'
 
     # Exporting standard application metrics (prometheus_client)
-    registry = CollectorRegistry()
-    multiprocess.MultiProcessCollector(registry)
-    # generate_latest returns bytes, so we decode to string to append to export
-    export += generate_latest(registry).decode("utf-8")
+    # Exporting standard application metrics (prometheus_client)
+    try:
+        registry = CollectorRegistry()
+        multiprocess.MultiProcessCollector(registry)
+        # generate_latest returns bytes, so we decode to string to append to export
+        export += generate_latest(registry).decode("utf-8")
+    except Exception:
+        # Fallback to default registry if multiprocess collection fails
+        # This is useful for local development or if configuration is improper
+        from prometheus_client import REGISTRY
+        export += generate_latest(REGISTRY).decode("utf-8")
 
     return Response(content=export, media_type=CONTENT_TYPE_LATEST)
 

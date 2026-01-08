@@ -1,9 +1,24 @@
 import os
 
+# This MUST be called before any prometheus_client import
+prom_multiproc_dir = os.environ.get("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus")
+os.environ["PROMETHEUS_MULTIPROC_DIR"] = prom_multiproc_dir
+try:
+    os.makedirs(prom_multiproc_dir, exist_ok=True)
+except Exception:
+    # This might fail if we don't have permissions, but we shouldn't crash
+    pass
+
 from prometheus_client import Counter, Gauge, Histogram, Summary
 
-PROMETHEUS_MULTIPROC_DIR = os.environ.get("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus")
-os.makedirs(PROMETHEUS_MULTIPROC_DIR, exist_ok=True)
+
+def init_metrics():
+    # Deprecated: logic moved to top level
+    pass
+
+
+# Initialize metrics configuration
+init_metrics()
 
 METRIC_PREFIX = "keep_"
 
@@ -36,6 +51,28 @@ running_tasks_by_process_gauge = Gauge(
     "Current number of running tasks per process",
     labelnames=["pid"],
     multiprocess_mode="livesum",
+)
+
+### ALERTS
+ALERT_METRIC_PREFIX = "keep_alert_"
+
+alert_ingestion_total = Counter(
+    f"{ALERT_METRIC_PREFIX}ingestion_total",
+    "Total number of alerts received",
+    labelnames=["source", "status"],
+)
+
+alert_ingestion_error_total = Counter(
+    f"{ALERT_METRIC_PREFIX}ingestion_error_total",
+    "Total number of alerts received with error",
+    labelnames=["source", "error_type"],
+)
+
+alert_enrichment_duration_seconds = Histogram(
+    f"{ALERT_METRIC_PREFIX}enrichment_duration_seconds",
+    "Time spent enriching alerts",
+    labelnames=["source"],
+    buckets=(0.1, 0.5, 1, 2, 5, 10, 30),
 )
 
 ### WORKFLOWS

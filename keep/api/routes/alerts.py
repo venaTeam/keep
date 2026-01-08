@@ -21,6 +21,10 @@ from keep.common.core.alerts import (
     get_alert_potential_facet_fields,
     query_last_alerts,
 )
+from keep.common.core.metrics import (
+    alert_ingestion_error_total,
+    alert_ingestion_total,
+)
 from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
 from keep.common.core.db import dismiss_error_alerts as dismiss_error_alerts_db
 from keep.common.core.db import (
@@ -492,6 +496,12 @@ async def receive_generic_event(
             trace_id=request.state.trace_id,
             provider_name=None,
         )
+        alert_ingestion_total.labels(source="generic", status="success").inc()
+    except Exception as e:
+        alert_ingestion_error_total.labels(
+            source="generic", error_type=type(e).__name__
+        ).inc()
+        raise
     except Exception:
         raise
 
@@ -561,6 +571,8 @@ async def receive_event(
         trace_id=trace_id,
         provider_name=provider_name,
     )
+    alert_ingestion_total.labels(source=provider_type, status="success").inc()
+
 
     if not task_name:
         task_name = "async-task"

@@ -22,6 +22,7 @@ from keep.common.models.db.maintenance_window import (
 from keep.api.routes.maintenance import update_maintenance_rule
 from keep.functions import cyaml
 from keep.workflowmanager.workflowstore import WorkflowStore
+from tests.fixtures.workflow_manager import workflow_manager  # noqa
 
 
 @pytest.fixture

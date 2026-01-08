@@ -23,6 +23,7 @@ ENV PYTHONPATH="/app:${PYTHONPATH}"
 ENV PATH="/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/venv"
 ENV POSTHOG_DISABLED="true"
+ENV PROMETHEUS_MULTIPROC_DIR="/tmp/prometheus"
 
 # Copy application code
 # Common and Shared Modules

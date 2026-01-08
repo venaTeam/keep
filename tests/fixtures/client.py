@@ -71,7 +71,7 @@ def test_app(monkeypatch, request, db_session):
 
         # Import and return the app instance
         from keep.api.api import get_app
-        from keep.api.config import provision_resources
+        from keep.common.core.init import provision_resources
 
         provision_resources()
         app = get_app()

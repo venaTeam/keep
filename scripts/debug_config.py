@@ -1,6 +1,4 @@
 import os
-import logging
-from starlette.config import Config
 
 # Mock missing .env
 os.environ["AUTH_TYPE"] = "noauth" # Ensure it exists in env if we want to test that, or remove it to test default.

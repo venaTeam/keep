@@ -4,7 +4,6 @@ import hmac
 import json
 import logging
 import os
-import time
 from copy import deepcopy
 from typing import List, Optional
 
@@ -23,12 +22,6 @@ from keep.common.core.alerts import (
     query_last_alerts,
 )
 from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
-from keep.common.core.facets import (
-    create_facet,
-    delete_facet,
-)
-from keep.common.core.incidents import get_last_incidents_by_cel
-from keep.common.core.config import config
 from keep.common.core.db import dismiss_error_alerts as dismiss_error_alerts_db
 from keep.common.core.db import (
     enrich_alerts_with_incidents,
@@ -50,7 +43,6 @@ from keep.common.core.dependencies import (
 )
 from keep.common.core.elastic import ElasticClient
 from keep.common.core.messaging import EventProducer
-from keep.common.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (
     AlertDto,
@@ -72,6 +64,12 @@ from keep.common.models.query import QueryDto
 from keep.common.models.search_alert import SearchAlertsRequest
 from keep.common.models.time_stamp import TimeStampFilter
 from keep.api.routes.preset import pull_data_from_providers
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.utils.time_stamp_helpers import get_time_stamp_filter
+from keep.identitymanager.authenticatedentity import AuthenticatedEntity
+from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
+from keep.searchengine.searchengine import SearchEngine
+from keep.workflowmanager.workflowmanager import WorkflowManager
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -79,12 +77,7 @@ logger = logging.getLogger(__name__)
 REDIS = os.environ.get("REDIS", "false") == "true"
 
 
-from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
-from keep.common.utils.time_stamp_helpers import get_time_stamp_filter
-from keep.identitymanager.authenticatedentity import AuthenticatedEntity
-from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
-from keep.searchengine.searchengine import SearchEngine
-from keep.workflowmanager.workflowmanager import WorkflowManager
+
 @router.post(
     "/facets/options",
     description="Query alert facet options. Accepts dictionary where key is facet id and value is cel to query facet",

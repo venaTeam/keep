@@ -43,7 +43,7 @@ from keep.common.core.dependencies import extract_generic_body, get_pusher_clien
 from keep.common.core.incidents import (
     get_incident_facets,
     get_incident_facets_data,
-    get_last_incidents_by_cel,
+    get_incident_potential_facet_fields,
 )
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (

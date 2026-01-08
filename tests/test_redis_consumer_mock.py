@@ -1,4 +1,3 @@
-import asyncio
 from unittest.mock import AsyncMock, patch
 import pytest
 from keep.event_handler.core.redis_consumer import RedisEventConsumer

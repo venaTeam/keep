@@ -13,10 +13,6 @@ from keep.common.core.cel_to_sql.ast_nodes import (
     PropertyAccessNode,
 )
 from keep.common.core.cel_to_sql.properties_metadata import (
-    PropertiesMetadata,
-    PropertyMetadataInfo,
-)
-from keep.common.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
     SimpleFieldMapping,
 )

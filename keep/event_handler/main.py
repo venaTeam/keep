@@ -2,6 +2,7 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 from dotenv import find_dotenv, load_dotenv
+from prometheus_fastapi_instrumentator import Instrumentator
 
 import keep.common.logging
 import keep.common.observability
@@ -28,6 +29,11 @@ app.include_router(health.router, tags=["root"])
 
 if config("KEEP_OTEL_ENABLED", default="true", cast=bool):
     keep.common.observability.setup(app)
+
+Instrumentator(
+    excluded_handlers=["/metrics", "/health"],
+    should_group_status_codes=False,
+).instrument(app=app, metric_namespace="keep")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)

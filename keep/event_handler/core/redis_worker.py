@@ -22,6 +22,7 @@ from keep.common.consts import (
 from keep.common.core.config import config
 from keep.common.redis_settings import get_redis_settings
 from keep.event_handler.controllers.event_controller import process_event_wrapper
+from keep.event_handler.models.event_dto import EventDTO
 
 # Load environment variables
 load_dotenv(find_dotenv())
@@ -64,7 +65,7 @@ FUNCTIONS: list = (
     else list()
 )
 
-from keep.event_handler.models.event_dto import EventDTO
+
 
 # Register the event controller as the ARQ function
 # We alias it to 'process_event_in_worker' to match what the producer enqueues

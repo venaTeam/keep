@@ -8,7 +8,6 @@ from sqlmodel import true
 from keep.common.core.cel_to_sql.ast_nodes import DataType
 from keep.common.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
-    PropertiesMetadata,
     PropertyMetadataInfo,
 )
 from keep.common.core.facets_query_builder.base_facets_query_builder import (

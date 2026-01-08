@@ -14,8 +14,6 @@ from keep.common.core.cel_to_sql.ast_nodes import (
 )
 from keep.common.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
-    PropertiesMetadata,
-    PropertyMetadataInfo,
     SimpleFieldMapping,
 )
 from keep.common.core.cel_to_sql.sql_providers.base import BaseCelToSqlProvider

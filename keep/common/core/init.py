@@ -11,7 +11,6 @@ from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes
 from keep.providers.providers_factory import ProvidersFactory
 from keep.providers.providers_service import ProvidersService
 from keep.workflowmanager.workflowstore import WorkflowStore
-import keep.common.logging
 
 logger = logging.getLogger(__name__)
 

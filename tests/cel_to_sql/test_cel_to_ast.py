@@ -6,11 +6,8 @@ from keep.common.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
-    DataType,
     LogicalNode,
     LogicalNodeOperator,
-    MemberAccessNode,
-    Node,
     ParenthesisNode,
     PropertyAccessNode,
     UnaryNode,
@@ -194,7 +191,7 @@ def test_simple_comparison_node_in(cel, args):
     # verify that each element in the list is a ConstantNode with the correct value and type
     for i, arg in enumerate(actual.second_operand):
         assert isinstance(arg, ConstantNode)
-        assert type(arg.value) == type(args[i])
+        assert isinstance(arg.value, type(args[i]))
         assert arg.value == args[i]
 
 

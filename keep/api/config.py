@@ -1,5 +1,4 @@
 import logging
-import os
 import keep.common.logging
 from keep.common.core.config import starlette_config
 from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes

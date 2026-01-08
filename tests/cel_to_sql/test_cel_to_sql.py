@@ -7,15 +7,8 @@ from keep.common.core.cel_to_sql.ast_nodes import DataType
 from keep.common.core.cel_to_sql.properties_metadata import (
     FieldMappingConfiguration,
     PropertiesMetadata,
-    PropertyMetadataInfo,
-    SimpleFieldMapping,
-)
-from keep.common.core.cel_to_sql.sql_providers.base import (
-    BaseCelToSqlProvider,
-    CelToSqlException,
 )
 from keep.common.core.cel_to_sql.sql_providers.get_cel_to_sql_provider_for_dialect import (
-    get_cel_to_sql_provider,
     get_cel_to_sql_provider_for_dialect,
 )
 

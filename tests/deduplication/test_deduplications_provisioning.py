@@ -4,11 +4,11 @@ from uuid import UUID
 
 import pytest
 
-from keep.api.alert_deduplicator.deduplication_rules_provisioning import (
+from keep.common.alert_deduplicator.deduplication_rules_provisioning import (
     provision_deduplication_rules_from_env,
 )
-from keep.api.models.db.alert import AlertDeduplicationRule
-from keep.api.models.provider import Provider
+from keep.common.models.db.alert import AlertDeduplicationRule
+from keep.common.models.provider import Provider
 
 
 @pytest.fixture
@@ -117,17 +117,17 @@ def setup(monkeypatch):
 
     with (
         patch(
-            "keep.api.core.db.get_all_deduplication_rules",
+            "keep.common.core.db.get_all_deduplication_rules",
             return_value=deduplication_rules_in_db,
         ) as mock_get_all,
         patch(
-            "keep.api.core.db.delete_deduplication_rule", return_value=None
+            "keep.common.core.db.delete_deduplication_rule", return_value=None
         ) as mock_delete,
         patch(
-            "keep.api.core.db.update_deduplication_rule", return_value=None
+            "keep.common.core.db.update_deduplication_rule", return_value=None
         ) as mock_update,
         patch(
-            "keep.api.core.db.create_deduplication_rule", return_value=None
+            "keep.common.core.db.create_deduplication_rule", return_value=None
         ) as mock_create,
         patch(
             "keep.providers.providers_factory.ProvidersFactory.get_installed_providers",

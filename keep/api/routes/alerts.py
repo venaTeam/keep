@@ -16,13 +16,18 @@ from sqlalchemy_utils import UUIDType
 from sqlmodel import Session
 
 from keep.common.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.alerts import (
+from keep.common.core.alerts import (
     get_alert_facets,
     get_alert_facets_data,
     get_alert_potential_facet_fields,
     query_last_alerts,
 )
-from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.facets import (
+    create_facet,
+    delete_facet,
+)
+from keep.common.core.incidents import get_last_incidents_by_cel
 from keep.common.core.config import config
 from keep.common.core.db import dismiss_error_alerts as dismiss_error_alerts_db
 from keep.common.core.db import (
@@ -43,9 +48,9 @@ from keep.common.core.dependencies import (
     get_event_producer,
     get_pusher_client,
 )
-from keep.api.core.elastic import ElasticClient
+from keep.common.core.elastic import ElasticClient
 from keep.common.core.messaging import EventProducer
-from keep.api.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
+from keep.common.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (
     AlertDto,

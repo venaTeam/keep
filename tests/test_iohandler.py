@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from keep.api.models.alert import AlertDto
+from keep.common.models.alert import AlertDto
 from keep.iohandler.iohandler import IOHandler
 
 

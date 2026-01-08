@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Optional, Union
 from unittest.mock import patch
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.provider import Provider
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.provider import Provider
 from keep.providers.providers_factory import ProvidersFactory
 
 

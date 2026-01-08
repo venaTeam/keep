@@ -8,7 +8,7 @@ from datetime import timedelta
 import pytest
 from freezegun import freeze_time
 
-from keep.api.models.alert import AlertStatus
+from keep.common.models.alert import AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.keep_provider.keep_provider import KeepProvider
 from keep.searchengine.searchengine import SearchEngine
@@ -937,7 +937,7 @@ def test_cel_equality_int_str_type_coercion(db_session):
     """
     Reproduce the bug: CEL 'field == "2"' should match payload {"field": 2} and vice versa.
     """
-    from keep.api.models.alert import AlertDto
+    from keep.common.models.alert import AlertDto
     from keep.rulesengine.rulesengine import RulesEngine
 
     # Case 1: field is int, CEL checks for string
@@ -975,9 +975,9 @@ def test_check_if_rule_apply_int_str_type_coercion(db_session):
     """
     from datetime import datetime
 
-    from keep.api.core.dependencies import SINGLE_TENANT_UUID
-    from keep.api.models.alert import AlertDto
-    from keep.api.models.db.rule import Rule
+    from keep.common.core.dependencies import SINGLE_TENANT_UUID
+    from keep.common.models.alert import AlertDto
+    from keep.common.models.db.rule import Rule
     from keep.rulesengine.rulesengine import RulesEngine
 
     # Create a test rule with CEL expression that checks for string equality with int payload

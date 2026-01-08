@@ -30,8 +30,8 @@ from keep.common.core.db import (
     update_incident_from_dto_by_id,
     update_incident_severity,
 )
-from keep.api.core.elastic import ElasticClient
-from keep.api.core.incidents import get_last_incidents_by_cel
+from keep.common.core.elastic import ElasticClient
+from keep.common.core.incidents import get_last_incidents_by_cel
 from keep.common.models.action_type import ActionType
 from keep.common.models.db.incident import Incident, IncidentSeverity, IncidentStatus
 from keep.common.models.db.rule import ResolveOn

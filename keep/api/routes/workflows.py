@@ -19,7 +19,7 @@ from fastapi.responses import RedirectResponse
 from opentelemetry import trace
 from sqlmodel import Session
 
-from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
 from keep.common.core.config import config
 from keep.common.core.db import (
     get_alert_by_event_id,
@@ -37,7 +37,7 @@ from keep.common.core.db import get_workflow_executions as get_workflow_executio
 from keep.common.core.db import (
     update_workflow_by_id as update_workflow_by_id_db,
 )
-from keep.api.core.workflows import (
+from keep.common.core.workflows import (
     get_workflow_facets,
     get_workflow_facets_data,
     get_workflow_potential_facet_fields,

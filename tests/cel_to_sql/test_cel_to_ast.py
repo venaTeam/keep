@@ -2,18 +2,21 @@ import datetime
 
 import pytest
 
-from keep.api.core.cel_to_sql.ast_nodes import (
+from keep.common.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
+    DataType,
     LogicalNode,
     LogicalNodeOperator,
+    MemberAccessNode,
+    Node,
     ParenthesisNode,
     PropertyAccessNode,
     UnaryNode,
     UnaryNodeOperator,
 )
-from keep.api.core.cel_to_sql.cel_ast_converter import CelToAstConverter
+from keep.common.core.cel_to_sql.cel_ast_converter import CelToAstConverter
 
 
 @pytest.mark.parametrize(

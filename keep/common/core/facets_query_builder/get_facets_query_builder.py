@@ -1,14 +1,14 @@
-from keep.api.core.cel_to_sql.properties_metadata import PropertiesMetadata
-from keep.api.core.cel_to_sql.sql_providers.get_cel_to_sql_provider_for_dialect import (
+from keep.common.core.cel_to_sql.properties_metadata import PropertiesMetadata
+from keep.common.core.cel_to_sql.sql_providers.get_cel_to_sql_provider_for_dialect import (
     get_cel_to_sql_provider,
 )
 from keep.common.core.db import engine
-from keep.api.core.facets_query_builder.base_facets_query_builder import (
+from keep.common.core.facets_query_builder.base_facets_query_builder import (
     BaseFacetsQueryBuilder,
 )
-from keep.api.core.facets_query_builder.mysql import MySqlFacetsQueryBuilder
-from keep.api.core.facets_query_builder.postgresql import PostgreSqlFacetsQueryBuilder
-from keep.api.core.facets_query_builder.sqlite import SqliteFacetsHandler
+from keep.common.core.facets_query_builder.mysql import MySqlFacetsQueryBuilder
+from keep.common.core.facets_query_builder.postgresql import PostgreSqlFacetsQueryBuilder
+from keep.common.core.facets_query_builder.sqlite import SqliteFacetsHandler
 
 
 def get_facets_query_builder(

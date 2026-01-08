@@ -1,6 +1,6 @@
 import pytest
 
-from keep.api.utils.alert_utils import sanitize_alert
+from keep.common.utils.alert_utils import sanitize_alert
 
 
 @pytest.mark.parametrize(

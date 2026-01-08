@@ -5,20 +5,20 @@ from time import sleep
 
 import pytest
 
-from keep.api.core.db import create_rule as create_rule_db
-from keep.api.core.db import (
+from keep.common.core.db import create_rule as create_rule_db
+from keep.common.core.db import (
     enrich_incidents_with_alerts,
     get_incident_alerts_by_incident_id,
     get_last_incidents,
     set_last_alert,
 )
-from keep.api.core.db import get_rules as get_rules_db
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.alert import Alert, Incident
-from keep.api.models.db.incident import IncidentSeverity, IncidentStatus
-from keep.api.models.db.rule import CreateIncidentOn, ResolveOn
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.db import get_rules as get_rules_db
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.alert import Alert, Incident
+from keep.common.models.db.incident import IncidentSeverity, IncidentStatus
+from keep.common.models.db.rule import CreateIncidentOn, ResolveOn
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.rulesengine.rulesengine import RulesEngine
 from tests.fixtures.client import client, test_app  # noqa
 

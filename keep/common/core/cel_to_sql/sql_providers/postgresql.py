@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-from keep.api.core.cel_to_sql.ast_nodes import (
+from keep.common.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
@@ -12,11 +12,13 @@ from keep.api.core.cel_to_sql.ast_nodes import (
     Node,
     PropertyAccessNode,
 )
-from keep.api.core.cel_to_sql.properties_metadata import (
+from keep.common.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
+    PropertiesMetadata,
+    PropertyMetadataInfo,
     SimpleFieldMapping,
 )
-from keep.api.core.cel_to_sql.sql_providers.base import BaseCelToSqlProvider
+from keep.common.core.cel_to_sql.sql_providers.base import BaseCelToSqlProvider
 
 
 class CelToPostgreSqlProvider(BaseCelToSqlProvider):

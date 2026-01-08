@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional, Dict, Any
 
 class EventDTO(BaseModel):
     tenant_id: str
-    trace_id: str
     event: Dict[str, Any]
+    trace_id: Optional[str] = None
     provider_type: Optional[str] = None
     provider_id: Optional[str] = None
     fingerprint: Optional[str] = None

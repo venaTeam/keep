@@ -4,9 +4,9 @@ from uuid import uuid4
 
 import pytest
 
-from keep.api.core.db import get_all_provisioned_workflows
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.workflow import (
+from keep.common.core.db import get_all_provisioned_workflows
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.workflow import (
     Workflow,
     WorkflowExecution,
     WorkflowExecutionLog,
@@ -365,8 +365,8 @@ def test_get_all_workflows_with_last_execution_no_dummy_workflow(db_session):
     """
     Test that get_all_workflows_with_last_execution does not return dummy workflows.
     """
-    from keep.api.core.db import get_or_create_dummy_workflow
-    from keep.api.models.db.workflow import get_dummy_workflow_id
+    from keep.common.core.db import get_or_create_dummy_workflow
+    from keep.common.models.db.workflow import get_dummy_workflow_id
 
     workflowstore = WorkflowStore()
 

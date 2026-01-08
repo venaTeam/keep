@@ -6,7 +6,7 @@ import pytest
 import pytz
 from fastapi import HTTPException
 
-from keep.api.core.db import (
+from keep.common.core.db import (
     assign_alert_to_incident,
     create_incident_from_dict,
     get_all_provisioned_workflows,
@@ -14,12 +14,12 @@ from keep.api.core.db import (
     get_last_workflow_execution_by_workflow_id,
     get_workflow_execution,
 )
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.incident import Incident, IncidentStatus
-from keep.api.models.db.workflow import Workflow
-from keep.api.models.incident import IncidentDto
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.incident import Incident, IncidentStatus
+from keep.common.models.db.workflow import Workflow
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identity_managers.db.db_authverifier import (  # noqa
     DbAuthVerifier,

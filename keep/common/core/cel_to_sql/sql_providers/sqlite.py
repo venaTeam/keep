@@ -2,13 +2,17 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-from keep.api.core.cel_to_sql.ast_nodes import (
+from keep.common.core.cel_to_sql.ast_nodes import (
+    ComparisonNode,
+    ComparisonNodeOperator,
     ConstantNode,
     DataType,
+    LogicalNode,
+    LogicalNodeOperator,
     Node,
     PropertyAccessNode,
 )
-from keep.api.core.cel_to_sql.sql_providers.base import BaseCelToSqlProvider
+from keep.common.core.cel_to_sql.sql_providers.base import BaseCelToSqlProvider
 
 
 class CelToSqliteProvider(BaseCelToSqlProvider):

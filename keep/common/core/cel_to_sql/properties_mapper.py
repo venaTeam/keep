@@ -1,6 +1,6 @@
 from typing import Optional
 
-from keep.api.core.cel_to_sql.ast_nodes import (
+from keep.common.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
@@ -15,7 +15,7 @@ from keep.api.core.cel_to_sql.ast_nodes import (
     UnaryNode,
     UnaryNodeOperator,
 )
-from keep.api.core.cel_to_sql.properties_metadata import (
+from keep.common.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
     PropertiesMetadata,
     PropertyMetadataInfo,

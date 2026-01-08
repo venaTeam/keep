@@ -132,14 +132,7 @@ class KafkaEventConsumer(EventConsumer):
                         try:
                             await process_event_wrapper(
                                 ctx={},
-                                tenant_id=tenant_id,
-                                provider_type=provider_type,
-                                provider_id=provider_id,
-                                fingerprint=fingerprint,
-                                api_key_name=api_key_name,
-                                trace_id=trace_id,
-                                event=event,
-                                provider_name=provider_name,
+                                event_dto=event_dto,
                             )
                             # If successful, break retry loop
                             break

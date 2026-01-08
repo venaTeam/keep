@@ -8,14 +8,14 @@ import pytest
 import pytz
 from sqlalchemy import text
 
-from keep.api.core.db import get_last_alerts
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertStatus
-from keep.api.models.db.alert import (
+from keep.common.core.db import get_last_alerts
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertStatus
+from keep.common.models.db.alert import (
     Alert,
     AlertDeduplicationRule,
 )
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.providers.providers_factory import ProvidersFactory
 from tests.fixtures.client import client, setup_api_key, test_app  # noqa
 

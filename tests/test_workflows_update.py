@@ -3,10 +3,10 @@ from datetime import datetime
 
 import pytz
 
-from keep.api.core.db import get_all_workflows
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.workflow import Workflow
+from keep.common.core.db import get_all_workflows
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.workflow import Workflow
 from keep.functions import cyaml
 from tests.fixtures.workflow_manager import (
     wait_for_workflow_execution,

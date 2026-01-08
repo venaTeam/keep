@@ -6,6 +6,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent  # app/
 BASE_DIR = ROOT.parent  # ./
 
 try:
-    config = Config(BASE_DIR / ".env")
+    starlette_config = Config(BASE_DIR / ".env")
 except FileNotFoundError:
-    config = Config()
+    starlette_config = Config()
+
+# Alias for backward compatibility if needed, but we should migrate
+config = starlette_config

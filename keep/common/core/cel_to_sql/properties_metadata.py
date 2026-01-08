@@ -1,7 +1,7 @@
 import fnmatch
 import re
 
-from keep.api.core.cel_to_sql.ast_nodes import DataType
+from keep.common.core.cel_to_sql.ast_nodes import DataType
 
 
 class SimpleFieldMapping:

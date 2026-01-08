@@ -20,7 +20,7 @@ from keep.common.core.db import (
 )
 from keep.common.core.db import finish_workflow_execution as finish_workflow_execution_db
 from keep.common.core.db import get_workflow_by_id as get_workflow_db
-from keep.api.core.metrics import (
+from keep.common.core.metrics import (
     workflow_execution_errors_total,
     workflow_execution_status,
     workflow_executions_total,

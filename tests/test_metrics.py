@@ -1,6 +1,6 @@
 import pytest
 
-from keep.api.core.db import (
+from keep.common.core.db import (
     add_alerts_to_incident,
     create_incident_from_dict,
 )

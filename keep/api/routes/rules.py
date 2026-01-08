@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from keep.api.core.cel_to_sql.cel_ast_converter import CelToAstConverter
+from keep.common.core.cel_to_sql.cel_ast_converter import CelToAstConverter
 from keep.common.core.db import create_rule as create_rule_db
 from keep.common.core.db import delete_rule as delete_rule_db
 from keep.common.core.db import get_rule_distribution as get_rule_distribution_db

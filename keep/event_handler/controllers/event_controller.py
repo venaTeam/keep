@@ -54,8 +54,8 @@ async def process_event_wrapper(
     logger.info(
         "Event processed successfully",
         extra={
-            "tenant_id": tenant_id,
-            "trace_id": trace_id,
+            "tenant_id": event_dto.tenant_id,
+            "trace_id": event_dto.trace_id,
         },
     )
     return resp

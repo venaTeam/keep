@@ -10,8 +10,8 @@ import requests
 import yaml
 from fastapi import HTTPException
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.action import Action
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.action import Action
 from keep.contextmanager.contextmanager import ContextManager
 from keep.functions import cyaml
 from keep.parser.parser import Parser, ParserUtils

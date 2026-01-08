@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.workflow import Workflow
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.workflow import Workflow
 from tests.fixtures.workflow_manager import workflow_manager  # noqa
 
 

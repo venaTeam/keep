@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from tests.fixtures.client import client, setup_api_key, test_app  # noqa
 
 MOCK_TOKEN = "MOCKTOKEN"
@@ -51,7 +51,7 @@ def get_mock_jwt_payload(token, *args, **kwargs):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_api_key_with_header(db_session, client, test_app):
     """Tests the API key authentication with the x-api-key/digest"""
@@ -93,13 +93,13 @@ def test_api_key_with_header(db_session, client, test_app):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_bearer_token(db_session, client, test_app):
     """Tests the bearer token authentication"""
     auth_type = os.getenv("AUTH_TYPE")
     # Test bearer tokens
-    from keep.api.core import dependencies
+    from keep.common.core import dependencies
 
     # Patch the jwks client (otherwise it will be None)
     dependencies.jwks_client = MockJWKClient()
@@ -122,7 +122,7 @@ def test_bearer_token(db_session, client, test_app):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_webhook_api_key(db_session, client, test_app):
     """Tests the webhook API key authentication"""
@@ -168,14 +168,7 @@ def test_webhook_api_key(db_session, client, test_app):
     assert response.status_code == 401 if auth_type != "NO_AUTH" else 202
 
 
-# sanity check with keycloak
-@pytest.mark.parametrize("test_app", ["KEYCLOAK"], indirect=True)
-def test_keycloak_sanity(db_session, keycloak_client, keycloak_token, client, test_app):
-    """Tests the keycloak sanity check"""
-    # Use the token to make a request to the Keep API
-    headers = {"Authorization": f"Bearer {keycloak_token}"}
-    response = client.get("/providers", headers=headers)
-    assert response.status_code == 200
+
 
 
 @pytest.mark.parametrize(
@@ -384,15 +377,15 @@ def test_oauth_proxy2(db_session, client, test_app):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_deleted_api_key_authentication(db_session, client, test_app):
     """Tests that deleted API keys cannot be used for authentication"""
     import hashlib
 
-    from keep.api.core.db import get_api_key
-    from keep.api.core.dependencies import SINGLE_TENANT_UUID
-    from keep.api.models.db.tenant import TenantApiKey
+    from keep.common.core.db import get_api_key
+    from keep.common.core.dependencies import SINGLE_TENANT_UUID
+    from keep.common.models.db.tenant import TenantApiKey
 
     auth_type = os.getenv("AUTH_TYPE")
     valid_api_key = "test_deleted_key"

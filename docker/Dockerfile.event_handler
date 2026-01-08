@@ -42,6 +42,7 @@ COPY keep/throttles /app/keep/throttles
 COPY keep/topologies /app/keep/topologies
 COPY keep/conditions /app/keep/conditions
 COPY keep/iohandler /app/keep/iohandler
+COPY keep/searchengine /app/keep/searchengine
 COPY keep/parser /app/keep/parser
 COPY keep/event_subscriber /app/keep/event_subscriber
 COPY keep/alembic.ini /app/keep/alembic.ini
@@ -53,9 +54,12 @@ COPY keep/event_handler /app/keep/event_handler
 COPY ee /app/ee
 
 # Entrypoint script
-COPY keep/entrypoint.sh /app/keep/entrypoint.sh
-RUN chmod +x /app/keep/entrypoint.sh
-ENTRYPOINT ["/app/keep/entrypoint.sh"]
+# Entrypoint script
+# Deprecated: COPY keep/entrypoint.sh /app/keep/entrypoint.sh
+# RUN chmod +x /app/keep/entrypoint.sh
+# ENTRYPOINT ["/app/keep/entrypoint.sh"]
 
 # Worker command
-CMD ["uvicorn", "keep.event_handler.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# We use Gunicorn with Uvicorn workers for production stability
+# The number of workers is controlled by KEEP_EVENT_WORKERS env var (default in config or here)
+CMD ["sh", "-c", "gunicorn keep.event_handler.main:app --bind 0.0.0.0:8080 --workers ${KEEP_EVENT_WORKERS:-1} --worker-class uvicorn.workers.UvicornWorker --timeout 120"]

@@ -9,13 +9,13 @@ from sqlalchemy.exc import OperationalError
 # from pydantic import BaseModel
 from sqlmodel import Session
 
-from keep.api.core.cel_to_sql.ast_nodes import DataType
-from keep.api.core.cel_to_sql.properties_metadata import PropertiesMetadata
+from keep.common.core.cel_to_sql.ast_nodes import DataType
+from keep.common.core.cel_to_sql.properties_metadata import PropertiesMetadata
 from keep.common.core.db import engine
-from keep.api.core.facets_query_builder.get_facets_query_builder import (
+from keep.common.core.facets_query_builder.get_facets_query_builder import (
     get_facets_query_builder,
 )
-from keep.api.core.facets_query_builder.utils import get_facet_key
+from keep.common.core.facets_query_builder.utils import get_facet_key
 from keep.common.models.db.facet import Facet, FacetType
 from keep.common.models.facet import (
     CreateFacetDto,

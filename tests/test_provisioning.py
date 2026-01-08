@@ -390,7 +390,7 @@ def test_provision_provider_with_empty_tenant_table(db_session, client, test_app
     assert tenant_count == 0, "Tenant table should be empty"
 
     # Import ProvidersService
-    from keep.api.core.dependencies import SINGLE_TENANT_UUID
+    from keep.common.core.dependencies import SINGLE_TENANT_UUID
     from keep.providers.providers_service import ProvidersService
 
     # Call install_provider directly instead of provision_providers_from_env

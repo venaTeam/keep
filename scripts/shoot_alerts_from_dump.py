@@ -5,9 +5,9 @@ import json
 import logging
 import sys
 
-from keep.api.core.db import get_session_sync
-from keep.api.models.alert import AlertDto
-from keep.api.tasks.process_event_task import __handle_formatted_events
+from keep.common.core.db import get_session_sync
+from keep.common.models.alert import AlertDto
+from keep.common.event_management.process_event_task import __handle_formatted_events
 
 # configure logging
 logging.basicConfig(

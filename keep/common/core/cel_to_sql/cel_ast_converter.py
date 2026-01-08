@@ -7,12 +7,14 @@ import celpy.celparser
 import lark
 from dateutil.parser import parse
 
-from keep.api.core.cel_to_sql.ast_nodes import (
+from keep.common.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
+    DataType,
     LogicalNode,
     LogicalNodeOperator,
+    MemberAccessNode,
     Node,
     ParenthesisNode,
     PropertyAccessNode,

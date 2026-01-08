@@ -5,12 +5,13 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import literal_column
 from sqlmodel import true
 
-from keep.api.core.cel_to_sql.ast_nodes import DataType
-from keep.api.core.cel_to_sql.properties_metadata import (
+from keep.common.core.cel_to_sql.ast_nodes import DataType
+from keep.common.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
+    PropertiesMetadata,
     PropertyMetadataInfo,
 )
-from keep.api.core.facets_query_builder.base_facets_query_builder import (
+from keep.common.core.facets_query_builder.base_facets_query_builder import (
     BaseFacetsQueryBuilder,
 )
 

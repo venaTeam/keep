@@ -5,10 +5,10 @@ import sys
 import pytest
 from fastapi.testclient import TestClient
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID, get_event_producer
-from keep.api.core.messaging import EventProducer
-from keep.api.models.db.tenant import TenantApiKey
-from keep.api.tasks.process_event_task import process_event
+from keep.common.core.dependencies import SINGLE_TENANT_UUID, get_event_producer
+from keep.common.core.messaging import EventProducer
+from keep.common.models.db.tenant import TenantApiKey
+from keep.common.event_management.process_event_task import process_event
 
 
 class MockEventProducer(EventProducer):
@@ -31,12 +31,12 @@ class MockEventProducer(EventProducer):
 @pytest.fixture
 def test_app(monkeypatch, request, db_session):
     # Store original setup_logging function
-    import keep.api.logging
+    import keep.common.logging
 
-    original_setup_logging = keep.api.logging.setup_logging
+    original_setup_logging = keep.common.logging.setup_logging
 
     # Replace with no-op function to prevent threading issues
-    keep.api.logging.setup_logging = lambda: None
+    keep.common.logging.setup_logging = lambda: None
 
     try:
         monkeypatch.setenv("KEEP_USE_LIMITER", "false")
@@ -78,7 +78,7 @@ def test_app(monkeypatch, request, db_session):
         return app
     finally:
         # Restore the original setup_logging function
-        keep.api.logging.setup_logging = original_setup_logging
+        keep.common.logging.setup_logging = original_setup_logging
 
 
 # Fixture for TestClient using the test_app fixture

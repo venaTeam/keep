@@ -29,7 +29,7 @@ from keep.common.core.db import (
     is_all_alerts_resolved,
 )
 from keep.common.core.db import enrich_entity as enrich_alert_db
-from keep.api.core.elastic import ElasticClient
+from keep.common.core.elastic import ElasticClient
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto
 from keep.common.models.db.alert import Alert

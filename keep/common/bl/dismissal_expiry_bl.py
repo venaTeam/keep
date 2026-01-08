@@ -14,7 +14,7 @@ from sqlmodel import Session, select
 from keep.common.core.db import get_session_sync
 from keep.common.core.db_utils import get_json_extract_field
 from keep.common.core.dependencies import get_pusher_client
-from keep.api.core.elastic import ElasticClient
+from keep.common.core.elastic import ElasticClient
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto
 from keep.common.models.db.alert import Alert, AlertAudit, AlertEnrichment

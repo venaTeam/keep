@@ -22,7 +22,7 @@ from keep.common.bl.enrichments_bl import EnrichmentsBl
 from keep.common.bl.incident_reports import IncidentReportsBl
 from keep.common.bl.incidents_bl import IncidentBl
 from keep.common.consts import KEEP_ARQ_QUEUE_BASIC, REDIS
-from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
 from keep.common.core.db import (
     DestinationIncidentNotFound,
     add_audit,
@@ -38,11 +38,12 @@ from keep.common.core.db import (
     get_workflow_executions_for_incident_or_alert,
     merge_incidents_to_id,
 )
+
 from keep.common.core.dependencies import extract_generic_body, get_pusher_client
-from keep.api.core.incidents import (
+from keep.common.core.incidents import (
     get_incident_facets,
     get_incident_facets_data,
-    get_incident_potential_facet_fields,
+    get_last_incidents_by_cel,
 )
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (

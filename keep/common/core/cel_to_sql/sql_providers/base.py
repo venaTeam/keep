@@ -3,7 +3,7 @@ from typing import Any, List
 from celpy import CELParseError
 from sqlalchemy import Dialect, String
 
-from keep.api.core.cel_to_sql.ast_nodes import (
+from keep.common.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
@@ -18,14 +18,14 @@ from keep.api.core.cel_to_sql.ast_nodes import (
     UnaryNodeOperator,
     from_type_to_data_type,
 )
-from keep.api.core.cel_to_sql.cel_ast_converter import CelToAstConverter
-from keep.api.core.cel_to_sql.properties_mapper import (
+from keep.common.core.cel_to_sql.cel_ast_converter import CelToAstConverter
+from keep.common.core.cel_to_sql.properties_mapper import (
     JsonPropertyAccessNode,
     MultipleFieldsNode,
     PropertiesMapper,
     PropertiesMappingException,
 )
-from keep.api.core.cel_to_sql.properties_metadata import (
+from keep.common.core.cel_to_sql.properties_metadata import (
     JsonFieldMapping,
     PropertiesMetadata,
     PropertyMetadataInfo,

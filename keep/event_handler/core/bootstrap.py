@@ -24,14 +24,18 @@ class Bootstrap:
     async def run_on_starting(self):
         """Runs the legacy on_starting hooks in a separate thread."""
         try:
-            from keep.api.config import on_starting
+            from keep.common.core.init import init_services
+            from keep.common.core.config import config
+            # Default to noauth if not specified
+            auth_type = config("AUTH_TYPE", default="noauth")
 
             def on_starting_helper():
                 # Create a new event loop for this thread
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 try:
-                    on_starting()
+                    # Pass skip_ngrok=True to avoid trying to start ngrok in event handler
+                    init_services(auth_type=auth_type, skip_ngrok=True)
                 finally:
                     loop.close()
 

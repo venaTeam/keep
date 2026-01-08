@@ -42,6 +42,7 @@ COPY keep/throttles /app/keep/throttles
 COPY keep/topologies /app/keep/topologies
 COPY keep/conditions /app/keep/conditions
 COPY keep/iohandler /app/keep/iohandler
+COPY keep/searchengine /app/keep/searchengine
 COPY keep/parser /app/keep/parser
 COPY keep/event_subscriber /app/keep/event_subscriber
 COPY keep/alembic.ini /app/keep/alembic.ini
@@ -53,9 +54,10 @@ COPY keep/api /app/keep/api
 COPY ee /app/ee
 
 # Entrypoint script
-COPY keep/entrypoint.sh /app/keep/entrypoint.sh
-RUN chmod +x /app/keep/entrypoint.sh
-ENTRYPOINT ["/app/keep/entrypoint.sh"]
+# Entrypoint script
+# Deprecated: COPY keep/entrypoint.sh /app/keep/entrypoint.sh
+# RUN chmod +x /app/keep/entrypoint.sh
+# ENTRYPOINT ["/app/keep/entrypoint.sh"]
 
 # For API, we theoretically only need keep/api, but due to monorepo structure it's safest to rely on imports.
 # In dev mode, volume mount overrides this.

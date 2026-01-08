@@ -102,9 +102,7 @@ async def get_event_producer() -> EventProducer:
 
     elif messaging_type == "KAFKA":
         global _kafka_producer_instance
-        print(f"DEBUG: get_event_producer called. MESSAGING_TYPE={messaging_type}")
         if _kafka_producer_instance is None:
-            print("DEBUG: Initializing KafkaEventProducer")
             _kafka_producer_instance = KafkaEventProducer()
         return _kafka_producer_instance
 

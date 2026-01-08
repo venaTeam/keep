@@ -36,8 +36,8 @@ from keep.common.core.db import (
     set_last_alert,
 )
 from keep.common.core.dependencies import get_pusher_client
-from keep.api.core.elastic import ElasticClient
-from keep.api.core.metrics import (
+from keep.common.core.elastic import ElasticClient
+from keep.common.core.metrics import (
     events_error_counter,
     events_in_counter,
     events_out_counter,

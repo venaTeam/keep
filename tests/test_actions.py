@@ -6,9 +6,9 @@ import pytest
 
 from keep.actions.actions_exception import ActionsCRUDException
 from keep.actions.actions_factory import ActionsCRUD
-from keep.api.core.db import create_action
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.action import Action
+from keep.common.core.db import create_action
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.action import Action
 
 NUMBER_OF_SEEDS = 10
 

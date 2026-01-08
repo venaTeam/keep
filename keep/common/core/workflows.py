@@ -10,17 +10,17 @@ from typing import Tuple, TypedDict
 from sqlalchemy import and_, case, desc, func, literal_column, select, text
 from sqlmodel import Session
 
-from keep.api.core.cel_to_sql.ast_nodes import DataType
-from keep.api.core.cel_to_sql.properties_metadata import (
+from keep.common.core.cel_to_sql.ast_nodes import DataType
+from keep.common.core.cel_to_sql.properties_metadata import (
     FieldMappingConfiguration,
     PropertiesMetadata,
     PropertyMetadataInfo,
 )
-from keep.api.core.cel_to_sql.sql_providers.get_cel_to_sql_provider_for_dialect import (
+from keep.common.core.cel_to_sql.sql_providers.get_cel_to_sql_provider_for_dialect import (
     get_cel_to_sql_provider,
 )
 from keep.common.core.db import existed_or_new_session
-from keep.api.core.facets import get_facet_options, get_facets
+from keep.common.core.facets import get_facet_options, get_facets
 from keep.common.models.db.facet import FacetType
 from keep.common.models.db.workflow import Workflow, WorkflowExecution
 from keep.common.models.facet import FacetDto, FacetOptionDto, FacetOptionsQueryDto

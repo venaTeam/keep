@@ -21,18 +21,18 @@ from sqlmodel import Session, SQLModel, create_engine
 from starlette_context import context, request_cycle_context
 
 # This import is required to create the tables
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.elastic import ElasticClient
-from keep.api.models.alert import AlertStatus
-from keep.api.models.db.alert import *
-from keep.api.models.db.maintenance_window import MaintenanceWindowRule
-from keep.api.models.db.provider import *
-from keep.api.models.db.rule import *
-from keep.api.models.db.tenant import *
-from keep.api.models.db.user import *
-from keep.api.models.db.workflow import *
-from keep.api.tasks.process_event_task import process_event
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.elastic import ElasticClient
+from keep.common.models.alert import AlertStatus
+from keep.common.models.db.alert import *
+from keep.common.models.db.maintenance_window import MaintenanceWindowRule
+from keep.common.models.db.provider import *
+from keep.common.models.db.rule import *
+from keep.common.models.db.tenant import *
+from keep.common.models.db.user import *
+from keep.common.models.db.workflow import *
+from keep.common.event_management.process_event_task import process_event
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.contextmanager.contextmanager import ContextManager
 from tests.fixtures.workflow_manager import workflow_manager
 
@@ -317,14 +317,14 @@ actions:
     session.add_all(workflow_data)
     session.commit()
 
-    with patch("keep.api.core.db.engine", mock_engine):
-        with patch("keep.api.core.db_utils.create_db_engine", return_value=mock_engine):
-            with patch("keep.api.core.alerts.engine", mock_engine):
+    with patch("keep.common.core.db.engine", mock_engine):
+        with patch("keep.common.core.db_utils.create_db_engine", return_value=mock_engine):
+            with patch("keep.common.core.alerts.engine", mock_engine):
                 yield session
 
     import logging
 
-    from keep.api.logging import WorkflowDBHandler
+    from keep.common.logging import WorkflowDBHandler
 
     # Close WorkflowDBHandler to stop background thread before dropping tables
     root_logger = logging.getLogger()

@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytest
 
-from keep.api.models.alert import AlertStatus
+from keep.common.models.alert import AlertStatus
 from tests.fixtures.client import client, setup_api_key, test_app  # noqa
 
 

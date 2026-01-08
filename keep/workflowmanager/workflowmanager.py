@@ -13,7 +13,7 @@ from keep.common.core.db import (
     get_previous_alert_by_fingerprint,
     save_workflow_results,
 )
-from keep.api.core.metrics import workflow_execution_duration
+from keep.common.core.metrics import workflow_execution_duration
 from keep.common.models.alert import AlertDto, AlertSeverity
 from keep.common.models.incident import IncidentDto
 from keep.common.utils.cel_utils import preprocess_cel_expression

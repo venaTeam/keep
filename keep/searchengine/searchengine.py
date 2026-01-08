@@ -2,10 +2,10 @@ import enum
 import logging
 from datetime import datetime, timedelta, timezone
 
-from keep.api.core.alerts import query_last_alerts
+from keep.common.core.alerts import query_last_alerts
 from keep.common.core.db import get_last_alerts
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.elastic import ElasticClient
+from keep.common.core.elastic import ElasticClient
 from keep.common.core.tenant_configuration import TenantConfiguration
 from keep.common.models.alert import AlertDto, AlertStatus
 from keep.common.models.db.preset import PresetDto, PresetSearchQuery

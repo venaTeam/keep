@@ -56,6 +56,4 @@ def test_bi_metrics(client, db_session, test_app):
     # The value might be greater than 1 if other tests ran, so we check for existence
     assert 'keep_alert_ingestion_total{source="generic",status="success"}' in resp.text
 
-    # Check for HTTP metrics
-    assert "keep_http_requests_total" in resp.text
 

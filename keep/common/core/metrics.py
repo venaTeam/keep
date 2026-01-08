@@ -1,4 +1,5 @@
 import os
+from prometheus_client import Counter, Gauge, Histogram, Summary
 
 # This MUST be called before any prometheus_client import
 prom_multiproc_dir = os.environ.get("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus")
@@ -8,8 +9,6 @@ try:
 except Exception:
     # This might fail if we don't have permissions, but we shouldn't crash
     pass
-
-from prometheus_client import Counter, Gauge, Histogram, Summary
 
 
 def init_metrics():

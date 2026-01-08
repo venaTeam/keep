@@ -367,10 +367,11 @@ def get_app(
         app.add_middleware(SlowAPIMiddleware)
 
     if config("KEEP_METRICS", default="true", cast=bool):
-        Instrumentator(
+        instrumentator = Instrumentator(
             excluded_handlers=["/metrics", "/metrics/processing"],
             should_group_status_codes=False,
-        ).instrument(app=app, metric_namespace="keep")
+        )
+        instrumentator.instrument(app=app, metric_namespace="keep")
 
     if config("KEEP_OTEL_ENABLED", default="true", cast=bool):
         keep.common.observability.setup(app)

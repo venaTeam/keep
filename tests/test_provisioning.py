@@ -145,8 +145,9 @@ def test_reprovision_workflow(monkeypatch, db_session, client, test_app):
 
     # manually trigger the provision resources
     from keep.common.core.init import provision_resources
+    from keep.api.routes.dashboard import provision_dashboards
 
-    provision_resources()
+    provision_resources(provision_dashboards_func=provision_dashboards)
 
     client = TestClient(get_app())
 
@@ -259,8 +260,9 @@ def test_reprovision_provider(monkeypatch, db_session, client, test_app):
 
     # manually trigger the provision resources
     from keep.common.core.init import provision_resources
+    from keep.api.routes.dashboard import provision_dashboards
 
-    provision_resources()
+    provision_resources(provision_dashboards_func=provision_dashboards)
 
     client = TestClient(app)
 
@@ -347,8 +349,9 @@ def test_reprovision_dashboard(monkeypatch, db_session, client, test_app):
 
     # manually trigger the provision resources
     from keep.common.core.init import provision_resources
+    from keep.api.routes.dashboard import provision_dashboards
 
-    provision_resources()
+    provision_resources(provision_dashboards_func=provision_dashboards)
 
     client = TestClient(app)
 

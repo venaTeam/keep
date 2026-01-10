@@ -72,8 +72,9 @@ def test_app(monkeypatch, request, db_session):
         # Import and return the app instance
         from keep.api.api import get_app
         from keep.common.core.init import provision_resources
+        from keep.api.routes.dashboard import provision_dashboards
 
-        provision_resources()
+        provision_resources(provision_dashboards_func=provision_dashboards)
         app = get_app()
         return app
     finally:

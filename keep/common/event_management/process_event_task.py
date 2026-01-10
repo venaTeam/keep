@@ -43,6 +43,9 @@ from keep.common.core.metrics import (
     events_out_counter,
     processing_time_summary,
     alert_enrichment_duration_seconds,
+    deduplication_events_total,
+    deduplication_duration_seconds,
+    rules_engine_duration_seconds,
 )
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
@@ -1068,6 +1071,7 @@ def __handle_formatted_events(
 
     with tracer.start_as_current_span("process_event_deduplication"):
         # second, filter out any deduplicated events
+        start_dedup_time = time.time()
         alert_deduplicator = AlertDeduplicator(tenant_id)
         deduplication_rules = alert_deduplicator.get_deduplication_rules(
             tenant_id=tenant_id, provider_id=provider_id, provider_type=provider_type
@@ -1085,9 +1089,25 @@ def __handle_formatted_events(
         deduplicated_events = list(
             filter(lambda event: event.isFullDuplicate, formatted_events)
         )
+        dedup_count = len(deduplicated_events)
         formatted_events = list(
             filter(lambda event: not event.isFullDuplicate, formatted_events)
         )
+        
+        # record metrics
+        deduplication_duration_seconds.labels(
+            provider_type=provider_type or "generic"
+        ).observe(time.time() - start_dedup_time)
+        
+        if dedup_count > 0:
+            deduplication_events_total.labels(
+                provider_type=provider_type or "generic", status="duplicated"
+            ).inc(dedup_count)
+        
+        # also count non-duplicated events to know the ratio
+        deduplication_events_total.labels(
+            provider_type=provider_type or "generic", status="new"
+        ).inc(len(formatted_events))
 
     with tracer.start_as_current_span("process_event_save_to_db"):
         # save to db
@@ -1204,6 +1224,7 @@ def __handle_formatted_events(
     with tracer.start_as_current_span("process_event_run_rules_engine"):
         # Now we need to run the rules engine
         if KEEP_CORRELATION_ENABLED:
+            start_rules_time = time.time()
             try:
                 rules_engine = RulesEngine(tenant_id=tenant_id)
                 # handle incidents, also handle workflow execution as
@@ -1220,6 +1241,10 @@ def __handle_formatted_events(
                         "tenant_id": tenant_id,
                     },
                 )
+            finally:
+                rules_engine_duration_seconds.labels(
+                    provider_type=provider_type or "generic"
+                ).observe(time.time() - start_rules_time)
 
     if MAINTENANCE_WINDOW_ALERT_STRATEGY == "recover_previous_status":
         enriched_formatted_events.extend(ignored_events)

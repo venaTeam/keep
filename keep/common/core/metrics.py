@@ -74,6 +74,24 @@ alert_enrichment_duration_seconds = Histogram(
     buckets=(0.1, 0.5, 1, 2, 5, 10, 30),
 )
 
+deduplication_events_total = Counter(
+    f"{ALERT_METRIC_PREFIX}deduplication_events_total",
+    "Total number of deduplicated events",
+    labelnames=["provider_type", "status"],
+)
+
+deduplication_duration_seconds = Histogram(
+    f"{ALERT_METRIC_PREFIX}deduplication_duration_seconds",
+    "Time spent deduplicating events",
+    labelnames=["provider_type"],
+)
+
+rules_engine_duration_seconds = Histogram(
+    f"{ALERT_METRIC_PREFIX}rules_engine_duration_seconds",
+    "Time spent in rules engine",
+    labelnames=["provider_type"],
+)
+
 ### WORKFLOWS
 WORKFLOW_METRIC_PREFIX = "keep_workflows_"
 

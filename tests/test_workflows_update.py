@@ -10,6 +10,7 @@ from keep.common.models.db.workflow import Workflow
 from keep.functions import cyaml
 from tests.fixtures.workflow_manager import (
     wait_for_workflow_execution,
+    workflow_manager,
 )
 
 MOCK_S3_WORKFLOWS_YAMLS = [

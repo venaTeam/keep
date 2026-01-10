@@ -57,3 +57,6 @@ def test_bi_metrics(client, db_session, test_app):
     assert 'keep_alert_ingestion_total{source="generic",status="success"}' in resp.text
 
 
+    # Check for keep_alert_deduplication_events_total
+    # Since we sent a new alert, it might not be a duplicate, so we check for status="new"
+    assert 'keep_alert_deduplication_events_total{provider_type="generic",status="new"}' in resp.text

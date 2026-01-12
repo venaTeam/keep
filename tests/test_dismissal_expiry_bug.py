@@ -12,12 +12,12 @@ from datetime import timedelta, timezone
 
 from freezegun import freeze_time
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.alert import Alert, LastAlert
-from keep.api.models.db.preset import PresetSearchQuery as SearchQuery
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.alert import Alert, LastAlert
+from keep.common.models.db.preset import PresetSearchQuery as SearchQuery
 from keep.searchengine.searchengine import SearchEngine
 
 
@@ -28,7 +28,7 @@ def wait_for_dismissal_expiry_processing(tenant_id, db_session, max_wait_count=1
     """
     import logging
 
-    from keep.api.bl.dismissal_expiry_bl import DismissalExpiryBl
+    from keep.common.bl.dismissal_expiry_bl import DismissalExpiryBl
 
     logger = logging.getLogger(__name__)
     logger.info(f"Running dismissal expiry check for tenant {tenant_id}")
@@ -846,8 +846,8 @@ def test_dismissal_expiry_boolean_comparison_fix(db_session):
     """
     import datetime
 
-    from keep.api.bl.dismissal_expiry_bl import DismissalExpiryBl
-    from keep.api.models.db.alert import AlertEnrichment
+    from keep.common.bl.dismissal_expiry_bl import DismissalExpiryBl
+    from keep.common.models.db.alert import AlertEnrichment
 
     tenant_id = SINGLE_TENANT_UUID
     current_time = datetime.datetime.now(datetime.timezone.utc)
@@ -921,10 +921,10 @@ def test_dismissal_expiry_status_and_disposable_fields_cleanup(db_session):
 
     from freezegun import freeze_time
 
-    from keep.api.bl.enrichments_bl import EnrichmentsBl
-    from keep.api.models.action_type import ActionType
-    from keep.api.models.db.alert import Alert, AlertEnrichment, LastAlert
-    from keep.api.models.db.preset import PresetSearchQuery as SearchQuery
+    from keep.common.bl.enrichments_bl import EnrichmentsBl
+    from keep.common.models.action_type import ActionType
+    from keep.common.models.db.alert import Alert, AlertEnrichment, LastAlert
+    from keep.common.models.db.preset import PresetSearchQuery as SearchQuery
     from keep.searchengine.searchengine import SearchEngine
 
     tenant_id = SINGLE_TENANT_UUID

@@ -8,7 +8,7 @@ import json
 import pydantic
 import requests
 
-from keep.api.core.config import config
+from keep.common.core.config import config
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_exception import ProviderException
 from keep.providers.base.base_provider import BaseProvider

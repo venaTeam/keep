@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
-from keep.api.core.db import get_session, get_session_sync
-from keep.api.models.db.topology import (
+from keep.common.core.db import get_session, get_session_sync
+from keep.common.models.db.topology import (
     DeleteServicesRequest,
     TopologyApplicationDtoIn,
     TopologyApplicationDtoOut,
@@ -20,7 +20,7 @@ from keep.api.models.db.topology import (
     TopologyServiceDtoOut,
     TopologyServiceUpdateRequestDTO,
 )
-from keep.api.tasks.process_topology_task import process_topology
+from keep.common.event_management.process_topology_task import process_topology
 from keep.functions import cyaml
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory

@@ -8,10 +8,10 @@ import pytest
 from fastapi import HTTPException
 from sqlalchemy import and_, desc, distinct, func
 
-import keep.api.consts
-from keep.api.bl.incidents_bl import IncidentBl
-from keep.api.bl.maintenance_windows_bl import MaintenanceWindowsBl
-from keep.api.core.db import (
+import keep.common.consts
+from keep.common.bl.incidents_bl import IncidentBl
+from keep.common.bl.maintenance_windows_bl import MaintenanceWindowsBl
+from keep.common.core.db import (
     IncidentSorting,
     add_alerts_to_incident,
     create_incident_from_dict,
@@ -23,21 +23,21 @@ from keep.api.core.db import (
     merge_incidents_to_id,
     remove_alerts_to_incident_by_incident_id,
 )
-from keep.api.core.db_utils import get_json_extract_field
-from keep.api.core.dependencies import SINGLE_TENANT_EMAIL, SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertSeverity, AlertStatus
-from keep.api.models.db.alert import (
+from keep.common.core.db_utils import get_json_extract_field
+from keep.common.core.dependencies import SINGLE_TENANT_EMAIL, SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertSeverity, AlertStatus
+from keep.common.models.db.alert import (
     NULL_FOR_DELETED_AT,
     Alert,
     Incident,
     LastAlertToIncident,
 )
-from keep.api.models.db.incident import IncidentSeverity, IncidentStatus
-from keep.api.models.db.mapping import MappingRule
-from keep.api.models.db.rule import CreateIncidentOn, ResolveOn, Rule
-from keep.api.models.db.tenant import Tenant
-from keep.api.models.incident import IncidentDto, IncidentDtoIn
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.models.db.incident import IncidentSeverity, IncidentStatus
+from keep.common.models.db.mapping import MappingRule
+from keep.common.models.db.rule import CreateIncidentOn, ResolveOn, Rule
+from keep.common.models.db.tenant import Tenant
+from keep.common.models.incident import IncidentDto, IncidentDtoIn
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.rbac import Admin
 from keep.rulesengine.rulesengine import RulesEngine
@@ -1138,7 +1138,7 @@ def test_incident_bl_create_incident(db_session):
     pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
             tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
         )
@@ -1207,7 +1207,7 @@ def test_incident_bl_update_incident(db_session):
     pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
             tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
         )
@@ -1271,7 +1271,7 @@ def test_incident_bl_delete_incident(db_session):
     pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
             tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
         )
@@ -1329,8 +1329,8 @@ async def test_incident_bl_add_alert_to_incident(db_session, create_alert):
     workflow_manager = WorkflowManagerMock()
     elastic_client = ElasticClientMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
-        with patch("keep.api.bl.incidents_bl.ElasticClient", elastic_client):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
+        with patch("keep.common.bl.incidents_bl.ElasticClient", elastic_client):
             incident_bl = IncidentBl(
                 tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
             )
@@ -1407,8 +1407,8 @@ async def test_incident_bl_delete_alerts_from_incident(db_session, create_alert)
     workflow_manager = WorkflowManagerMock()
     elastic_client = ElasticClientMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
-        with patch("keep.api.bl.incidents_bl.ElasticClient", elastic_client):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
+        with patch("keep.common.bl.incidents_bl.ElasticClient", elastic_client):
             incident_bl = IncidentBl(
                 tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
             )
@@ -1780,7 +1780,7 @@ def test_incident_auto_resolve_only_if_active(db_session, create_alert):
         )
 
     with patch(
-        "keep.api.tasks.process_event_task.IncidentBl.resolve_incident_if_require"
+        "keep.common.event_management.process_event_task.IncidentBl.resolve_incident_if_require"
     ) as incident_bl_mock:
         create_alert(
             "alert-test",
@@ -1808,8 +1808,8 @@ def test_incident_not_created_maintenance(
     """
     # GIVEN The strategy is block_alert_by_maintenance_window
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND A rule matching by Source
     correlation_rule = Rule(
         tenant_id=SINGLE_TENANT_UUID,
@@ -1886,8 +1886,8 @@ def test_create_incident_after_maintenance_window(
     """
     # GIVEN The source not allowed to create incidents
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND A Maintenance Window matching by Source
     maintenance_w = create_window_maintenance_active(
         start=datetime.now(UTC) - timedelta(hours=3),

@@ -11,9 +11,9 @@ from starlette.routing import Route
 from ee.identitymanager.identity_managers.keycloak.keycloak_authverifier import (
     KeycloakAuthVerifier,
 )
-from keep.api.core.config import config
-from keep.api.core.db import get_resource_ids_by_resource_type
-from keep.api.models.user import Group, PermissionEntity, ResourcePermission, Role, User
+from keep.common.core.config import config
+from keep.common.core.db import get_resource_ids_by_resource_type
+from keep.common.models.user import Group, PermissionEntity, ResourcePermission, Role, User
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase, get_all_scopes

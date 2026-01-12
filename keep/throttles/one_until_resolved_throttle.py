@@ -1,8 +1,8 @@
-from keep.api.core.db import (
+from keep.common.core.db import (
     get_alert_by_fingerprint_and_event_id,
     get_workflow_to_alert_execution_by_workflow_execution_id,
 )
-from keep.api.models.alert import AlertStatus
+from keep.common.models.alert import AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.throttles.base_throttle import BaseThrottle
 

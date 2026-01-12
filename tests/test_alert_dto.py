@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import freezegun
 import pytest
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from tests.fixtures.client import client, test_app  # noqa
 
 

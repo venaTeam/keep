@@ -5,7 +5,7 @@ import os
 import time
 from typing import Type
 
-from keep.api.core.config import config
+from keep.common.core.config import config
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.authverifierbase import AuthVerifierBase
 from keep.identitymanager.identitymanager import BaseIdentityManager

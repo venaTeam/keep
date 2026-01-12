@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 from fastapi import HTTPException
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from tests.fixtures.client import client, setup_api_key, test_app  # noqa
 
 VALID_API_KEY = "test-api-key"

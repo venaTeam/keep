@@ -11,10 +11,10 @@ import uuid
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.incident import IncidentSeverity, IncidentStatus
-from keep.api.models.db.topology import TopologyServiceInDto
-from keep.api.models.incident import IncidentDto
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.incident import IncidentSeverity, IncidentStatus
+from keep.common.models.db.topology import TopologyServiceInDto
+from keep.common.models.incident import IncidentDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_config_exception import ProviderConfigException
 from keep.providers.base.base_provider import (

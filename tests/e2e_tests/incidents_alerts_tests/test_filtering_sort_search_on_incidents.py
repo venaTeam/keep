@@ -138,7 +138,8 @@ def test_initial_loading(browser, setup_test_data):
         incidents = setup_test_data["incidents"]
         # verify intial loading of incidents page
         init_test(browser, incidents)
-        filter_predicate = lambda alert: (alert["status"] in ["firing", "acknowledged"])
+        def filter_predicate(alert):
+            return alert["status"] in ["firing", "acknowledged"]
 
         assert_incidents_by_column(
             browser,

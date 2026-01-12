@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Body, Depends
 
-from keep.api.models.user import ResourcePermission
+from keep.common.models.user import ResourcePermission
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import ALL_RESOURCES
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory

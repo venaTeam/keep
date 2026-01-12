@@ -9,7 +9,7 @@ import pydantic
 import requests
 from pydantic import AnyHttpUrl
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope

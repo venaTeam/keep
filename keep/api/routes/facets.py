@@ -6,8 +6,8 @@ from fastapi import (
     HTTPException,
 )
 
-import keep.api.core.facets as facets
-from keep.api.models.facet import CreateFacetDto, FacetDto
+import keep.common.core.facets as facets
+from keep.common.models.facet import CreateFacetDto, FacetDto
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

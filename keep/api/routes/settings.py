@@ -10,13 +10,13 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlmodel import Session
 
-from keep.api.core.config import config
-from keep.api.core.db import get_session
-from keep.api.core.tenant_configuration import TenantConfiguration
-from keep.api.models.alert import AlertDto
-from keep.api.models.smtp import SMTPSettings
-from keep.api.models.webhook import WebhookSettings
-from keep.api.utils.tenant_utils import (
+from keep.common.core.config import config
+from keep.common.core.db import get_session
+from keep.common.core.tenant_configuration import TenantConfiguration
+from keep.common.models.alert import AlertDto
+from keep.common.models.smtp import SMTPSettings
+from keep.common.models.webhook import WebhookSettings
+from keep.common.utils.tenant_utils import (
     APIKeyException,
     create_api_key,
     get_api_key,

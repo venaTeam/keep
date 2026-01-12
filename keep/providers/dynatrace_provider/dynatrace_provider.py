@@ -13,7 +13,7 @@ from urllib.parse import quote
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
@@ -455,7 +455,7 @@ if __name__ == "__main__":
 
     api_token = os.environ.get("DYNATRACE_API_TOKEN")
     environment_id = os.environ.get("DYNATRACE_ENVIRONMENT_ID")
-    from keep.api.core.dependencies import SINGLE_TENANT_UUID
+    from keep.common.core.dependencies import SINGLE_TENANT_UUID
 
     context_manager = ContextManager(tenant_id=SINGLE_TENANT_UUID)
     config = {

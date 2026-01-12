@@ -6,16 +6,16 @@ from unittest.mock import MagicMock, patch
 import freezegun
 import pytest
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.bl.incidents_bl import IncidentBl
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.mapping import MappingRule
-from keep.api.models.db.preset import PresetSearchQuery as SearchQuery
-from keep.api.models.db.rule import CreateIncidentOn, ResolveOn, Rule
-from keep.api.models.incident import IncidentDtoIn
-from keep.api.models.query import QueryDto
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.bl.incidents_bl import IncidentBl
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.mapping import MappingRule
+from keep.common.models.db.preset import PresetSearchQuery as SearchQuery
+from keep.common.models.db.rule import CreateIncidentOn, ResolveOn, Rule
+from keep.common.models.incident import IncidentDtoIn
+from keep.common.models.query import QueryDto
 from keep.api.routes.alerts import query_alerts
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.searchengine.searchengine import SearchEngine

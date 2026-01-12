@@ -1,4 +1,3 @@
-import asyncio
 import json
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -10,7 +9,7 @@ async def test_consume_loop_success_commits():
     Verify that if process_event_wrapper succeeds, commit() is called.
     """
     mock_msg = MagicMock()
-    mock_msg.value = json.dumps({"trace_id": "test-trace"}).encode("utf-8")
+    mock_msg.value = json.dumps({"trace_id": "test-trace", "tenant_id": "test-tenant", "event": {"data": "test"}}).encode("utf-8")
 
     # Mock AIOKafkaConsumer
     mock_consumer_cls = AsyncMock()
@@ -42,7 +41,7 @@ async def test_consume_loop_retries_and_crashes():
     3. It raises the exception (crashes).
     """
     mock_msg = MagicMock()
-    mock_msg.value = json.dumps({"trace_id": "fail-trace"}).encode("utf-8")
+    mock_msg.value = json.dumps({"trace_id": "fail-trace", "tenant_id": "test-tenant", "event": {"data": "fail"}}).encode("utf-8")
 
     mock_consumer_cls = AsyncMock()
     mock_consumer_instance = mock_consumer_cls.return_value

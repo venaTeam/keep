@@ -8,19 +8,19 @@ import requests
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from keep.api.core.db import (
+from keep.common.core.db import (
     calc_incidents_mttr,
     get_combined_workflow_execution_distribution,
     get_incidents_created_distribution,
     get_provider_distribution,
 )
-from keep.api.core.db import (
+from keep.common.core.db import (
     create_dashboard as create_dashboard_db,
 )
-from keep.api.core.db import delete_dashboard as delete_dashboard_db
-from keep.api.core.db import get_dashboards as get_dashboards_db
-from keep.api.core.db import update_dashboard as update_dashboard_db
-from keep.api.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
+from keep.common.core.db import delete_dashboard as delete_dashboard_db
+from keep.common.core.db import get_dashboards as get_dashboards_db
+from keep.common.core.db import update_dashboard as update_dashboard_db
+from keep.common.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 from keep.providers.providers_factory import ProvidersFactory

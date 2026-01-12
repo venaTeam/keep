@@ -12,8 +12,8 @@ import celpy.evaluation
 from sqlalchemy.orm.exc import StaleDataError
 from sqlmodel import Session
 
-from keep.api.bl.incidents_bl import IncidentBl
-from keep.api.core.db import (
+from keep.common.bl.incidents_bl import IncidentBl
+from keep.common.core.db import (
     assign_alert_to_incident,
     create_incident_for_grouping_rule,
     enrich_incidents_with_alerts,
@@ -21,14 +21,14 @@ from keep.api.core.db import (
     get_incident_for_grouping_rule,
     is_all_alerts_in_status,
 )
-from keep.api.core.db import get_rules as get_rules_db
-from keep.api.core.dependencies import get_pusher_client
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.alert import Incident
-from keep.api.models.db.rule import Rule
-from keep.api.models.incident import IncidentDto
-from keep.api.utils.cel_utils import preprocess_cel_expression
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.db import get_rules as get_rules_db
+from keep.common.core.dependencies import get_pusher_client
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.alert import Incident
+from keep.common.models.db.rule import Rule
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.cel_utils import preprocess_cel_expression
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 
 # Shahar: this is performance enhancment https://github.com/cloud-custodian/cel-python/issues/68
 

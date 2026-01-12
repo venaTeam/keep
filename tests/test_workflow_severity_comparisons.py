@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.workflow import Workflow
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.workflow import Workflow
 from tests.fixtures.workflow_manager import workflow_manager  # noqa
 
 
@@ -130,7 +130,7 @@ def test_severity_greater_than_or_equal_warning(
     db_session, workflow_manager, create_workflow, create_alert
 ):
     """Test severity >= 'warning' comparisons work correctly with numeric conversion"""
-    workflow = create_workflow("test-severity-gte-warning", "severity >= 'warning'")
+    _workflow = create_workflow("test-severity-gte-warning", "severity >= 'warning'")
 
     # Should match: critical, high, warning
     critical_alert = create_alert(
@@ -167,7 +167,7 @@ def test_severity_less_than_high(
     db_session, workflow_manager, create_workflow, create_alert
 ):
     """Test severity < 'high' comparisons work correctly with numeric conversion"""
-    workflow = create_workflow("test-severity-lt-high", "severity < 'high'")
+    _workflow = create_workflow("test-severity-lt-high", "severity < 'high'")
 
     # Should match: info, low, warning
     info_alert = create_alert(severity=AlertSeverity.INFO, fingerprint="fp-info")
@@ -204,7 +204,7 @@ def test_complex_severity_expressions(
     db_session, workflow_manager, create_workflow, create_alert
 ):
     """Test complex CEL expressions involving severity comparisons"""
-    workflow = create_workflow(
+    _workflow = create_workflow(
         "test-complex-severity",
         "(severity >= 'warning' && source.contains('prometheus')) || (severity == 'critical' && source.contains('grafana'))",
     )

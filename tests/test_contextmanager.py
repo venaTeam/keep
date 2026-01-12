@@ -7,8 +7,8 @@ import tempfile
 
 import pytest
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.workflow import WorkflowExecution
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.workflow import WorkflowExecution
 from keep.contextmanager.contextmanager import ContextManager
 
 STATE_FILE_MOCK_DATA = {

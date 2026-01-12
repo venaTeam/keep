@@ -7,10 +7,10 @@ import pytz
 from freezegun import freeze_time
 
 import keep.functions as functions
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import AlertStatus
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import AlertStatus
 from keep.iohandler.iohandler import IOHandler
 
 

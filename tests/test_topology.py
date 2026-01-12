@@ -4,8 +4,8 @@ from datetime import datetime
 import pytest
 from sqlmodel import select
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.topology import (
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.topology import (
     TopologyApplication,
     TopologyApplicationDtoIn,
     TopologyService,

@@ -1,7 +1,7 @@
 import json
 
-from keep.api.models.db.topology import TopologyServiceInDto
-from keep.api.tasks.process_topology_task import process_topology
+from keep.common.models.db.topology import TopologyServiceInDto
+from keep.common.event_management.process_topology_task import process_topology
 
 if __name__ == "__main__":
     services = {}

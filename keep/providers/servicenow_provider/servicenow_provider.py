@@ -10,7 +10,7 @@ import pydantic
 import requests
 from requests.auth import HTTPBasicAuth
 
-from keep.api.models.db.topology import TopologyServiceInDto
+from keep.common.models.db.topology import TopologyServiceInDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_exception import ProviderException
 from keep.providers.base.base_provider import BaseTopologyProvider

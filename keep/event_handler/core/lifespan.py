@@ -1,120 +1,44 @@
-import asyncio
 import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from keep.api.core.config import config
+from keep.common.core.config import config
 
+
+from keep.event_handler.core.bootstrap import Bootstrap
 
 logger = logging.getLogger(__name__)
 
-async def run_arq_worker(worker_id, number_of_errors_before_restart=0):
-    from keep.event_handler.core.redis_worker import get_arq_worker, safe_run_worker
-    from keep.workflowmanager.workflowmanager import WorkflowManager
-    from keep.api.consts import (
-        KEEP_ARQ_QUEUE_BASIC,
-        KEEP_ARQ_TASK_POOL,
-        KEEP_ARQ_TASK_POOL_ALL,
-        KEEP_ARQ_TASK_POOL_BASIC_PROCESSING,
-    )
-    import sys
-    import os
 
-    print(f"DEBUG: run_arq_worker started for {worker_id}")
-    logger.info(f"Starting ARQ Worker {worker_id} (PID: {os.getpid()})")
-
-    def determine_queue_name():
-        if not KEEP_ARQ_TASK_POOL:
-            return KEEP_ARQ_TASK_POOL_ALL
-        elif KEEP_ARQ_TASK_POOL in [
-            KEEP_ARQ_TASK_POOL_ALL,
-            KEEP_ARQ_TASK_POOL_BASIC_PROCESSING,
-        ]:
-            return KEEP_ARQ_QUEUE_BASIC
-        else:
-            raise ValueError(f"Invalid task pool: {KEEP_ARQ_TASK_POOL}")
-
-    try:
-        queue_name = determine_queue_name()
-    except ValueError as e:
-        logger.exception(f"Invalid task pool configuration: {e}")
-        sys.exit(1)
-
-    if not queue_name:
-        logger.info("No task pools configured to run - exiting")
-        sys.exit(1)
-
-    # Apply debug patches if needed
-    if config("LOG_LEVEL", default="INFO") == "DEBUG":
-        logger.info("Applying ARQ debug patches")
-        try:
-            # TODO: fix import path for patches if needed
-            # For now assuming it's in the same package (unlikely after refactor)
-            # Maybe we skip this for now or move patch file
-            pass
-        except ImportError:
-            pass
-
-    # Start the workflow manager
-    logger.info("Starting Workflow Manager")
-    wf_manager = WorkflowManager.get_instance()
-    await wf_manager.start()
-    logger.info("Workflow Manager started")
-
-    # Get and run the ARQ worker
-    logger.info(f"Getting ARQ worker for queue {queue_name}")
-    worker = get_arq_worker(queue_name)
-    logger.info("Starting safe_run_worker")
-    await safe_run_worker(
-        worker, number_of_errors_before_restart=number_of_errors_before_restart
-    )
-    logger.info(f"ARQ Worker {worker_id} finished")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Event Handler Service")
-    # Initialize DB and other resources (similar to API startup)
-    try:
-        from keep.api.config import on_starting
-        def on_starting_helper():
-            # Create a new event loop for this thread
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                on_starting()
-            finally:
-                loop.close()
-
-        print("DEBUG: Calling on_starting")
-        # Run sync on_starting in a separate thread to avoid "loop already running" issues with Alembic/SQLAlchemy
-        await asyncio.to_thread(on_starting_helper)
-        print("DEBUG: on_starting finished")
-    except Exception as e:
-        logger.exception("Failed to run on_starting")
-        print(f"DEBUG: on_starting failed: {e}")
+    
+    bootstrap = await Bootstrap.get_instance()
+    
+    # Initialize DB and other resources
+    await bootstrap.run_on_starting()
 
     messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
     consumer = None
-    worker_task = None
 
     if messaging_type == "KAFKA":
         from keep.event_handler.core.kafka_consumer import KafkaEventConsumer
 
         logger.info("MESSAGING_TYPE is KAFKA - starting Kafka Consumer")
         consumer = KafkaEventConsumer()
-        await consumer.start()
-
     else:
         # Default to REDIS / ARQ
-        logger.info(f"MESSAGING_TYPE is {messaging_type} - starting ARQ Worker")
-        worker_id = "worker-service"
-        # Create background task for the worker
-        loop = asyncio.get_running_loop()
-        print(f"DEBUG: Creating worker task for {worker_id}")
-        worker_task = loop.create_task(run_arq_worker(worker_id))
-        print("DEBUG: Worker task created")
+        from keep.event_handler.core.redis_consumer import RedisEventConsumer
+
+        logger.info(f"MESSAGING_TYPE is {messaging_type} - starting Redis Consumer (ARQ)")
+        consumer = RedisEventConsumer()
+
+    # Start the consumer (whether Redis or Kafka)
+    await consumer.start()
 
     yield
 
@@ -123,13 +47,5 @@ async def lifespan(app: FastAPI):
 
     if consumer:
         await consumer.stop()
-
-    if worker_task:
-        if not worker_task.done():
-            worker_task.cancel()
-            try:
-                await worker_task
-            except asyncio.CancelledError:
-                pass
 
     logger.info("Event Handler Service stopped")

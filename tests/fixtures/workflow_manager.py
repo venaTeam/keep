@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from keep.api.core.db import get_last_workflow_execution_by_workflow_id
+from keep.common.core.db import get_last_workflow_execution_by_workflow_id
 from keep.workflowmanager.workflowmanager import WorkflowManager
 from keep.workflowmanager.workflowscheduler import WorkflowScheduler
 

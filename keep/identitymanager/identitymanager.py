@@ -3,7 +3,7 @@ import importlib
 import inspect
 import logging
 
-from keep.api.models.user import ResourcePermission, Role, User
+from keep.common.models.user import ResourcePermission, Role, User
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import ALL_RESOURCES, AuthVerifierBase

@@ -16,7 +16,7 @@ from jwt.exceptions import (
     MissingRequiredClaimError,
 )
 
-from keep.api.core.db import create_user, update_user_last_sign_in, user_exists
+from keep.common.core.db import create_user, update_user_last_sign_in, user_exists
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase, oauth2_scheme
 from keep.identitymanager.rbac import Admin as AdminRole

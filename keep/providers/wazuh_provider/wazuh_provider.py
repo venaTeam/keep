@@ -2,7 +2,7 @@
 Wazuh is a security platform that provides unified XDR and SIEM protection for endpoints and cloud workloads
 """
 
-from keep.api.models.alert import AlertDto, AlertStatus
+from keep.common.models.alert import AlertDto, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig

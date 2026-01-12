@@ -1,5 +1,5 @@
-from keep.api.core.db import create_single_tenant_for_e2e
-from keep.api.models.user import User
+from keep.common.core.db import create_single_tenant_for_e2e
+from keep.common.models.user import User
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.authverifierbase import AuthVerifierBase
 from keep.identitymanager.identity_managers.noauth.noauth_authverifier import (

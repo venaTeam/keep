@@ -7,15 +7,15 @@ from uuid import uuid4
 from pydantic import ValidationError
 
 from keep.actions.actions_exception import ActionsCRUDException
-from keep.api.core.db import (
+from keep.common.core.db import (
     create_actions,
     delete_action,
     get_action,
     get_all_actions,
     update_action,
 )
-from keep.api.models.action import ActionDTO
-from keep.api.models.db.action import Action
+from keep.common.models.action import ActionDTO
+from keep.common.models.db.action import Action
 from keep.functions import cyaml
 
 logger = logging.getLogger(__name__)

@@ -1,12 +1,9 @@
 import base64
-import concurrent.futures
 import hashlib
 import hmac
 import json
 import logging
 import os
-import time
-from concurrent.futures import Future, ThreadPoolExecutor
 from copy import deepcopy
 from typing import List, Optional
 
@@ -17,17 +14,20 @@ from pusher import Pusher
 from sqlalchemy_utils import UUIDType
 from sqlmodel import Session
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.alerts import (
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.alerts import (
     get_alert_facets,
     get_alert_facets_data,
     get_alert_potential_facet_fields,
     query_last_alerts,
 )
-from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
-from keep.api.core.config import config
-from keep.api.core.db import dismiss_error_alerts as dismiss_error_alerts_db
-from keep.api.core.db import (
+from keep.common.core.metrics import (
+    alert_ingestion_error_total,
+    alert_ingestion_total,
+)
+from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.db import dismiss_error_alerts as dismiss_error_alerts_db
+from keep.common.core.db import (
     enrich_alerts_with_incidents,
     get_alerts_by_fingerprint,
     get_alerts_by_ids,
@@ -38,18 +38,17 @@ from keep.api.core.db import (
     get_session,
     is_all_alerts_resolved,
 )
-from keep.api.core.db import get_alert_audit as get_alert_audit_db
-from keep.api.core.db import get_error_alerts as get_error_alerts_db
-from keep.api.core.dependencies import (
+from keep.common.core.db import get_alert_audit as get_alert_audit_db
+from keep.common.core.db import get_error_alerts as get_error_alerts_db
+from keep.common.core.dependencies import (
     extract_generic_body,
     get_event_producer,
     get_pusher_client,
 )
-from keep.api.core.elastic import ElasticClient
-from keep.api.core.messaging import EventProducer
-from keep.api.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import (
+from keep.common.core.elastic import ElasticClient
+from keep.common.core.messaging import EventProducer
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import (
     AlertDto,
     AlertErrorDto,
     AlertStatus,
@@ -61,17 +60,16 @@ from keep.api.models.alert import (
     EnrichAlertRequestBody,
     UnEnrichAlertRequestBody,
 )
-from keep.api.models.alert_audit import AlertAuditDto
-from keep.api.models.db.incident import IncidentStatus
-from keep.api.models.db.rule import ResolveOn
-from keep.api.models.facet import FacetOptionsQueryDto
-from keep.api.models.query import QueryDto
-from keep.api.models.search_alert import SearchAlertsRequest
-from keep.api.models.time_stamp import TimeStampFilter
+from keep.common.models.alert_audit import AlertAuditDto
+from keep.common.models.db.incident import IncidentStatus
+from keep.common.models.db.rule import ResolveOn
+from keep.common.models.facet import FacetOptionsQueryDto
+from keep.common.models.query import QueryDto
+from keep.common.models.search_alert import SearchAlertsRequest
+from keep.common.models.time_stamp import TimeStampFilter
 from keep.api.routes.preset import pull_data_from_providers
-from keep.api.tasks.process_event_task import process_event
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
-from keep.api.utils.time_stamp_helpers import get_time_stamp_filter
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.utils.time_stamp_helpers import get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 from keep.searchengine.searchengine import SearchEngine
@@ -81,12 +79,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 REDIS = os.environ.get("REDIS", "false") == "true"
-EVENT_WORKERS = int(config("KEEP_EVENT_WORKERS", default=5, cast=int))
 
-# Create dedicated threadpool
-process_event_executor = ThreadPoolExecutor(
-    max_workers=EVENT_WORKERS, thread_name_prefix="process_event_worker"
-)
 
 
 @router.post(
@@ -464,94 +457,7 @@ def assign_alert(
     return {"status": "ok"}
 
 
-def discard_future(
-    trace_id: str,
-    future: Future,
-    running_tasks: set,
-    started_time: float,
-):
-    try:
-        running_tasks.discard(future)
-        running_tasks_gauge.dec()
-        running_tasks_by_process_gauge.labels(pid=os.getpid()).dec()
 
-        # Log any exception that occurred in the future
-        try:
-            exception = future.exception()
-            if exception:
-                logger.error(
-                    "Task failed with exception",
-                    extra={
-                        "trace_id": trace_id,
-                        "error": str(exception),
-                        "processing_time": time.time() - started_time,
-                    },
-                )
-            else:
-                logger.info(
-                    "Task completed",
-                    extra={
-                        "processing_time": time.time() - started_time,
-                        "trace_id": trace_id,
-                    },
-                )
-        except concurrent.futures.CancelledError:
-            logger.error(
-                "Task was cancelled",
-                extra={
-                    "trace_id": trace_id,
-                    "processing_time": time.time() - started_time,
-                },
-            )
-
-    except Exception:
-        # Make sure we always decrement both counters even if something goes wrong
-        running_tasks_gauge.dec()
-        running_tasks_by_process_gauge.labels(pid=os.getpid()).dec()
-        logger.exception(
-            "Error in discard_future callback",
-            extra={
-                "trace_id": trace_id,
-            },
-        )
-
-
-def create_process_event_task(
-    tenant_id: str,
-    provider_type: str | None,
-    provider_id: str | None,
-    fingerprint: str,
-    api_key_name: str | None,
-    trace_id: str,
-    event: AlertDto | list[AlertDto] | dict,
-    running_tasks: set,
-    provider_name: str | None = None,
-) -> str:
-    logger.info("Adding task", extra={"trace_id": trace_id})
-    started_time = time.time()
-    running_tasks_gauge.inc()  # Increase total counter
-    running_tasks_by_process_gauge.labels(
-        pid=os.getpid()
-    ).inc()  # Increase process counter
-    future = process_event_executor.submit(
-        process_event,
-        {},  # ctx
-        tenant_id,
-        provider_type,
-        provider_id,
-        fingerprint,
-        api_key_name,
-        trace_id,
-        event,
-        provider_name=provider_name,
-    )
-    running_tasks.add(future)
-    future.add_done_callback(
-        lambda task: discard_future(trace_id, task, running_tasks, started_time)
-    )
-
-    logger.info("Task added", extra={"trace_id": trace_id})
-    return str(id(future))
 
 
 @router.post(
@@ -578,35 +484,26 @@ async def receive_generic_event(
         bg_tasks (BackgroundTasks): Background tasks handler.
         tenant_id (str, optional): Defaults to Depends(verify_api_key).
     """
-    running_tasks: set = request.state.background_tasks
-    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
-    if REDIS or messaging_type == "KAFKA":
-        # Use the abstract event producer (Redis or Kafka)
-        try:
-            task_name = await event_producer.produce(
-                event=event,
-                tenant_id=authenticated_entity.tenant_id,
-                provider_type=None,  # Generic event
-                provider_id=provider_id,
-                fingerprint=fingerprint,
-                api_key_name=authenticated_entity.api_key_name,
-                trace_id=request.state.trace_id,
-                provider_name=None,
-            )
-        except Exception:
-            raise
-    else:
-        # Fallback to local threadpool execution
-        task_name = create_process_event_task(
-            authenticated_entity.tenant_id,
-            None,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            request.state.trace_id,
-            event,
-            running_tasks,
+    # Use the abstract event producer (Redis or Kafka)
+    try:
+        task_name = await event_producer.produce(
+            event=event,
+            tenant_id=authenticated_entity.tenant_id,
+            provider_type=None,  # Generic event
+            provider_id=provider_id,
+            fingerprint=fingerprint,
+            api_key_name=authenticated_entity.api_key_name,
+            trace_id=request.state.trace_id,
+            provider_name=None,
         )
+        alert_ingestion_total.labels(source="generic", status="success").inc()
+    except Exception as e:
+        alert_ingestion_error_total.labels(
+            source="generic", error_type=type(e).__name__
+        ).inc()
+        raise
+    except Exception:
+        raise
 
     if not task_name:
         task_name = "async-task"
@@ -663,35 +560,19 @@ async def receive_event(
     # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
     # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
 
-    # If provider_name is provided, we pass it to the worker to resolve it
-    # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
-    # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
+    # Use the abstract event producer (Redis or Kafka)
+    task_name = await event_producer.produce(
+        event=event,
+        tenant_id=authenticated_entity.tenant_id,
+        provider_type=provider_type,
+        provider_id=provider_id,
+        fingerprint=fingerprint,
+        api_key_name=authenticated_entity.api_key_name,
+        trace_id=trace_id,
+        provider_name=provider_name,
+    )
+    alert_ingestion_total.labels(source=provider_type, status="success").inc()
 
-    messaging_type = config("MESSAGING_TYPE", default="REDIS").upper()
-    if REDIS or messaging_type == "KAFKA":
-        # Use the abstract event producer (Redis or Kafka)
-        task_name = await event_producer.produce(
-            event=event,
-            tenant_id=authenticated_entity.tenant_id,
-            provider_type=provider_type,
-            provider_id=provider_id,
-            fingerprint=fingerprint,
-            api_key_name=authenticated_entity.api_key_name,
-            trace_id=trace_id,
-            provider_name=provider_name,
-        )
-    else:
-        # Fallback to local threadpool execution
-        task_name = create_process_event_task(
-            authenticated_entity.tenant_id,
-            provider_type,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            trace_id,
-            event,
-            request.state.background_tasks,
-        )
 
     if not task_name:
         task_name = "async-task"

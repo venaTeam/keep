@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Body, Depends
 
-from keep.api.models.user import CreateOrUpdateRole, Role
+from keep.common.models.user import CreateOrUpdateRole, Role
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

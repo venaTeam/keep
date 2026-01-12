@@ -6,22 +6,23 @@ from uuid import uuid4
 
 import pytest
 
-import keep.api.consts
-from keep.api.bl.maintenance_windows_bl import MaintenanceWindowsBl
-from keep.api.core.db import (
+import keep.common.consts
+from keep.common.bl.maintenance_windows_bl import MaintenanceWindowsBl
+from keep.common.core.db import (
     get_alerts_by_status,
     get_workflow_executions,
 )
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.alert import Alert
-from keep.api.models.db.maintenance_window import (
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.alert import Alert
+from keep.common.models.db.maintenance_window import (
     MaintenanceRuleCreate,
     MaintenanceWindowRule,
 )
 from keep.api.routes.maintenance import update_maintenance_rule
 from keep.functions import cyaml
 from keep.workflowmanager.workflowstore import WorkflowStore
+from tests.fixtures.workflow_manager import workflow_manager  # noqa
 
 
 @pytest.fixture
@@ -154,8 +155,8 @@ def test_alert_in_active_maintenance_window_with_suppress(
 ):
     # Ensure we use the default strategy (not recover_previous_status from other tests)
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "default")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
 
     # Simulate the query to return the active maintenance_window
     mock_session.query.return_value.filter.return_value.filter.return_value.filter.return_value.filter.return_value.all.return_value = [
@@ -308,8 +309,8 @@ def test_strategy_restore_update_status(
     """
     # GIVEN The strategy is recover_previous_status
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND there is a maintenance window rule with suppression on active
     mock_session.query.return_value.filter.return_value.filter.return_value.filter.return_value.filter.return_value.all.return_value = [
         active_maintenance_window_rule_with_suppression_on
@@ -342,8 +343,8 @@ def test_strategy_clean_status(
     """
     # GIVEN The strategy is recover_previous_status
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND there is a maintenance window expired.
     retrieve_windows_session = MagicMock()
     retrieve_windows_session.exec.return_value.all.return_value = [
@@ -371,12 +372,12 @@ def test_strategy_clean_status(
         MagicMock(),
     ]
     with (
-        patch("keep.api.core.db.existed_or_new_session", return_value=mock_session),
+        patch("keep.common.core.db.existed_or_new_session", return_value=mock_session),
         patch(
-            "keep.api.bl.maintenance_windows_bl.get_last_alert_by_fingerprint",
+            "keep.common.bl.maintenance_windows_bl.get_last_alert_by_fingerprint",
             return_value=mock_last_alert,
         ),
-        patch("keep.api.core.db.get_alert_by_event_id", return_value=alert_maint),
+        patch("keep.common.core.db.get_alert_by_event_id", return_value=alert_maint),
     ):
         MaintenanceWindowsBl.recover_strategy(logger=MagicMock(), session=mock_session)
 
@@ -400,8 +401,8 @@ def test_strategy_alert_block_by_window(
     """
     # GIVEN The strategy is recover_previous_status
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND there is a maintenance window active
     retrieve_windows_session = MagicMock()
     retrieve_windows_session.exec.return_value.all.return_value = [
@@ -423,7 +424,7 @@ def test_strategy_alert_block_by_window(
         recover_status_session,
         MagicMock(),
     ]
-    with patch("keep.api.core.db.existed_or_new_session", return_value=mock_session):
+    with patch("keep.common.core.db.existed_or_new_session", return_value=mock_session):
         MaintenanceWindowsBl.recover_strategy(logger=loggerMag, session=mock_session)
 
     # THEN the update status method will not be called
@@ -446,8 +447,8 @@ def test_strategy_alert_expired_by_current_time(
     """
     # GIVEN The strategy is recover_previous_status
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND there is a maintenance window active.
     mw = create_window_maintenance_active(
         cel='fingerprint == "alert-test-1" || fingerprint == "alert-test-2"',
@@ -522,8 +523,8 @@ def test_strategy_alert_execution_wf(
     """
     # GIVEN The strategy is recover_previous_status
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND A Workflow ready to be executed
     workflow_definition = """
         workflow:

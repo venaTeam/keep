@@ -3,8 +3,8 @@ from datetime import datetime
 
 from sqlmodel import Session, select
 
-from keep.api.core.db import engine
-from keep.api.models.db.secret import Secret
+from keep.common.core.db import engine
+from keep.common.models.db.secret import Secret
 from keep.secretmanager.secretmanager import BaseSecretManager
 
 

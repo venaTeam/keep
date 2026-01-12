@@ -5,9 +5,10 @@ import logging
 
 from aiokafka import AIOKafkaConsumer
 
-from keep.api.consts import MAX_PROCESSING_RETRIES
-from keep.api.core.config import config
+from keep.common.consts import MAX_PROCESSING_RETRIES
+from keep.common.core.config import config
 from keep.event_handler.controllers.event_controller import process_event_wrapper
+from keep.event_handler.models.event_dto import EventDTO
 
 
 class EventConsumer(abc.ABC):
@@ -112,15 +113,17 @@ class KafkaEventConsumer(EventConsumer):
                         f"Received event from Kafka: {payload.get('trace_id')}"
                     )
 
-                    # Extract arguments matching process_event's expectation
-                    event = payload.get("event")
-                    tenant_id = payload.get("tenant_id")
-                    provider_type = payload.get("provider_type")
-                    provider_id = payload.get("provider_id")
-                    fingerprint = payload.get("fingerprint")
-                    api_key_name = payload.get("api_key_name")
-                    trace_id = payload.get("trace_id")
-                    provider_name = payload.get("provider_name")
+                    # Construct DTO
+                    event_dto = EventDTO(
+                        tenant_id=payload.get("tenant_id"),
+                        trace_id=payload.get("trace_id"),
+                        event=payload.get("event"),
+                        provider_type=payload.get("provider_type"),
+                        provider_id=payload.get("provider_id"),
+                        fingerprint=payload.get("fingerprint"),
+                        api_key_name=payload.get("api_key_name"),
+                        provider_name=payload.get("provider_name"),
+                    )
 
                     # Run logic via controller with retries
                     # We pass an empty dict as ctx since we are not in ARQ
@@ -129,14 +132,7 @@ class KafkaEventConsumer(EventConsumer):
                         try:
                             await process_event_wrapper(
                                 ctx={},
-                                tenant_id=tenant_id,
-                                provider_type=provider_type,
-                                provider_id=provider_id,
-                                fingerprint=fingerprint,
-                                api_key_name=api_key_name,
-                                trace_id=trace_id,
-                                event=event,
-                                provider_name=provider_name,
+                                event_dto=event_dto,
                             )
                             # If successful, break retry loop
                             break
@@ -154,7 +150,10 @@ class KafkaEventConsumer(EventConsumer):
                     await self.consumer.commit()
 
                 except Exception as e:
-                    self.logger.exception(f"Error processing Kafka message: {e}")
+                    # Critical: Do NOT commit. Log exception.
+                    # TODO: this should trigger a DLQ.
+                    # For now, we ensure we don't lose the message by not committing.
+                    self.logger.exception(f"Error processing Kafka message (trace_id={payload.get('trace_id', 'unknown')}): {e} - Message will be reprocessed on restart.")
                     # CRITICAL: We want to crash the loop so the pod restarts or alerts trigger
                     # rather than skipping the message silently.
                     raise e

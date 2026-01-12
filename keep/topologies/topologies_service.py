@@ -8,8 +8,8 @@ from sqlalchemy import and_, exists, or_
 from sqlalchemy.orm import joinedload, selectinload
 from sqlmodel import Session, select
 
-from keep.api.core.db_utils import get_aggreated_field
-from keep.api.models.db.topology import (
+from keep.common.core.db_utils import get_aggreated_field
+from keep.common.models.db.topology import (
     TopologyApplication,
     TopologyApplicationDtoIn,
     TopologyApplicationDtoOut,

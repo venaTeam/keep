@@ -1,6 +1,6 @@
 import pytest
 
-from keep.api.core.db import (
+from keep.common.core.db import (
     add_alerts_to_incident,
     create_incident_from_dict,
 )
@@ -30,3 +30,33 @@ def test_add_remove_alert_to_incidents(
 
     # Checking for open_incidents_total metric
     assert "open_incidents_total 1" in response.text.split("\n")
+
+
+@pytest.mark.parametrize("test_app", ["NO_AUTH"], indirect=True)
+def test_bi_metrics(client, db_session, test_app):
+    valid_api_key = "valid_api_key"
+    setup_api_key(db_session, valid_api_key)
+    headers = {"X-API-KEY": valid_api_key}
+
+    # Send an alert
+    alert = {
+        "source": ["test_source"],
+        "name": "test_alert",
+        "status": "firing",
+        "lastReceived": "2023-10-26T12:00:00Z",
+    }
+    resp = client.post("/alerts/event", json=alert, headers=headers)
+    assert resp.status_code == 202
+
+    # Get metrics
+    resp = client.get("/metrics", headers=headers)
+    assert resp.status_code == 200
+
+    # Check for keep_alert_ingestion_total
+    # The value might be greater than 1 if other tests ran, so we check for existence
+    assert 'keep_alert_ingestion_total{source="generic",status="success"}' in resp.text
+
+
+    # Check for keep_alert_deduplication_events_total
+    # Since we sent a new alert, it might not be a duplicate, so we check for status="new"
+    assert 'keep_alert_deduplication_events_total{provider_type="generic",status="new"}' in resp.text

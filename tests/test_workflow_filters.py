@@ -1,6 +1,6 @@
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto
-from keep.api.models.db.workflow import Workflow as WorkflowDB
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto
+from keep.common.models.db.workflow import Workflow as WorkflowDB
 from keep.workflowmanager.workflowmanager import WorkflowManager
 
 

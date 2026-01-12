@@ -6,8 +6,8 @@ from keycloak.connection import ConnectionManager
 from keycloak.keycloak_uma import KeycloakUMA
 from keycloak.uma_permissions import UMAPermission
 
-from keep.api.core.config import config
-from keep.api.core.db import create_tenant, get_tenants
+from keep.common.core.config import config
+from keep.common.core.db import create_tenant, get_tenants
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase, oauth2_scheme
 from keep.identitymanager.rbac import Roles

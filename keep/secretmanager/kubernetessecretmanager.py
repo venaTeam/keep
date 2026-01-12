@@ -6,7 +6,7 @@ import kubernetes.client
 import kubernetes.config
 from kubernetes.client.exceptions import ApiException
 
-from keep.api.core.config import config
+from keep.common.core.config import config
 from keep.secretmanager.secretmanager import BaseSecretManager
 
 # kubernetes.config.incluster_config.SERVICE_CERT_FILENAME = "/app/bla"

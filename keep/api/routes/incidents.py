@@ -16,14 +16,14 @@ from fastapi import (
 from pusher import Pusher
 from sqlmodel import Session
 
-from keep.api.arq_pool import get_pool
-from keep.api.bl.ai_suggestion_bl import AISuggestionBl
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.bl.incident_reports import IncidentReportsBl
-from keep.api.bl.incidents_bl import IncidentBl
-from keep.api.consts import KEEP_ARQ_QUEUE_BASIC, REDIS
-from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
-from keep.api.core.db import (
+from keep.common.arq_pool import get_pool
+from keep.common.bl.ai_suggestion_bl import AISuggestionBl
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.bl.incident_reports import IncidentReportsBl
+from keep.common.bl.incidents_bl import IncidentBl
+from keep.common.consts import KEEP_ARQ_QUEUE_BASIC, REDIS
+from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.db import (
     DestinationIncidentNotFound,
     add_audit,
     confirm_predicted_incident_by_id,
@@ -38,25 +38,26 @@ from keep.api.core.db import (
     get_workflow_executions_for_incident_or_alert,
     merge_incidents_to_id,
 )
-from keep.api.core.dependencies import extract_generic_body, get_pusher_client
-from keep.api.core.incidents import (
+
+from keep.common.core.dependencies import extract_generic_body, get_pusher_client
+from keep.common.core.incidents import (
     get_incident_facets,
     get_incident_facets_data,
     get_incident_potential_facet_fields,
 )
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import (
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import (
     AlertDto,
     EnrichIncidentRequestBody,
     UnEnrichIncidentRequestBody,
 )
-from keep.api.models.db.alert import (
+from keep.common.models.db.alert import (
     AlertAudit,
     CommentMention,
 )
-from keep.api.models.db.incident import IncidentSeverity, IncidentStatus
-from keep.api.models.facet import FacetOptionsQueryDto
-from keep.api.models.incident import (
+from keep.common.models.db.incident import IncidentSeverity, IncidentStatus
+from keep.common.models.facet import FacetOptionsQueryDto
+from keep.common.models.incident import (
     IncidentCommit,
     IncidentDto,
     IncidentDtoIn,
@@ -70,15 +71,15 @@ from keep.api.models.incident import (
     SplitIncidentRequestDto,
     SplitIncidentResponseDto,
 )
-from keep.api.models.workflow import WorkflowExecutionDTO
-from keep.api.tasks.process_incident_task import process_incident
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
-from keep.api.utils.pagination import (
+from keep.common.models.workflow import WorkflowExecutionDTO
+from keep.common.event_management.process_incident_task import process_incident
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.utils.pagination import (
     AlertWithIncidentLinkMetadataPaginatedResultsDto,
     IncidentsPaginatedResultsDto,
     WorkflowExecutionsPaginatedResultsDto,
 )
-from keep.api.utils.pluralize import pluralize
+from keep.common.utils.pluralize import pluralize
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 from keep.providers.providers_factory import ProvidersFactory

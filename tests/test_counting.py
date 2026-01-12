@@ -1,5 +1,5 @@
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.utils.enrichment_helpers import (
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.utils.enrichment_helpers import (
     calculated_firing_counter,
     calculated_unresolved_counter,
 )

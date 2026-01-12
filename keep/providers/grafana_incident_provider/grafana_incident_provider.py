@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 import pydantic
 import requests
 
-from keep.api.models.incident import IncidentDto, IncidentSeverity, IncidentStatus
+from keep.common.models.incident import IncidentDto, IncidentSeverity, IncidentStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseIncidentProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope

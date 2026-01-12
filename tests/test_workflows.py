@@ -1,11 +1,11 @@
 from datetime import datetime
 from unittest.mock import patch
 
-from keep.api.core.db import create_workflow_execution, get_workflow_execution
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.provider import Provider
-from keep.api.models.db.workflow import Workflow
+from keep.common.core.db import create_workflow_execution, get_workflow_execution
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.provider import Provider
+from keep.common.models.db.workflow import Workflow
 from keep.functions import cyaml
 from keep.parser.parser import Parser
 from keep.workflowmanager.workflowmanager import WorkflowManager
@@ -660,7 +660,7 @@ def test_workflow_bash_python(db_session):
     "keep.providers.postgres_provider.postgres_provider.PostgresProvider.validate_config"
 )
 @patch("keep.step.step.StepError")
-@patch("keep.api.tasks.process_event_task.process_event")
+@patch("keep.common.event_management.process_event_task.process_event")
 def test_workflow_keep_notify_after_another_foreach(
     mock_process_event,
     mock_step_error,

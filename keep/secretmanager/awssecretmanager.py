@@ -5,7 +5,7 @@ import boto3
 import opentelemetry.trace as trace
 from botocore.exceptions import ClientError
 
-from keep.api.core.config import config
+from keep.common.core.config import config
 from keep.secretmanager.secretmanager import BaseSecretManager
 
 tracer = trace.get_tracer(__name__)

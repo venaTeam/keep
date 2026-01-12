@@ -5,7 +5,7 @@ Checkmk is a monitoring tool for Infrastructure and Application Monitoring.
 import logging
 from datetime import datetime, timezone
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig

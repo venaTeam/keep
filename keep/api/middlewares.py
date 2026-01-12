@@ -7,8 +7,8 @@ import jwt
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from keep.api.core.config import config
-from keep.api.core.db import get_api_key
+from keep.common.core.config import config
+from keep.common.core.db import get_api_key
 
 logger = logging.getLogger(__name__)
 try:

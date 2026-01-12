@@ -3,14 +3,14 @@ from typing import Optional
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     create_user,
     update_user_last_sign_in,
     update_user_role,
     user_exists,
 )
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase
 from keep.identitymanager.rbac import get_role_by_role_name

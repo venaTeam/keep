@@ -3,7 +3,7 @@ import os
 import jwt
 from fastapi import HTTPException
 
-from keep.api.core.db import create_user, user_exists
+from keep.common.core.db import create_user, user_exists
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase
 from keep.identitymanager.rbac import Admin as AdminRole

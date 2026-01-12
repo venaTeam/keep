@@ -15,15 +15,15 @@ import typing
 from dataclasses import _MISSING_TYPE, fields
 from typing import get_args
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     get_consumer_providers,
     get_installed_providers,
     get_linked_providers,
     get_provider_by_type_and_id,
 )
-from keep.api.models.alert import DeduplicationRuleDto
-from keep.api.models.provider import Provider
+from keep.common.models.alert import DeduplicationRuleDto
+from keep.common.models.provider import Provider
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import (
     BaseIncidentProvider,

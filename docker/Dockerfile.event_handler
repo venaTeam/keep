@@ -25,13 +25,41 @@ ENV VIRTUAL_ENV="/venv"
 ENV POSTHOG_DISABLED="true"
 
 # Copy application code
-COPY keep /app/keep
+# Common and Shared Modules
+COPY keep/common /app/keep/common
+COPY keep/providers /app/keep/providers
+COPY keep/workflowmanager /app/keep/workflowmanager
+COPY keep/secretmanager /app/keep/secretmanager
+COPY keep/rulesengine /app/keep/rulesengine
+COPY keep/identitymanager /app/keep/identitymanager
+COPY keep/contextmanager /app/keep/contextmanager
+COPY keep/actions /app/keep/actions
+COPY keep/step /app/keep/step
+COPY keep/functions /app/keep/functions
+COPY keep/exceptions /app/keep/exceptions
+COPY keep/validation /app/keep/validation
+COPY keep/throttles /app/keep/throttles
+COPY keep/topologies /app/keep/topologies
+COPY keep/conditions /app/keep/conditions
+COPY keep/iohandler /app/keep/iohandler
+COPY keep/searchengine /app/keep/searchengine
+COPY keep/parser /app/keep/parser
+COPY keep/event_subscriber /app/keep/event_subscriber
+COPY keep/alembic.ini /app/keep/alembic.ini
+
+# Service Specific
+COPY keep/event_handler /app/keep/event_handler
+
+# Enterprise Edition
 COPY ee /app/ee
 
 # Entrypoint script
-COPY keep/entrypoint.sh /app/keep/entrypoint.sh
-RUN chmod +x /app/keep/entrypoint.sh
-ENTRYPOINT ["/app/keep/entrypoint.sh"]
+# Entrypoint script
+# Deprecated: COPY keep/entrypoint.sh /app/keep/entrypoint.sh
+# RUN chmod +x /app/keep/entrypoint.sh
+# ENTRYPOINT ["/app/keep/entrypoint.sh"]
 
 # Worker command
-CMD ["uvicorn", "keep.event_handler.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# We use Gunicorn with Uvicorn workers for production stability
+# The number of workers is controlled by KEEP_EVENT_WORKERS env var (default in config or here)
+CMD ["sh", "-c", "gunicorn keep.event_handler.main:app --bind 0.0.0.0:8080 --workers ${KEEP_EVENT_WORKERS:-1} --worker-class uvicorn.workers.UvicornWorker --timeout 120"]

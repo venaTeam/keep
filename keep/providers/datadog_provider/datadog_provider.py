@@ -39,8 +39,8 @@ from datadog_api_client.v2.api.service_definition_api import ServiceDefinitionAp
 from datadog_api_client.v2.api.users_api import UsersApi, UsersResponse
 from pydantic import Field
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.topology import TopologyServiceInDto
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.topology import TopologyServiceInDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseTopologyProvider, ProviderHealthMixin
 from keep.providers.base.provider_exceptions import GetAlertException

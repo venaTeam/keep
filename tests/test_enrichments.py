@@ -8,16 +8,16 @@ import pytest
 from sqlalchemy import text
 from tenacity import sleep
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.alert import Alert
-from keep.api.models.db.extraction import ExtractionRule
-from keep.api.models.db.mapping import MappingRule
-from keep.api.models.db.topology import TopologyService
-from keep.api.models.db.workflow import Workflow
-from tests.fixtures.client import client, test_app
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from tests.fixtures.client import client, test_app  # noqa
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.alert import Alert
+from keep.common.models.db.extraction import ExtractionRule
+from keep.common.models.db.mapping import MappingRule
+from keep.common.models.db.topology import TopologyService
+from keep.common.models.db.workflow import Workflow
 from tests.fixtures.workflow_manager import (
     wait_for_workflow_execution,
     wait_for_workflow_in_run_queue,
@@ -28,7 +28,7 @@ from tests.fixtures.workflow_manager import (
 def patch_get_tenants_configurations():
     """Automatically patch get_tenants_configurations for all tests."""
     with patch(
-        "keep.api.core.tenant_configuration.TenantConfiguration._TenantConfiguration.get_configuration",
+        "keep.common.core.tenant_configuration.TenantConfiguration._TenantConfiguration.get_configuration",
         return_value=None,
     ):
         yield
@@ -632,12 +632,12 @@ def test_topology_mapping_rule_enrichment(mock_session, mock_alert_dto):
 
     # Mock the get_topology_data_by_dynamic_matcher to return the mock topology service
     with patch(
-        "keep.api.bl.enrichments_bl.get_topology_data_by_dynamic_matcher",
+        "keep.common.bl.enrichments_bl.get_topology_data_by_dynamic_matcher",
         return_value=mock_topology_service,
     ):
         # Mock the enrichment database function so no actual DB actions occur
         with patch(
-            "keep.api.bl.enrichments_bl.enrich_alert_db"
+            "keep.common.bl.enrichments_bl.enrich_alert_db"
         ) as mock_enrich_alert_db:
             # Run the mapping rule logic for the topology
             result_event = enrichment_bl.run_mapping_rules(mock_alert_dto)

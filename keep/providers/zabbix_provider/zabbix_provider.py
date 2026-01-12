@@ -13,7 +13,7 @@ from typing import Union
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.base.provider_exceptions import ProviderMethodException

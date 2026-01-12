@@ -9,9 +9,9 @@ from datetime import timedelta, timezone
 
 from freezegun import freeze_time
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertStatus
-from keep.api.models.db.alert import Alert, LastAlert
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertStatus
+from keep.common.models.db.alert import Alert, LastAlert
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.keep_provider.keep_provider import KeepProvider
 from keep.providers.models.provider_config import ProviderConfig
@@ -139,7 +139,7 @@ def test_keep_provider_time_delta_filtering_version_1(db_session):
     This should work correctly as it uses get_alerts_with_filters directly.
     """
     # This test is simpler since we're testing version 1 which should work
-    from keep.api.core.db import get_alerts_with_filters
+    from keep.common.core.db import get_alerts_with_filters
 
     tenant_id = SINGLE_TENANT_UUID
 

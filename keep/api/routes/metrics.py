@@ -1,7 +1,7 @@
 from typing import List
 
 import chevron
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import APIRouter, Query, Request, Response
 from fastapi.responses import JSONResponse
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
@@ -10,47 +10,19 @@ from prometheus_client import (
     multiprocess,
 )
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     get_last_alerts_for_incidents,
     get_last_incidents,
     get_workflow_executions_count,
 )
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.api.core.limiter import limiter
-from keep.api.models.alert import AlertDto
-from keep.identitymanager.authenticatedentity import AuthenticatedEntity
-from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
+from keep.common.models.alert import AlertDto
 
 router = APIRouter()
 
 CONTENT_TYPE_LATEST = "text/plain; version=0.0.4; charset=utf-8"
-NO_AUTH_METRICS = config("KEEP_NO_AUTH_METRICS", default=False, cast=bool)
-
-if NO_AUTH_METRICS:
-
-    @router.get("/processing", include_in_schema=False)
-    async def get_processing_metrics(
-        request: Request,
-    ):
-        registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry)
-        metrics = generate_latest(registry)
-        return Response(content=metrics, media_type=CONTENT_TYPE_LATEST)
-
-else:
-
-    @router.get("/processing", include_in_schema=False)
-    async def get_processing_metrics(
-        request: Request,
-        authenticated_entity: AuthenticatedEntity = Depends(
-            IdentityManagerFactory.get_auth_verifier(["read:metrics"])
-        ),
-    ):
-        registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry)
-        metrics = generate_latest(registry)
-        return Response(content=metrics, media_type=CONTENT_TYPE_LATEST)
 
 
 @router.get("")
@@ -143,10 +115,17 @@ def get_metrics(
     export += f'workflows_executions_total {{status="other"}} {workflow_execution_counts["other"]}\n'
 
     # Exporting standard application metrics (prometheus_client)
-    registry = CollectorRegistry()
-    multiprocess.MultiProcessCollector(registry)
-    # generate_latest returns bytes, so we decode to string to append to export
-    export += generate_latest(registry).decode("utf-8")
+    # Exporting standard application metrics (prometheus_client)
+    try:
+        registry = CollectorRegistry()
+        multiprocess.MultiProcessCollector(registry)
+        # generate_latest returns bytes, so we decode to string to append to export
+        export += generate_latest(registry).decode("utf-8")
+    except Exception:
+        # Fallback to default registry if multiprocess collection fails
+        # This is useful for local development or if configuration is improper
+        from prometheus_client import REGISTRY
+        export += generate_latest(REGISTRY).decode("utf-8")
 
     return Response(content=export, media_type=CONTENT_TYPE_LATEST)
 

@@ -1,7 +1,7 @@
 from auth0.authentication import GetToken
 from auth0.management import Auth0
 
-from keep.api.core.config import config
+from keep.common.core.config import config
 
 
 def getAuth0Client() -> Auth0:

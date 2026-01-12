@@ -24,7 +24,7 @@ try:
     from kubernetes.client.rest import ApiException
     from kubernetes.config import kube_config
 
-    from keep.api.models.db.topology import TopologyServiceInDto
+    from keep.common.models.db.topology import TopologyServiceInDto
     from keep.contextmanager.contextmanager import ContextManager
     from keep.providers.base.base_provider import BaseTopologyProvider
     from keep.providers.models.provider_config import ProviderConfig, ProviderScope

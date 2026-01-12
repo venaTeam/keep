@@ -8,7 +8,7 @@ import pydantic
 from socketio.exceptions import BadNamespaceError
 from uptime_kuma_api import UptimeKumaApi
 
-from keep.api.models.alert import AlertDto, AlertStatus
+from keep.common.models.alert import AlertDto, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope

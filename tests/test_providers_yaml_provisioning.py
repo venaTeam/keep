@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from sqlmodel import SQLModel
 
-from keep.api.core.db import engine
+from keep.common.core.db import engine
 from keep.providers.providers_service import ProvidersService
 
 
@@ -81,7 +81,7 @@ def test_provision_provider_from_yaml(temp_providers_dir, sample_provider_yaml, 
             patch(
                 "keep.providers.providers_service.provision_deduplication_rules"
             ) as mock_provision_rules,
-            patch("keep.api.core.db.get_all_provisioned_providers", return_value=[]),
+            patch("keep.common.core.db.get_all_provisioned_providers", return_value=[]),
             patch(
                 "keep.providers.providers_factory.ProvidersFactory.get_installed_providers",
                 return_value=[mock_provider],

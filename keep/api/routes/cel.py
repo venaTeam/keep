@@ -5,7 +5,7 @@ from celpy import CELParseError
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from keep.api.core.cel_to_sql.cel_ast_converter import CelToAstConverter
+from keep.common.core.cel_to_sql.cel_ast_converter import CelToAstConverter
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

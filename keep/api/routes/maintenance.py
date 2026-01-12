@@ -3,8 +3,8 @@ from datetime import timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from keep.api.core.db import get_session
-from keep.api.models.db.maintenance_window import (
+from keep.common.core.db import get_session
+from keep.common.models.db.maintenance_window import (
     MaintenanceRuleCreate,
     MaintenanceRuleRead,
     MaintenanceWindowRule,

@@ -9,20 +9,20 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
-from keep.api.alert_deduplicator.deduplication_rules_provisioning import (
+from keep.common.alert_deduplicator.deduplication_rules_provisioning import (
     provision_deduplication_rules,
 )
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     engine,
     existed_or_new_session,
     get_all_provisioned_providers,
     get_provider_by_name,
     get_provider_logs,
 )
-from keep.api.models.db.provider import Provider, ProviderExecutionLog
-from keep.api.models.provider import Provider as ProviderModel
-from keep.api.utils.tenant_utils import get_or_create_api_key
+from keep.common.models.db.provider import Provider, ProviderExecutionLog
+from keep.common.models.provider import Provider as ProviderModel
+from keep.common.utils.tenant_utils import get_or_create_api_key
 from keep.contextmanager.contextmanager import ContextManager
 from keep.event_subscriber.event_subscriber import EventSubscriber
 from keep.functions import cyaml
@@ -546,9 +546,10 @@ class ProvidersService:
 
             for provider_name, provider_config in env_providers.items():
                 provider_info = provider_config.get("authentication", {})
-                install_webhook_env = os.environ.get(
-                    "KEEP_PROVIDERS_INSTALL_WEBHOOKS", "true"
-                ).lower() == "true"
+                install_webhook_env = (
+                    os.environ.get("KEEP_PROVIDERS_INSTALL_WEBHOOKS", "true").lower()
+                    == "true"
+                )
                 install_webhook = provider_config.get(
                     "install_webhook", install_webhook_env
                 )
@@ -620,9 +621,12 @@ class ProvidersService:
                             provider_type = provider_yaml["type"]
                             provider_config = provider_yaml.get("authentication", {})
 
-                            install_webhook_env = os.environ.get(
-                                "KEEP_PROVIDERS_INSTALL_WEBHOOKS", "false"
-                            ).lower() == "true"
+                            install_webhook_env = (
+                                os.environ.get(
+                                    "KEEP_PROVIDERS_INSTALL_WEBHOOKS", "false"
+                                ).lower()
+                                == "true"
+                            )
                             install_webhook = provider_yaml.get(
                                 "install_webhook", install_webhook_env
                             )
@@ -668,11 +672,16 @@ class ProvidersService:
                                         provider_type=installed_provider["type"],
                                         provider_id=installed_provider["id"],
                                     )
-                                    logger.info(f"Webhook installed for {provider_name}")
+                                    logger.info(
+                                        f"Webhook installed for {provider_name}"
+                                    )
                                 except Exception as e:
                                     logger.error(
                                         "Error installing webhook for provider from directory",
-                                        extra={"provider_name": provider_name, "exception": e},
+                                        extra={
+                                            "provider_name": provider_name,
+                                            "exception": e,
+                                        },
                                     )
                             else:
                                 logger.info(

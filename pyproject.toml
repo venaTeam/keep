@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "keep"
-version = "0.47.20.0"
+version = "0.48.0.4"
 description = "Alerting. for developers, by developers."
 authors = ["Keep Alerting LTD"]
 packages = [{include = "keep"}]
@@ -26,6 +26,7 @@ validators = "0.34.0"
 python-telegram-bot = "^20.1"
 fastapi = "^0.115.6"
 uvicorn = "0.32.1"
+aiokafka = "^0.11.0"
 opsgenie-sdk = "^2.1.5"
 starlette-context = "^0.3.6"
 datadog-api-client = "^2.12.0"
@@ -57,6 +58,7 @@ google-cloud-container = "^2.32.0"
 pympler = "^1.0.1"
 prettytable = "^3.9.0"
 kafka-python = "^2.0.2"
+pyopenssl = "^24.0.0"
 opentelemetry-exporter-otlp-proto-http = "^1.20.0"
 twilio = "^8.10.0"
 azure-identity = "^1.16.1"

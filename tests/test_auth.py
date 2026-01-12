@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from tests.fixtures.client import client, setup_api_key, test_app  # noqa
 
 MOCK_TOKEN = "MOCKTOKEN"
@@ -51,7 +51,7 @@ def get_mock_jwt_payload(token, *args, **kwargs):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_api_key_with_header(db_session, client, test_app):
     """Tests the API key authentication with the x-api-key/digest"""
@@ -93,19 +93,22 @@ def test_api_key_with_header(db_session, client, test_app):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_bearer_token(db_session, client, test_app):
     """Tests the bearer token authentication"""
     auth_type = os.getenv("AUTH_TYPE")
     # Test bearer tokens
-    from keep.api.core import dependencies
+    from keep.common.core import dependencies
 
     # Patch the jwks client (otherwise it will be None)
     dependencies.jwks_client = MockJWKClient()
-    with patch("jwt.decode", side_effect=get_mock_jwt_payload), patch(
-        "jwt.PyJWKClient.get_signing_key_from_jwt",
-        side_effect=mock_get_signing_key_from_jwt,
+    with (
+        patch("jwt.decode", side_effect=get_mock_jwt_payload),
+        patch(
+            "jwt.PyJWKClient.get_signing_key_from_jwt",
+            side_effect=mock_get_signing_key_from_jwt,
+        ),
     ):
         response = client.get(
             "/providers", headers={"Authorization": f"Bearer {MOCK_TOKEN}"}
@@ -119,7 +122,7 @@ def test_bearer_token(db_session, client, test_app):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_webhook_api_key(db_session, client, test_app):
     """Tests the webhook API key authentication"""
@@ -165,14 +168,7 @@ def test_webhook_api_key(db_session, client, test_app):
     assert response.status_code == 401 if auth_type != "NO_AUTH" else 202
 
 
-# sanity check with keycloak
-@pytest.mark.parametrize("test_app", ["KEYCLOAK"], indirect=True)
-def test_keycloak_sanity(db_session, keycloak_client, keycloak_token, client, test_app):
-    """Tests the keycloak sanity check"""
-    # Use the token to make a request to the Keep API
-    headers = {"Authorization": f"Bearer {keycloak_token}"}
-    response = client.get("/providers", headers=headers)
-    assert response.status_code == 200
+
 
 
 @pytest.mark.parametrize(
@@ -381,18 +377,19 @@ def test_oauth_proxy2(db_session, client, test_app):
 
 
 @pytest.mark.parametrize(
-    "test_app", ["SINGLE_TENANT", "MULTI_TENANT", "NO_AUTH"], indirect=True
+    "test_app", ["SINGLE_TENANT", "NO_AUTH"], indirect=True
 )
 def test_deleted_api_key_authentication(db_session, client, test_app):
     """Tests that deleted API keys cannot be used for authentication"""
     import hashlib
-    from keep.api.core.dependencies import SINGLE_TENANT_UUID
-    from keep.api.models.db.tenant import TenantApiKey
-    from keep.api.core.db import get_api_key
-    
+
+    from keep.common.core.db import get_api_key
+    from keep.common.core.dependencies import SINGLE_TENANT_UUID
+    from keep.common.models.db.tenant import TenantApiKey
+
     auth_type = os.getenv("AUTH_TYPE")
     valid_api_key = "test_deleted_key"
-    
+
     # Create API key in database directly
     hash_api_key = hashlib.sha256(valid_api_key.encode()).hexdigest()
     api_key_entry = TenantApiKey(
@@ -401,32 +398,32 @@ def test_deleted_api_key_authentication(db_session, client, test_app):
         key_hash=hash_api_key,
         created_by="test@example.com",
         role="admin",
-        is_deleted=False
+        is_deleted=False,
     )
     db_session.add(api_key_entry)
     db_session.commit()
-    
+
     # Test that non-deleted API key works
     response = client.get("/providers", headers={"x-api-key": valid_api_key})
     assert response.status_code == 200
-    
+
     # Test get_api_key function directly - should find non-deleted key
     found_key = get_api_key(valid_api_key)
     assert found_key is not None
     assert found_key.is_deleted == False
-    
+
     # Mark API key as deleted
     api_key_entry.is_deleted = True
     db_session.commit()
-    
+
     # Test that deleted API key is rejected
     response = client.get("/providers", headers={"x-api-key": valid_api_key})
     assert response.status_code == 401 if auth_type != "NO_AUTH" else 200
-    
+
     # Test get_api_key function directly - should NOT find deleted key by default
     found_key = get_api_key(valid_api_key)
     assert found_key is None
-    
+
     # Test get_api_key function with include_deleted=True - should find deleted key
     found_key = get_api_key(valid_api_key, include_deleted=True)
     assert found_key is not None

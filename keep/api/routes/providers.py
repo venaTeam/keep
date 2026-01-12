@@ -9,18 +9,18 @@ from typing import Any, Callable, Dict, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
+from sqlmodel import Session, select
 from starlette.datastructures import UploadFile
 
-from keep.api.core.config import config
-from keep.api.core.db import count_alerts, get_provider_distribution, get_session
+from keep.common.core.config import config
+from keep.common.core.db import count_alerts, get_provider_distribution, get_session
 from keep.api.core.limiter import limiter
-from keep.api.models.db.provider import Provider
-from keep.api.models.provider import Provider as ProviderDTO
-from keep.api.models.provider import ProviderAlertsCountResponseDTO
-from keep.api.models.webhook import ProviderWebhookSettings
-from keep.api.utils.tenant_utils import get_or_create_api_key
+from keep.common.models.db.provider import Provider
+from keep.common.models.provider import Provider as ProviderDTO
+from keep.common.models.provider import ProviderAlertsCountResponseDTO
+from keep.common.models.webhook import ProviderWebhookSettings
+from keep.common.utils.tenant_utils import get_or_create_api_key
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_exception import ProviderException
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
@@ -350,7 +350,8 @@ def test_provider(
     # 1. provider_type and provider id is valid
     # 2. the provider config is valid
     context_manager = ContextManager(
-        tenant_id=tenant_id, workflow_id=""  # this is not in a workflow scope
+        tenant_id=tenant_id,
+        workflow_id="",  # this is not in a workflow scope
     )
     provider = ProvidersFactory.get_provider(
         context_manager, provider_id, provider_type, provider_config

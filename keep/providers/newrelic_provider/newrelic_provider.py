@@ -10,7 +10,7 @@ from datetime import datetime
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_config_exception import ProviderConfigException
 from keep.exceptions.provider_exception import ProviderException
@@ -42,7 +42,7 @@ class NewrelicProviderAuthConfig:
         metadata={
             "required": False,
             "description": "New Relic API URL",
-            "validation": "https_url"
+            "validation": "https_url",
         },
         default="https://api.newrelic.com",
     )
@@ -456,7 +456,7 @@ class NewrelicProvider(BaseProvider):
             name = event.get("title", "")
 
         logger.info("Formatted event from New Relic")
-        # TypeError: keep.api.models.alert.AlertDto() got multiple values for keyword argument 'source'"
+        # TypeError: keep.common.models.alert.AlertDto() got multiple values for keyword argument 'source'"
         if "source" in event:
             newrelic_source = event.pop("source")
 
@@ -695,7 +695,7 @@ class NewrelicProvider(BaseProvider):
                 extra={
                     "name": name,
                     "channel_id": channel_id,
-                }
+                },
             )
 
     def __add_new_worflow(

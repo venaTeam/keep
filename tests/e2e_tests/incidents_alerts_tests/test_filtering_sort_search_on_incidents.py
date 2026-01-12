@@ -1,7 +1,9 @@
-from datetime import datetime, timedelta, timezone
 import re
+from datetime import datetime, timedelta, timezone
+
 import pytest
-from playwright.sync_api import expect, Page
+from playwright.sync_api import Page, expect
+
 from tests.e2e_tests.incidents_alerts_tests.incidents_alerts_setup import (
     query_incidents,
     setup_incidents_alerts,
@@ -136,7 +138,8 @@ def test_initial_loading(browser, setup_test_data):
         incidents = setup_test_data["incidents"]
         # verify intial loading of incidents page
         init_test(browser, incidents)
-        filter_predicate = lambda alert: (alert["status"] in ["firing", "acknowledged"])
+        def filter_predicate(alert):
+            return alert["status"] in ["firing", "acknowledged"]
 
         assert_incidents_by_column(
             browser,

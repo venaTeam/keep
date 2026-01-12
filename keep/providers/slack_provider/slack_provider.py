@@ -269,10 +269,11 @@ class SlackProvider(BaseProvider):
                     payload["token"] = self.authentication_config.access_token
 
             response = requests.post(
-                f"{SlackProvider.SLACK_API}/{method}", json=payload,
+                f"{SlackProvider.SLACK_API}/{method}",
+                json=payload,
                 headers={
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {self.authentication_config.access_token}",
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {self.authentication_config.access_token}",
                 },
             )
 

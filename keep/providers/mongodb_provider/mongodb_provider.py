@@ -162,7 +162,7 @@ class MongodbProvider(BaseProvider):
         """
         if isinstance(query, str):
             query = json.loads(query)
-            
+
         client = self.__generate_client()
         database = client[self.authentication_config.database]
         results = list(database.cursor_command(query))

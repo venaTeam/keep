@@ -4,7 +4,7 @@ import logging
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-from keep.api.core.config import config
+from keep.common.core.config import config
 
 logger = logging.getLogger(__name__)
 limiter_enabled = config("KEEP_USE_LIMITER", default="false", cast=bool)

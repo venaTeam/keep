@@ -5,11 +5,11 @@ from dateutil import parser
 from dateutil.parser import ParserError
 from dotenv import load_dotenv
 
-from keep.api.consts import STATIC_PRESETS
-from keep.api.core.db import get_alerts_with_filters
-from keep.api.core.elastic import ElasticClient
-from keep.api.models.alert import AlertDto
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.consts import STATIC_PRESETS
+from keep.common.core.db import get_alerts_with_filters
+from keep.common.core.elastic import ElasticClient
+from keep.common.models.alert import AlertDto
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.searchengine.searchengine import SearchEngine
 
 load_dotenv()
@@ -92,7 +92,9 @@ if __name__ == "__main__":
     search_engine.search_alerts(preset.query)
     # get the number of alerts + noisy alerts for each preset
 
-    alerts = get_alerts_with_filters(TENANT_ID, time_delta=365, with_incidents=True)  # year ago
+    alerts = get_alerts_with_filters(
+        TENANT_ID, time_delta=365, with_incidents=True
+    )  # year ago
     print(f"Found {len(alerts)} alerts")
     alerts_dto = convert_db_alerts_to_dto_alerts(alerts, with_incidents=True)
     print(f"Converted {len(alerts_dto)} alerts")

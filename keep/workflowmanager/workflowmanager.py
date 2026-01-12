@@ -7,21 +7,21 @@ import uuid
 
 import celpy
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.config import config
+from keep.common.core.db import (
     get_enrichment,
     get_previous_alert_by_fingerprint,
     save_workflow_results,
 )
-from keep.api.core.metrics import workflow_execution_duration
-from keep.api.models.alert import AlertDto, AlertSeverity
-from keep.api.models.incident import IncidentDto
+from keep.common.core.metrics import workflow_execution_duration
+from keep.common.models.alert import AlertDto, AlertSeverity
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.cel_utils import preprocess_cel_expression
 from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes
 from keep.providers.providers_factory import ProviderConfigurationException
 from keep.workflowmanager.workflow import Workflow
 from keep.workflowmanager.workflowscheduler import WorkflowScheduler, timing_histogram
 from keep.workflowmanager.workflowstore import WorkflowStore
-from keep.api.utils.cel_utils import preprocess_cel_expression
 
 
 class WorkflowManager:
@@ -130,7 +130,6 @@ class WorkflowManager:
             },
         )
         for workflow_model in all_workflow_models:
-
             if workflow_model.is_disabled:
                 self.logger.debug(
                     f"Skipping the workflow: id={workflow_model.id}, name={workflow_model.name}, "
@@ -328,7 +327,6 @@ class WorkflowManager:
                         )
                         should_run = True
                     else:
-
                         # By default, the workflow should not run. Only if the CEL evaluates to true, the workflow will run.
                         should_run = False
 
@@ -527,8 +525,8 @@ class WorkflowManager:
                         try:
                             self.logger.info("Adding workflow to REDIS")
                             from arq import ArqRedis
-                            from keep.api.arq_pool import get_pool
-                            from keep.api.consts import KEEP_ARQ_QUEUE_WORKFLOWS
+                            from keep.common.arq_pool import get_pool
+                            from keep.common.consts import KEEP_ARQ_QUEUE_WORKFLOWS
 
                             # We need to run this asynchronously
                             async def enqueue_workflow():

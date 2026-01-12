@@ -31,29 +31,29 @@ class HttpOrHttpsUrl(str):
     def validate(cls, v):
         if not isinstance(v, str):
             raise TypeError("string required")
-        
+
         import re
         from urllib.parse import urlparse
-        
+
         v = v.strip()
         if not v:
             raise ValueError("URL cannot be empty")
-        
+
         # Basic URL structure check
         try:
             parsed = urlparse(v)
         except Exception as e:
             raise ValueError(f"Invalid URL format: {str(e)}")
-        
+
         # Must have http or https scheme
         if parsed.scheme not in ("http", "https"):
             raise ValueError("URL must use http:// or https:// scheme")
-        
+
         # Extract host from netloc (handles port numbers)
         netloc = parsed.netloc
         if not netloc:
             raise ValueError("URL must have a host")
-        
+
         # Remove port if present
         if ":" in netloc:
             # Handle IPv6 addresses in brackets
@@ -73,14 +73,14 @@ class HttpOrHttpsUrl(str):
                 host = netloc[1:-1]
             else:
                 host = netloc
-        
+
         if not host:
             raise ValueError("URL must have a valid host")
-        
+
         # Allow localhost variants
         if host.lower() in ("localhost", "127.0.0.1", "::1"):
             return cls(v)
-        
+
         # Allow IPv4 addresses
         ipv4_pattern = r"^(\d{1,3}\.){3}\d{1,3}$"
         if re.match(ipv4_pattern, host):
@@ -91,7 +91,7 @@ class HttpOrHttpsUrl(str):
                     return cls(v)
             except ValueError:
                 pass
-        
+
         # Allow IPv6 addresses (basic check - contains colons and valid hex)
         if ":" in host:
             # Remove brackets if present
@@ -99,7 +99,7 @@ class HttpOrHttpsUrl(str):
             # Basic IPv6 validation - contains colons and hex characters
             if re.match(r"^[0-9a-fA-F:]+$", ipv6_host):
                 return cls(v)
-        
+
         # For domain names, try to validate with HttpUrl (which requires TLD)
         # If it fails, we still allow it if it looks like a valid domain
         try:
@@ -111,8 +111,10 @@ class HttpOrHttpsUrl(str):
             domain_pattern = r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
             if re.match(domain_pattern, host):
                 return cls(v)
-            raise ValueError(f"Invalid host: {host}. Must be a valid domain, IP address, or localhost")
-        
+            raise ValueError(
+                f"Invalid host: {host}. Must be a valid domain, IP address, or localhost"
+            )
+
         return cls(v)
 
 

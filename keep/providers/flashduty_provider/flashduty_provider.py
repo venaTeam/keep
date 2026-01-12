@@ -1,4 +1,5 @@
 import dataclasses
+
 import pydantic
 import requests
 
@@ -7,12 +8,13 @@ from keep.exceptions.provider_exception import ProviderException
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig
 
+
 @pydantic.dataclasses.dataclass
 class FlashdutyProviderAuthConfig:
     """Flashduty authentication configuration."""
 
     integration_key: str = dataclasses.field(
-        metadata= {
+        metadata={
             "required": True,
             "description": "Flashduty integration key",
             "sensitive": True,
@@ -48,7 +50,7 @@ class FlashdutyProvider(BaseProvider):
         event_status: str = "",
         description: str = "",
         alert_key: str = "",
-        labels: dict = {}
+        labels: dict = {},
     ):
         """
         Create incident Flashduty using the Flashduty API
@@ -81,7 +83,9 @@ class FlashdutyProvider(BaseProvider):
             "Content-Type": "application/json",
         }
         resp = requests.post(
-            url=f"https://api.flashcat.cloud/event/push/alert/standard?integration_key={self.authentication_config.integration_key}", json=body, headers=headers
+            url=f"https://api.flashcat.cloud/event/push/alert/standard?integration_key={self.authentication_config.integration_key}",
+            json=body,
+            headers=headers,
         )
         assert resp.status_code == 200
         self.logger.info("Alert message notified to Flashduty")
@@ -117,4 +121,3 @@ if __name__ == "__main__":
         alert_key="1234567890",
         labels={"service": "10.10.10.10"},
     )
-

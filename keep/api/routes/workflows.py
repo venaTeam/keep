@@ -19,31 +19,35 @@ from fastapi.responses import RedirectResponse
 from opentelemetry import trace
 from sqlmodel import Session
 
-from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.config import config
+from keep.common.core.db import (
     get_alert_by_event_id,
     get_installed_providers,
     get_last_workflow_workflow_to_alert_executions,
     get_or_create_dummy_workflow,
     get_session,
-    get_workflow_by_id as get_workflow_by_id_db,
     get_workflow_version,
     get_workflow_versions,
+)
+from keep.common.core.db import (
+    get_workflow_by_id as get_workflow_by_id_db,
+)
+from keep.common.core.db import get_workflow_executions as get_workflow_executions_db
+from keep.common.core.db import (
     update_workflow_by_id as update_workflow_by_id_db,
 )
-from keep.api.core.db import get_workflow_executions as get_workflow_executions_db
-from keep.api.core.workflows import (
+from keep.common.core.workflows import (
     get_workflow_facets,
     get_workflow_facets_data,
     get_workflow_potential_facet_fields,
 )
-from keep.api.models.alert import AlertDto, AlertSeverity
-from keep.api.models.db.incident import IncidentSeverity
-from keep.api.models.facet import FacetOptionsQueryDto
-from keep.api.models.incident import IncidentDto
-from keep.api.models.query import QueryDto
-from keep.api.models.workflow import (
+from keep.common.models.alert import AlertDto, AlertSeverity
+from keep.common.models.db.incident import IncidentSeverity
+from keep.common.models.facet import FacetOptionsQueryDto
+from keep.common.models.incident import IncidentDto
+from keep.common.models.query import QueryDto
+from keep.common.models.workflow import (
     WorkflowCreateOrUpdateDTO,
     WorkflowDTO,
     WorkflowExecutionDTO,
@@ -54,8 +58,8 @@ from keep.api.models.workflow import (
     WorkflowVersionDTO,
     WorkflowVersionListDTO,
 )
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
-from keep.api.utils.pagination import WorkflowExecutionsPaginatedResultsDto
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.utils.pagination import WorkflowExecutionsPaginatedResultsDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.functions import cyaml
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity

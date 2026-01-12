@@ -8,7 +8,7 @@ from datetime import timedelta
 import pytest
 from freezegun import freeze_time
 
-from keep.api.models.alert import AlertStatus
+from keep.common.models.alert import AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.keep_provider.keep_provider import KeepProvider
 from keep.searchengine.searchengine import SearchEngine
@@ -937,7 +937,7 @@ def test_cel_equality_int_str_type_coercion(db_session):
     """
     Reproduce the bug: CEL 'field == "2"' should match payload {"field": 2} and vice versa.
     """
-    from keep.api.models.alert import AlertDto
+    from keep.common.models.alert import AlertDto
     from keep.rulesengine.rulesengine import RulesEngine
 
     # Case 1: field is int, CEL checks for string
@@ -975,9 +975,9 @@ def test_check_if_rule_apply_int_str_type_coercion(db_session):
     """
     from datetime import datetime
 
-    from keep.api.core.dependencies import SINGLE_TENANT_UUID
-    from keep.api.models.alert import AlertDto
-    from keep.api.models.db.rule import Rule
+    from keep.common.core.dependencies import SINGLE_TENANT_UUID
+    from keep.common.models.alert import AlertDto
+    from keep.common.models.db.rule import Rule
     from keep.rulesengine.rulesengine import RulesEngine
 
     # Create a test rule with CEL expression that checks for string equality with int payload
@@ -1001,9 +1001,9 @@ def test_check_if_rule_apply_int_str_type_coercion(db_session):
     alert1 = AlertDto(id="a1", name="test", field=2, fingerprint="fp1", source=["test"])
     matched_rules1 = engine._check_if_rule_apply(rule, alert1)
     print(f"Case 1 - field=2, CEL='field == \"2\"': matched_rules={matched_rules1}")
-    assert (
-        len(matched_rules1) == 1
-    ), "Rule with 'field == \"2\"' should match alert with field=2"
+    assert len(matched_rules1) == 1, (
+        "Rule with 'field == \"2\"' should match alert with field=2"
+    )
 
     # Case 2: field is string ("2"), CEL checks for int (2) - should match
     rule2 = Rule(
@@ -1025,9 +1025,9 @@ def test_check_if_rule_apply_int_str_type_coercion(db_session):
     )
     matched_rules2 = engine._check_if_rule_apply(rule2, alert2)
     print(f"Case 2 - field='2', CEL='field == 2': matched_rules={matched_rules2}")
-    assert (
-        len(matched_rules2) == 1
-    ), "Rule with 'field == 2' should match alert with field='2'"
+    assert len(matched_rules2) == 1, (
+        "Rule with 'field == 2' should match alert with field='2'"
+    )
 
     # Case 3: field is int (2), CEL checks for int (2) - should match
     rule3 = Rule(
@@ -1047,9 +1047,9 @@ def test_check_if_rule_apply_int_str_type_coercion(db_session):
     alert3 = AlertDto(id="a3", name="test", field=2, fingerprint="fp3", source=["test"])
     matched_rules3 = engine._check_if_rule_apply(rule3, alert3)
     print(f"Case 3 - field=2, CEL='field == 2': matched_rules={matched_rules3}")
-    assert (
-        len(matched_rules3) == 1
-    ), "Rule with 'field == 2' should match alert with field=2"
+    assert len(matched_rules3) == 1, (
+        "Rule with 'field == 2' should match alert with field=2"
+    )
 
     # Case 4: field is string ("2"), CEL checks for string ("2") - should match
     rule4 = Rule(
@@ -1071,6 +1071,6 @@ def test_check_if_rule_apply_int_str_type_coercion(db_session):
     )
     matched_rules4 = engine._check_if_rule_apply(rule4, alert4)
     print(f"Case 4 - field='2', CEL='field == \"2\"': matched_rules={matched_rules4}")
-    assert (
-        len(matched_rules4) == 1
-    ), "Rule with 'field == \"2\"' should match alert with field='2'"
+    assert len(matched_rules4) == 1, (
+        "Rule with 'field == \"2\"' should match alert with field='2'"
+    )

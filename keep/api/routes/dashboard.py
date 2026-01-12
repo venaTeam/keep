@@ -8,17 +8,19 @@ import requests
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from keep.api.core.db import (
-    create_dashboard as create_dashboard_db,
-    get_provider_distribution,
-    get_incidents_created_distribution,
-    get_combined_workflow_execution_distribution,
+from keep.common.core.db import (
     calc_incidents_mttr,
+    get_combined_workflow_execution_distribution,
+    get_incidents_created_distribution,
+    get_provider_distribution,
 )
-from keep.api.core.db import delete_dashboard as delete_dashboard_db
-from keep.api.core.db import get_dashboards as get_dashboards_db
-from keep.api.core.db import update_dashboard as update_dashboard_db
-from keep.api.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
+from keep.common.core.db import (
+    create_dashboard as create_dashboard_db,
+)
+from keep.common.core.db import delete_dashboard as delete_dashboard_db
+from keep.common.core.db import get_dashboards as get_dashboards_db
+from keep.common.core.db import update_dashboard as update_dashboard_db
+from keep.common.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 from keep.providers.providers_factory import ProvidersFactory
@@ -198,34 +200,32 @@ def get_ticket_count(
     Returns the count from the provider's count_url endpoint.
     """
     tenant_id = authenticated_entity.tenant_id
-    
+
     installed_providers = ProvidersFactory.get_installed_providers(
         tenant_id, include_details=True
     )
-    
+
     ticket_count_provider = None
     for provider in installed_providers:
         if provider.type == "ticket_count":
             ticket_count_provider = provider
             break
-    
+
     if not ticket_count_provider:
-        raise HTTPException(
-            status_code=404, detail="ticket_count provider not found"
-        )
-    
+        raise HTTPException(status_code=404, detail="ticket_count provider not found")
+
     ticket_url = ticket_count_provider.details.get("authentication", {}).get(
         "count_url"
     )
-    
+
     if not ticket_url:
         raise HTTPException(
             status_code=400,
             detail="ticket_count provider missing count_url configuration",
         )
-    
+
     try:
-        from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
+        from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
         params: dict[str, str] = {}
         if team:
@@ -244,7 +244,7 @@ def get_ticket_count(
         response = requests.get(composed_url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        
+
         try:
             if isinstance(data, dict) and "Team not found" in data:
                 return data

@@ -1,83 +1,77 @@
 import base64
-import concurrent.futures
 import hashlib
 import hmac
 import json
 import logging
 import os
-import time
-from concurrent.futures import Future, ThreadPoolExecutor
 from copy import deepcopy
 from typing import List, Optional
 
 import celpy
-from arq import ArqRedis
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from pusher import Pusher
 from sqlalchemy_utils import UUIDType
 from sqlmodel import Session
 
-from keep.api.arq_pool import get_pool
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.consts import KEEP_ARQ_QUEUE_BASIC
-from keep.api.core.alerts import (
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.alerts import (
     get_alert_facets,
     get_alert_facets_data,
     get_alert_potential_facet_fields,
     query_last_alerts,
 )
-from keep.api.core.cel_to_sql.sql_providers.base import CelToSqlException
-from keep.api.core.config import config
-from keep.api.core.db import dismiss_error_alerts as dismiss_error_alerts_db
-from keep.api.core.db import enrich_alerts_with_incidents
-from keep.api.core.db import get_alert_audit as get_alert_audit_db
-from keep.api.core.db import (
+from keep.common.core.metrics import (
+    alert_ingestion_error_total,
+    alert_ingestion_total,
+)
+from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
+from keep.common.core.db import dismiss_error_alerts as dismiss_error_alerts_db
+from keep.common.core.db import (
+    enrich_alerts_with_incidents,
     get_alerts_by_fingerprint,
     get_alerts_by_ids,
     get_alerts_metrics_by_provider,
     get_enrichment,
-    get_session,
-)
-from keep.api.core.db import get_error_alerts as get_error_alerts_db
-from keep.api.core.db import (
     get_last_alerts,
     get_last_alerts_by_fingerprints,
-    get_provider_by_name,
     get_session,
     is_all_alerts_resolved,
 )
-from keep.api.core.dependencies import extract_generic_body, get_pusher_client
-from keep.api.core.elastic import ElasticClient
-from keep.api.core.metrics import running_tasks_by_process_gauge, running_tasks_gauge
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import (
+from keep.common.core.db import get_alert_audit as get_alert_audit_db
+from keep.common.core.db import get_error_alerts as get_error_alerts_db
+from keep.common.core.dependencies import (
+    extract_generic_body,
+    get_event_producer,
+    get_pusher_client,
+)
+from keep.common.core.elastic import ElasticClient
+from keep.common.core.messaging import EventProducer
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import (
     AlertDto,
     AlertErrorDto,
     AlertStatus,
-    BatchEnrichAlertRequestBody,
     AssignAlertRequestBody,
+    BatchEnrichAlertRequestBody,
     DeleteRequestBody,
     DismissAlertRequest,
     EnrichAlertNoteRequestBody,
     EnrichAlertRequestBody,
     UnEnrichAlertRequestBody,
 )
-from keep.api.models.alert_audit import AlertAuditDto
-from keep.api.models.db.incident import IncidentStatus
-from keep.api.models.db.rule import ResolveOn
-from keep.api.models.facet import FacetOptionsQueryDto
-from keep.api.models.query import QueryDto
-from keep.api.models.search_alert import SearchAlertsRequest
-from keep.api.models.time_stamp import TimeStampFilter
+from keep.common.models.alert_audit import AlertAuditDto
+from keep.common.models.db.incident import IncidentStatus
+from keep.common.models.db.rule import ResolveOn
+from keep.common.models.facet import FacetOptionsQueryDto
+from keep.common.models.query import QueryDto
+from keep.common.models.search_alert import SearchAlertsRequest
+from keep.common.models.time_stamp import TimeStampFilter
 from keep.api.routes.preset import pull_data_from_providers
-from keep.api.tasks.process_event_task import process_event
-
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
-from keep.api.utils.time_stamp_helpers import get_time_stamp_filter
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.utils.time_stamp_helpers import get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
-from keep.providers.providers_factory import ProvidersFactory
 from keep.searchengine.searchengine import SearchEngine
 from keep.workflowmanager.workflowmanager import WorkflowManager
 
@@ -85,12 +79,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 REDIS = os.environ.get("REDIS", "false") == "true"
-EVENT_WORKERS = int(config("KEEP_EVENT_WORKERS", default=5, cast=int))
 
-# Create dedicated threadpool
-process_event_executor = ThreadPoolExecutor(
-    max_workers=EVENT_WORKERS, thread_name_prefix="process_event_worker"
-)
 
 
 @router.post(
@@ -109,7 +98,6 @@ def fetch_alert_facet_options(
         "Fetching alert facets from DB",
         extra={
             "tenant_id": tenant_id,
-            
         },
     )
 
@@ -219,10 +207,7 @@ def query_alerts(
     tenant_id = authenticated_entity.tenant_id
     logger.info(
         "Fetching alerts from DB",
-        extra={
-            "tenant_id": tenant_id,
-            "cel_expression": query.cel
-        },
+        extra={"tenant_id": tenant_id, "cel_expression": query.cel},
     )
 
     try:
@@ -415,7 +400,6 @@ def assign_alert(
         },
     )
 
-
     logger.info(
         "Assigning alert",
         extra={
@@ -425,7 +409,7 @@ def assign_alert(
             "assignee": user_email,
         },
     )
-    
+
     # If the user wants to dispose the assignment on new alert, we need to add a disposable enrichment
     dispose_on_new_alert = False
     note = None
@@ -472,92 +456,8 @@ def assign_alert(
         )
     return {"status": "ok"}
 
-def discard_future(
-    trace_id: str,
-    future: Future,
-    running_tasks: set,
-    started_time: float,
-):
-    try:
-        running_tasks.discard(future)
-        running_tasks_gauge.dec()
-        running_tasks_by_process_gauge.labels(pid=os.getpid()).dec()
-
-        # Log any exception that occurred in the future
-        try:
-            exception = future.exception()
-            if exception:
-                logger.error(
-                    "Task failed with exception",
-                    extra={
-                        "trace_id": trace_id,
-                        "error": str(exception),
-                        "processing_time": time.time() - started_time,
-                    },
-                )
-            else:
-                logger.info(
-                    "Task completed",
-                    extra={
-                        "processing_time": time.time() - started_time,
-                        "trace_id": trace_id,
-                    },
-                )
-        except concurrent.futures.CancelledError:
-            logger.error(
-                "Task was cancelled",
-                extra={
-                    "trace_id": trace_id,
-                    "processing_time": time.time() - started_time,
-                },
-            )
-
-    except Exception:
-        # Make sure we always decrement both counters even if something goes wrong
-        running_tasks_gauge.dec()
-        running_tasks_by_process_gauge.labels(pid=os.getpid()).dec()
-        logger.exception(
-            "Error in discard_future callback",
-            extra={
-                "trace_id": trace_id,
-            },
-        )
 
 
-def create_process_event_task(
-    tenant_id: str,
-    provider_type: str | None,
-    provider_id: str | None,
-    fingerprint: str,
-    api_key_name: str | None,
-    trace_id: str,
-    event: AlertDto | list[AlertDto] | dict,
-    running_tasks: set,
-) -> str:
-    logger.info("Adding task", extra={"trace_id": trace_id})
-    started_time = time.time()
-    running_tasks_gauge.inc()  # Increase total counter
-    running_tasks_by_process_gauge.labels(
-        pid=os.getpid()
-    ).inc()  # Increase process counter
-    future = process_event_executor.submit(
-        process_event,
-        {},  # ctx
-        tenant_id,
-        provider_type,
-        provider_id,
-        fingerprint,
-        api_key_name,
-        trace_id,
-        event,
-    )
-    running_tasks.add(future)
-    future.add_done_callback(
-        lambda task: discard_future(trace_id, task, running_tasks, started_time)
-    )
-
-    logger.info("Task added", extra={"trace_id": trace_id})
-    return str(id(future))
 
 
 @router.post(
@@ -574,6 +474,7 @@ async def receive_generic_event(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:alert"])
     ),
+    event_producer: EventProducer = Depends(get_event_producer),
 ):
     """
     A generic webhook endpoint that can be used by any provider to send alerts to Keep.
@@ -583,40 +484,30 @@ async def receive_generic_event(
         bg_tasks (BackgroundTasks): Background tasks handler.
         tenant_id (str, optional): Defaults to Depends(verify_api_key).
     """
-    running_tasks: set = request.state.background_tasks
-    if REDIS:
-        redis: ArqRedis = await get_pool()
-        job = await redis.enqueue_job(
-            "process_event_in_worker",
-            authenticated_entity.tenant_id,
-            None,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            request.state.trace_id,
-            event,
-            _queue_name=KEEP_ARQ_QUEUE_BASIC,
+    # Use the abstract event producer (Redis or Kafka)
+    try:
+        task_name = await event_producer.produce(
+            event=event,
+            tenant_id=authenticated_entity.tenant_id,
+            provider_type=None,  # Generic event
+            provider_id=provider_id,
+            fingerprint=fingerprint,
+            api_key_name=authenticated_entity.api_key_name,
+            trace_id=request.state.trace_id,
+            provider_name=None,
         )
-        logger.info(
-            "Enqueued job",
-            extra={
-                "job_id": job.job_id,
-                "tenant_id": authenticated_entity.tenant_id,
-                "queue": KEEP_ARQ_QUEUE_BASIC,
-            },
-        )
-        task_name = job.job_id
-    else:
-        task_name = create_process_event_task(
-            authenticated_entity.tenant_id,
-            None,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            request.state.trace_id,
-            event,
-            running_tasks,
-        )
+        alert_ingestion_total.labels(source="generic", status="success").inc()
+    except Exception as e:
+        alert_ingestion_error_total.labels(
+            source="generic", error_type=type(e).__name__
+        ).inc()
+        raise
+    except Exception:
+        raise
+
+    if not task_name:
+        task_name = "async-task"
+
     return JSONResponse(content={"task_name": task_name}, status_code=202)
 
 
@@ -662,87 +553,30 @@ async def receive_event(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:alert"])
     ),
+    event_producer: EventProducer = Depends(get_event_producer),
 ) -> dict[str, str]:
     trace_id = request.state.trace_id
-    running_tasks: set = request.state.background_tasks
-    provider_class = None
-    try:
-        t = time.time()
-        logger.debug(f"Getting provider class for {provider_type}")
-        provider_class = ProvidersFactory.get_provider_class(provider_type)
-        logger.debug(
-            "Got provider class",
-            extra={
-                "provider_type": provider_type,
-                "time": time.time() - t,
-            },
-        )
-    except ModuleNotFoundError:
-        raise HTTPException(
-            status_code=400, detail=f"Provider {provider_type} not found"
-        )
-    if not provider_class:
-        raise HTTPException(
-            status_code=400, detail=f"Provider {provider_type} not found"
-        )
+    # If provider_name is provided, we pass it to the worker to resolve it
+    # We do NOT parse the event here anymore, we pass the raw body (event) to the worker
+    # We do NOT resolve the provider here anymore, we pass the provider_name to the worker
 
-    # Parse the raw body
-    t = time.time()
-    logger.debug("Parsing event raw body")
-    try:
-        event = provider_class.parse_event_raw_body(event)
-    except Exception:
-        logger.exception(
-            "Failed to parse event raw body",
-            extra={"tenant_id": authenticated_entity.tenant_id, "event": event},
-        )
-        raise HTTPException(status_code=400, detail="Malformed event")
-    logger.debug("Parsed event raw body", extra={"time": time.time() - t})
+    # Use the abstract event producer (Redis or Kafka)
+    task_name = await event_producer.produce(
+        event=event,
+        tenant_id=authenticated_entity.tenant_id,
+        provider_type=provider_type,
+        provider_id=provider_id,
+        fingerprint=fingerprint,
+        api_key_name=authenticated_entity.api_key_name,
+        trace_id=trace_id,
+        provider_name=provider_name,
+    )
+    alert_ingestion_total.labels(source=provider_type, status="success").inc()
 
-    # If provider_name is provided, try to get provider_id from it
-    if provider_name and not provider_id:
-        provider = get_provider_by_name(authenticated_entity.tenant_id, provider_name)
-        if not provider or provider.type != provider_type:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Provider with name '{provider_name}' not found",
-            )
 
-        provider_id = provider.id
+    if not task_name:
+        task_name = "async-task"
 
-    if REDIS:
-        redis: ArqRedis = await get_pool()
-        job = await redis.enqueue_job(
-            "process_event_in_worker",
-            authenticated_entity.tenant_id,
-            provider_type,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            trace_id,
-            event,
-            _queue_name=KEEP_ARQ_QUEUE_BASIC,
-        )
-        logger.info(
-            "Enqueued job",
-            extra={
-                "job_id": job.job_id,
-                "tenant_id": authenticated_entity.tenant_id,
-                "queue": KEEP_ARQ_QUEUE_BASIC,
-            },
-        )
-        task_name = job.job_id
-    else:
-        task_name = create_process_event_task(
-            authenticated_entity.tenant_id,
-            provider_type,
-            provider_id,
-            fingerprint,
-            authenticated_entity.api_key_name,
-            trace_id,
-            event,
-            running_tasks,
-        )
     return JSONResponse(content={"task_name": task_name}, status_code=202)
 
 
@@ -771,7 +605,7 @@ def get_alert(
     )
     if not db_alerts:
         raise HTTPException(status_code=404, detail="Alert not found")
-    
+
     enriched_alerts_dto = convert_db_alerts_to_dto_alerts(db_alerts)
     return enriched_alerts_dto[0]
 
@@ -911,7 +745,9 @@ def batch_enrich_alerts(
 
         if enrichments.get("status") == AlertStatus.RESOLVED.value:
             for fingerprint in fingerprints:
-                enrichment_bl.make_enrichments_permanent(fingerprint, dispose_keys=["assignees"])
+                enrichment_bl.make_enrichments_permanent(
+                    fingerprint, dispose_keys=["assignees"]
+                )
 
         enrichment_bl.batch_enrich(
             fingerprints=fingerprints,
@@ -1079,7 +915,9 @@ def _enrich_alert(
         enrichments = deepcopy(enrich_data.enrichments)
 
         if enrichments.get("status") == AlertStatus.RESOLVED.value:
-            enrichement_bl.make_enrichments_permanent(enrich_data.fingerprint, dispose_keys=["assignees"])
+            enrichement_bl.make_enrichments_permanent(
+                enrich_data.fingerprint, dispose_keys=["assignees"]
+            )
 
         enrichment_kwargs = {
             "fingerprint": enrich_data.fingerprint,

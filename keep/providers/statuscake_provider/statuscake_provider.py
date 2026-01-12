@@ -9,7 +9,7 @@ from urllib.parse import urlencode, urljoin
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
@@ -340,7 +340,6 @@ class StatuscakeProvider(BaseProvider):
 
         alert_dtos = []
         for alert in response:
-
             if alert.get("status").lower() == "up":
                 status = AlertStatus.RESOLVED
             else:

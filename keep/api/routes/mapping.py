@@ -6,17 +6,17 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.db import get_session
-from keep.api.models.db.enrichment_event import EnrichmentEventWithLogs
-from keep.api.models.db.mapping import (
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.db import get_session
+from keep.common.models.db.enrichment_event import EnrichmentEventWithLogs
+from keep.common.models.db.mapping import (
     MappingRule,
     MappingRuleDtoIn,
     MappingRuleDtoOut,
     MappingRuleUpdateDtoIn,
 )
-from keep.api.models.db.topology import TopologyService
-from keep.api.utils.pagination import EnrichmentEventPaginatedResultsDto
+from keep.common.models.db.topology import TopologyService
+from keep.common.utils.pagination import EnrichmentEventPaginatedResultsDto
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

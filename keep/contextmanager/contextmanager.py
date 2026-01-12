@@ -6,10 +6,10 @@ import click
 import json5
 from pympler.asizeof import asizeof
 
-from keep.api.core.config import config
-from keep.api.core.db import get_last_workflow_execution_by_workflow_id, get_session
-from keep.api.models.alert import AlertDto
-from keep.api.models.incident import IncidentDto
+from keep.common.core.config import config
+from keep.common.core.db import get_last_workflow_execution_by_workflow_id, get_session
+from keep.common.models.alert import AlertDto
+from keep.common.models.incident import IncidentDto
 
 
 class ForeachContext(TypedDict):
@@ -94,7 +94,7 @@ class ContextManager:
     @property
     def api_key(self):
         # avoid circular import
-        from keep.api.utils.tenant_utils import get_or_create_api_key
+        from keep.common.utils.tenant_utils import get_or_create_api_key
 
         if self._api_key is None:
             session = next(get_session())

@@ -6,7 +6,7 @@ import pytest
 import pytz
 from fastapi import HTTPException
 
-from keep.api.core.db import (
+from keep.common.core.db import (
     assign_alert_to_incident,
     create_incident_from_dict,
     get_all_provisioned_workflows,
@@ -14,21 +14,21 @@ from keep.api.core.db import (
     get_last_workflow_execution_by_workflow_id,
     get_workflow_execution,
 )
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertStatus, AlertSeverity
-from keep.api.models.db.incident import Incident, IncidentStatus
-from keep.api.models.db.workflow import Workflow
-from keep.api.models.incident import IncidentDto
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.incident import Incident, IncidentStatus
+from keep.common.models.db.workflow import Workflow
+from keep.common.models.incident import IncidentDto
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identity_managers.db.db_authverifier import (  # noqa
     DbAuthVerifier,
 )
-from tests.fixtures.client import client, test_app  # noqa
 from keep.workflowmanager.workflowstore import WorkflowStore
+from tests.fixtures.client import client, test_app  # noqa
 from tests.fixtures.workflow_manager import (
-    workflow_manager,
     wait_for_workflow_execution,
+    workflow_manager,
 )
 
 MAX_WAIT_FOR_WORKFLOW_EXECUTION_COUNT = 30
@@ -1163,7 +1163,9 @@ def test_alert_routing_policy(
                     # support both list and dict
                     expected_message in json.dumps(result)
                     for result in workflow_execution.results[action_name]
-                ), f"Expected message '{expected_message}' not found in {action_name} results"
+                ), (
+                    f"Expected message '{expected_message}' not found in {action_name} results"
+                )
 
 
 workflow_definition_nested = """workflow:
@@ -1334,7 +1336,9 @@ def test_nested_conditional_flow(
                 assert any(
                     expected_message in json.dumps(result)
                     for result in workflow_execution.results[action_name]
-                ), f"Expected message '{expected_message}' not found in {action_name} results"
+                ), (
+                    f"Expected message '{expected_message}' not found in {action_name} results"
+                )
 
 
 workflow_resolve_definition = """workflow:
@@ -1360,7 +1364,6 @@ workflow_resolve_definition = """workflow:
 
 
 def test_alert_resolved(db_session, create_alert, workflow_manager):
-
     # Create the current alert
     create_alert("fp1", AlertStatus.FIRING, datetime.now(tz=pytz.utc), {})
 

@@ -3,13 +3,13 @@ AxiomProvider is a class that allows to ingest/digest data from Axiom.
 """
 
 import dataclasses
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto
+from keep.common.models.alert import AlertDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig
@@ -129,7 +129,6 @@ class AxiomProvider(BaseProvider):
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> AlertDto | list[AlertDto]:
-
         action = event.get("action", "Unable to fetch action")
         axiom_event = event.get("event")
         monitorId = axiom_event.get("monitorID")

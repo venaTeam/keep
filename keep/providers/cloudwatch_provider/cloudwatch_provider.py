@@ -17,8 +17,8 @@ import boto3
 import pydantic
 import requests
 
-from keep.api.core.config import config as keep_config
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.core.config import config as keep_config
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider, ProviderHealthMixin
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
@@ -687,9 +687,9 @@ class CloudwatchProvider(BaseProvider, ProviderHealthMixin):
                 target[param_parts[-1]] = choices[param_index]
 
         # Set StateChangeTime to current time
-        simulated_alert["Message"][
-            "StateChangeTime"
-        ] = datetime.datetime.now().isoformat()
+        simulated_alert["Message"]["StateChangeTime"] = (
+            datetime.datetime.now().isoformat()
+        )
 
         # Provider expects all keys as string
         for key in simulated_alert:

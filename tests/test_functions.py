@@ -7,10 +7,10 @@ import pytz
 from freezegun import freeze_time
 
 import keep.functions as functions
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import AlertStatus
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import AlertStatus
 from keep.iohandler.iohandler import IOHandler
 
 
@@ -41,9 +41,9 @@ from keep.iohandler.iohandler import IOHandler
     ],
 )
 def test_functions_diff(test_description, given, expected):
-    assert (
-        functions.diff(given) == expected
-    ), f"{test_description}: Expected {given} to return {expected}"
+    assert functions.diff(given) == expected, (
+        f"{test_description}: Expected {given} to return {expected}"
+    )
 
 
 def test_keep_add_function():
@@ -68,6 +68,7 @@ def test_keep_mul_function():
     """
     assert functions.mul(1, 2) == 2
     assert functions.mul(1, 2, 3) == 6
+
 
 def test_keep_mul_function_with_zero():
     """

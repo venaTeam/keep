@@ -1,4 +1,5 @@
 import time
+from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -12,7 +13,6 @@ from tests.e2e_tests.incidents_alerts_tests.incidents_alerts_setup import (
 )
 from tests.e2e_tests.test_end_to_end import init_e2e_test, setup_console_listener
 from tests.e2e_tests.utils import get_token, save_failure_artifacts
-from copy import deepcopy
 
 
 def multi_sort(data, criteria):
@@ -447,7 +447,7 @@ def test_multi_sort_asc_dsc(
         raise
     # data-testid="header-cell-tags.customerName"
     browser.locator(
-        f"[data-testid='alerts-table'] table thead th [data-testid='header-cell-tags.customerName']",
+        "[data-testid='alerts-table'] table thead th [data-testid='header-cell-tags.customerName']",
         has_text=coumn_name,
     ).click()
     print("ff")
@@ -465,7 +465,7 @@ def test_multi_sort_asc_dsc(
         )
 
         column_header_locator = browser.locator(
-            f"[data-testid='alerts-table'] table thead th [data-testid='header-cell-tags.alertIndex']",
+            "[data-testid='alerts-table'] table thead th [data-testid='header-cell-tags.alertIndex']",
             has_text=coumn_name,
         )
         expect(column_header_locator).to_be_visible()
@@ -523,7 +523,9 @@ def test_alerts_stream(browser: Page, setup_page_logging, failure_artifacts):
     try:
         # refresh the page to get the new alerts
         browser.reload()
-        browser.wait_for_selector("[data-testid='facet-value']", timeout=30000)  # Increase timeout from 10s to 30s
+        browser.wait_for_selector(
+            "[data-testid='facet-value']", timeout=30000
+        )  # Increase timeout from 10s to 30s
 
         # Add retry logic for checking alert count
         max_retries = 5
@@ -534,11 +536,17 @@ def test_alerts_stream(browser: Page, setup_page_logging, failure_artifacts):
                     print(f"Retry {retry}/{max_retries} for alert count check")
                     time.sleep(5)
                     browser.reload()
-                    browser.wait_for_selector("[data-testid='facet-value']", timeout=30000)
+                    browser.wait_for_selector(
+                        "[data-testid='facet-value']", timeout=30000
+                    )
 
                 # Check if alerts are visible
-                alert_count = browser.locator("[data-testid='alerts-table'] table tbody tr").count()
-                print(f"Current alert count: {alert_count}, expected: {len(simulated_alerts)}")
+                alert_count = browser.locator(
+                    "[data-testid='alerts-table'] table tbody tr"
+                ).count()
+                print(
+                    f"Current alert count: {alert_count}, expected: {len(simulated_alerts)}"
+                )
 
                 if alert_count == len(simulated_alerts):
                     break

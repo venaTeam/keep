@@ -13,8 +13,8 @@ import pydantic
 import requests
 from packaging.version import Version
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.topology import TopologyServiceInDto
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.topology import TopologyServiceInDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import (
     BaseProvider,
@@ -197,9 +197,9 @@ class GrafanaProvider(BaseTopologyProvider, ProviderHealthMixin):
             )
             error = response.json()
             if response.status_code == 403:
-                error[
-                    "message"
-                ] += f"\nYou can test your permissions with \n\tcurl -H 'Authorization: Bearer {{token}}' -X GET '{self.authentication_config.host}/api/access-control/user/permissions' | jq \nDocs: https://grafana.com/docs/grafana/latest/administration/service-accounts/#debug-the-permissions-of-a-service-account-token"
+                error["message"] += (
+                    f"\nYou can test your permissions with \n\tcurl -H 'Authorization: Bearer {{token}}' -X GET '{self.authentication_config.host}/api/access-control/user/permissions' | jq \nDocs: https://grafana.com/docs/grafana/latest/administration/service-accounts/#debug-the-permissions-of-a-service-account-token"
+                )
             raise GetAlertException(message=error, status_code=response.status_code)
         return response.json()
 
@@ -247,7 +247,7 @@ class GrafanaProvider(BaseTopologyProvider, ProviderHealthMixin):
         if fingerprint:
             logger.debug("Fingerprint provided in alert")
             return fingerprint
-        
+
         labels = alert.get("labels", {})
         fingerprint = labels.get("fingerprint", "")
         if fingerprint:
@@ -456,12 +456,12 @@ class GrafanaProvider(BaseTopologyProvider, ProviderHealthMixin):
                 webhook["settings"]["authorization_scheme"] = "digest"
                 webhook["settings"]["authorization_credentials"] = api_key
                 requests.put(
-                    f'{contacts_api}/{webhook["uid"]}',
+                    f"{contacts_api}/{webhook['uid']}",
                     verify=False,
                     json=webhook,
                     headers=headers,
                 )
-                self.logger.info(f'Updated webhook {webhook["uid"]}')
+                self.logger.info(f"Updated webhook {webhook['uid']}")
             else:
                 self.logger.info('Creating webhook with name "{webhook_name}"')
                 webhook = {
@@ -490,12 +490,12 @@ class GrafanaProvider(BaseTopologyProvider, ProviderHealthMixin):
                 webhook = webhook_exists[0]
                 webhook["settings"]["url"] = f"{keep_api_url}&api_key={api_key}"
                 requests.put(
-                    f'{contacts_api}/{webhook["uid"]}',
+                    f"{contacts_api}/{webhook['uid']}",
                     verify=False,
                     json=webhook,
                     headers=headers,
                 )
-                self.logger.info(f'Updated webhook {webhook["uid"]}')
+                self.logger.info(f"Updated webhook {webhook['uid']}")
             else:
                 self.logger.info('Creating webhook with name "{webhook_name}"')
                 webhook = {
@@ -1158,7 +1158,7 @@ class GrafanaProvider(BaseTopologyProvider, ProviderHealthMixin):
                                 history_alerts.append(alert_dto)
                             except Exception as e:
                                 self.logger.error(
-                                    f"Error processing event {i+1}",
+                                    f"Error processing event {i + 1}",
                                     extra={"event": event, "error": str(e)},
                                 )
 

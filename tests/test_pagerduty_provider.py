@@ -2,7 +2,7 @@ import json
 import os
 import unittest
 
-from keep.api.models.db.incident import IncidentSeverity, IncidentStatus
+from keep.common.models.db.incident import IncidentSeverity, IncidentStatus
 from keep.providers.pagerduty_provider.pagerduty_provider import PagerdutyProvider
 
 

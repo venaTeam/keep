@@ -4,7 +4,7 @@ import requests
 from posthog import Posthog
 from importlib import metadata
 
-from keep.api.core.db import get_or_creat_posthog_instance_id
+from keep.common.core.db import get_or_creat_posthog_instance_id
 
 try:
     KEEP_VERSION = metadata.version("keep")

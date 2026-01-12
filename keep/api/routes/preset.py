@@ -14,16 +14,16 @@ from fastapi import (
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-from keep.api.consts import PROVIDER_PULL_INTERVAL_MINUTE, STATIC_PRESETS
-from keep.api.core.db import get_db_preset_by_name
-from keep.api.core.db import get_presets as get_presets_db
-from keep.api.core.db import (
+from keep.common.consts import PROVIDER_PULL_INTERVAL_MINUTE, STATIC_PRESETS
+from keep.common.core.db import (
+    get_db_preset_by_name,
     get_session,
     update_preset_options,
     update_provider_last_pull_time,
 )
-from keep.api.models.alert import AlertDto
-from keep.api.models.db.preset import (
+from keep.common.core.db import get_presets as get_presets_db
+from keep.common.models.alert import AlertDto
+from keep.common.models.db.preset import (
     Preset,
     PresetDto,
     PresetOption,
@@ -31,10 +31,10 @@ from keep.api.models.db.preset import (
     Tag,
     TagDto,
 )
-from keep.api.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
-from keep.api.tasks.process_event_task import process_event
-from keep.api.tasks.process_incident_task import process_incident
-from keep.api.tasks.process_topology_task import process_topology
+from keep.common.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
+from keep.common.event_management.process_event_task import process_event
+from keep.common.event_management.process_incident_task import process_incident
+from keep.common.event_management.process_topology_task import process_topology
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 from keep.providers.base.base_provider import BaseIncidentProvider, BaseTopologyProvider
@@ -438,7 +438,6 @@ def get_preset_alerts(
         IdentityManagerFactory.get_auth_verifier(["read:presets"])
     ),
 ) -> list:
-
     # Gathering alerts may take a while and we don't care if it will finish before we return the response.
     # In the worst case, gathered alerts will be pulled in the next request.
 
@@ -616,7 +615,7 @@ def update_preset_column_config(
 ) -> PresetDto:
     tenant_id = authenticated_entity.tenant_id
     logger.info("Updating preset column configuration", extra={"preset_id": preset_id})
-    
+
     statement = (
         select(Preset)
         .where(Preset.tenant_id == tenant_id)
@@ -628,52 +627,47 @@ def update_preset_column_config(
 
     # Get current options and remove any existing column config options
     current_options = [
-        option for option in preset.options 
-        if option.get("label", "").lower() not in [
-            "column_visibility", 
-            "column_order", 
-            "column_rename_mapping", 
-            "column_time_formats", 
-            "column_list_formats"
+        option
+        for option in preset.options
+        if option.get("label", "").lower()
+        not in [
+            "column_visibility",
+            "column_order",
+            "column_rename_mapping",
+            "column_time_formats",
+            "column_list_formats",
         ]
     ]
 
     # Add new column configuration options
     if body.column_visibility:
-        current_options.append({
-            "label": "column_visibility",
-            "value": body.column_visibility
-        })
-    
+        current_options.append(
+            {"label": "column_visibility", "value": body.column_visibility}
+        )
+
     if body.column_order:
-        current_options.append({
-            "label": "column_order", 
-            "value": body.column_order
-        })
-    
+        current_options.append({"label": "column_order", "value": body.column_order})
+
     if body.column_rename_mapping:
-        current_options.append({
-            "label": "column_rename_mapping",
-            "value": body.column_rename_mapping
-        })
-    
+        current_options.append(
+            {"label": "column_rename_mapping", "value": body.column_rename_mapping}
+        )
+
     if body.column_time_formats:
-        current_options.append({
-            "label": "column_time_formats",
-            "value": body.column_time_formats
-        })
-    
+        current_options.append(
+            {"label": "column_time_formats", "value": body.column_time_formats}
+        )
+
     if body.column_list_formats:
-        current_options.append({
-            "label": "column_list_formats",
-            "value": body.column_list_formats
-        })
+        current_options.append(
+            {"label": "column_list_formats", "value": body.column_list_formats}
+        )
 
     # Update the preset options
     preset.options = current_options
     session.commit()
     session.refresh(preset)
-    
+
     logger.info("Updated preset column configuration", extra={"preset_id": preset_id})
     return PresetDto(**preset.to_dict())
 
@@ -691,7 +685,7 @@ def get_preset_column_config(
 ) -> ColumnConfigurationDto:
     tenant_id = authenticated_entity.tenant_id
     logger.info("Getting preset column configuration", extra={"preset_id": preset_id})
-    
+
     statement = (
         select(Preset)
         .where(Preset.tenant_id == tenant_id)
@@ -702,7 +696,7 @@ def get_preset_column_config(
         raise HTTPException(404, "Preset not found")
 
     preset_dto = PresetDto(**preset.to_dict())
-    
+
     return ColumnConfigurationDto(
         column_visibility=preset_dto.column_visibility,
         column_order=preset_dto.column_order,

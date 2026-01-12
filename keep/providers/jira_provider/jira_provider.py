@@ -305,7 +305,10 @@ class JiraProvider(BaseProvider):
             )
 
     def __transition_issue(
-            self, issue_id: str, transition_name: Optional[str] = None, transition_id: Optional[str] = None
+        self,
+        issue_id: str,
+        transition_name: Optional[str] = None,
+        transition_id: Optional[str] = None,
     ):
         """
         Transition an issue to a new status.
@@ -583,7 +586,9 @@ class JiraProvider(BaseProvider):
 
                 # Apply transition if requested
                 if transition_to:
-                    self.logger.info(f"Applying transition '{transition_to}' to issue {issue_id}")
+                    self.logger.info(
+                        f"Applying transition '{transition_to}' to issue {issue_id}"
+                    )
                     transition_result = self.__transition_issue(
                         issue_id=issue_id, transition_name=transition_to
                     )
@@ -614,7 +619,9 @@ class JiraProvider(BaseProvider):
             # Apply transition if requested (on newly created issue)
             if transition_to:
                 created_issue_id = result["issue"]["key"]
-                self.logger.info(f"Applying transition '{transition_to}' to newly created issue {created_issue_id}")
+                self.logger.info(
+                    f"Applying transition '{transition_to}' to newly created issue {created_issue_id}"
+                )
                 transition_result = self.__transition_issue(
                     issue_id=created_issue_id, transition_name=transition_to
                 )
@@ -702,5 +709,5 @@ if __name__ == "__main__":
         issue_id=result["issue"]["key"],
         summary="Test Alert - Updated",
         description="Alert has been resolved",
-        transition_to="Done"
+        transition_to="Done",
     )

@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from keep.api.models.user import Group
+from keep.common.models.user import Group
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

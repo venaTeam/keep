@@ -8,7 +8,7 @@ import typing
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto
+from keep.common.models.alert import AlertDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig
@@ -186,10 +186,9 @@ class MailgunProvider(BaseProvider):
 
         # Use custom domain from config, env var, or default
         email_domain = (
-            self.authentication_config.email_domain 
-            or MailgunProvider.MAILGUN_DOMAIN
+            self.authentication_config.email_domain or MailgunProvider.MAILGUN_DOMAIN
         )
-        
+
         email = f"{tenant_id}-{self.provider_id}@{email_domain}"
         expression = f'match_recipient("{email}")'
 
@@ -245,10 +244,7 @@ class MailgunProvider(BaseProvider):
         # We receive FormData here, convert it to simple dict.
         logger.info(
             "Received alert from mail",
-            extra={
-                "from": event["from"],
-                "subject": event.get("subject")
-            },
+            extra={"from": event["from"], "subject": event.get("subject")},
         )
         event = dict(event)
 

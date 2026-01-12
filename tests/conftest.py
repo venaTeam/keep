@@ -12,28 +12,32 @@ import mysql.connector
 import pytest
 import requests
 from dotenv import find_dotenv, load_dotenv
+from playwright.sync_api import Page
 from pytest_docker.plugin import get_docker_services
 from sqlalchemy import event, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 from starlette_context import context, request_cycle_context
-from playwright.sync_api import Page
+import tempfile
+
+# Ensure PROMETHEUS_MULTIPROC_DIR is set before any keep imports
+if "PROMETHEUS_MULTIPROC_DIR" not in os.environ:
+    os.environ["PROMETHEUS_MULTIPROC_DIR"] = tempfile.mkdtemp(prefix="prometheus_multiproc_")
 
 # This import is required to create the tables
-from keep.api.bl.maintenance_windows_bl import MaintenanceWindowsBl
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.elastic import ElasticClient
-from keep.api.models.alert import AlertStatus
-from keep.api.models.db.alert import *
-from keep.api.models.db.maintenance_window import MaintenanceWindowRule
-from keep.api.models.db.provider import *
-from keep.api.models.db.rule import *
-from keep.api.models.db.tenant import *
-from keep.api.models.db.user import *
-from keep.api.models.db.workflow import *
-from keep.api.tasks.process_event_task import process_event
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.elastic import ElasticClient
+from keep.common.models.alert import AlertStatus
+from keep.common.models.db.alert import *
+from keep.common.models.db.maintenance_window import MaintenanceWindowRule
+from keep.common.models.db.provider import *
+from keep.common.models.db.rule import *
+from keep.common.models.db.tenant import *
+from keep.common.models.db.user import *
+from keep.common.models.db.workflow import *
+from keep.common.event_management.process_event_task import process_event
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.contextmanager.contextmanager import ContextManager
 
 original_request = requests.Session.request  # noqa
@@ -41,7 +45,6 @@ load_dotenv(find_dotenv())
 
 
 class PusherMock:
-
     def __init__(self):
         self.triggers = []
 
@@ -50,7 +53,6 @@ class PusherMock:
 
 
 class WorkflowManagerMock:
-
     def __init__(self):
         self.events = []
 
@@ -62,7 +64,6 @@ class WorkflowManagerMock:
 
 
 class ElasticClientMock:
-
     def __init__(self):
         self.alerts = []
         self.tenant_id = None
@@ -101,10 +102,7 @@ def setup_prometheus_multiproc_dir(tmp_path_factory):
     """
     Sets up the PROMETHEUS_MULTIPROC_DIR environment variable for the session.
     """
-    # Create a temporary directory specific for prometheus multiproc
-    prom_dir = tmp_path_factory.mktemp("prometheus_multiproc")
-    os.environ["PROMETHEUS_MULTIPROC_DIR"] = str(prom_dir)
-    return str(prom_dir)
+    return os.environ["PROMETHEUS_MULTIPROC_DIR"]
 
 
 
@@ -320,13 +318,14 @@ actions:
     session.add_all(workflow_data)
     session.commit()
 
-    with patch("keep.api.core.db.engine", mock_engine):
-        with patch("keep.api.core.db_utils.create_db_engine", return_value=mock_engine):
-            with patch("keep.api.core.alerts.engine", mock_engine):
+    with patch("keep.common.core.db.engine", mock_engine):
+        with patch("keep.common.core.db_utils.create_db_engine", return_value=mock_engine):
+            with patch("keep.common.core.alerts.engine", mock_engine):
                 yield session
 
     import logging
-    from keep.api.logging import WorkflowDBHandler
+
+    from keep.common.logging import WorkflowDBHandler
 
     # Close WorkflowDBHandler to stop background thread before dropping tables
     root_logger = logging.getLogger()
@@ -454,7 +453,6 @@ def elastic_container(docker_ip, docker_services):
 
 @pytest.fixture
 def elastic_client(request):
-
     if hasattr(request, "param") and request.param is False:
         yield None
     else:
@@ -667,7 +665,6 @@ def setup_alerts(elastic_client, db_session, request):
 
 @pytest.fixture
 def setup_stress_alerts_no_elastic(db_session):
-
     def _setup_stress_alerts_no_elastic(num_alerts):
         alert_details = [
             {
@@ -778,6 +775,7 @@ def create_alert(db_session):
 
     return _create_alert
 
+
 @pytest.fixture
 def create_window_maintenance_active(db_session):
     def _create_window_maintenance_active(
@@ -800,14 +798,17 @@ def create_window_maintenance_active(db_session):
             cel_query=cel,
             enabled=True,
             suppress=True,
-            ignore_statuses=[AlertStatus.RESOLVED.value, AlertStatus.ACKNOWLEDGED.value],
-
+            ignore_statuses=[
+                AlertStatus.RESOLVED.value,
+                AlertStatus.ACKNOWLEDGED.value,
+            ],
         )
         db_session.add(window)
         db_session.commit()
         return window
 
     return _create_window_maintenance_active
+
 
 @pytest.fixture
 def finalize_window_maintenance(db_session):
@@ -827,6 +828,7 @@ def finalize_window_maintenance(db_session):
         db_session.refresh(rule)
 
     return _finalize_window_maintenance
+
 
 def pytest_addoption(parser):
     """

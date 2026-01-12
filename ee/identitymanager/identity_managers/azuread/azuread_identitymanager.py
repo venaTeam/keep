@@ -1,7 +1,7 @@
 from ee.identitymanager.identity_managers.azuread.azuread_authverifier import (
     AzureadAuthVerifier,
 )
-from keep.api.models.user import User
+from keep.common.models.user import User
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.identity_managers.db.db_identitymanager import (
     DbIdentityManager,

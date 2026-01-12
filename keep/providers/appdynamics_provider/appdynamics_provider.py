@@ -13,7 +13,7 @@ import pydantic
 import requests
 from dateutil import parser
 
-from keep.api.models.alert import AlertDto, AlertSeverity
+from keep.common.models.alert import AlertDto, AlertSeverity
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
@@ -50,7 +50,7 @@ class AppdynamicsProviderAuthConfig:
             "required": True,
             "description": "AppDynamics host",
             "hint": "e.g. https://baseball202404101029219.saas.appdynamics.com",
-            "validation": "any_http_url"
+            "validation": "any_http_url",
         },
     )
 

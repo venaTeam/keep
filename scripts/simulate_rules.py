@@ -3,7 +3,7 @@
 import logging
 import os
 
-from keep.api.core.db import create_rule, get_api_key
+from keep.common.core.db import create_rule, get_api_key
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

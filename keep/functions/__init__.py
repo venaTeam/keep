@@ -13,9 +13,9 @@ import pytz
 from dateutil import parser
 from dateutil.parser import ParserError
 
-from keep.api.core.db import get_alerts_by_fingerprint
-from keep.api.models.alert import AlertStatus
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.db import get_alerts_by_fingerprint
+from keep.common.models.alert import AlertStatus
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 
 logger = logging.getLogger(__name__)
 

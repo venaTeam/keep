@@ -1,3 +1,1 @@
 """Ticket Count provider package."""
-
-

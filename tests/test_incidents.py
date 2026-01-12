@@ -1,5 +1,5 @@
-from datetime import UTC, datetime, timedelta
 import importlib
+from datetime import UTC, datetime, timedelta
 from itertools import cycle
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
@@ -8,11 +8,10 @@ import pytest
 from fastapi import HTTPException
 from sqlalchemy import and_, desc, distinct, func
 
-import keep.api.consts
-
-from keep.api.bl.incidents_bl import IncidentBl
-from keep.api.bl.maintenance_windows_bl import MaintenanceWindowsBl
-from keep.api.core.db import (
+import keep.common.consts
+from keep.common.bl.incidents_bl import IncidentBl
+from keep.common.bl.maintenance_windows_bl import MaintenanceWindowsBl
+from keep.common.core.db import (
     IncidentSorting,
     add_alerts_to_incident,
     create_incident_from_dict,
@@ -20,26 +19,25 @@ from keep.api.core.db import (
     get_alerts_data_for_incident,
     get_incident_alerts_by_incident_id,
     get_incident_by_id,
-    get_incidents_count,
     get_last_incidents,
     merge_incidents_to_id,
     remove_alerts_to_incident_by_incident_id,
 )
-from keep.api.core.db_utils import get_json_extract_field
-from keep.api.core.dependencies import SINGLE_TENANT_EMAIL, SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.alert import (
+from keep.common.core.db_utils import get_json_extract_field
+from keep.common.core.dependencies import SINGLE_TENANT_EMAIL, SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertSeverity, AlertStatus
+from keep.common.models.db.alert import (
     NULL_FOR_DELETED_AT,
     Alert,
     Incident,
     LastAlertToIncident,
 )
-from keep.api.models.db.incident import IncidentSeverity, IncidentStatus
-from keep.api.models.db.mapping import MappingRule
-from keep.api.models.db.rule import CreateIncidentOn, ResolveOn, Rule
-from keep.api.models.db.tenant import Tenant
-from keep.api.models.incident import IncidentDto, IncidentDtoIn
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.models.db.incident import IncidentSeverity, IncidentStatus
+from keep.common.models.db.mapping import MappingRule
+from keep.common.models.db.rule import CreateIncidentOn, ResolveOn, Rule
+from keep.common.models.db.tenant import Tenant
+from keep.common.models.incident import IncidentDto, IncidentDtoIn
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.rbac import Admin
 from keep.rulesengine.rulesengine import RulesEngine
@@ -234,7 +232,6 @@ def test_add_remove_alert_to_incidents(db_session, setup_stress_alerts_no_elasti
 
 
 def test_get_last_incidents(db_session, create_alert):
-
     severity_cycle = cycle([s.order for s in IncidentSeverity])
     status_cycle = cycle(
         [
@@ -286,8 +283,7 @@ def test_get_last_incidents(db_session, create_alert):
         )
 
     incidents_candidates, incidents_candidates_count = get_last_incidents(
-        SINGLE_TENANT_UUID,
-        is_candidate=True
+        SINGLE_TENANT_UUID, is_candidate=True
     )
     assert len(incidents_candidates) == 0
     assert incidents_candidates_count == 0
@@ -329,7 +325,10 @@ def test_get_last_incidents(db_session, create_alert):
     # Test sorting
 
     incidents_sorted_by_severity, _ = get_last_incidents(
-        SINGLE_TENANT_UUID, is_candidate=False, sorting=IncidentSorting.severity, limit=5
+        SINGLE_TENANT_UUID,
+        is_candidate=False,
+        sorting=IncidentSorting.severity,
+        limit=5,
     )
     assert all(
         [i.severity == IncidentSeverity.LOW.order for i in incidents_sorted_by_severity]
@@ -379,7 +378,6 @@ def test_get_last_incidents(db_session, create_alert):
 def test_incident_status_change(
     db_session, client, test_app, setup_stress_alerts_no_elastic
 ):
-
     alerts = setup_stress_alerts_no_elastic(100)
     incident = create_incident_from_dict(
         "keep", {"name": "test", "description": "test"}
@@ -628,9 +626,7 @@ def test_add_alerts_with_same_fingerprint_to_incident(db_session, create_alert):
     assert len(incident_alerts) == 0
     assert total_incident_alerts == 0
 
-    add_alerts_to_incident(
-        SINGLE_TENANT_UUID, incident, [fp1_alerts[0].fingerprint]
-    )
+    add_alerts_to_incident(SINGLE_TENANT_UUID, incident, [fp1_alerts[0].fingerprint])
 
     incident = get_incident_by_id(SINGLE_TENANT_UUID, incident.id)
 
@@ -1075,7 +1071,6 @@ def test_split_incident_app(db_session, client, test_app, create_alert):
 
 
 def test_cross_tenant_exposure_issue_2768(db_session, create_alert):
-
     tenant_data = [
         Tenant(id="tenant_1", name="test-tenant-1", created_by="tests-1@keephq.dev"),
         Tenant(id="tenant_2", name="test-tenant-2", created_by="tests-2@keephq.dev"),
@@ -1113,12 +1108,8 @@ def test_cross_tenant_exposure_issue_2768(db_session, create_alert):
         db_session.query(Alert).filter(Alert.tenant_id == "tenant_2").first()
     )
 
-    add_alerts_to_incident(
-        "tenant_1", incident_tenant_1, [alert_tenant_1.fingerprint]
-    )
-    add_alerts_to_incident(
-        "tenant_2", incident_tenant_2, [alert_tenant_2.fingerprint]
-    )
+    add_alerts_to_incident("tenant_1", incident_tenant_1, [alert_tenant_1.fingerprint])
+    add_alerts_to_incident("tenant_2", incident_tenant_2, [alert_tenant_2.fingerprint])
 
     incident_tenant_1 = get_incident_by_id("tenant_1", incident_tenant_1.id)
     incident_tenant_1_alerts, total_incident_tenant_1_alerts = (
@@ -1144,11 +1135,10 @@ def test_cross_tenant_exposure_issue_2768(db_session, create_alert):
 
 
 def test_incident_bl_create_incident(db_session):
-
     pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
             tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
         )
@@ -1217,7 +1207,7 @@ def test_incident_bl_update_incident(db_session):
     pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
             tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
         )
@@ -1281,7 +1271,7 @@ def test_incident_bl_delete_incident(db_session):
     pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
             tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
         )
@@ -1339,8 +1329,8 @@ async def test_incident_bl_add_alert_to_incident(db_session, create_alert):
     workflow_manager = WorkflowManagerMock()
     elastic_client = ElasticClientMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
-        with patch("keep.api.bl.incidents_bl.ElasticClient", elastic_client):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
+        with patch("keep.common.bl.incidents_bl.ElasticClient", elastic_client):
             incident_bl = IncidentBl(
                 tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
             )
@@ -1417,8 +1407,8 @@ async def test_incident_bl_delete_alerts_from_incident(db_session, create_alert)
     workflow_manager = WorkflowManagerMock()
     elastic_client = ElasticClientMock()
 
-    with patch("keep.api.bl.incidents_bl.WorkflowManager", workflow_manager):
-        with patch("keep.api.bl.incidents_bl.ElasticClient", elastic_client):
+    with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
+        with patch("keep.common.bl.incidents_bl.ElasticClient", elastic_client):
             incident_bl = IncidentBl(
                 tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
             )
@@ -1709,15 +1699,15 @@ async def test_incident_timestamps_based_on_alert_last_received(
 
 
 @pytest.mark.asyncio
-def test_incident_auto_resolve_without_rule( db_session, create_alert):
-
+def test_incident_auto_resolve_without_rule(db_session, create_alert):
     incident = create_incident_from_dict(
-        SINGLE_TENANT_UUID, {
+        SINGLE_TENANT_UUID,
+        {
             "user_generated_name": "test",
             "user_summary": "test",
             "resolve_on": ResolveOn.ALL.value,
         },
-        session=db_session
+        session=db_session,
     )
 
     create_alert(
@@ -1750,16 +1740,16 @@ def test_incident_auto_resolve_without_rule( db_session, create_alert):
 
 @pytest.mark.asyncio
 def test_incident_auto_resolve_only_if_active(db_session, create_alert):
-
     def create_incident_with_status(status: IncidentStatus):
         return create_incident_from_dict(
-            SINGLE_TENANT_UUID, {
+            SINGLE_TENANT_UUID,
+            {
                 "user_generated_name": "test",
                 "user_summary": "test",
                 "resolve_on": ResolveOn.ALL.value,
-                "status": status.value
+                "status": status.value,
             },
-            session=db_session
+            session=db_session,
         )
 
     firing_incident = create_incident_with_status(IncidentStatus.FIRING)
@@ -1778,19 +1768,28 @@ def test_incident_auto_resolve_only_if_active(db_session, create_alert):
     alerts = db_session.query(Alert).all()
     assert len(alerts) == 1
 
-    for incident in [firing_incident, acknowledged_incident, resolved_incident, deleted_incident, merged_incident]:
+    for incident in [
+        firing_incident,
+        acknowledged_incident,
+        resolved_incident,
+        deleted_incident,
+        merged_incident,
+    ]:
         add_alerts_to_incident(
             SINGLE_TENANT_UUID, incident, [alerts[0].fingerprint], session=db_session
         )
 
-    with patch("keep.api.tasks.process_event_task.IncidentBl.resolve_incident_if_require") as incident_bl_mock:
+    with patch(
+        "keep.common.event_management.process_event_task.IncidentBl.resolve_incident_if_require"
+    ) as incident_bl_mock:
         create_alert(
             "alert-test",
             AlertStatus.RESOLVED,
             datetime.utcnow(),
             {"severity": AlertSeverity.CRITICAL.value},
         )
-        assert incident_bl_mock.call_count == 2 # firing and acknowledged
+        assert incident_bl_mock.call_count == 2  # firing and acknowledged
+
 
 def test_incident_not_created_maintenance(
     db_session,
@@ -1809,9 +1808,9 @@ def test_incident_not_created_maintenance(
     """
     # GIVEN The strategy is block_alert_by_maintenance_window
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
-    #AND A rule matching by Source
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
+    # AND A rule matching by Source
     correlation_rule = Rule(
         tenant_id=SINGLE_TENANT_UUID,
         name="Rule-test",
@@ -1831,37 +1830,41 @@ def test_incident_not_created_maintenance(
     db_session.add(correlation_rule)
     db_session.commit()
     db_session.refresh(correlation_rule)
-    #AND A Maintenance Window matching by Source
+    # AND A Maintenance Window matching by Source
     maintenance_w = create_window_maintenance_active(
         start=datetime.now(UTC) - timedelta(hours=3),
         end=datetime.now(UTC) + timedelta(hours=1),
-        cel='source == "test-source"'
+        cel='source == "test-source"',
     )
-    #AND An alert come in from Maintenance Window with Firing
+    # AND An alert come in from Maintenance Window with Firing
     create_alert(
         "test-fingerprint",
         AlertStatus.FIRING,
         datetime.now(UTC) - timedelta(hours=1),
-        {"severity": AlertSeverity.INFO.value,
-        "lastReceived": (datetime.now(UTC) - timedelta(hours=1)).isoformat(),
-        "source": ["test-source"]},
+        {
+            "severity": AlertSeverity.INFO.value,
+            "lastReceived": (datetime.now(UTC) - timedelta(hours=1)).isoformat(),
+            "source": ["test-source"],
+        },
         tenant_id=SINGLE_TENANT_UUID,
     )
-    #AND An alert received in the same Maintenance Window with Resolved
+    # AND An alert received in the same Maintenance Window with Resolved
     create_alert(
         "test-fingerprint",
         AlertStatus.RESOLVED,
         datetime.now(UTC) - timedelta(hours=1),
-        {"severity": AlertSeverity.INFO.value,
-        "lastReceived": (datetime.now(UTC) - timedelta(hours=1)).isoformat(),
-        "source": ["test-source"]},
+        {
+            "severity": AlertSeverity.INFO.value,
+            "lastReceived": (datetime.now(UTC) - timedelta(hours=1)).isoformat(),
+            "source": ["test-source"],
+        },
         tenant_id=SINGLE_TENANT_UUID,
     )
-    #AND an expired window
+    # AND an expired window
     finalize_window_maintenance(maintenance_w.id)
-    #WHEN The recover strategy is checked
+    # WHEN The recover strategy is checked
     MaintenanceWindowsBl.recover_strategy(logger=MagicMock(), session=db_session)
-    #THEN its creation is refuse because of the Firing has been already closed by the Resolved.
+    # THEN its creation is refuse because of the Firing has been already closed by the Resolved.
     _, total = get_last_incidents(
         tenant_id=SINGLE_TENANT_UUID, with_alerts=True, is_candidate=False
     )
@@ -1883,13 +1886,13 @@ def test_create_incident_after_maintenance_window(
     """
     # GIVEN The source not allowed to create incidents
     monkeypatch.setenv("MAINTENANCE_WINDOW_STRATEGY", "recover_previous_status")
-    importlib.reload(keep.api.consts)
-    importlib.reload(keep.api.bl.maintenance_windows_bl)
+    importlib.reload(keep.common.consts)
+    importlib.reload(keep.common.bl.maintenance_windows_bl)
     # AND A Maintenance Window matching by Source
     maintenance_w = create_window_maintenance_active(
         start=datetime.now(UTC) - timedelta(hours=3),
         end=datetime.now(UTC) + timedelta(hours=1),
-        cel='source == "test-source"'
+        cel='source == "test-source"',
     )
     # AND A rule matching by Source
     correlation_rule = Rule(
@@ -1919,7 +1922,7 @@ def test_create_incident_after_maintenance_window(
         {
             "severity": AlertSeverity.INFO.value,
             "lastReceived": (datetime.now(UTC) - timedelta(hours=1)).isoformat(),
-            "source": ["test-source"]
+            "source": ["test-source"],
         },
         tenant_id=SINGLE_TENANT_UUID,
     )
@@ -1933,4 +1936,4 @@ def test_create_incident_after_maintenance_window(
         tenant_id=SINGLE_TENANT_UUID, with_alerts=True, is_candidate=False
     )
     assert total == 1
-    assert incidents[total-1].user_generated_name == "Rule-test-after-mw"
+    assert incidents[total - 1].user_generated_name == "Rule-test-after-mw"

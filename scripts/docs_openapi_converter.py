@@ -1,6 +1,6 @@
-from argparse import ArgumentParser
-import typing as t
 import json
+import typing as t
+from argparse import ArgumentParser
 
 Json = dict[str | t.Literal["anyOf", "type"], "Json"] | list["Json"] | str | bool
 
@@ -48,8 +48,8 @@ def convert_3_dot_1_to_3_dot_0(json: dict[str, Json]):
     inner(json)
     return json
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     parser = ArgumentParser(
         description="Script for converting openapi version 3.1.0 to 3.0.2"
     )

@@ -1,5 +1,6 @@
-import json
 import dataclasses
+import json
+
 import pydantic
 from anthropic import Anthropic
 
@@ -88,8 +89,8 @@ class AnthropicProvider(BaseProvider):
 
 
 if __name__ == "__main__":
-    import os
     import logging
+    import os
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
     context_manager = ContextManager(

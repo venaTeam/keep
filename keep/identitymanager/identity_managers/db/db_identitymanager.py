@@ -4,12 +4,12 @@ import jwt
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-from keep.api.core.db import create_user as create_user_in_db
-from keep.api.core.db import delete_user as delete_user_from_db
-from keep.api.core.db import get_user
-from keep.api.core.db import get_users as get_users_from_db
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.user import User
+from keep.common.core.db import create_user as create_user_in_db
+from keep.common.core.db import delete_user as delete_user_from_db
+from keep.common.core.db import get_user
+from keep.common.core.db import get_users as get_users_from_db
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.user import User
 from keep.contextmanager.contextmanager import ContextManager
 from keep.identitymanager.identity_managers.db.db_authverifier import DbAuthVerifier
 from keep.identitymanager.identitymanager import BaseIdentityManager

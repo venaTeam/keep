@@ -4,8 +4,8 @@ from typing import Optional
 from fastapi import Request
 from fastapi.security import HTTPAuthorizationCredentials
 
-from keep.api.core.db import get_api_key
-from keep.api.core.dependencies import SINGLE_TENANT_EMAIL, SINGLE_TENANT_UUID
+from keep.common.core.db import get_api_key
+from keep.common.core.dependencies import SINGLE_TENANT_EMAIL, SINGLE_TENANT_UUID
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase
 from keep.identitymanager.rbac import Admin as AdminRole
@@ -47,7 +47,6 @@ class NoAuthVerifier(AuthVerifierBase):
         api_key: str,
         authorization: Optional[HTTPAuthorizationCredentials],
     ) -> AuthenticatedEntity:
-
         tenant_api_key = get_api_key(api_key)
         # this is ok, since we are in noauth mode
         if not tenant_api_key:

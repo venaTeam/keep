@@ -1,0 +1,142 @@
+version: "3"
+services:
+  keep-frontend:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-frontend
+
+  keep-backend:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-backend
+    environment:
+      - MESSAGING_TYPE=KAFKA
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS=false
+      - KEEP_OTEL_ENABLED=true
+      - KAFKA_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_SASL_MECHANISM=SCRAM-SHA-256
+      - KAFKA_SASL_USERNAME=admin
+      - KAFKA_SASL_PASSWORD=admin
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  keep-event-handler:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-event-handler
+    environment:
+      - MESSAGING_TYPE=KAFKA
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS=false
+      - KEEP_OTEL_ENABLED=true
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
+      - KAFKA_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_SASL_MECHANISM=SCRAM-SHA-256
+      - KAFKA_SASL_USERNAME=admin
+      - KAFKA_SASL_PASSWORD=admin
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  keep-websocket-server:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-websocket-server
+
+  postgres:
+    extends:
+      file: docker-compose-lite.yml
+      service: postgres
+
+  keep-arq-redis:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-arq-redis
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_PLAINTEXT_HOST:SASL_PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://kafka:9092,SASL_PLAINTEXT_HOST://localhost:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: SASL_PLAINTEXT
+      KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 60000
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 60000
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf -Dzookeeper.sasl.client=false"
+      KAFKA_LOG4J_LOGGERS: "org.apache.zookeeper=DEBUG"
+    volumes:
+      - ./kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf
+    healthcheck:
+      test: nc -z localhost 9092 || exit 1
+      start_period: 20s
+      interval: 5s
+      retries: 10
+
+  kafka-setup:
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: >
+      bash -c "
+        echo 'Waiting for Kafka to be ready...'
+        cub kafka-ready -b kafka:9092 1 20
+        echo 'Creating admin user...'
+        kafka-configs --zookeeper zookeeper:2181 --alter --add-config 'SCRAM-SHA-256=[password=admin]' --entity-type users --entity-name admin
+        echo 'Done!'
+      "
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter
+    command: [ "--kafka.server=kafka:9092", "--sasl.enabled", "--sasl.mechanism=SCRAM-SHA256", "--sasl.username=admin", "--sasl.password=admin" ]
+    # Note: kafka-exporter might need updated flags or config for SASL/SCRAM
+    # command: [ "--kafka.server=kafka:9092" ]
+    ports:
+      - "9308:9308"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus-kafka.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    depends_on:
+      - kafka-exporter
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:

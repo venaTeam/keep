@@ -1,0 +1,80 @@
+version: "3"
+services:
+  keep-frontend:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-frontend
+
+  keep-backend:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-backend
+    environment:
+      - MESSAGING_TYPE=KAFKA
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_SASL_MECHANISM=PLAIN
+      - KAFKA_SASL_USERNAME=admin
+      - KAFKA_SASL_PASSWORD=admin
+    depends_on:
+      - kafka
+
+  keep-event-handler:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-event-handler
+    environment:
+      - MESSAGING_TYPE=KAFKA
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_SASL_MECHANISM=PLAIN
+      - KAFKA_SASL_USERNAME=admin
+      - KAFKA_SASL_PASSWORD=admin
+    depends_on:
+      - kafka
+
+  keep-websocket-server:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-websocket-server
+
+  postgres:
+    extends:
+      file: docker-compose-lite.yml
+      service: postgres
+
+  keep-arq-redis:
+    extends:
+      file: docker-compose-lite.yml
+      service: keep-arq-redis
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    volumes:
+      - ./kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://kafka:9092,SASL_PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_PLAINTEXT_HOST:SASL_PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: SASL_PLAINTEXT
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_PLAINTEXT
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf"
+
+volumes:
+  postgres_data:

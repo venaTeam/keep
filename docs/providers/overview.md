@@ -23,6 +23,7 @@ By leveraging Keep Providers, users are able to deeply integrate Keep with the t
 - [Graylog](/providers/documentation/graylog-provider)
 - [HTTP](/providers/documentation/http-provider)
 - [Icinga2](/providers/documentation/icinga2-provider)
+- [Jira On-Prem](/providers/documentation/jira%20on-prem-provider)
 - [Kafka](/providers/documentation/kafka-provider)
 - [Keep](/providers/documentation/keep-provider)
 - [Kibana](/providers/documentation/kibana-provider)

@@ -64,10 +64,18 @@ def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
     assert response.status_code == 202
 
     # Wait for processing
-    time.sleep(1)
-
-    # Get the updated alert - should be deduplicated and counter incremented
-    updated_alert = get_alert_by_fingerprint(client, fingerprint)
+    # Wait for processing
+    # Loop and wait for the firing counter to be updated
+    retry = 0
+    updated_alert = None
+    while retry < 10:
+        time.sleep(1)
+        # Get the updated alert - should be deduplicated and counter incremented
+        updated_alert = get_alert_by_fingerprint(client, fingerprint)
+        if updated_alert and updated_alert["firingCounter"] == 2:
+            break
+        retry += 1
+    
     assert updated_alert is not None
     assert updated_alert["firingCounter"] == 2
 

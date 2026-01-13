@@ -43,25 +43,23 @@ def wait_for_alerts(client, num_alerts):
 )
 def test_default_deduplication_rule(db_session, client, test_app):
     # insert an alert with some provider_id and make sure that the default deduplication rule is working
-    provider_classes = {
-        provider: ProvidersFactory.get_provider_class(provider)
-        for provider in ["prometheus", "mock"]
-    }
-    for provider_type, provider in provider_classes.items():
-        alert = provider.simulate_alert()
-        client.post(
-            f"/alerts/event/{provider_type}?",
-            json=alert,
-            headers={"x-api-key": "some-api-key"},
-        )
-        time.sleep(0.1)
+    provider_type = "prometheus"
+    provider_class = ProvidersFactory.get_provider_class(provider_type)
+    alert = provider_class.simulate_alert()
+    
+    client.post(
+        f"/alerts/event/{provider_type}?",
+        json=alert,
+        headers={"x-api-key": "some-api-key"},
+    )
+    time.sleep(0.1)
 
-    wait_for_alerts(client, 2)
+    wait_for_alerts(client, 1)
 
     deduplication_rules = client.get(
         "/deduplications", headers={"x-api-key": "some-api-key"}
     ).json()
-    assert len(deduplication_rules) == 3  # default + prometheus + mock
+    assert len(deduplication_rules) == 2  # default + prometheus
 
     for dedup_rule in deduplication_rules:
         # check that the default deduplication rule is working

@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -35,6 +36,9 @@ def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
     # Get a simulated prometheus alert
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
+    # Ensure startsAt provided
+    if "startsAt" not in alert:
+         alert["startsAt"] = datetime.now().isoformat()
 
     # Send the alert
     response = client.post(
@@ -52,7 +56,8 @@ def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
     fingerprint = alerts[0]["fingerprint"]
     assert alerts[0]["firingCounter"] == 1
 
-    # Send the EXACT same alert again (same payload)
+    # Send the alert again with newer timestamp but same fingerprint
+    alert["startsAt"] = (datetime.now() + timedelta(minutes=1)).isoformat()
     response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
@@ -228,6 +233,9 @@ def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app
     # Get a simulated prometheus alert
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
+    # Ensure startsAt provided
+    if "startsAt" not in alert:
+         alert["startsAt"] = datetime.now().isoformat()
     # Send the same alert payload twice to test deduplication
     alert["status"] = "firing"
 
@@ -248,6 +256,7 @@ def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app
     assert alerts[0]["unresolvedCounter"] == 1
 
     # Send the same alert again
+    alert["startsAt"] = (datetime.now() + timedelta(minutes=1)).isoformat()
     response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )

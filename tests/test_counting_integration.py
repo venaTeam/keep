@@ -32,17 +32,17 @@ def get_alert_by_fingerprint(client, fingerprint):
 )
 def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
     """Test that firing counter increments when the same alert fires multiple times."""
-    # Get a simulated datadog alert
-    provider = ProvidersFactory.get_provider_class("datadog")
+    # Get a simulated prometheus alert
+    provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    # we want another alert with the same monitor id but different attributes (so alert is correlated)
+    # we want another alert with the same alertname but different attributes (so alert is correlated)
     alert2 = provider.simulate_alert()
-    alert2["monitor_id"] = alert["monitor_id"]
-    alert2["scopes"] = alert["scopes"]
+    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
+    alert2["fingerprint"] = alert["fingerprint"]
 
     # Send the alert
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -58,7 +58,7 @@ def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
 
     # Send the same alert again
     response = client.post(
-        "/alerts/event/datadog", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -84,16 +84,16 @@ def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
 )
 def test_firing_counter_reset_on_acknowledge(db_session, client, test_app):
     """Test that firing counter resets to 0 when an alert is acknowledged."""
-    # Get a simulated datadog alert
-    provider = ProvidersFactory.get_provider_class("datadog")
+    # Get a simulated prometheus alert
+    provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
     alert2 = provider.simulate_alert()
-    alert2["monitor_id"] = alert["monitor_id"]
-    alert2["scopes"] = alert["scopes"]
+    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
+    alert2["fingerprint"] = alert["fingerprint"]
 
     # Send the alert
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -133,7 +133,7 @@ def test_firing_counter_reset_on_acknowledge(db_session, client, test_app):
 
     # Fire the same alert again after it was acknowledged
     response = client.post(
-        "/alerts/event/datadog", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -159,17 +159,17 @@ def test_firing_counter_reset_on_acknowledge(db_session, client, test_app):
 )
 def test_firing_counter_with_different_status(db_session, client, test_app):
     """Test firing counter behavior with different alert statuses."""
-    # Get a simulated datadog alert
-    provider = ProvidersFactory.get_provider_class("datadog")
+    # Get a simulated prometheus alert
+    provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
     alert2 = provider.simulate_alert()
-    alert2["monitor_id"] = alert["monitor_id"]
-    alert2["scopes"] = alert["scopes"]
-    alert["alert_transition"] = "Triggered"
-    alert2["alert_transition"] = "Recovered"
+    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
+    alert2["fingerprint"] = alert["fingerprint"]
+    alert["status"] = "firing"
+    alert2["status"] = "resolved"
     # Send the alert (FIRING by default)
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -184,7 +184,7 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
     assert alerts[0]["firingCounter"] == 1
 
     response = client.post(
-        "/alerts/event/datadog", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -201,7 +201,7 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
     resolved_firing_counter = resolved_alert["firingCounter"]
 
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -229,19 +229,19 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
 )
 def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app):
     """Test that unresolved counter increments when the same alert fires multiple times."""
-    # Get a simulated datadog alert
-    provider = ProvidersFactory.get_provider_class("datadog")
+    # Get a simulated prometheus alert
+    provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    # we want another alert with the same monitor id but different attributes (so alert is correlated)
+    # we want another alert with the same alertname but different attributes (so alert is correlated)
     alert2 = provider.simulate_alert()
-    alert2["monitor_id"] = alert["monitor_id"]
-    alert2["scopes"] = alert["scopes"]
-    alert["alert_transition"] = "Triggered"
-    alert2["alert_transition"] = "Triggered"
+    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
+    alert2["fingerprint"] = alert["fingerprint"]
+    alert["status"] = "firing"
+    alert2["status"] = "firing"
 
     # Send the alert
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -257,7 +257,7 @@ def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app
 
     # Send the same alert again
     response = client.post(
-        "/alerts/event/datadog", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -283,18 +283,18 @@ def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app
 )
 def test_unresolved_counter_reset_on_resolved(db_session, client, test_app):
     """Test that unresolved counter resets to 0 when an alert is resolved."""
-    # Get a simulated datadog alert
-    provider = ProvidersFactory.get_provider_class("datadog")
+    # Get a simulated prometheus alert
+    provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
     alert2 = provider.simulate_alert()
-    alert2["monitor_id"] = alert["monitor_id"]
-    alert2["scopes"] = alert["scopes"]
-    alert["alert_transition"] = "Triggered"
-    alert2["alert_transition"] = "Triggered"
+    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
+    alert2["fingerprint"] = alert["fingerprint"]
+    alert["status"] = "firing"
+    alert2["status"] = "firing"
 
     # Send the alert
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -334,7 +334,7 @@ def test_unresolved_counter_reset_on_resolved(db_session, client, test_app):
 
     # Fire the same alert again after it was acknowledged
     response = client.post(
-        "/alerts/event/datadog", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -360,17 +360,17 @@ def test_unresolved_counter_reset_on_resolved(db_session, client, test_app):
 )
 def test_unresolved_counter_with_different_status(db_session, client, test_app):
     """Test unresolved counter behavior with different alert statuses."""
-    # Get a simulated datadog alert
-    provider = ProvidersFactory.get_provider_class("datadog")
+    # Get a simulated prometheus alert
+    provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
     alert2 = provider.simulate_alert()
-    alert2["monitor_id"] = alert["monitor_id"]
-    alert2["scopes"] = alert["scopes"]
-    alert["alert_transition"] = "Triggered"
-    alert2["alert_transition"] = "Muted"
+    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
+    alert2["fingerprint"] = alert["fingerprint"]
+    alert["status"] = "firing"
+    alert2["status"] = "suppressed"
     # Send the alert (FIRING by default)
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -385,7 +385,7 @@ def test_unresolved_counter_with_different_status(db_session, client, test_app):
     assert alerts[0]["unresolvedCounter"] == 1
 
     response = client.post(
-        "/alerts/event/datadog", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -402,7 +402,7 @@ def test_unresolved_counter_with_different_status(db_session, client, test_app):
     ack_firing_counter = acknowledge_alert["unresolvedCounter"]
 
     response = client.post(
-        "/alerts/event/datadog", json=alert, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 

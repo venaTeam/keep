@@ -55,7 +55,6 @@ from keep.api.routes import (
     preset,
     provider_images,
     providers,
-    pusher,
     rules,
     settings,
     status,
@@ -307,7 +306,6 @@ def get_app(
         workflows.router, prefix="/workflows", tags=["workflows", "alerts"]
     )
     app.include_router(whoami.router, prefix="/whoami", tags=["whoami"])
-    app.include_router(pusher.router, prefix="/pusher", tags=["pusher"])
     app.include_router(status.router, prefix="/status", tags=["status"])
     app.include_router(rules.router, prefix="/rules", tags=["rules"])
     app.include_router(preset.router, prefix="/preset", tags=["preset"])

@@ -4,11 +4,11 @@ import os
 import pathlib
 import sys
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Any, List, Optional
 from uuid import UUID
 
 from fastapi import HTTPException
-from pusher import Pusher
+
 from sqlalchemy.orm.exc import StaleDataError
 from sqlmodel import Session
 
@@ -60,7 +60,7 @@ class IncidentBl:
         self,
         tenant_id: str,
         session: Session,
-        pusher_client: Optional[Pusher] = None,
+        pusher_client: Any = None,
         user: str = None,
     ):
         self.tenant_id = tenant_id

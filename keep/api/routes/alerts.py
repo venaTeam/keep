@@ -5,12 +5,12 @@ import json
 import logging
 import os
 from copy import deepcopy
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import celpy
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
-from pusher import Pusher
+
 from sqlalchemy_utils import UUIDType
 from sqlmodel import Session
 
@@ -995,7 +995,7 @@ def _enrich_alert(
 )
 def unenrich_alert(
     enrich_data: UnEnrichAlertRequestBody,
-    pusher_client: Pusher = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:alert"])
     ),

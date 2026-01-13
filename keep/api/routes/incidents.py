@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import Any, List, Optional
 from uuid import UUID
 
 from arq import ArqRedis
@@ -13,7 +13,7 @@ from fastapi import (
     Request,
     Response,
 )
-from pusher import Pusher
+
 from sqlmodel import Session
 
 from keep.common.arq_pool import get_pool
@@ -100,7 +100,7 @@ def create_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> IncidentDto:
     tenant_id = authenticated_entity.tenant_id
@@ -393,7 +393,7 @@ def update_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> IncidentDto:
     tenant_id = authenticated_entity.tenant_id
@@ -430,7 +430,7 @@ def bulk_delete_incidents(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ):
     tenant_id = authenticated_entity.tenant_id
@@ -448,7 +448,7 @@ def delete_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ):
     tenant_id = authenticated_entity.tenant_id
@@ -468,7 +468,7 @@ async def split_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> SplitIncidentResponseDto:
     tenant_id = authenticated_entity.tenant_id
@@ -698,7 +698,7 @@ async def add_alerts_to_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ):
     tenant_id = authenticated_entity.tenant_id
@@ -722,7 +722,7 @@ def delete_alerts_from_incident(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
     session=Depends(get_session),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
 ):
     tenant_id = authenticated_entity.tenant_id
     incident_bl = IncidentBl(tenant_id, session, pusher_client)
@@ -873,7 +873,7 @@ def change_incident_severity(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
     session: Session = Depends(get_session),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
 ) -> IncidentDto:
     tenant_id = authenticated_entity.tenant_id
     logger.info(
@@ -900,7 +900,7 @@ def add_comment(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> AlertAudit:
     extra = {
@@ -986,7 +986,7 @@ async def commit_with_ai(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
     session: Session = Depends(get_session),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
 ) -> List[IncidentDto]:
     tenant_id = authenticated_entity.tenant_id
 
@@ -1058,7 +1058,7 @@ async def enrich_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
     db_session: Session = Depends(get_session),
 ) -> Response:
     """Enrich incident with additional data."""
@@ -1109,7 +1109,7 @@ async def unenrich_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
+    pusher_client: Any = Depends(get_pusher_client),
 ) -> Response:
     """Unenrich incident additional data."""
     tenant_id = authenticated_entity.tenant_id

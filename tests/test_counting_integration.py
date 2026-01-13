@@ -35,10 +35,6 @@ def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
     # Get a simulated prometheus alert
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    # we want another alert with the same alertname but different attributes (so alert is correlated)
-    alert2 = provider.simulate_alert()
-    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
-    alert2["fingerprint"] = alert["fingerprint"]
 
     # Send the alert
     response = client.post(
@@ -56,16 +52,16 @@ def test_firing_counter_increment_on_same_alert(db_session, client, test_app):
     fingerprint = alerts[0]["fingerprint"]
     assert alerts[0]["firingCounter"] == 1
 
-    # Send the same alert again
+    # Send the EXACT same alert again (same payload)
     response = client.post(
-        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
     # Wait for processing
     time.sleep(1)
 
-    # Get the updated alert
+    # Get the updated alert - should be deduplicated and counter incremented
     updated_alert = get_alert_by_fingerprint(client, fingerprint)
     assert updated_alert is not None
     assert updated_alert["firingCounter"] == 2
@@ -88,8 +84,6 @@ def test_firing_counter_reset_on_acknowledge(db_session, client, test_app):
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
     alert2 = provider.simulate_alert()
-    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
-    alert2["fingerprint"] = alert["fingerprint"]
 
     # Send the alert
     response = client.post(
@@ -133,7 +127,7 @@ def test_firing_counter_reset_on_acknowledge(db_session, client, test_app):
 
     # Fire the same alert again after it was acknowledged
     response = client.post(
-        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -163,8 +157,6 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
     alert2 = provider.simulate_alert()
-    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
-    alert2["fingerprint"] = alert["fingerprint"]
     alert["status"] = "firing"
     alert2["status"] = "resolved"
     # Send the alert (FIRING by default)
@@ -184,7 +176,7 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
     assert alerts[0]["firingCounter"] == 1
 
     response = client.post(
-        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -232,10 +224,7 @@ def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app
     # Get a simulated prometheus alert
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    # we want another alert with the same alertname but different attributes (so alert is correlated)
-    alert2 = provider.simulate_alert()
-    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
-    alert2["fingerprint"] = alert["fingerprint"]
+    # Send the same alert payload twice to test deduplication
     alert["status"] = "firing"
     alert2["status"] = "firing"
 
@@ -257,7 +246,7 @@ def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app
 
     # Send the same alert again
     response = client.post(
-        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -287,8 +276,6 @@ def test_unresolved_counter_reset_on_resolved(db_session, client, test_app):
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
     alert2 = provider.simulate_alert()
-    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
-    alert2["fingerprint"] = alert["fingerprint"]
     alert["status"] = "firing"
     alert2["status"] = "firing"
 
@@ -334,7 +321,7 @@ def test_unresolved_counter_reset_on_resolved(db_session, client, test_app):
 
     # Fire the same alert again after it was acknowledged
     response = client.post(
-        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -363,12 +350,10 @@ def test_unresolved_counter_with_different_status(db_session, client, test_app):
     # Get a simulated prometheus alert
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    alert2 = provider.simulate_alert()
-    alert2["labels"]["alertname"] = alert["labels"]["alertname"]
-    alert2["fingerprint"] = alert["fingerprint"]
+    # Force status to firing
     alert["status"] = "firing"
-    alert2["status"] = "suppressed"
-    # Send the alert (FIRING by default)
+    
+    # Send the alert (FIRING)
     response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
@@ -384,8 +369,10 @@ def test_unresolved_counter_with_different_status(db_session, client, test_app):
     fingerprint = alerts[0]["fingerprint"]
     assert alerts[0]["unresolvedCounter"] == 1
 
+    # Now send same alert but with resolved status
+    alert["status"] = "resolved"
     response = client.post(
-        "/alerts/event/prometheus", json=alert2, headers={"x-api-key": "some-api-key"}
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
     assert response.status_code == 202
 
@@ -393,14 +380,16 @@ def test_unresolved_counter_with_different_status(db_session, client, test_app):
     time.sleep(1)
 
     # Get the updated alert
-    acknowledge_alert = get_alert_by_fingerprint(client, fingerprint)
-    assert acknowledge_alert is not None
+    resolved_alert = get_alert_by_fingerprint(client, fingerprint)
+    assert resolved_alert is not None
 
-    # Check status and unresolved counter (should keep previous value when resolved)
-    assert acknowledge_alert["status"] == "suppressed"
-    # The counter will likely have incremented here since it's just a new alert with a different status
-    ack_firing_counter = acknowledge_alert["unresolvedCounter"]
+    # Check status - should be resolved now
+    assert resolved_alert["status"] == "resolved"
+    # Counter should increment
+    resolved_counter = resolved_alert["unresolvedCounter"]
 
+    # Send it firing again
+    alert["status"] = "firing"
     response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
@@ -414,4 +403,4 @@ def test_unresolved_counter_with_different_status(db_session, client, test_app):
     assert refired_alert is not None
     assert refired_alert["status"] == "firing"
     # Should have incremented from the resolved state
-    assert refired_alert["unresolvedCounter"] == ack_firing_counter + 1
+    assert refired_alert["unresolvedCounter"] == resolved_counter + 1

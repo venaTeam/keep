@@ -194,3 +194,20 @@ Updated test workflow and configuration files to use `console_provider` instead 
   is sufficient - no code modifications needed
 - All test files were updated to use `console_provider` as a replacement for testing purposes
 - The conftest.py was already using console provider for mock workflows
+
+## Next Steps
+
+### Documentation Cleanup Required
+
+The following documentation files contain references to removed cloud SaaS providers and need manual cleanup:
+
+1. **`docs/providers/overview.mdx`** - Contains 74 card entries for removed providers
+2. **`docs/providers/overview.md`** - Contains 72 card entries for removed providers  
+
+These large files list all providers and should be regenerated or manually edited to remove the 76 deleted cloud SaaS provider cards.
+
+**Files Already Updated:**
+- ✅ `docs/overview/servicetopology.mdx` - Removed Datadog and Pagerduty references
+- ✅ All provider documentation snippets regenerated
+
+**Note:** The script `scripts/docs_get_providers_list.py` can generate the provider card list, but the overview files are extensive and may need careful manual review to preserve formatting and other content.

@@ -401,6 +401,8 @@ def test_custom_deduplication_rule_2(db_session, client, test_app):
         headers={"x-api-key": "some-api-key"},
     )
     alert1["title"] = "Different title"
+    # we need to change the alertname to make sure it is not deduplicated
+    alert1["labels"]["alertname"] = "DifferentAlertName"
     client.post(
         f"/alerts/event/prometheus?provider_id={datadog_provider_id}",
         json=alert1,
@@ -409,9 +411,11 @@ def test_custom_deduplication_rule_2(db_session, client, test_app):
 
     # wait for the background tasks to finish
     alerts = client.get("/alerts", headers={"x-api-key": "some-api-key"}).json()
-    while len(alerts) < 2:
+    retry = 0
+    while len(alerts) < 2 and retry < 10:
         time.sleep(1)
         alerts = client.get("/alerts", headers={"x-api-key": "some-api-key"}).json()
+        retry += 1
 
     deduplication_rules = client.get(
         "/deduplications", headers={"x-api-key": "some-api-key"}
@@ -732,7 +736,7 @@ def test_partial_deduplication(db_session, client, test_app):
     alerts = [
         base_alert,
         {**base_alert, "message": "Different message"},
-        {**base_alert, "source": "Different source"},
+        {**base_alert, "generatorURL": "Different URL"},
     ]
 
     for alert in alerts:

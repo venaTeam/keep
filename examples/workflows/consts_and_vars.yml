@@ -102,7 +102,7 @@ workflow:
         alert_tier: "Alert 0"
       provider:
         config: "{{ providers.dev_slack }}"
-        type: slack
+        type: console
         with:
           message: "{{ consts.slack_message }}"
 
@@ -112,7 +112,7 @@ workflow:
         alert_tier: "Alert 1"
       provider:
         config: "{{ providers.dev_slack }}"
-        type: slack
+        type: console
         with:
           message: "{{ consts.slack_message }}"
 
@@ -122,7 +122,7 @@ workflow:
         alert_tier: "Alert 2"
       provider:
         config: "{{ providers.dev_slack }}"
-        type: slack
+        type: console
         with:
           message: "{{ consts.slack_message }}"
 
@@ -132,7 +132,7 @@ workflow:
         alert_tier: "Alert 3"
       provider:
         config: "{{ providers.dev_slack }}"
-        type: slack
+        type: console
         with:
           message: "{{ consts.slack_message }}"
 
@@ -142,6 +142,6 @@ workflow:
         alert_tier: "Alert 4"
       provider:
         config: "{{ providers.dev_slack }}"
-        type: slack
+        type: console
         with:
           message: "{{ consts.slack_message }}"

@@ -23,7 +23,7 @@ workflow:
           alias: A
           compare_type: gt
       provider:
-        type: slack
+        type: console
         config: "{{ providers.slack }}"
         with:
           message: "Result: {{ steps.victoriametrics-step.results.data.result.0.value.1 }} is greater than 0.0040! 🚨"
@@ -31,7 +31,7 @@ workflow:
     - name: trigger-slack2
       if: "{{ A }}"
       provider:
-        type: slack
+        type: console
         config: "{{ providers.slack }}"
         with:
           message: "Result: {{ steps.victoriametrics-step.results.data.result.0.value.1 }} is greater than 0.0040! 🚨"

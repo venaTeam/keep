@@ -22,14 +22,14 @@ workflow:
           type: assert
           assert: "{{ steps.get-customer-tier-by-id.result.tier }} == 'enterprise'"
       provider:
-        type: opsgenie
+        type: console
         config: " {{ providers.opsgenie-prod }} "
         with:
           message: "User of customer {{ steps.get-customer-tier-by-id.result.customer_name }} failed to login!"
     # for every customer, send a slack message
     - name: trigger-slack
       provider:
-        type: slack
+        type: console
         config: " {{ providers.slack-prod }} "
         with:
           message: "User of customer {{ steps.get-customer-tier-by-id.result.customer_name }} failed to login!"

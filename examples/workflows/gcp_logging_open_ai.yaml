@@ -37,6 +37,6 @@ workflow:
     - name: slack-action
       provider:
         config: "{{ providers.slack }}"
-        type: slack
+        type: console
         with:
           message: "{{steps.openai-step.results}}"

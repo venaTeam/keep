@@ -24,7 +24,7 @@ alert:
   actions:
     - name: trigger-slack
       provider:
-        type: slack
+        type: mock
         config: " {{ providers.slack-demo }} "
         with:
           channel: db-is-down

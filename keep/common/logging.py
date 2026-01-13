@@ -113,6 +113,7 @@ class WorkflowDBHandler(logging.Handler):
         self.records = []
         self.flush_interval = flush_interval
         self._stop_event = threading.Event()
+        self._closed = False
         # Start repeating timer in a separate thread
         self._timer_thread = threading.Thread(target=self._timer_run)
         self._timer_thread.daemon = (
@@ -130,6 +131,7 @@ class WorkflowDBHandler(logging.Handler):
             self._stop_event.wait(self.flush_interval)  # Wait but can be interrupted
 
     def close(self):
+        self._closed = True
         self._stop_event.set()  # Signal the timer to stop
         # Wait for timer thread to finish with a timeout to prevent hanging during test teardown
         if self._timer_thread.is_alive():
@@ -138,7 +140,7 @@ class WorkflowDBHandler(logging.Handler):
 
     def emit(self, record):
         # we want to push only workflow logs to the DB
-        if not KEEP_STORE_WORKFLOW_LOGS:
+        if self._closed or not KEEP_STORE_WORKFLOW_LOGS:
             return
         if hasattr(record, "workflow_execution_id") and record.workflow_execution_id:
             self.format(record)
@@ -151,7 +153,7 @@ class WorkflowDBHandler(logging.Handler):
         push_logs_to_db(log_entries)
 
     def flush(self):
-        if not self.records:
+        if self._closed or not self.records:
             return
 
         try:

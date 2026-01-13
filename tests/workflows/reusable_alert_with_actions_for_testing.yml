@@ -35,7 +35,7 @@ actions:
   - name: trigger-slack
     use: '@trigger_slack'
     provider:
-      type: slack
+      type: mock
       config: " {{ providers.slack-demo }} "
       with:
         channel: db-is-down

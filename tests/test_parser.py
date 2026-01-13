@@ -107,7 +107,7 @@ class TestParseProvidersFromEnv:
     def test_parse_providers_from_env_providers(self, monkeypatch, context_manager):
         # ARRANGE
         providers_dict = {
-            "slack-demo": {"authentication": {"webhook_url": "https://not.a.real.url"}}
+            "mock-demo": {"authentication": {"api_key": "some-key"}}
         }
         monkeypatch.setenv("KEEP_PROVIDERS", json.dumps(providers_dict))
 
@@ -121,7 +121,7 @@ class TestParseProvidersFromEnv:
         self, monkeypatch, context_manager
     ):
         # ARRANGE
-        providers_str = '{"slack-demo": {"authentication": {"webhook_url": '
+        providers_str = '{"mock-demo": {"authentication": {"api_key": '
         monkeypatch.setenv("KEEP_PROVIDERS", providers_str)
 
         # ACT
@@ -322,7 +322,7 @@ class TestReusableActionWithWorkflow:
 
             assert (
                 actions.get("@trigger-slack2", {}).get("provider", {}).get("type")
-                == "slack"
+                == "mock"
             )
 
     def test_load_actions_config(self, db_session):

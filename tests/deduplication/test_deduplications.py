@@ -45,7 +45,7 @@ def test_default_deduplication_rule(db_session, client, test_app):
     # insert an alert with some provider_id and make sure that the default deduplication rule is working
     provider_classes = {
         provider: ProvidersFactory.get_provider_class(provider)
-        for provider in ["prometheus", "prometheus"]
+        for provider in ["prometheus", "mock"]
     }
     for provider_type, provider in provider_classes.items():
         alert = provider.simulate_alert()
@@ -61,7 +61,7 @@ def test_default_deduplication_rule(db_session, client, test_app):
     deduplication_rules = client.get(
         "/deduplications", headers={"x-api-key": "some-api-key"}
     ).json()
-    assert len(deduplication_rules) == 3  # default + datadog + prometheus
+    assert len(deduplication_rules) == 3  # default + prometheus + mock
 
     for dedup_rule in deduplication_rules:
         # check that the default deduplication rule is working
@@ -72,7 +72,7 @@ def test_default_deduplication_rule(db_session, client, test_app):
             assert dedup_rule.get("distribution") == [
                 {"hour": i, "number": 0} for i in range(24)
             ]
-        # check that the datadog/prometheus deduplication rule is working
+        # check that the provider deduplication rule is working
         else:
             assert dedup_rule.get("ingested") == 1
             # the deduplication ratio is zero since the alert was not deduplicated
@@ -362,7 +362,7 @@ def test_custom_deduplication_rule_behaviour(db_session, client, test_app):
     [
         {
             "AUTH_TYPE": "NOAUTH",
-            "KEEP_PROVIDERS": '{"keepDatadog":{"type":"prometheus","authentication":{"api_key":"1234","app_key": "1234"}}}',
+            "KEEP_PROVIDERS": '{"keepPrometheus":{"type":"prometheus","authentication":{"url":"http://localhost:9090"}}}',
         },
     ],
     indirect=True,
@@ -435,7 +435,7 @@ def test_custom_deduplication_rule_2(db_session, client, test_app):
     [
         {
             "AUTH_TYPE": "NOAUTH",
-            "KEEP_PROVIDERS": '{"keepDatadog":{"type":"prometheus","authentication":{"api_key":"1234","app_key": "1234"}}}',
+            "KEEP_PROVIDERS": '{"keepPrometheus":{"type":"prometheus","authentication":{"url":"http://localhost:9090"}}}',
         },
     ],
     indirect=True,
@@ -560,7 +560,7 @@ def test_update_deduplication_rule_linked_provider(db_session, client, test_app)
     [
         {
             "AUTH_TYPE": "NOAUTH",
-            "KEEP_PROVIDERS": '{"keepDatadog":{"type":"prometheus","authentication":{"api_key":"1234","app_key": "1234"}}}',
+            "KEEP_PROVIDERS": '{"keepPrometheus":{"type":"prometheus","authentication":{"url":"http://localhost:9090"}}}',
         },
     ],
     indirect=True,

@@ -156,10 +156,9 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
     # Get a simulated prometheus alert
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    alert2 = provider.simulate_alert()
+    
+    # 1. Send the alert (FIRING)
     alert["status"] = "firing"
-    alert2["status"] = "resolved"
-    # Send the alert (FIRING by default)
     response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
@@ -175,6 +174,8 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
     fingerprint = alerts[0]["fingerprint"]
     assert alerts[0]["firingCounter"] == 1
 
+    # 2. Send the alert again (RESOLVED)
+    alert["status"] = "resolved"
     response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
@@ -189,9 +190,12 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
 
     # Check status and firing counter (should keep previous value when resolved)
     assert resolved_alert["status"] == "resolved"
-    # The counter will likely have incremented here since it's just a new alert with a different status
     resolved_firing_counter = resolved_alert["firingCounter"]
-
+    # Firing counter tracks how many times it FIRED. Resolving shouldn't increment it? 
+    # Or maybe it stays same. Let's assume it stays same for now.
+    
+    # 3. Send the alert again (FIRING)
+    alert["status"] = "firing"
     response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
@@ -204,7 +208,7 @@ def test_firing_counter_with_different_status(db_session, client, test_app):
     refired_alert = get_alert_by_fingerprint(client, fingerprint)
     assert refired_alert is not None
     assert refired_alert["status"] == "firing"
-    # Should have incremented from the resolved state
+    # Should have incremented from the resolved state because it transitioned back to firing
     assert refired_alert["firingCounter"] == resolved_firing_counter + 1
 
 
@@ -226,7 +230,6 @@ def test_unresolved_counter_increment_on_same_alert(db_session, client, test_app
     alert = provider.simulate_alert()
     # Send the same alert payload twice to test deduplication
     alert["status"] = "firing"
-    alert2["status"] = "firing"
 
     # Send the alert
     response = client.post(

@@ -11,7 +11,7 @@ workflow:
     - name: send-slack-message
       if: "keep.is_first_time('{{ alert.fingerprint }}', '24h')"
       provider:
-        type: slack
+        type: console
         config: "{{ providers.slack }}"
         with:
           message: |

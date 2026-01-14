@@ -75,7 +75,7 @@ workflow:
       # if there are any alerts that have not been acknowledged
       if: "{{ query-ack-index.hits.total.value }} > 0"
       provider:
-        type: console # or email or whatever you want
+        type: slack # or email or whatever you want
         config: " {{ providers.slack }} "
         with:
           message: |

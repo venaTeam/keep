@@ -13,7 +13,7 @@ workflow:
       # send tier0 if this is a new incident (no tier set) or if the incident is tier0 but the alert is alert2
       if: "{{ !incident.current_tier || incident.current_tier == 0 && alert.name == 'alert2' }}"
       provider:
-        type: console
+        type: slack
         config: "{{ providers.slack }}"
         with:
           message: |
@@ -28,7 +28,7 @@ workflow:
     - name: send-slack-message-tier-1
       if: "{{ incident.current_tier == 0 && alert.name == 'alert1' }}"
       provider:
-        type: console
+        type: slack
         config: "{{ providers.slack }}"
         with:
           message: |

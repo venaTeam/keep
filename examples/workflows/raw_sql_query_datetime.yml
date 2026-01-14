@@ -26,7 +26,7 @@ workflow:
           compare_to: 1 # hours
           compare_type: gt # greater than
       provider:
-        type: console
+        type: slack
         config: " {{ providers.slack-demo }} "
         with:
           message: "DB datetime value ({{ actions.trigger-slack.conditions.threshold.0.compare_value }}) is greater than 1! 🚨"

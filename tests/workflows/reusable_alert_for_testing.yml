@@ -22,8 +22,8 @@ alert:
           value:  "{{ steps.this.results }}"
           compare_to: 90% # Trigger if more than 90% full
   actions:
-    - name: trigger-console
-      use: '@trigger-console'
+    - name: trigger-slack
+      use: '@trigger-slack2'
 
 
 providers:

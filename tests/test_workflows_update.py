@@ -1,4 +1,4 @@
-# Mock HTTP workflow data for testing S3 sync functionality
+# Mock S3 workflow data for testing S3 sync functionality
 from datetime import datetime
 
 import pytz
@@ -13,7 +13,7 @@ from tests.fixtures.workflow_manager import (
     workflow_manager,
 )
 
-MOCK_HTTP_WORKFLOWS_YAMLS = [
+MOCK_S3_WORKFLOWS_YAMLS = [
     f"""
     workflow:
         id: workflow-{i}
@@ -62,32 +62,31 @@ workflow:
 """
 
 
-# HTTP sync workflow definition
-HTTP_SYNC_WORKFLOW_DEFINITION = """
+# S3 sync workflow definition
+S3_SYNC_WORKFLOW_DEFINITION = """
 workflow:
-  id: http-workflow-sync
-  name: HTTP Workflow Sync
-  description: Synchronizes Keep workflows from HTTP storage
+  id: s3-workflow-sync
+  name: S3 Workflow Sync
+  description: Synchronizes Keep workflows from S3 bucket storage
   disabled: false
   triggers:
     - type: manual
     - type: alert
-      cel: name == "sync-workflows-from-http"
+      cel: name == "sync-workflows-from-s3"
   inputs: []
   consts: {}
   owners: []
   services: []
   steps:
-    - name: http-get
+    - name: s3-dump
       provider:
-        type: http
-        config: "{{ providers.http }}"
+        type: s3
+        config: "{{ providers.s3 }}"
         with:
-          url: https://example.com/workflows
-          method: GET
+          bucket: keep-workflows
   actions:
     - name: update
-      foreach: "{{ steps.http-get.results }}"
+      foreach: "{{ steps.s3-dump.results }}"
       provider:
         type: keep
         config: "{{ providers.default-keep }}"
@@ -120,41 +119,41 @@ def get_manual_run_event(name: str):
     return manual_run_event
 
 
-def test_http_workflow_sync_manual_trigger(db_session, workflow_manager, mocker):
+def test_s3_workflow_sync_manual_trigger(db_session, workflow_manager, mocker):
     """Test the S3 workflow sync functionality using manual trigger."""
     # Create the sync workflow
     sync_workflow = Workflow(
-        id="http-workflow-sync",
-        name="http-workflow-sync",
+        id="s3-workflow-sync",
+        name="s3-workflow-sync",
         tenant_id=SINGLE_TENANT_UUID,
-        description="Synchronizes Keep workflows from HTTP storage",
+        description="Synchronizes Keep workflows from S3 bucket storage",
         created_by="test@keephq.dev",
         interval=0,
-        workflow_raw=HTTP_SYNC_WORKFLOW_DEFINITION,
+        workflow_raw=S3_SYNC_WORKFLOW_DEFINITION,
         last_updated=datetime.now(),
     )
     db_session.add(sync_workflow)
     db_session.commit()
 
-    # Mock HTTP provider to return our mock workflows
-    mock_http_validate_config = mocker.patch(
-        "keep.providers.http_provider.http_provider.HttpProvider.validate_config"
+    # Mock S3 provider to return our mock workflows
+    mock_s3_validate_config = mocker.patch(
+        "keep.providers.s3_provider.s3_provider.S3Provider.validate_config"
     )
-    mock_http_validate_config.return_value = True
-    mock_http_query = mocker.patch(
-        "keep.providers.http_provider.http_provider.HttpProvider._query"
+    mock_s3_validate_config.return_value = True
+    mock_s3_query = mocker.patch(
+        "keep.providers.s3_provider.s3_provider.S3Provider._query"
     )
-    mock_http_query.return_value = MOCK_HTTP_WORKFLOWS_YAMLS
+    mock_s3_query.return_value = MOCK_S3_WORKFLOWS_YAMLS
 
     # Trigger workflow using workflow scheduler
     workflow_manager.insert_events(
-        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-http")]
+        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-s3")]
     )
     assert len(workflow_manager.scheduler.workflows_to_run) == 1
 
     # Wait for workflow execution to complete
     workflow_execution = wait_for_workflow_execution(
-        SINGLE_TENANT_UUID, "http-workflow-sync"
+        SINGLE_TENANT_UUID, "s3-workflow-sync"
     )
 
     # Verify workflow execution
@@ -167,7 +166,7 @@ def test_http_workflow_sync_manual_trigger(db_session, workflow_manager, mocker)
         for w in get_all_workflows(SINGLE_TENANT_UUID)
         if w.description.startswith("Sync test workflow")
     ]
-    for i, workflow_yaml in enumerate(MOCK_HTTP_WORKFLOWS_YAMLS):
+    for i, workflow_yaml in enumerate(MOCK_S3_WORKFLOWS_YAMLS):
         workflow = next((w for w in workflows if w.name == f"Workflow {i + 1}"), None)
         assert workflow is not None
         assert_workflow_yaml(workflow.workflow_raw, workflow_yaml)
@@ -175,12 +174,12 @@ def test_http_workflow_sync_manual_trigger(db_session, workflow_manager, mocker)
 
     # Run again - should not change anything
     workflow_manager.insert_events(
-        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-http")]
+        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-s3")]
     )
     assert len(workflow_manager.scheduler.workflows_to_run) == 1
 
     workflow_execution_2 = wait_for_workflow_execution(
-        SINGLE_TENANT_UUID, "http-workflow-sync", exclude_ids=[workflow_execution.id]
+        SINGLE_TENANT_UUID, "s3-workflow-sync", exclude_ids=[workflow_execution.id]
     )
     assert workflow_execution_2 is not None
     assert workflow_execution_2.status == "success"
@@ -192,7 +191,7 @@ def test_http_workflow_sync_manual_trigger(db_session, workflow_manager, mocker)
         if w.description.startswith("Sync test workflow")
     ]
 
-    for i, workflow_yaml in enumerate(MOCK_HTTP_WORKFLOWS_YAMLS):
+    for i, workflow_yaml in enumerate(MOCK_S3_WORKFLOWS_YAMLS):
         workflow_db = next(
             (w for w in workflows if w.name == f"Workflow {i + 1}"), None
         )
@@ -201,14 +200,14 @@ def test_http_workflow_sync_manual_trigger(db_session, workflow_manager, mocker)
         assert workflow_db.revision == 1
 
     # Modify workflow-3 and run again
-    mock_http_query.return_value = [MODIFIED_WORKFLOW_YAML]
+    mock_s3_query.return_value = [MODIFIED_WORKFLOW_YAML]
     workflow_manager.insert_events(
-        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-http")]
+        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-s3")]
     )
     assert len(workflow_manager.scheduler.workflows_to_run) == 1
     workflow_execution_3 = wait_for_workflow_execution(
         SINGLE_TENANT_UUID,
-        "http-workflow-sync",
+        "s3-workflow-sync",
         exclude_ids=[workflow_execution.id, workflow_execution_2.id],
     )
     assert workflow_execution_3 is not None
@@ -223,7 +222,7 @@ def test_http_workflow_sync_manual_trigger(db_session, workflow_manager, mocker)
     assert len(latest_workflows) == 5
 
     # Verify only workflow-3 was updated
-    for i, workflow_yaml in enumerate(MOCK_HTTP_WORKFLOWS_YAMLS):
+    for i, workflow_yaml in enumerate(MOCK_S3_WORKFLOWS_YAMLS):
         workflow_db = next(
             (w for w in latest_workflows if w.name == f"Workflow {i + 1}"), None
         )
@@ -273,25 +272,25 @@ def test_workflow_update_from_workflow(db_session, workflow_manager, mocker):
                     message: modified message
     """
 
-    # Mock HTTP provider to return our modified workflow
-    mock_http_validate_config = mocker.patch(
-        "keep.providers.http_provider.http_provider.HttpProvider.validate_config"
+    # Mock S3 provider to return our modified workflow
+    mock_s3_validate_config = mocker.patch(
+        "keep.providers.s3_provider.s3_provider.S3Provider.validate_config"
     )
-    mock_http_validate_config.return_value = True
-    mock_http_query = mocker.patch(
-        "keep.providers.http_provider.http_provider.HttpProvider._query"
+    mock_s3_validate_config.return_value = True
+    mock_s3_query = mocker.patch(
+        "keep.providers.s3_provider.s3_provider.S3Provider._query"
     )
-    mock_http_query.return_value = [initial_workflow_yaml]
+    mock_s3_query.return_value = [initial_workflow_yaml]
 
     # Create the sync workflow
     sync_workflow = Workflow(
-        id="http-workflow-sync",
-        name="http-workflow-sync",
+        id="s3-workflow-sync",
+        name="s3-workflow-sync",
         tenant_id=SINGLE_TENANT_UUID,
-        description="Synchronizes Keep workflows from HTTP storage",
+        description="Synchronizes Keep workflows from S3 bucket storage",
         created_by="test@keephq.dev",
         interval=0,
-        workflow_raw=HTTP_SYNC_WORKFLOW_DEFINITION,
+        workflow_raw=S3_SYNC_WORKFLOW_DEFINITION,
         last_updated=datetime.now(),
     )
     db_session.add(sync_workflow)
@@ -299,13 +298,13 @@ def test_workflow_update_from_workflow(db_session, workflow_manager, mocker):
 
     # Trigger workflow using workflow scheduler
     workflow_manager.insert_events(
-        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-http")]
+        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-s3")]
     )
     assert len(workflow_manager.scheduler.workflows_to_run) == 1
 
     # Wait for workflow execution to complete
     workflow_execution = wait_for_workflow_execution(
-        SINGLE_TENANT_UUID, "http-workflow-sync"
+        SINGLE_TENANT_UUID, "s3-workflow-sync"
     )
 
     # Verify workflow execution
@@ -313,17 +312,17 @@ def test_workflow_update_from_workflow(db_session, workflow_manager, mocker):
     assert workflow_execution.status == "success"
 
     # Update workflow with modified content
-    mock_http_query.return_value = [modified_workflow_yaml]
+    mock_s3_query.return_value = [modified_workflow_yaml]
 
     # Trigger workflow using workflow scheduler
     workflow_manager.insert_events(
-        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-http")]
+        SINGLE_TENANT_UUID, [get_manual_run_event("sync-workflows-from-s3")]
     )
     assert len(workflow_manager.scheduler.workflows_to_run) == 1
 
     # Wait for workflow execution to complete
     workflow_execution = wait_for_workflow_execution(
-        SINGLE_TENANT_UUID, "http-workflow-sync"
+        SINGLE_TENANT_UUID, "s3-workflow-sync"
     )
 
     # Verify workflow execution

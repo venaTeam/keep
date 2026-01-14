@@ -107,7 +107,7 @@ class TestParseProvidersFromEnv:
     def test_parse_providers_from_env_providers(self, monkeypatch, context_manager):
         # ARRANGE
         providers_dict = {
-            "console-demo": {"authentication": {}}
+            "slack-demo": {"authentication": {"webhook_url": "https://not.a.real.url"}}
         }
         monkeypatch.setenv("KEEP_PROVIDERS", json.dumps(providers_dict))
 
@@ -121,7 +121,7 @@ class TestParseProvidersFromEnv:
         self, monkeypatch, context_manager
     ):
         # ARRANGE
-        providers_str = '{"console-demo": {"authentication": {'
+        providers_str = '{"slack-demo": {"authentication": {"webhook_url": '
         monkeypatch.setenv("KEEP_PROVIDERS", providers_str)
 
         # ACT
@@ -321,8 +321,8 @@ class TestReusableActionWithWorkflow:
                 assert "provider" in action_data
 
             assert (
-                actions.get("@trigger-console", {}).get("provider", {}).get("type")
-                == "console"
+                actions.get("@trigger-slack2", {}).get("provider", {}).get("type")
+                == "slack"
             )
 
     def test_load_actions_config(self, db_session):
@@ -371,8 +371,8 @@ class TestReusableActionWithWorkflow:
         action = Action(
             id=str(uuid.uuid4()),
             tenant_id=SINGLE_TENANT_UUID,
-            use="@trigger-console",
-            name="trigger-console",
+            use="@trigger-slack",
+            name="trigger-slack",
             description="None",
             action_raw=yaml.dump(workflow_action),
             installed_by="pytest",

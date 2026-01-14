@@ -28,6 +28,6 @@ actions:
     if: "'{{ steps.clickhouse-step.results.level }}' == 'ERROR'"
     provider:
       config: "{{ providers.slack }}"
-      type: console
+      type: slack
       with:
         message: "Error in clickhouse logs_table: {{ steps.clickhouse-step.results.level }}"

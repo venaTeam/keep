@@ -169,7 +169,7 @@ workflow:
     - name: send-notification
       if: "{{ alert }}"
       provider:
-        type: console
+        type: slack
         config: "{{ providers.slack }}"
         with:
           message: |

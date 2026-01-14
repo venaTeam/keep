@@ -29,7 +29,7 @@ workflow:
           value: "{{ steps.db-no-space.results }}"
           compare_to: 90% # Trigger if more than 90% full
       provider:
-        type: console
+        type: slack
         config: " {{ providers.slack-demo }} "
         with:
           # Message is always mandatory

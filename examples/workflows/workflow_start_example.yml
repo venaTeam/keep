@@ -11,7 +11,7 @@ workflow:
     - name: send-slack-message-tier-1
       if: "keep.get_firing_time('{{ alert }}', 'minutes') > 15  and not keep.get_firing_time('{{ alert }}', 'minutes') < 30"
       provider:
-        type: console
+        type: slack
         config: "{{ providers.slack }}"
         with:
           message: |
@@ -20,7 +20,7 @@ workflow:
     - name: send-slack-message-tier-2
       if: "keep.get_firing_time('{{ alert }}', 'minutes') > 30"
       provider:
-        type: console
+        type: slack
         config: "{{ providers.slack }}"
         with:
           message: |

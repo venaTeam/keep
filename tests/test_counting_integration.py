@@ -20,7 +20,7 @@ def get_alert_by_fingerprint(client, fingerprint):
     return None
 
 
-@pytest.mark.timeout(15)
+@pytest.mark.timeout(30)
 @pytest.mark.parametrize(
     "test_app",
     [

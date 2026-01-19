@@ -14,12 +14,12 @@ from keep.common.core.config import config
 from keep.common.core.db import (
     create_workflow_execution,
     get_enrichment,
-    get_previous_execution_id,
+
     get_timeouted_workflow_exections,
     get_workflows_that_should_run,
 )
 from keep.common.core.db import finish_workflow_execution as finish_workflow_execution_db
-from keep.common.core.db import get_workflow_by_id as get_workflow_db
+
 from keep.common.core.metrics import (
     workflow_execution_errors_total,
     workflow_execution_status,

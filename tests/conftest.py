@@ -330,9 +330,9 @@ actions:
     # Close WorkflowDBHandler to stop background thread before dropping tables
     root_logger = logging.getLogger()
     for handler in root_logger.handlers[:]:
-        if isinstance(handler, WorkflowDBHandler):
+        if isinstance(handler, WorkflowDBHandler) or handler.__class__.__name__ == "FluentBitHandler":
             handler.close()
-            break
+            root_logger.removeHandler(handler)
 
     logger = logging.getLogger(__name__)
     logger.info("Dropping all tables")

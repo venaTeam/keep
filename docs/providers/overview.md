@@ -10,6 +10,7 @@ By leveraging Keep Providers, users are able to deeply integrate Keep with the t
 
 - [Airflow](/providers/documentation/airflow-provider)
 - [ArgoCD](/providers/documentation/argocd-provider)
+- [Auth0](/providers/documentation/auth0-provider)
 - [Flux CD](/providers/documentation/fluxcd-provider)
 - [Bash](/providers/documentation/bash-provider)
 - [Centreon](/providers/documentation/centreon-provider)

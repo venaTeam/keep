@@ -297,6 +297,15 @@ class ProvidersFactory:
             elif provider_directory in blacklisted_providers:
                 continue
             # import it
+            # check if the provider module exists
+            provider_module_file = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                provider_directory,
+                f"{provider_directory}.py",
+            )
+            if not os.path.exists(provider_module_file):
+                continue
+
             try:
                 module = importlib.import_module(
                     f"keep.providers.{provider_directory}.{provider_directory}"

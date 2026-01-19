@@ -7,6 +7,9 @@ import os
 import sys
 import threading
 import uuid
+import queue
+import requests
+import json
 from datetime import datetime
 from threading import Timer
 
@@ -273,8 +276,10 @@ class ProviderLoggerAdapter(logging.LoggerAdapter):
 
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
-KEEP_LOG_FILE = os.environ.get("KEEP_LOG_FILE")
-
+KEEP_LOG_FILE = os.environ.get("KEEP_LOG_FILE", "false").lower() == "true"
+KEEP_FLUENTBIT = os.environ.get("KEEP_FLUENTBIT", "true").lower() == "true"
+KEEP_FLUENTBIT_HOST = os.environ.get("KEEP_FLUENTBIT_HOST")
+KEEP_FLUENTBIT_PORT = os.environ.get("KEEP_FLUENTBIT_PORT", "80")
 LOG_FORMAT_OPEN_TELEMETRY = "open_telemetry"
 LOG_FORMAT_DEVELOPMENT_TERMINAL = "dev_terminal"
 
@@ -322,6 +327,48 @@ def get_worker_type():
 
 # Set this as a global variable during initialization
 WORKER_TYPE = get_worker_type()
+
+
+class FluentBitHandler(logging.Handler):
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    def __init__(self, host, port, tenant="keep", **kwargs):
+        super().__init__()
+        self.url = f"http://{host}:{port}"
+        self.tenant = tenant
+        self.queue = queue.Queue(maxsize=1000)
+        self.session = requests.Session()
+        self._stop = threading.Event()
+        threading.Thread(target=self._send, daemon=True).start()
+
+    def _send(self):
+        while not self._stop.is_set():
+            try:
+                record = self.queue.get(timeout=1)
+                if record is None:
+                    break
+                json_record = json.loads(record)
+                json_record["tenant"] = self.tenant
+                try:
+                    self.session.post(self.url, json=json_record, verify=False)
+                except Exception:
+                    pass
+            except queue.Empty:
+                continue
+
+    def emit(self, record):
+        try:
+            self.queue.put_nowait(self.format(record))
+        except queue.Full:
+            pass
+
+    def close(self):
+        try:
+            self.queue.put(None)
+            self._stop.set()
+
+        except Exception:
+            pass
+        super().close()
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
@@ -436,6 +483,11 @@ CONFIG = {
             "level": "ERROR",
             "propagate": False,
         },
+        "http.client": {
+            "handlers": ["default"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
     },
 }
 
@@ -519,6 +571,7 @@ class CustomizedUvicornLogger(logging.Logger):
 
 def setup_logging():
     # Add file handler if KEEP_LOG_FILE is set
+    # TODO: remove this after we move to fluentbit
     if KEEP_LOG_FILE:
         CONFIG["handlers"]["file"] = {
             "level": "DEBUG",
@@ -531,6 +584,18 @@ def setup_logging():
         }
         # Add file handler to root logger
         CONFIG["loggers"][""]["handlers"].append("file")
+
+    # Add fluentbit handler if KEEP_FLUENTBIT is set
+    if KEEP_FLUENTBIT:
+        CONFIG["handlers"]["fluentbit"] = {
+            "level": "DEBUG",
+            "formatter": ("json"),
+            "class": "keep.common.logging.FluentBitHandler",
+            "host": KEEP_FLUENTBIT_HOST,
+            "port": int(KEEP_FLUENTBIT_PORT),
+        }
+        # Add file handler to root logger
+        CONFIG["loggers"][""]["handlers"].append("fluentbit")
 
     logging.config.dictConfig(CONFIG)
     # MONKEY PATCHING http.client

@@ -353,6 +353,87 @@ jobs:
           echo "Commit SHA: ${{ github.sha }}"
           echo "Repository owner (lowercase): ${{ steps.repo-owner.outputs.owner }}"
 
+  build-event-handler:
+      name: Build Event Handler
+      runs-on: ubuntu-latest
+      if: github.event_name != 'pull_request' || github.event.pull_request.base.ref == 'development'
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+
+        - name: Set lowercase repository owner
+          id: repo-owner
+          run: |
+            REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            echo "owner=${REPO_OWNER_LOWER}" >> $GITHUB_OUTPUT
+            echo "Repository owner (lowercase): ${REPO_OWNER_LOWER}"
+
+        - name: Extract version from pyproject.toml
+          id: get-version
+          run: |
+            VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+            echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            echo "Extracted version: ${VERSION}"
+
+        - name: Login to GitHub Container Registry
+          if: ${{ env.IS_FORK != 'true' }}
+          uses: docker/login-action@v2
+          with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Set up Docker Buildx
+          id: buildx
+          uses: docker/setup-buildx-action@v2
+
+        - name: Set cache key variables
+          id: cache-keys
+          run: |
+            # Create a safe branch name for cache key (replace / with - and remove special chars)
+            SAFE_BRANCH=$(echo "${{ github.head_ref || github.ref_name }}" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9._-]//g')
+            echo "SAFE_BRANCH_NAME=${SAFE_BRANCH}" >> $GITHUB_OUTPUT
+
+            # Create a hash of poetry files for version-specific caching
+            DEPS_HASH=$(cat poetry.lock pyproject.toml | sha256sum | cut -d ' ' -f 1)
+            echo "DEPS_HASH=${DEPS_HASH:0:8}" >> $GITHUB_OUTPUT
+
+        - name: Check if branch cache exists
+          id: branch-cache-exists
+          if: ${{ env.IS_FORK != 'true' }}
+          continue-on-error: true
+          run: |
+            BRANCH_CACHE_TAG="ghcr.io/${{ steps.repo-owner.outputs.owner }}/keep-event-handler:cache-${{ steps.cache-keys.outputs.SAFE_BRANCH_NAME }}"
+            if docker buildx imagetools inspect "$BRANCH_CACHE_TAG" &>/dev/null; then
+              echo "Branch cache exists: $BRANCH_CACHE_TAG"
+              echo "cache_exists=true" >> $GITHUB_OUTPUT
+            else
+              echo "Branch cache does not exist: $BRANCH_CACHE_TAG"
+              echo "cache_exists=false" >> $GITHUB_OUTPUT
+            fi
+
+        - name: Build and push event handler image with registry cache
+          if: ${{ env.IS_FORK != 'true' }}
+          uses: docker/build-push-action@v4
+          with:
+            context: .
+            file: ./docker/Dockerfile.event_handler
+            push: true
+            tags: |
+              ghcr.io/${{ steps.repo-owner.outputs.owner }}/keep-event-handler:${{ github.sha }}
+              ghcr.io/${{ steps.repo-owner.outputs.owner }}/keep-event-handler:${{ steps.get-version.outputs.version }}
+            metadata: |
+              labels.docker.image="${{ steps.repo-owner.outputs.owner }}/keep-event-handler:${{ github.sha }}"
+            cache-from: |
+              type=registry,ref=ghcr.io/${{ steps.repo-owner.outputs.owner }}/keep-event-handler:cache-${{ steps.cache-keys.outputs.DEPS_HASH }}
+              type=registry,ref=ghcr.io/${{ steps.repo-owner.outputs.owner }}/keep-event-handler:cache-${{ steps.cache-keys.outputs.SAFE_BRANCH_NAME }}
+            cache-to: |
+              type=registry,ref=ghcr.io/${{ steps.repo-owner.outputs.owner }}/keep-event-handler:cache-${{ steps.cache-keys.outputs.DEPS_HASH }},mode=max
+              type=registry,ref=ghcr.io/${{ steps.repo-owner.outputs.owner }}/keep-event-handler:cache-${{ steps.cache-keys.outputs.SAFE_BRANCH_NAME }},mode=max
+            build-args: |
+              BUILDKIT_INLINE_CACHE=1
+            outputs: type=image,push=true
+    
   # Run tests with all services in one job
   # run-mysql-with-redis:
   #   needs: [build-frontend, build-backend, prepare-test-environment]

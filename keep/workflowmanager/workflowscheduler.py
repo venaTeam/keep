@@ -29,7 +29,7 @@ from keep.common.core.metrics import (
 )
 from keep.common.models.alert import AlertDto
 from keep.common.models.incident import IncidentDto
-from keep.common.utils.email_utils import KEEP_EMAILS_ENABLED, EmailTemplates, send_email
+
 from keep.providers.providers_factory import ProviderConfigurationException
 from keep.workflowmanager.workflow import Workflow, WorkflowStrategy
 from keep.workflowmanager.workflowstore import WorkflowStore
@@ -724,40 +724,4 @@ class WorkflowScheduler:
             error=error,
         )
 
-        if KEEP_EMAILS_ENABLED:
-            # get the previous workflow execution id
-            previous_execution = get_previous_execution_id(
-                tenant_id, workflow_id, workflow_execution_id
-            )
-            # if error, send an email
-            if status == WorkflowStatus.ERROR and (
-                previous_execution
-                is None  # this means this is the first execution, for example
-                or previous_execution.status != WorkflowStatus.ERROR.value
-            ):
-                workflow = get_workflow_db(tenant_id=tenant_id, workflow_id=workflow_id)
-                try:
-                    keep_platform_url = config(
-                        "KEEP_PLATFORM_URL", default="https://platform.keephq.dev"
-                    )
-                    error_logs_url = f"{keep_platform_url}/workflows/{workflow_id}/runs/{workflow_execution_id}"
-                    self.logger.debug(
-                        f"Sending email to {workflow.created_by} for failed workflow {workflow_id}"
-                    )
-                    email_sent = send_email(
-                        to_email=workflow.created_by,
-                        template_id=EmailTemplates.WORKFLOW_RUN_FAILED,
-                        workflow_id=workflow_id,
-                        workflow_name=workflow.name,
-                        workflow_execution_id=workflow_execution_id,
-                        error=error,
-                        url=error_logs_url,
-                    )
-                    if email_sent:
-                        self.logger.info(
-                            f"Email sent to {workflow.created_by} for failed workflow {workflow_id}"
-                        )
-                except Exception as e:
-                    self.logger.error(
-                        f"Failed to send email to {workflow.created_by} for failed workflow {workflow_id}: {e}"
-                    )
+

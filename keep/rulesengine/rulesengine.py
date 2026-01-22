@@ -23,6 +23,7 @@ from keep.common.core.db import (
 )
 from keep.common.core.db import get_rules as get_rules_db
 from keep.common.core.dependencies import get_pusher_client
+from keep.common.core.metrics import incidents_opened_total
 from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.common.models.db.alert import Incident
 from keep.common.models.db.rule import Rule
@@ -217,6 +218,13 @@ class RulesEngine:
                                 )
 
                             incidents_dto[incident.id] = incident_dto
+                            
+                            if send_created_event:
+                                incidents_opened_total.labels(
+                                    tenant_id=self.tenant_id,
+                                    rule_id=rule.id,
+                                    rule_name=rule.name,
+                                ).inc()
 
                 else:
                     self.logger.info(

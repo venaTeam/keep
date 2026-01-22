@@ -19,6 +19,7 @@ from keep.common.core.db import (
     set_maintenance_windows_trace,
 )
 from keep.common.core.dependencies import get_pusher_client
+from keep.common.core.metrics import alerts_maintenance_silenced_total
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
 from keep.common.models.db.alert import Alert, AlertAudit
@@ -85,6 +86,12 @@ class MaintenanceWindowsBl:
                     "Alert is in maintenance window",
                     extra={**extra, "maintenance_rule_id": maintenance_rule.id},
                 )
+                
+                alerts_maintenance_silenced_total.labels(
+                    tenant_id=self.tenant_id,
+                    maintenance_window_id=maintenance_rule.id,
+                    maintenance_window_name=maintenance_rule.name,
+                ).inc()
 
                 try:
                     audit = AlertAudit(

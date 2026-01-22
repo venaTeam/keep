@@ -1,13 +1,21 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from prometheus_client import Histogram
+from prometheus_client import Histogram, REGISTRY
+
+def get_or_create_histogram(name, documentation, labelnames, buckets):
+    try:
+        return Histogram(name, documentation, labelnames, buckets=buckets)
+    except ValueError:
+        if name in REGISTRY._names_to_collectors:
+            return REGISTRY._names_to_collectors[name]
+        raise
 
 router = APIRouter()
 
 # Define Histograms for Web Vitals
 # Buckets are customized for Web Vitals thresholds (in milliseconds/seconds as appropriate)
 # CLS: 0.1 (good), 0.25 (needs improvement)
-CLS_HISTOGRAM = Histogram(
+CLS_HISTOGRAM = get_or_create_histogram(
     "keep_frontend_web_vital_cls",
     "Cumulative Layout Shift",
     ["path"],
@@ -15,7 +23,7 @@ CLS_HISTOGRAM = Histogram(
 )
 
 # FCP: 1.8s (good), 3.0s (needs improvement)
-FCP_HISTOGRAM = Histogram(
+FCP_HISTOGRAM = get_or_create_histogram(
     "keep_frontend_web_vital_fcp",
     "First Contentful Paint (seconds)",
     ["path"],
@@ -23,7 +31,7 @@ FCP_HISTOGRAM = Histogram(
 )
 
 # LCP: 2.5s (good), 4.0s (needs improvement)
-LCP_HISTOGRAM = Histogram(
+LCP_HISTOGRAM = get_or_create_histogram(
     "keep_frontend_web_vital_lcp",
     "Largest Contentful Paint (seconds)",
     ["path"],
@@ -31,7 +39,7 @@ LCP_HISTOGRAM = Histogram(
 )
 
 # TTFB: 0.8s (good), 1.8s (needs improvement)
-TTFB_HISTOGRAM = Histogram(
+TTFB_HISTOGRAM = get_or_create_histogram(
     "keep_frontend_web_vital_ttfb",
     "Time to First Byte (seconds)",
     ["path"],
@@ -39,7 +47,7 @@ TTFB_HISTOGRAM = Histogram(
 )
 
 # FID: 100ms (good), 300ms (needs improvement)
-FID_HISTOGRAM = Histogram(
+FID_HISTOGRAM = get_or_create_histogram(
     "keep_frontend_web_vital_fid",
     "First Input Delay (seconds)",
     ["path"],
@@ -47,7 +55,7 @@ FID_HISTOGRAM = Histogram(
 )
 
 # INP: 200ms (good), 500ms (needs improvement)
-INP_HISTOGRAM = Histogram(
+INP_HISTOGRAM = get_or_create_histogram(
     "keep_frontend_web_vital_inp",
     "Interaction to Next Paint (seconds)",
     ["path"],

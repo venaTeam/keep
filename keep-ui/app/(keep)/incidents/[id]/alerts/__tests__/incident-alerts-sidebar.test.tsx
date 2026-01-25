@@ -95,7 +95,9 @@ jest.mock('@/shared/ui', () => ({
 }));
 
 jest.mock('../incident-alert-table-body-skeleton', () => ({
-  IncidentAlertsTableBodySkeleton: () => <div data-testid="loading-skeleton" />,
+  IncidentAlertsTableBodySkeleton: () => (
+    <tbody data-testid="loading-skeleton" />
+  ),
 }));
 
 jest.mock('../incident-alert-actions', () => ({
@@ -107,8 +109,8 @@ jest.mock('@/widgets/alerts-table/lib/alert-table-utils', () => ({
   useAlertTableCols: jest.fn(({ MenuComponent }: any) => [
     { id: 'name', header: 'Name', cell: ({ row }: any) => row.original.name },
     { id: 'severity', header: 'Severity', cell: ({ row }: any) => row.original.severity },
-    { 
-      id: 'alertMenu', 
+    {
+      id: 'alertMenu',
       header: 'Actions',
       MenuComponent: MenuComponent,
       cell: ({ row }: any) => MenuComponent(row.original)
@@ -173,7 +175,7 @@ jest.mock('@/features/alerts/alert-detail-sidebar', () => ({
     // Update our tracked state
     alertSidebarState.isOpen = isOpen;
     alertSidebarState.alert = alert;
-    
+
     if (!isOpen) return null;
     return (
       <div data-testid="alert-sidebar">
@@ -191,7 +193,7 @@ jest.mock('@/features/alerts/alert-detail-sidebar', () => ({
 
 // Mock ViewAlertModal
 jest.mock("@/features/alerts/view-raw-alert", () => ({
-  ViewAlertModal: ({ alert, handleClose }: any) => 
+  ViewAlertModal: ({ alert, handleClose }: any) =>
     alert ? <div data-testid="view-alert-modal">ViewAlertModal</div> : null,
 }));
 
@@ -392,7 +394,7 @@ describe('IncidentAlerts - AlertSidebar Integration', () => {
     // Verify no error was thrown and state is clean
     expect(alertSidebarState.isOpen).toBe(false);
     expect(alertSidebarState.alert).toBe(null);
-    
+
     // The key verification is that no error was thrown during the close operation
     // If the bug existed, we would get "Cannot read properties of null (reading 'fingerprint')"
   });
@@ -402,7 +404,7 @@ describe('IncidentAlerts - AlertSidebar Integration', () => {
 
     // Open sidebar for first alert
     fireEvent.click(screen.getByTestId('alert-row-alert-1'));
-    
+
     await waitFor(() => {
       const sidebarContent = screen.getByTestId('alert-sidebar-content');
       expect(sidebarContent).toHaveTextContent('Test Alert 1');

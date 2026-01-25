@@ -68,17 +68,17 @@ export const GroupedRow = ({
     return (
       <>
         {/* Group Header Row */}
-        <TableRow className="bg-orange-100 hover:bg-orange-200 cursor-pointer border-t border-orange-300">
+        <TableRow
+          className="bg-orange-100 hover:bg-orange-200 cursor-pointer border-t border-orange-300"
+          onClick={() => onToggleExpanded?.(groupKey)}
+        >
           {/* Render a single cell that spans the entire width */}
           <TableCell
             colSpan={row.getVisibleCells().length}
             className="group-header-cell bg-orange-100 group-hover:bg-orange-200"
           >
             <div className="flex items-center gap-2">
-              <div
-                className="flex items-center"
-                onClick={() => onToggleExpanded?.(groupKey)}
-              >
+              <div className="flex items-center">
                 <ChevronDownIcon
                   className={clsx(
                     "w-5 h-5 transition-transform",
@@ -91,12 +91,10 @@ export const GroupedRow = ({
                   checked={row.getIsAllSubRowsSelected()}
                   indeterminate={row.getIsSomeSelected()}
                   onChange={row.getToggleSelectedHandler()}
+                  onClick={(e) => e.stopPropagation()}
                 />
               )}
-              <div
-                className="flex items-center gap-2 flex-grow"
-                onClick={() => onToggleExpanded?.(groupKey)}
-              >
+              <div className="flex items-center gap-2 flex-grow">
                 <span className="font-medium">{String(groupValue)}</span>
                 <span className="text-gray-500 text-sm">
                   ({row.subRows.length}{" "}

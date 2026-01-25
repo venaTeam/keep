@@ -701,6 +701,7 @@ export function AlertTableServerSide({
         ) : (
           <AlertPresetManager
             presetName={presetName}
+            celValue={searchCel}
             onCelChanges={setSearchCel}
             table={table}
             isGroupingActive={isGroupingActive}

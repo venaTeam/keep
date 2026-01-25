@@ -29,13 +29,13 @@ export const AlertTimeline: React.FC<AlertTimelineProps> = ({
   // Default audit event if no audit data is available
   const defaultAuditEvent = alert
     ? [
-        {
-          user_id: "system",
-          action: "Alert is triggered",
-          description: "alert received from provider with status firing",
-          timestamp: alert.lastReceived,
-        },
-      ]
+      {
+        user_id: "system",
+        action: "Alert is triggered",
+        description: "alert received from provider with status firing",
+        timestamp: alert.lastReceived,
+      },
+    ]
     : [];
 
   const auditContent = auditData?.length ? auditData : defaultAuditEvent;
@@ -63,10 +63,10 @@ export const AlertTimeline: React.FC<AlertTimelineProps> = ({
       )}
       <div className="flex flex-col justify-center flex-grow overflow-hidden">
         <Subtitle className="text-sm text-orange-500 font-semibold whitespace-normal overflow-wrap-break-word">
-          {entry.action.toLowerCase()}
+          {entry.action}
         </Subtitle>
         <Subtitle className="text-xs whitespace-normal overflow-wrap-break-word">
-          {entry.description.toLowerCase()}
+          {entry.description}
         </Subtitle>
       </div>
     </div>

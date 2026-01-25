@@ -135,6 +135,7 @@ type AlertsRulesBuilderProps = {
   table?: Table<AlertDto>;
   selectedPreset?: Preset;
   defaultQuery: string | undefined;
+  celValue?: string | null;
   setIsModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   setPresetCEL?: React.Dispatch<React.SetStateAction<string>>;
   updateOutputCEL?: React.Dispatch<React.SetStateAction<string>>;
@@ -181,6 +182,7 @@ export const AlertsRulesBuilder = ({
   table,
   selectedPreset,
   defaultQuery = "",
+  celValue,
   setIsModalOpen,
   setPresetCEL,
   updateOutputCEL,
@@ -205,9 +207,13 @@ export const AlertsRulesBuilder = ({
   const [isImportSQLOpen, setImportSQLOpen] = useState(false);
   const [sqlQuery, setSQLQuery] = useState("");
 
+  // If celValue is provided (from parent state), use it as the initial value
+  // This ensures the CEL expression is preserved across component remounts
+  const initialCel = celValue ?? constructCELRules(selectedPreset);
+
   const [appliedCel, setAppliedCel] = useCelState({
     enableQueryParams: shouldSetQueryParam,
-    defaultCel: constructCELRules(selectedPreset),
+    defaultCel: initialCel,
   });
   const [celRules, setCELRules] = useState(appliedCel);
 
@@ -297,13 +303,13 @@ export const AlertsRulesBuilder = ({
 
   const fields: Field[] = table
     ? table
-        .getAllColumns()
-        .filter(({ getIsPinned }) => getIsPinned() === false)
-        .map(({ id, columnDef }) => ({
-          name: id,
-          label: columnDef.header as string,
-          operators: getOperators(id),
-        }))
+      .getAllColumns()
+      .filter(({ getIsPinned }) => getIsPinned() === false)
+      .map(({ id, columnDef }) => ({
+        name: id,
+        label: columnDef.header as string,
+        operators: getOperators(id),
+      }))
     : customFields
       ? customFields
       : [];
@@ -387,17 +393,17 @@ export const AlertsRulesBuilder = ({
                       minimal
                         ? undefined
                         : {
-                            ...customComponents,
-                            MenuList: (props) => (
-                              <CustomMenuList
-                                {...props}
-                                docsUrl={
-                                  config?.KEEP_DOCS_URL ||
-                                  "https://docs.keephq.dev"
-                                }
-                              />
-                            ),
-                          }
+                          ...customComponents,
+                          MenuList: (props) => (
+                            <CustomMenuList
+                              {...props}
+                              docsUrl={
+                                config?.KEEP_DOCS_URL ||
+                                "https://docs.keephq.dev"
+                              }
+                            />
+                          ),
+                        }
                     }
                     onBlur={() => setShowSuggestions(false)}
                   />

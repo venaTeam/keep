@@ -12,7 +12,7 @@ import { Table } from "@tanstack/react-table";
 
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 import { useConfig } from "@/utils/hooks/useConfig";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, BellIcon } from "@heroicons/react/24/outline";
 import { ChevronDoubleRightIcon } from "@heroicons/react/24/solid";
 import { AlertChangeStatusModal } from "@/features/alerts/alert-change-status/ui/alert-change-status-modal";
 import { CreatePresetModal } from "./create-preset-modal";
@@ -57,6 +57,8 @@ export default function AlertActions({
   const selectedAlerts = table
     .getSelectedRowModel()
     .rows.map((row) => row.original);
+  const isAllDismissed =
+    selectedAlerts.length > 0 && selectedAlerts.every((a) => a.dismissed);
 
   async function addOrUpdatePreset(newPresetName: string) {
     if (newPresetName) {
@@ -150,16 +152,17 @@ export default function AlertActions({
         />
       )}
       <Button
-        icon={SilencedDoorbellNotification}
+        icon={isAllDismissed ? BellIcon : SilencedDoorbellNotification}
         size="xs"
-        color="red"
-        title="Delete"
+        color={isAllDismissed ? "orange" : "red"}
+        title={isAllDismissed ? "Restore" : "Dismiss"}
         onClick={() => {
           setDismissModalAlert?.(selectedAlerts);
           clearRowSelection();
         }}
       >
-        Dismiss {selectedAlertsFingerprints.length} alert(s)
+        {isAllDismissed ? "Restore" : "Dismiss"}{" "}
+        {selectedAlertsFingerprints.length} alert(s)
       </Button>
       <Button
         icon={PlusIcon}

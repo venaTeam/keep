@@ -38,7 +38,7 @@ const makeRequiredEitherStepsOrActions: PostProcessCallback = (
 };
 
 export function generateWorkflowYamlJsonSchema(zodSchema: ZodSchema) {
-  return zodToJsonSchema(zodSchema, {
+  return zodToJsonSchema(zodSchema as any, {
     name: schemaName,
     // Make workflow valid if it has either actions or steps
     postProcess: makeRequiredEitherStepsOrActions,

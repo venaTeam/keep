@@ -10,6 +10,7 @@ import {
   TabPanel,
   TabPanels,
   Callout,
+  Textarea,
 } from "@tremor/react";
 import Modal from "@/components/ui/Modal";
 import DatePicker from "react-datepicker";
@@ -18,14 +19,10 @@ import { AlertDto } from "@/entities/alerts/model";
 import { set, isSameDay, isAfter } from "date-fns";
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { toast } from "react-toastify";
-import "react-quill-new/dist/quill.snow.css";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 import "./alert-dismiss-modal.css";
-import dynamic from "next/dynamic";
-
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 interface Props {
   preset: string;
@@ -90,14 +87,7 @@ export function AlertDismissModal({
     const dismissUntil =
       selectedTab === 0 ? null : selectedDateTime?.toISOString();
 
-    // Decode HTML entities (like &nbsp;) using DOM-based approach
-    const decodeHtmlEntities = (html: string): string => {
-      const txt = document.createElement('textarea');
-      txt.innerHTML = html;
-      return txt.value;
-    };
-
-    const plainTextNote = decodeHtmlEntities(dismissComment.replace(/<[^>]+>/g, '')).trim();
+    const plainTextNote = dismissComment.trim();
 
     const enrichments: {
       dismissed: boolean;
@@ -235,12 +225,12 @@ export function AlertDismissModal({
             </TabPanels>
           </TabGroup>
           <Title>Dismiss Comment</Title>
-          <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-            <ReactQuill
+          <div className="mt-4">
+            <Textarea
               value={dismissComment}
-              onChange={(value: string) => setDismissComment(value)}
-              theme="snow"
+              onChange={(e) => setDismissComment(e.target.value)}
               placeholder="Add your dismiss comment here..."
+              rows={4}
             />
           </div>
           <div className="mt-4 flex justify-end gap-2">

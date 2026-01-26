@@ -90,7 +90,14 @@ export function AlertDismissModal({
     const dismissUntil =
       selectedTab === 0 ? null : selectedDateTime?.toISOString();
 
-    const plainTextNote = dismissComment.replace(/<[^>]+>/g, '').trim();
+    // Decode HTML entities (like &nbsp;) using DOM-based approach
+    const decodeHtmlEntities = (html: string): string => {
+      const txt = document.createElement('textarea');
+      txt.innerHTML = html;
+      return txt.value;
+    };
+
+    const plainTextNote = decodeHtmlEntities(dismissComment.replace(/<[^>]+>/g, '')).trim();
 
     const enrichments: {
       dismissed: boolean;
@@ -167,9 +174,8 @@ export function AlertDismissModal({
       ) : (
         <>
           <Callout color="orange" title="Dismissing Alerts" className="mb-2.5">
-            {`This will dismiss the alert until an alert with the same fingerprint comes in${
-              selectedTab === 1 ? ` or until ${selectedDateTime}.` : "."
-            }`}
+            {`This will dismiss the alert until an alert with the same fingerprint comes in${selectedTab === 1 ? ` or until ${selectedDateTime}.` : "."
+              }`}
           </Callout>
           <div className="flex justify-end mb-4">
             <Button

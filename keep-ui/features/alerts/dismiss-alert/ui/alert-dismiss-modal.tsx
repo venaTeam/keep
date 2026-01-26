@@ -15,14 +15,28 @@ import {
 import Modal from "@/components/ui/Modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AlertDto } from "@/entities/alerts/model";
+import { AlertDto, Status } from "@/entities/alerts/model";
 import { set, isSameDay, isAfter } from "date-fns";
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { toast } from "react-toastify";
 import { useApi } from "@/shared/lib/hooks/useApi";
-import { showErrorToast } from "@/shared/ui";
+import { Select, showErrorToast } from "@/shared/ui";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  PauseIcon,
+  CircleStackIcon,
+} from "@heroicons/react/24/outline";
 import "./alert-dismiss-modal.css";
+
+const statusIcons = {
+  [Status.Firing]: <ExclamationCircleIcon className="w-5 h-5 text-red-500 mr-2" />,
+  [Status.Resolved]: <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />,
+  [Status.Acknowledged]: <PauseIcon className="w-5 h-5 text-gray-500 mr-2" />,
+  [Status.Suppressed]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
+  [Status.Pending]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
+};
 
 interface Props {
   preset: string;
@@ -41,7 +55,9 @@ export function AlertDismissModal({
   const [showError, setShowError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disposeOnNewAlert, setDisposeOnNewAlert] = useState<boolean>(true);
+  const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 
+  const isRestore = alerts?.every((a) => a.dismissed);
   const revalidateMultiple = useRevalidateMultiple();
   const presetsMutator = () => revalidateMultiple(["/preset"]);
   const { alertsMutator } = useAlerts();
@@ -92,11 +108,13 @@ export function AlertDismissModal({
     const enrichments: {
       dismissed: boolean;
       note: string;
-      dismissUntil: string;
+      dismissUntil?: string;
+      status?: Status | null;
     } = {
       dismissed: !alerts[0]?.dismissed,
       note: plainTextNote,
-      dismissUntil: dismissUntil || "",
+      ...(!isRestore && { dismissUntil: dismissUntil || "" }),
+      ...(isRestore && selectedStatus && { status: selectedStatus }),
     };
 
     const requestData = {
@@ -105,13 +123,18 @@ export function AlertDismissModal({
     };
 
     try {
-      await api.post(
-        `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
-        requestData
+      const endpoint = isRestore
+        ? "/alerts/batch_enrich?dispose_on_new_alert=false"
+        : `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`;
+
+      await api.post(endpoint, requestData);
+      toast.success(
+        `${alerts.length} alerts ${isRestore ? "restored" : "dismissed"
+        } successfully!`,
+        {
+          position: "top-right",
+        }
       );
-      toast.success(`${alerts.length} alerts dismissed successfully!`, {
-        position: "top-right",
-      });
       await alertsMutator();
       await presetsMutator();
     } catch (error) {
@@ -128,6 +151,7 @@ export function AlertDismissModal({
     setDismissComment("");
     setShowError(false);
     setDisposeOnNewAlert(true);
+    setSelectedStatus(null);
     handleClose();
   };
 
@@ -148,15 +172,66 @@ export function AlertDismissModal({
       isOpen={isOpen}
       className="overflow-visible"
       beforeTitle={alerts?.[0]?.name}
-      title="Dismiss Alert"
+      title={isRestore ? "Restore Alert(s)" : "Dismiss Alert(s)"}
     >
-      {alerts && alerts.length == 1 && alerts[0].dismissed ? (
+      {isRestore ? (
         <>
-          <Subtitle className="text-center">
-            Are you sure you want to restore this alert?
-          </Subtitle>
-          <div className="flex justify-center mt-4 space-x-2">
-            <Button onClick={handleDismissChange} color="orange">
+          <Callout color="orange" title="Restoring Alerts" className="mb-2.5">
+            This will restore the alert(s) and set their status.
+          </Callout>
+          <div className="flex mt-2.5 items-center mb-4">
+            <Subtitle className="flex items-center font-bold mr-2">
+              New status:
+            </Subtitle>
+            <Select
+              options={Object.values(Status).map((status) => ({
+                value: status,
+                label: (
+                  <div className="flex items-center">
+                    {statusIcons[status]}
+                    <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                  </div>
+                ),
+              }))}
+              value={
+                selectedStatus
+                  ? {
+                    value: selectedStatus,
+                    label: (
+                      <div className="flex items-center">
+                        {statusIcons[selectedStatus]}
+                        <span>
+                          {selectedStatus.charAt(0).toUpperCase() +
+                            selectedStatus.slice(1)}
+                        </span>
+                      </div>
+                    ),
+                  }
+                  : null
+              }
+              onChange={(option) => setSelectedStatus(option?.value || null)}
+              placeholder="Select new status"
+              className="w-56"
+            />
+          </div>
+          <Title>Restore Note</Title>
+          <div className="mt-4">
+            <Textarea
+              value={dismissComment}
+              onChange={(e) => setDismissComment(e.target.value)}
+              placeholder="Add your restore note here..."
+              rows={4}
+            />
+          </div>
+          <div className="flex justify-end mt-4 space-x-2">
+            <Button variant="secondary" color="orange" onClick={clearAndClose}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDismissChange}
+              color="orange"
+              loading={isLoading}
+            >
               Restore
             </Button>
           </div>
@@ -224,12 +299,13 @@ export function AlertDismissModal({
               </TabPanel>
             </TabPanels>
           </TabGroup>
-          <Title>Dismiss Comment</Title>
+          <Title>{isRestore ? "Restore Note" : "Dismiss Comment"}</Title>
           <div className="mt-4">
             <Textarea
               value={dismissComment}
               onChange={(e) => setDismissComment(e.target.value)}
-              placeholder="Add your dismiss comment here..."
+              placeholder={`Add your ${isRestore ? "restore" : "dismiss"
+                } note here...`}
               rows={4}
             />
           </div>

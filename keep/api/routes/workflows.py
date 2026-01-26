@@ -20,7 +20,7 @@ from opentelemetry import trace
 from sqlmodel import Session
 
 from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
-from keep.common.core.config import config
+from keep.api.config import KEEP_PLATFORM_URL
 from keep.common.core.db import (
     get_alert_by_event_id,
     get_installed_providers,
@@ -75,7 +75,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
-PLATFORM_URL = config("KEEP_PLATFORM_URL", default="https://platform.keephq.dev")
+PLATFORM_URL = KEEP_PLATFORM_URL
 
 
 @router.post(

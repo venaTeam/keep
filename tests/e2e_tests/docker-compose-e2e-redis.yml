@@ -9,7 +9,6 @@ services:
     environment:
       - AUTH_TYPE=NO_AUTH
       - API_URL=http://keep-backend:8080
-      - POSTHOG_DISABLED=true
       - SENTRY_DISABLED=true
     depends_on:
       - keep-backend
@@ -22,7 +21,6 @@ services:
     environment:
       - AUTH_TYPE=NO_AUTH
       - DATABASE_CONNECTION_STRING=sqlite:///./newdb.db?check_same_thread=False
-      - POSTHOG_DISABLED=true
       - SECRET_MANAGER_DIRECTORY=/appֿ
       - REDIS=true
       - REDIS_HOST=keep-arq-redis
@@ -40,7 +38,6 @@ services:
     environment:
       - AUTH_TYPE=NO_AUTH
       - DATABASE_CONNECTION_STRING=sqlite:///./newdb.db?check_same_thread=False
-      - POSTHOG_DISABLED=true
       - SECRET_MANAGER_DIRECTORY=/app
       - REDIS=true
       - REDIS_HOST=keep-arq-redis

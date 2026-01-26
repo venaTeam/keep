@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlmodel import Session
 
-from keep.common.core.config import config
+from keep.api.config import KEEP_API_URL
 from keep.common.core.db import get_session
 from keep.common.core.tenant_configuration import TenantConfiguration
 from keep.common.models.alert import AlertDto
@@ -57,7 +57,7 @@ def webhook_settings(
 ) -> WebhookSettings:
     tenant_id = authenticated_entity.tenant_id
     logger.info("Getting webhook settings")
-    api_url = config("KEEP_API_URL")
+    api_url = KEEP_API_URL
     keep_webhook_api_url = f"{api_url}/alerts/event"
     try:
         webhook_api_key = get_or_create_api_key(

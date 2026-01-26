@@ -22,7 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { StopIcon, TrashIcon } from "@radix-ui/react-icons";
 import { toast } from "react-toastify";
-import { capture } from "@/shared/lib/capture";
+
 import "@copilotkit/react-ui/styles.css";
 import "./incident-chat.css";
 import { EmptyStateCard } from "@/shared/ui";
@@ -531,7 +531,6 @@ export function IncidentChat({
   };
 
   const handleSubmitMessage = useCallback((_message: string) => {
-    capture("incident_chat_message_submitted");
   }, []);
 
   if (!alerts?.items || alerts.items.length === 0)

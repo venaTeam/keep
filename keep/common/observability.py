@@ -4,7 +4,6 @@ from urllib.parse import urlparse
 
 from fastapi import FastAPI, Request
 from opentelemetry import metrics, trace
-from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
     OTLPSpanExporter as GRPCOTLPSpanExporter,
@@ -16,7 +15,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.propagate import set_global_textmap
-from opentelemetry.propagators.cloud_trace_propagator import CloudTraceFormatPropagator
+from opentelemetry.propagate import set_global_textmap
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
@@ -49,9 +48,6 @@ def setup(app: FastAPI):
     otlp_traces_endpoint = os.environ.get("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", None)
     otlp_logs_endpoint = os.environ.get("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", None)
     otlp_metrics_endpoint = os.environ.get("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", None)
-    enable_cloud_trace_exporter = config(
-        "CLOUD_TRACE_ENABLED", default=False, cast=bool
-    )
     metrics_enabled = os.environ.get("METRIC_OTEL_ENABLED", "")
 
     resource = Resource.create(
@@ -84,17 +80,9 @@ def setup(app: FastAPI):
         if otlp_logs_endpoint:
             logger.info(f"OTLP Logs endpoint set to {otlp_logs_endpoint}")
 
-    if enable_cloud_trace_exporter:
-        logger.info("Cloud Trace exporter enabled.")
-        processor = BatchSpanProcessor(
-            CloudTraceSpanExporter(resource_regex="service.*")
-        )
-        provider.add_span_processor(processor)
 
     trace.set_tracer_provider(provider)
     # Enable trace context propagation
-    propagator = CloudTraceFormatPropagator()
-    set_global_textmap(propagator)
 
     # let's create a simple middleware that will add a trace id to each request
     # this will allow us to trace requests through the system and in the exception handler

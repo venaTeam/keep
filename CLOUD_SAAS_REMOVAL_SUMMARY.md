@@ -30,7 +30,7 @@ Removed 76 cloud SaaS providers from the Keep codebase, retaining only self-host
 - thousandeyes_provider
 - pingdom_provider
 - statuscake_provider
-- posthog_provider
+
 - rollbar_provider
 - dash0_provider
 

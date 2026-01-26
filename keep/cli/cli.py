@@ -13,7 +13,7 @@ import requests
 from dotenv import find_dotenv, load_dotenv
 from prettytable import PrettyTable
 
-from keep.api.core.posthog import posthog_client
+
 from keep.functions import cyaml
 from keep.providers.providers_factory import ProviderEncoder, ProvidersFactory
 
@@ -189,18 +189,10 @@ pass_info = click.make_pass_decorator(Info, ensure=True)
 @click.pass_context
 def cli(ctx, info: Info, verbose: int, json: bool, keep_config: str):
     """Run Keep CLI."""
-    # https://posthog.com/tutorials/identifying-users-guide#identifying-and-setting-user-ids-for-every-other-library
+
     # random user id
     info.set_config(keep_config)
-    if posthog_client is not None:
-        posthog_client.capture(
-            info.random_user_id,
-            "keep-cli-started",
-            properties={
-                "args": sys.argv,
-                "keep_version": KEEP_VERSION,
-            },
-        )
+
     # Use the verbosity count to determine the logging level...
     if verbose > 0:
         # set the verbosity level to debug
@@ -214,8 +206,8 @@ def cli(ctx, info: Info, verbose: int, json: bool, keep_config: str):
 
     @ctx.call_on_close
     def cleanup():
-        if posthog_client is not None:
-            posthog_client.flush()
+        pass
+
 
 
 @cli.command()

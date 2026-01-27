@@ -201,6 +201,18 @@ const mockConfig: InternalConfig = {
   SENTRY_DISABLED: "true",
   KEEP_WORKFLOW_DEBUG: false,
   KEEP_HIDE_SENSITIVE_FIELDS: true,
+  KEYCLOAK_SECRET: undefined,
+  KEYCLOAK_ID: undefined,
+  KEYCLOAK_ISSUER: undefined,
+  HIDE_NAVBAR_DEDUPLICATION: false,
+  HIDE_NAVBAR_WORKFLOWS: false,
+  HIDE_NAVBAR_SERVICE_TOPOLOGY: false,
+  HIDE_NAVBAR_MAPPING: false,
+  HIDE_NAVBAR_EXTRACTION: false,
+  HIDE_NAVBAR_MAINTENANCE_WINDOW: false,
+  HIDE_NAVBAR_AI_PLUGINS: false,
+  KEEP_TICKETING_ENABLED: false,
+  KEEP_WF_LIST_EXTENDED_INFO: false,
 };
 
 jest.mock("@/utils/hooks/useConfig", () => ({

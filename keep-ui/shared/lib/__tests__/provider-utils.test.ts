@@ -9,8 +9,8 @@ describe('provider-utils', () => {
         installed: true
       };
       const providers: Provider[] = [];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(true);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(true);
     });
 
     it('should return true if the provider is not installed and no providers of the same type exist', () => {
@@ -19,8 +19,8 @@ describe('provider-utils', () => {
         installed: false
       };
       const providers: Provider[] = [];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(true);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(true);
     });
 
     it('should return false if the provider is not installed and another provider of the same type is configured', () => {
@@ -33,10 +33,10 @@ describe('provider-utils', () => {
           id: '1',
           type: 'slack',
           config: { apiKey: 'some-key' }
-        } as Provider
+        } as any as Provider
       ];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(false);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(false);
     });
 
     it('should return true if a provider of the same type exists but has no config', () => {
@@ -49,10 +49,10 @@ describe('provider-utils', () => {
           id: '1',
           type: 'slack',
           config: {}
-        } as Provider
+        } as any as Provider
       ];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(true);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(true);
     });
 
     it('should return true if a provider of the same type exists but config is empty', () => {
@@ -65,10 +65,10 @@ describe('provider-utils', () => {
           id: '1',
           type: 'slack',
           config: {}
-        } as Provider
+        } as any as Provider
       ];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(true);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(true);
     });
 
     it('should handle multiple providers with different types correctly', () => {
@@ -81,10 +81,10 @@ describe('provider-utils', () => {
           id: '1',
           type: 'discord',
           config: { token: 'some-token' }
-        } as Provider
+        } as any as Provider
       ];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(true);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(true);
     });
 
     it('should return false if multiple providers exist with one matching the type with non-empty config', () => {
@@ -97,15 +97,15 @@ describe('provider-utils', () => {
           id: '1',
           type: 'discord',
           config: { token: 'some-token' }
-        } as Provider,
+        } as any as Provider,
         {
           id: '2',
           type: 'slack',
           config: { apiKey: 'some-key' }
-        } as Provider
+        } as any as Provider
       ];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(false);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(false);
     });
 
     it('should handle case when providers is undefined', () => {
@@ -113,7 +113,7 @@ describe('provider-utils', () => {
         type: 'slack',
         installed: false
       };
-      
+
       // @ts-ignore - Intentionally passing undefined to test handling
       expect(isProviderInstalled(provider, undefined)).toBe(true);
     });
@@ -123,7 +123,7 @@ describe('provider-utils', () => {
         type: 'slack',
         installed: false
       };
-      
+
       // @ts-ignore - Intentionally passing null to test handling
       expect(isProviderInstalled(provider, null)).toBe(true);
     });
@@ -134,8 +134,8 @@ describe('provider-utils', () => {
         installed: true
       };
       const providers: Provider[] = [];
-      
-      expect(isProviderInstalled(provider, providers)).toBe(true);
+
+      expect(isProviderInstalled(provider as any, providers)).toBe(true);
     });
   });
 });

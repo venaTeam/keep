@@ -1,12 +1,11 @@
 import useSWR from "swr";
 import { Provider } from "@/shared/api/providers";
 import { Subtitle, Title, Text, Icon } from "@tremor/react";
-import { CopyBlock, a11yLight } from "react-code-blocks";
 import Image from "next/image";
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { DynamicImageProviderIcon } from "@/components/ui";
-import { MarkdownHTML } from "@/shared/ui/MarkdownHTML/MarkdownHTML";
+import { MarkdownHTML, CodeBlock } from "@/shared/ui";
 
 interface WebhookSettings {
   webhookDescription: string;
@@ -31,23 +30,12 @@ export const ProviderSemiAutomated = ({ provider }: Props) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  const settings = {
-    theme: { ...a11yLight },
-    customStyle: {
-      backgroundColor: "white",
-      color: "orange",
-      maxHeight: "200px",
-      overflow: "scroll",
-    },
-    language: "yaml",
-    text: data!.webhookTemplate,
-    codeBlock: true,
-  };
-
+  const webhookTemplate = data!.webhookTemplate;
   const isMultiline = data!.webhookDescription.includes("\n");
   const descriptionLines = data!.webhookDescription.split("\n");
-  const settingsNotEmpty = settings.text.trim().length > 0;
+  const settingsNotEmpty = webhookTemplate.trim().length > 0;
   const webhookMarkdown = data!.webhookMarkdown;
+
   return (
     <div className="my-2.5">
       <Title>
@@ -85,7 +73,12 @@ export const ProviderSemiAutomated = ({ provider }: Props) => {
       ) : (
         <Text className="my-2.5 text-wrap">{data!.webhookDescription}</Text>
       )}
-      {settingsNotEmpty && <CopyBlock {...settings} />}
+      {settingsNotEmpty && (
+        <CodeBlock
+          text={webhookTemplate}
+          language="yaml"
+        />
+      )}
       {webhookMarkdown && (
         <div className="prose text-wrap">
           <MarkdownHTML>{webhookMarkdown}</MarkdownHTML>

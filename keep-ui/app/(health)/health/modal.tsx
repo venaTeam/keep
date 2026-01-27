@@ -9,7 +9,7 @@ import {
   Subtitle,
   Title,
 } from "@tremor/react";
-import { CheckCircle2Icon } from "lucide-react";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
 
 interface ProviderHealthResultsModalProps {
   handleClose: () => void;
@@ -56,7 +56,7 @@ const ProviderHealthResultsModal = ({
             ) : (
               <>
                 <div className="flex justify-center pt-4 pb-2">
-                  <CheckCircle2Icon color="green" />
+                  <CheckCircleIcon className="h-6 w-6 text-green-500" />
                 </div>
                 <Subtitle>Everything is ok</Subtitle>
               </>
@@ -84,7 +84,7 @@ const ProviderHealthResultsModal = ({
             ) : (
               <>
                 <div className="flex justify-center pt-4 pb-2">
-                  <CheckCircle2Icon color="green" />
+                  <CheckCircleIcon className="h-6 w-6 text-green-500" />
                 </div>
                 <Subtitle>Everything is ok</Subtitle>
               </>
@@ -93,7 +93,7 @@ const ProviderHealthResultsModal = ({
           <Card className="text-center flex flex-col justify-between">
             <Title>Actionable</Title>
             <div className="flex justify-center pt-4 pb-2">
-              <CheckCircle2Icon color="green" />
+              <CheckCircleIcon className="h-6 w-6 text-green-500" />
             </div>
             <Subtitle>Everything is ok</Subtitle>
           </Card>
@@ -133,7 +133,7 @@ const ProviderHealthResultsModal = ({
             ) : (
               <>
                 <div className="flex justify-center pt-4 pb-2">
-                  <CheckCircle2Icon color="green" />
+                  <CheckCircleIcon className="h-6 w-6 text-green-500" />
                 </div>
                 <Subtitle>Everything is ok</Subtitle>
               </>

@@ -33,7 +33,7 @@ export function TabLinkNavigation({
 // Example usage with icons:
 {
   /*
-import { BellIcon, ActivityIcon, ClockIcon, NetworkIcon, WorkflowIcon, ChatIcon } from 'lucide-react'
+// import { BellIcon, ActivityIcon, ClockIcon, NetworkIcon, WorkflowIcon, ChatIcon } from '@heroicons/react/24/outline'
 
 <TabLinkNavigation>
   <TabLinkNavigationLink

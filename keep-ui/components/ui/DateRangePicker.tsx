@@ -3,15 +3,15 @@ import * as Popover from "@radix-ui/react-popover";
 import { Button, Badge, Subtitle, Text } from "@tremor/react";
 import { Calendar } from "./Calendar";
 import {
-  Play,
-  Pause,
-  FastForward,
-  Rewind,
-  ZoomOut,
-  ChevronRight,
+  PlayIcon as Play,
+  PauseIcon as Pause,
+  ChevronDoubleRightIcon as FastForward,
+  ChevronDoubleLeftIcon as Rewind,
+  ChevronRightIcon as ChevronRight,
   CalendarIcon,
-  ChevronDown,
-} from "lucide-react";
+  ChevronDownIcon as ChevronDown,
+} from "@heroicons/react/24/outline";
+import { RiZoomOutLine as ZoomOut } from "@remixicon/react";
 import { format } from "date-fns";
 import { type DateRange } from "react-day-picker";
 import clsx from "clsx";
@@ -123,9 +123,9 @@ export default function EnhancedDateRangePicker({
   const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
     timeFrame.start && timeFrame.end
       ? {
-          from: timeFrame.start,
-          to: timeFrame.end,
-        }
+        from: timeFrame.start,
+        to: timeFrame.end,
+      }
       : undefined
   );
 
@@ -490,9 +490,8 @@ export default function EnhancedDateRangePicker({
             <div className="flex items-center w-full">
               <Badge
                 color={isPaused ? "gray" : "green"}
-                className={`mr-2 min-w-14 justify-center ${
-                  isPaused ? "" : "bg-green-700"
-                }`}
+                className={`mr-2 min-w-14 justify-center ${isPaused ? "" : "bg-green-700"
+                  }`}
               >
                 {getSelectedBadgeText()}
               </Badge>
@@ -541,7 +540,7 @@ export default function EnhancedDateRangePicker({
                         color="gray"
                         className="mr-2 min-w-14 justify-center"
                       >
-                        <CalendarIcon size={16} />
+                        <CalendarIcon className="h-4 w-4" />
                       </Badge>
                       <span className="text-gray-900 text-sm">
                         Select from calendar...
@@ -559,7 +558,7 @@ export default function EnhancedDateRangePicker({
                         color="gray"
                         className="mr-2 min-w-14 justify-center"
                       >
-                        <ChevronRight size={16} />
+                        <ChevronRight className="h-4 w-4" />
                       </Badge>
                       <span className="text-gray-900 text-sm">
                         More options

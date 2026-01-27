@@ -4,17 +4,14 @@ import React from "react";
 
 // Mocks
 window.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 };
 
 window.confirm = jest.fn();
 
-jest.mock("react-code-blocks", () => ({
-  CopyBlock: ({ text }: { text: string }) => null,
-  a11yLight: {},
-}));
+
 
 jest.mock("@/shared/lib/hooks/useApi", () => ({
   useApi: jest.fn().mockReturnValue({

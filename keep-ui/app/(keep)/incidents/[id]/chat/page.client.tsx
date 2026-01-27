@@ -1,9 +1,14 @@
 "use client";
 
-import { IncidentChat } from "./incident-chat";
 import { IncidentDto } from "@/entities/incidents/model";
 import { useConfig } from "@/utils/hooks/useConfig";
 import { CopilotKit } from "@copilotkit/react-core";
+import dynamic from "next/dynamic";
+
+const IncidentChat = dynamic(() => import("./incident-chat").then((mod) => mod.IncidentChat), {
+  ssr: false,
+  loading: () => <div className="h-full flex items-center justify-center">Loading Chat...</div>,
+});
 
 export function IncidentChatClientPage({
   incident,

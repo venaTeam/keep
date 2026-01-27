@@ -1,4 +1,8 @@
-import { Check, Copy, Download } from "lucide-react";
+import {
+  CheckIcon as Check,
+  DocumentDuplicateIcon as Copy,
+  ArrowDownTrayIcon as Download,
+} from "@heroicons/react/24/outline";
 import { Button } from "@tremor/react";
 import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";

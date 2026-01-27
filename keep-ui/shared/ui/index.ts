@@ -1,4 +1,5 @@
 export { Input } from "./Input";
+export { MarkdownHTML } from "./MarkdownHTML/MarkdownHTML";
 export { TablePagination } from "./TablePagination";
 export { TabLinkNavigation, TabNavigationLink } from "./TabLinkNavigation";
 export { DateTimeField } from "./DateTimeField";
@@ -28,5 +29,6 @@ export { showErrorToast } from "./utils/showErrorToast";
 export { showSuccessToast } from "./utils/showSuccessToast";
 export { DebugJSON } from "./DebugJSON";
 export { getIconForStatusString } from "./utils/getIconForStatusString";
+export { CodeBlock } from "./CodeBlock/CodeBlock";
 
 export type { UISeverity } from "./utils/severity-utils";

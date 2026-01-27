@@ -3,15 +3,15 @@ import * as Popover from "@radix-ui/react-popover";
 import { Button, Badge, Subtitle, Text } from "@tremor/react";
 import { Calendar } from "./Calendar";
 import {
-  Play,
-  Pause,
-  FastForward,
-  Rewind,
-  ZoomOut,
-  ChevronRight,
+  PlayIcon as Play,
+  PauseIcon as Pause,
+  ChevronDoubleRightIcon as FastForward,
+  ChevronDoubleLeftIcon as Rewind,
+  ChevronRightIcon as ChevronRight,
   CalendarIcon,
-  ChevronDown,
-} from "lucide-react";
+  ChevronDownIcon as ChevronDown,
+} from "@heroicons/react/24/outline";
+import { RiZoomOutLine as ZoomOut } from "@remixicon/react";
 import { format } from "date-fns";
 import { type DateRange } from "react-day-picker";
 import clsx from "clsx";
@@ -450,11 +450,10 @@ export default function EnhancedDateRangePickerV2({
                     ? "green"
                     : "gray"
                 }
-                className={`mr-2 min-w-14 justify-center ${
-                  "isPaused" in timeFrame && !(timeFrame as any).isPaused
+                className={`mr-2 min-w-14 justify-center ${"isPaused" in timeFrame && !(timeFrame as any).isPaused
                     ? "bg-green-700"
                     : ""
-                }`}
+                  }`}
               >
                 {selectedTimeFrameInfo.badgeText}
               </Badge>
@@ -504,7 +503,7 @@ export default function EnhancedDateRangePickerV2({
                         color="gray"
                         className="mr-2 min-w-14 justify-center"
                       >
-                        <CalendarIcon size={16} />
+                        <CalendarIcon className="h-4 w-4" />
                       </Badge>
                       <span className="text-gray-900 text-sm">
                         Select from calendar...
@@ -522,7 +521,7 @@ export default function EnhancedDateRangePickerV2({
                         color="gray"
                         className="mr-2 min-w-14 justify-center"
                       >
-                        <ChevronRight size={16} />
+                        <ChevronRight className="h-4 w-4" />
                       </Badge>
                       <span className="text-gray-900 text-sm">
                         More options

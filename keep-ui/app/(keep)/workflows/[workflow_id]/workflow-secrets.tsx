@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@tremor/react";
-import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { EyeOff, Eye } from "lucide-react";
+import { EyeSlashIcon, EyeIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { GenericTable } from "@/components/table/GenericTable";
 import { DisplayColumnDef } from "@tanstack/react-table";
 import { useWorkflowSecrets } from "@/utils/hooks/useWorkflowSecrets";
@@ -60,7 +59,7 @@ const WorkflowSecrets = ({ workflowId }: { workflowId: string }) => {
           <Button
             onClick={() => toggleShowValue(row.original.name)}
             className="p-1 rounded"
-            icon={showValues[row.original.name] ? EyeOff : Eye}
+            icon={showValues[row.original.name] ? EyeSlashIcon : EyeIcon}
             color="orange"
             variant="secondary"
           />
@@ -124,9 +123,9 @@ const WorkflowSecrets = ({ workflowId }: { workflowId: string }) => {
           data={
             secrets
               ? Object.entries(secrets).map(([name, value]) => ({
-                  name,
-                  value,
-                }))
+                name,
+                value,
+              }))
               : []
           }
           columns={columns}

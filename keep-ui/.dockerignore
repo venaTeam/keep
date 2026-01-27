@@ -6,3 +6,6 @@ node_modules
 .vscode/
 .github/
 .pytest_cache
+*.log
+.swc/
+.DS_Store

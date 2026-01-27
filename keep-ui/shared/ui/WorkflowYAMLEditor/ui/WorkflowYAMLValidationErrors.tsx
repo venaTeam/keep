@@ -1,4 +1,4 @@
-import { Loader2Icon } from "lucide-react";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { YamlValidationError } from "../model/types";
 import {
   CheckCircleIcon,
@@ -25,7 +25,7 @@ export function WorkflowYAMLValidationErrors({
         className="bg-gray-100 text-sm flex items-start gap-1 px-4 py-1 z-10 border-t border-gray-200"
         data-testid="wf-yaml-editor-validation-errors-loading"
       >
-        <Loader2Icon className="h-4 w-4 animate-spin shrink-0 mt-0.5" />
+        <ArrowPathIcon className="h-4 w-4 animate-spin shrink-0 mt-0.5" />
         Loading editor...
       </div>
     );
@@ -36,7 +36,7 @@ export function WorkflowYAMLValidationErrors({
         className="bg-gray-100 text-sm flex items-start gap-1 px-4 py-1 z-10 border-t border-gray-200"
         data-testid="wf-yaml-editor-validation-errors-initializing"
       >
-        <Loader2Icon className="h-4 w-4 animate-spin shrink-0 mt-0.5" />
+        <ArrowPathIcon className="h-4 w-4 animate-spin shrink-0 mt-0.5" />
         Initializing validation...
       </div>
     );
@@ -93,9 +93,8 @@ export function WorkflowYAMLValidationErrors({
         className="text-sm cursor-pointer hover:underline gap-1 px-4 py-1"
         data-testid="wf-yaml-editor-validation-errors-summary"
       >
-        {`${validationErrors.length} validation ${
-          validationErrors.length === 1 ? "error" : "errors"
-        }`}
+        {`${validationErrors.length} validation ${validationErrors.length === 1 ? "error" : "errors"
+          }`}
       </summary>
       <div
         className="flex flex-col"

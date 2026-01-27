@@ -12,7 +12,7 @@ import {
 } from "@tremor/react";
 import { TrashIcon, KeyIcon } from "@heroicons/react/24/outline";
 import { UpdateIcon } from "@radix-ui/react-icons";
-import { CopyBlock, a11yLight } from "react-code-blocks";
+import { CodeBlock } from "@/shared/ui";
 
 interface APIKey {
   reference_id: string;
@@ -36,14 +36,6 @@ export function APIKeysTable({
   onDelete,
   isDisabled = false,
 }: APIKeysTableProps) {
-  const getCopyBlockProps = (secret: string) => ({
-    theme: { ...a11yLight },
-    language: "text",
-    text: secret,
-    codeBlock: true,
-    showLineNumbers: false,
-  });
-
   return (
     <Table>
       <TableHead>
@@ -65,7 +57,7 @@ export function APIKeysTable({
           >
             <TableCell>{key.reference_id}</TableCell>
             <TableCell className="text-left">
-              <CopyBlock {...getCopyBlockProps(key.secret)} />
+              <CodeBlock text={key.secret} />
             </TableCell>
             <TableCell className="text-left">
               <Badge color="orange">{key.role || "N/A"}</Badge>

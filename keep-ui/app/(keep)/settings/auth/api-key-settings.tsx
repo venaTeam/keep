@@ -11,7 +11,6 @@ import {
   Text,
 } from "@tremor/react";
 import Loading from "@/app/(keep)/loading";
-import { a11yLight, CopyBlock } from "react-code-blocks";
 import useSWR, { mutate } from "swr";
 import { KeyIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
@@ -21,7 +20,7 @@ import { useRoles } from "utils/hooks/useRoles";
 import { UpdateIcon } from "@radix-ui/react-icons";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { useConfig } from "@/utils/hooks/useConfig";
-import { PageSubtitle, PageTitle, showErrorToast } from "@/shared/ui";
+import { PageSubtitle, PageTitle, showErrorToast, CodeBlock } from "@/shared/ui";
 import { ApiKey } from "@/app/(keep)/settings/auth/types";
 
 interface Props {
@@ -52,14 +51,6 @@ export default function ApiKeySettings({ selectedTab }: Props) {
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
-
-  const getCopyBlockProps = (secret: string) => ({
-    theme: { ...a11yLight },
-    language: "text",
-    text: secret,
-    codeBlock: true,
-    showLineNumbers: false,
-  });
 
   const authType = configData?.AUTH_TYPE as AuthType;
   const createApiKeyEnabled = authType !== AuthType.NOAUTH;
@@ -153,7 +144,7 @@ export default function ApiKeySettings({ selectedTab }: Props) {
                 >
                   <TableCell>{key.reference_id}</TableCell>
                   <TableCell className="text-left">
-                    <CopyBlock {...getCopyBlockProps(key.secret)} />
+                    <CodeBlock text={key.secret} />
                   </TableCell>
                   <TableCell className="text-left">
                     <Badge color="orange">{key.role || "N/A"}</Badge>

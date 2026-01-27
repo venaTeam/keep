@@ -14,7 +14,7 @@ import "react-querybuilder/dist/query-builder.scss";
 import { Table } from "@tanstack/react-table";
 import { FiExternalLink, FiSave } from "react-icons/fi";
 import { AlertDto } from "@/entities/alerts/model";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 import { TbDatabaseImport } from "react-icons/tb";
 import { components, GroupBase, MenuListProps } from "react-select";
 import { Select } from "@/shared/ui";
@@ -22,7 +22,6 @@ import { useConfig } from "@/utils/hooks/useConfig";
 import { IoSearchOutline } from "react-icons/io5";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { CornerDownLeft } from "lucide-react";
 import { STATIC_PRESETS_NAMES } from "@/entities/presets/model/constants";
 import { Preset } from "@/entities/presets/model/types";
 import { usePresetActions } from "@/entities/presets/model/usePresetActions";
@@ -416,7 +415,7 @@ export const AlertsRulesBuilder = ({
               )}
               <div className="flex items-center justify-end pt-1 px-2">
                 <span className="text-xs text-gray-400">
-                  <CornerDownLeft className="h-3 w-3 mr-1 inline-block" />
+                  <ArrowUturnLeftIcon className="h-3 w-3 mr-1 inline-block" />
                   Enter to apply
                 </span>
               </div>

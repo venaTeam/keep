@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Globe, Database, Cpu } from "lucide-react";
+import { GlobeAltIcon, CircleStackIcon, CpuChipIcon } from "@heroicons/react/24/outline";
 import { TraceData } from "./Trace";
 import { Card } from "@tremor/react";
 import {
@@ -114,18 +114,15 @@ const SimpleTraceViewer = ({ trace }: { trace: TraceData }) => {
   }
 
   const TypeIcon: React.FC<TypeIconProps> = ({ type, className }) => {
-    const iconProps = {
-      size: 16,
-      className: `${className} mr-2`,
-    };
+    const fullClassName = `${className} mr-2 h-4 w-4`;
 
     switch (type) {
       case "web":
-        return <Globe {...iconProps} />;
+        return <GlobeAltIcon className={fullClassName} />;
       case "db":
-        return <Database {...iconProps} />;
+        return <CircleStackIcon className={fullClassName} />;
       default:
-        return <Cpu {...iconProps} />;
+        return <CpuChipIcon className={fullClassName} />;
     }
   };
 
@@ -154,8 +151,8 @@ const SimpleTraceViewer = ({ trace }: { trace: TraceData }) => {
                           span.type === "web"
                             ? "text-purple-500"
                             : span.type === "db"
-                            ? "text-green-500"
-                            : "text-blue-500"
+                              ? "text-green-500"
+                              : "text-blue-500"
                         }
                       />
                       <span className="font-bold">{span.displayName}</span>
@@ -166,15 +163,14 @@ const SimpleTraceViewer = ({ trace }: { trace: TraceData }) => {
                       <div
                         className={`
                       absolute h-full rounded
-                      ${
-                        span.isErrorStatus
-                          ? "bg-red-100"
-                          : span.type === "web"
-                          ? "bg-purple-100"
-                          : span.type === "db"
-                          ? "bg-green-100"
-                          : "bg-blue-100"
-                      }
+                      ${span.isErrorStatus
+                            ? "bg-red-100"
+                            : span.type === "web"
+                              ? "bg-purple-100"
+                              : span.type === "db"
+                                ? "bg-green-100"
+                                : "bg-blue-100"
+                          }
                     `}
                         style={{
                           left: `${span.startOffset}%`,
@@ -187,11 +183,10 @@ const SimpleTraceViewer = ({ trace }: { trace: TraceData }) => {
                     </div>
                     {span.httpStatus && (
                       <div
-                        className={`w-20 text-right text-sm ${
-                          span.isErrorStatus
+                        className={`w-20 text-right text-sm ${span.isErrorStatus
                             ? "text-red-600 font-medium"
                             : "text-gray-600"
-                        }`}
+                          }`}
                       >
                         {span.httpStatus}
                       </div>

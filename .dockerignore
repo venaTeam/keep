@@ -8,3 +8,9 @@ keep-ui/.env.local
 .github/
 keep.db
 docker-compose*
+*.log
+**/.next/cache
+**/node_modules
+**/__pycache__
+.pytest_cache/
+.swc/

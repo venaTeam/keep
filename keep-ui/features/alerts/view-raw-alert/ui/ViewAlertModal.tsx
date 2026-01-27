@@ -6,7 +6,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { MonacoEditor, showErrorToast, showSuccessToast } from "@/shared/ui";
 import { type Monaco } from "@monaco-editor/react";
-import { Lock, Unlock, Save, AlertTriangle, Copy, X } from "lucide-react";
+import {
+  LockClosedIcon as Lock,
+  LockOpenIcon as Unlock,
+  DocumentCheckIcon as Save,
+  ExclamationTriangleIcon as AlertTriangle,
+  DocumentDuplicateIcon as Copy,
+  XMarkIcon as X,
+} from "@heroicons/react/24/outline";
 import { type editor } from "monaco-editor";
 import "./ViewAlertModal.css";
 import { DOCS_CLIPBOARD_COPY_ERROR_PATH } from "@/shared/constants";
@@ -85,24 +92,24 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
 
       const displayValue = showHighlightedOnly
         ? JSON.stringify(
-            Object.fromEntries(
-              alert.enriched_fields.map((key) => [
-                key,
-                alertData[key as keyof typeof alertData],
-              ])
-            ),
-            null,
-            2
-          )
+          Object.fromEntries(
+            alert.enriched_fields.map((key) => [
+              key,
+              alertData[key as keyof typeof alertData],
+            ])
+          ),
+          null,
+          2
+        )
         : JSON.stringify(
-            Object.fromEntries(
-              Object.entries(alertData).filter(
-                ([key]) => key !== "enriched_fields"
-              )
-            ),
-            null,
-            2
-          );
+          Object.fromEntries(
+            Object.entries(alertData).filter(
+              ([key]) => key !== "enriched_fields"
+            )
+          ),
+          null,
+          2
+        );
 
       setEditorValue(displayValue);
       setOriginalValue(displayValue);
@@ -148,7 +155,7 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
           jsonToValidate[field] !== undefined &&
           originalJson[field] !== undefined &&
           JSON.stringify(originalJson[field]) !==
-            JSON.stringify(jsonToValidate[field])
+          JSON.stringify(jsonToValidate[field])
         ) {
           errors.push({
             message: `Cannot modify read-only field: ${field}`,
@@ -304,7 +311,7 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
           lineContent.includes(`"${field}"`) &&
           position.column >= lineContent.indexOf(`"${field}"`) &&
           position.column <=
-            lineContent.indexOf(`"${field}"`) + field.length + 2
+          lineContent.indexOf(`"${field}"`) + field.length + 2
       );
 
       if (clickedKey) {
@@ -692,9 +699,8 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
             />
             <label
               htmlFor="showHighlightedOnly"
-              className={`text-sm ${
-                isEditable ? "text-gray-400" : "text-gray-500"
-              }`}
+              className={`text-sm ${isEditable ? "text-gray-400" : "text-gray-500"
+                }`}
             >
               <Text>Enriched Fields Only</Text>
             </label>

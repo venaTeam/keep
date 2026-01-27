@@ -12,6 +12,15 @@ window.ResizeObserver = class ResizeObserver {
 window.confirm = jest.fn();
 
 
+jest.mock("@/shared/ui/MarkdownHTML/MarkdownHTML", () => ({
+  MarkdownHTML: ({ children }: any) => React.createElement("div", { "data-testid": "markdown-html" }, children),
+}));
+
+jest.mock("react-markdown", () => ({
+  __esModule: true,
+  default: ({ children }: any) => React.createElement("div", null, children),
+}));
+
 
 jest.mock("@/shared/lib/hooks/useApi", () => ({
   useApi: jest.fn().mockReturnValue({

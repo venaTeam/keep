@@ -9,10 +9,10 @@ const isSentryDisabled =
 const turbopackAliases =
   process.env.NODE_ENV === "development"
     ? {
-        "./MonacoEditor": "@/shared/ui/MonacoEditor/index.turbopack.ts",
-        "./MonacoYAMLEditor": "@/shared/ui/MonacoYAMLEditor/index.turbopack.ts",
-        "./MonacoCel": "@/shared/ui/MonacoCELEditor/MonacoCel.turbopack.tsx",
-      }
+      "./MonacoEditor": "@/shared/ui/MonacoEditor/index.turbopack.ts",
+      "./MonacoYAMLEditor": "@/shared/ui/MonacoYAMLEditor/index.turbopack.ts",
+      "./MonacoCel": "@/shared/ui/MonacoCELEditor/MonacoCel.turbopack.tsx",
+    }
     : {};
 
 /** @type {import('next').NextConfig} */
@@ -73,7 +73,20 @@ const nextConfig = {
   },
   // @auth/core is ESM-only and jest fails to transpile it.
   // https://github.com/nextauthjs/next-auth/issues/6822
-  transpilePackages: ["next-auth", "@auth/core"],
+  transpilePackages: [
+    "next-auth",
+    "@auth/core",
+    "react-markdown",
+    "remark-gfm",
+    "remark-rehype",
+    "rehype-raw",
+    "rehype-sanitize",
+    "unified",
+    "vfile",
+    "vfile-message",
+    "unist-util-vfile-message",
+    "unist-util-stringify-position"
+  ],
   images: {
     remotePatterns: [
       {
@@ -123,13 +136,13 @@ const nextConfig = {
     return process.env.DISABLE_REDIRECTS === "true"
       ? []
       : [
-          {
-            source: "/",
-            destination: "/incidents",
-            permanent: process.env.ENV === "production",
-          },
-          ...workflowRawYamlRedirects,
-        ];
+        {
+          source: "/",
+          destination: "/incidents",
+          permanent: process.env.ENV === "production",
+        },
+        ...workflowRawYamlRedirects,
+      ];
   },
   async headers() {
     // Allow Keycloak Server as a CORS origin since we use SSO wizard as iframe

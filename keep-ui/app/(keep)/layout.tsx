@@ -12,7 +12,6 @@ import { auth } from "@/auth";
 import { ThemeScript, WatchUpdateTheme } from "@/shared/ui";
 import "@/app/globals.css";
 import "react-toastify/dist/ReactToastify.css";
-
 import { WorkflowModalProvider } from "@/features/workflows/manual-run-workflow";
 
 // If loading a variable font, you don't need to specify the font weight

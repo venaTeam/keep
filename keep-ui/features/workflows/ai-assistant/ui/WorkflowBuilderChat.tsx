@@ -158,7 +158,7 @@ export function WorkflowBuilderChat({
     [nodes, steps, selectedNode]
   );
 
-  const { setMessages } = useCopilotChat();
+  const { reset } = useCopilotChat();
 
   useCopilotAction({
     name: "changeWorkflowName",
@@ -1059,7 +1059,7 @@ Example: 'node_123__empty_true'`,
             <Button
               variant="secondary"
               size="xs"
-              onClick={() => setMessages([])}
+              onClick={() => reset()}
             >
               Reset
             </Button>

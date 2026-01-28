@@ -622,14 +622,24 @@ class EnrichmentsBl:
             should_run_workflow = True
             if enrichments["status"] == "resolved":
                 should_check_incidents_resolution = True
+        elif "ticket_url" in enrichments:
+            action_type = ActionType.TICKET_ASSIGNED
+            action_description = f"Ticket assigned by {authenticated_entity.email} - {enrichments['ticket_url']}"
         elif "note" in enrichments and enrichments["note"]:
             action_type = ActionType.COMMENT
             action_description = (
                 f"Comment added by {authenticated_entity.email} - {enrichments['note']}"
             )
-        elif "ticket_url" in enrichments:
-            action_type = ActionType.TICKET_ASSIGNED
-            action_description = f"Ticket assigned by {authenticated_entity.email} - {enrichments['ticket_url']}"
+
+        # If there's a note AND we already have a status or ticket, append it to the description
+        # (if we only have a note, it's already handled in the elif above)
+        if (
+            "note" in enrichments
+            and enrichments["note"]
+            and ("status" in enrichments or "ticket_url" in enrichments)
+        ):
+            action_description += f" - With note: {enrichments['note']}"
+
         return (
             action_type,
             action_description,

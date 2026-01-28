@@ -1,15 +1,9 @@
 import asyncio
 import logging
 import os
-import time
-from contextlib import asynccontextmanager
-from functools import wraps
-from importlib import metadata
-from typing import Awaitable, Callable
 
 import requests
-import uvicorn
-from arq import ArqRedis
+from contextlib import asynccontextmanager
 from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.gzip import GZipMiddleware

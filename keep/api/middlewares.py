@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-from importlib import metadata
 
 import jwt
 from fastapi import Request

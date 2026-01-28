@@ -19,6 +19,7 @@ from keep.api.routes import (
     providers,
     pusher,
     rules,
+    rum,
     settings,
     status,
     tags,
@@ -57,6 +58,7 @@ def setup_routers(app: FastAPI):
     )
     app.include_router(roles.router, prefix="/auth/roles", tags=["auth", "roles"])
     app.include_router(users.router, prefix="/auth/users", tags=["auth", "users"])
+    app.include_router(rum.router, prefix="/rum", tags=["rum"])
     app.include_router(metrics.router, prefix="/metrics", tags=["metrics"])
     app.include_router(
         extraction.router, prefix="/extraction", tags=["enrichment", "extraction"]

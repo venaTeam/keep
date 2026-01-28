@@ -3,7 +3,9 @@ import logging
 import os
 
 import requests
+import uvicorn
 from contextlib import asynccontextmanager
+from arq import ArqRedis
 from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.gzip import GZipMiddleware
@@ -44,10 +46,6 @@ from keep.topologies.topology_processor import TopologyProcessor
 # load all providers into cache
 from keep.workflowmanager.workflowmanager import WorkflowManager
 
-load_dotenv(find_dotenv())
-keep.common.logging.setup_logging()
-logger = logging.getLogger(__name__)
-
 from keep.api.config import (
     AUTH_TYPE,
     CONSUMER,
@@ -66,6 +64,11 @@ from keep.api.config import (
     TOPOLOGY,
     WATCHER,
 )
+
+load_dotenv(find_dotenv())
+keep.common.logging.setup_logging()
+logger = logging.getLogger(__name__)
+
 
 # Monkey patch requests to disable redirects
 original_request = requests.Session.request

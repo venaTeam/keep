@@ -22,9 +22,6 @@ from keep.common.core.db import (
     update_provider_last_pull_time,
 )
 from keep.common.core.db import get_presets as get_presets_db
-from keep.common.event_management.process_event_task import process_event
-from keep.common.event_management.process_incident_task import process_incident
-from keep.common.event_management.process_topology_task import process_topology
 from keep.common.models.alert import AlertDto
 from keep.common.models.db.preset import (
     Preset,
@@ -35,6 +32,9 @@ from keep.common.models.db.preset import (
     TagDto,
 )
 from keep.common.models.time_stamp import TimeStampFilter, _get_time_stamp_filter
+from keep.common.event_management.process_event_task import process_event
+from keep.common.event_management.process_incident_task import process_incident
+from keep.common.event_management.process_topology_task import process_topology
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 from keep.providers.base.base_provider import BaseIncidentProvider, BaseTopologyProvider

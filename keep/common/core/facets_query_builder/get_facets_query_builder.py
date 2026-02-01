@@ -7,9 +7,7 @@ from keep.common.core.facets_query_builder.base_facets_query_builder import (
     BaseFacetsQueryBuilder,
 )
 from keep.common.core.facets_query_builder.mysql import MySqlFacetsQueryBuilder
-from keep.common.core.facets_query_builder.postgresql import (
-    PostgreSqlFacetsQueryBuilder,
-)
+from keep.common.core.facets_query_builder.postgresql import PostgreSqlFacetsQueryBuilder
 from keep.common.core.facets_query_builder.sqlite import SqliteFacetsHandler
 
 

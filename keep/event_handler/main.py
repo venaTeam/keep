@@ -1,8 +1,7 @@
 import logging
-
 import uvicorn
-from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI
+from dotenv import find_dotenv, load_dotenv
 from prometheus_fastapi_instrumentator import Instrumentator
 
 import keep.common.logging

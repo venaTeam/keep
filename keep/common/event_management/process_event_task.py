@@ -22,10 +22,7 @@ from keep.common.alert_deduplicator.alert_deduplicator import AlertDeduplicator
 from keep.common.bl.enrichments_bl import EnrichmentsBl
 from keep.common.bl.incidents_bl import IncidentBl
 from keep.common.bl.maintenance_windows_bl import MaintenanceWindowsBl
-from keep.common.consts import (
-    KEEP_CORRELATION_ENABLED,
-    MAINTENANCE_WINDOW_ALERT_STRATEGY,
-)
+from keep.common.consts import KEEP_CORRELATION_ENABLED, MAINTENANCE_WINDOW_ALERT_STRATEGY
 from keep.common.core.db import (
     bulk_upsert_alert_fields,
     enrich_alerts_with_incidents,
@@ -41,21 +38,21 @@ from keep.common.core.db import (
 from keep.common.core.dependencies import get_pusher_client
 from keep.common.core.elastic import ElasticClient
 from keep.common.core.metrics import (
-    alert_enrichment_duration_seconds,
-    deduplication_duration_seconds,
-    deduplication_events_total,
     events_error_counter,
     events_in_counter,
     events_out_counter,
     processing_time_summary,
+    alert_enrichment_duration_seconds,
+    deduplication_events_total,
+    deduplication_duration_seconds,
     rules_engine_duration_seconds,
 )
-from keep.common.event_management.notification_cache import get_notification_cache
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
 from keep.common.models.db.alert import Alert, AlertAudit, AlertRaw
 from keep.common.models.db.incident import IncidentStatus
 from keep.common.models.incident import IncidentDto
+from keep.common.event_management.notification_cache import get_notification_cache
 from keep.common.utils.alert_utils import sanitize_alert
 from keep.common.utils.enrichment_helpers import (
     calculate_firing_time_since_last_resolved,

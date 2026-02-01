@@ -2,7 +2,6 @@ import inspect
 import json
 import os
 import random
-import tempfile
 import time
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -20,6 +19,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 from starlette_context import context, request_cycle_context
+import tempfile
 
 # Ensure PROMETHEUS_MULTIPROC_DIR is set before any keep imports
 if "PROMETHEUS_MULTIPROC_DIR" not in os.environ:
@@ -28,7 +28,6 @@ if "PROMETHEUS_MULTIPROC_DIR" not in os.environ:
 # This import is required to create the tables
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.common.core.elastic import ElasticClient
-from keep.common.event_management.process_event_task import process_event
 from keep.common.models.alert import AlertStatus
 from keep.common.models.db.alert import *
 from keep.common.models.db.maintenance_window import MaintenanceWindowRule
@@ -37,6 +36,7 @@ from keep.common.models.db.rule import *
 from keep.common.models.db.tenant import *
 from keep.common.models.db.user import *
 from keep.common.models.db.workflow import *
+from keep.common.event_management.process_event_task import process_event
 from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.contextmanager.contextmanager import ContextManager
 

@@ -9,6 +9,7 @@ from sqlalchemy import text
 from tenacity import sleep
 
 from keep.common.bl.enrichments_bl import EnrichmentsBl
+from tests.fixtures.client import client, test_app  # noqa
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
@@ -17,7 +18,6 @@ from keep.common.models.db.extraction import ExtractionRule
 from keep.common.models.db.mapping import MappingRule
 from keep.common.models.db.topology import TopologyService
 from keep.common.models.db.workflow import Workflow
-from tests.fixtures.client import client, test_app  # noqa
 from tests.fixtures.workflow_manager import (
     wait_for_workflow_execution,
     wait_for_workflow_in_run_queue,

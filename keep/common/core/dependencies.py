@@ -5,6 +5,7 @@ from fastapi import Request
 from fastapi.datastructures import FormData
 from pusher import Pusher
 
+from keep.common.arq_pool import get_pool
 from keep.common.core.config import config
 
 logger = logging.getLogger(__name__)

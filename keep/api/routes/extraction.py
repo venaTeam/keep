@@ -7,10 +7,7 @@ from sqlmodel import Session
 
 from keep.common.bl.enrichments_bl import EnrichmentsBl
 from keep.common.core.db import get_alert_by_event_id, get_session
-from keep.common.models.db.enrichment_event import (
-    EnrichmentEventWithLogs,
-    EnrichmentType,
-)
+from keep.common.models.db.enrichment_event import EnrichmentEventWithLogs, EnrichmentType
 from keep.common.models.db.extraction import (
     ExtractionRule,
     ExtractionRuleDtoBase,

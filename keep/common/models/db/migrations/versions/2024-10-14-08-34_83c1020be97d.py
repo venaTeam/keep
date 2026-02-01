@@ -6,12 +6,11 @@ Create Date: 2024-10-14 08:34:46.608806
 
 """
 
-from contextlib import contextmanager
-
-import sqlalchemy as sa
-from alembic import op
 from sqlalchemy import inspect
+from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.sql import expression
+from contextlib import contextmanager
 
 # revision identifiers, used by Alembic.
 revision = "83c1020be97d"

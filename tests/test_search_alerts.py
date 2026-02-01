@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 import freezegun
 import pytest
 
-from keep.api.routes.alerts import query_alerts
 from keep.common.bl.enrichments_bl import EnrichmentsBl
 from keep.common.bl.incidents_bl import IncidentBl
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
@@ -17,6 +16,7 @@ from keep.common.models.db.preset import PresetSearchQuery as SearchQuery
 from keep.common.models.db.rule import CreateIncidentOn, ResolveOn, Rule
 from keep.common.models.incident import IncidentDtoIn
 from keep.common.models.query import QueryDto
+from keep.api.routes.alerts import query_alerts
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.searchengine.searchengine import SearchEngine
 from tests.fixtures.client import client, setup_api_key, test_app  # noqa

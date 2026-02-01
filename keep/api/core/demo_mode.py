@@ -12,9 +12,9 @@ from requests.models import PreparedRequest
 
 from keep.common.core.db import get_session_sync
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
-from keep.common.event_management.process_topology_task import process_topology
 from keep.common.logging import CONFIG
 from keep.common.models.db.topology import TopologyServiceInDto
+from keep.common.event_management.process_topology_task import process_topology
 from keep.common.utils.tenant_utils import get_or_create_api_key
 from keep.providers.providers_factory import ProvidersFactory
 

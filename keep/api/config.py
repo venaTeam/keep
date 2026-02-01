@@ -1,5 +1,4 @@
 import logging
-
 import keep.common.logging
 from keep.common.core.config import starlette_config
 from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes
@@ -16,8 +15,8 @@ logger = logging.getLogger(__name__)
 
 def on_starting(server=None):
     """This function is called by the gunicorn server when it starts"""
-    from keep.api.routes.dashboard import provision_dashboards
     from keep.common.core.init import init_services
+    from keep.api.routes.dashboard import provision_dashboards
     
     init_services(auth_type=AUTH_TYPE, provision_dashboards_func=provision_dashboards)
 

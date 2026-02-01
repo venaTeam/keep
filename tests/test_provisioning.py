@@ -144,8 +144,8 @@ def test_reprovision_workflow(monkeypatch, db_session, client, test_app):
         asyncio.run(event_handler())
 
     # manually trigger the provision resources
-    from keep.api.routes.dashboard import provision_dashboards
     from keep.common.core.init import provision_resources
+    from keep.api.routes.dashboard import provision_dashboards
 
     provision_resources(provision_dashboards_func=provision_dashboards)
 
@@ -259,8 +259,8 @@ def test_reprovision_provider(monkeypatch, db_session, client, test_app):
         asyncio.run(event_handler())
 
     # manually trigger the provision resources
-    from keep.api.routes.dashboard import provision_dashboards
     from keep.common.core.init import provision_resources
+    from keep.api.routes.dashboard import provision_dashboards
 
     provision_resources(provision_dashboards_func=provision_dashboards)
 
@@ -348,8 +348,8 @@ def test_reprovision_dashboard(monkeypatch, db_session, client, test_app):
         asyncio.run(event_handler())
 
     # manually trigger the provision resources
-    from keep.api.routes.dashboard import provision_dashboards
     from keep.common.core.init import provision_resources
+    from keep.api.routes.dashboard import provision_dashboards
 
     provision_resources(provision_dashboards_func=provision_dashboards)
 

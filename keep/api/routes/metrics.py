@@ -10,7 +10,6 @@ from prometheus_client import (
     multiprocess,
 )
 
-from keep.api.core.limiter import limiter
 from keep.common.core.config import config
 from keep.common.core.db import (
     get_last_alerts_for_incidents,
@@ -18,6 +17,7 @@ from keep.common.core.db import (
     get_workflow_executions_count,
 )
 from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.api.core.limiter import limiter
 from keep.common.models.alert import AlertDto
 
 router = APIRouter()

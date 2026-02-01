@@ -38,13 +38,13 @@ from keep.common.core.db import (
     get_workflow_executions_for_incident_or_alert,
     merge_incidents_to_id,
 )
+
 from keep.common.core.dependencies import extract_generic_body, get_pusher_client
 from keep.common.core.incidents import (
     get_incident_facets,
     get_incident_facets_data,
     get_incident_potential_facet_fields,
 )
-from keep.common.event_management.process_incident_task import process_incident
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (
     AlertDto,
@@ -72,6 +72,7 @@ from keep.common.models.incident import (
     SplitIncidentResponseDto,
 )
 from keep.common.models.workflow import WorkflowExecutionDTO
+from keep.common.event_management.process_incident_task import process_incident
 from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.common.utils.pagination import (
     AlertWithIncidentLinkMetadataPaginatedResultsDto,

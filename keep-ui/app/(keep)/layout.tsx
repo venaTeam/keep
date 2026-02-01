@@ -13,6 +13,7 @@ import { ThemeScript, WatchUpdateTheme } from "@/shared/ui";
 import "@/app/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { PostHogPageView } from "@/shared/ui/PostHogPageView";
+import { WebVitalsReporter } from "@/shared/ui/WebVitalsReporter";
 import { WorkflowModalProvider } from "@/features/workflows/manual-run-workflow";
 
 // If loading a variable font, you don't need to specify the font weight
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 <WorkflowModalProvider>
                   {/* @ts-ignore-error Server Component */}
                   <PostHogPageView />
+                  <WebVitalsReporter />
                   <Navbar />
                   {/* https://discord.com/channels/752553802359505017/1068089513253019688/1117731746922893333 */}
                   <main className="page-container flex flex-col col-start-3 overflow-auto">

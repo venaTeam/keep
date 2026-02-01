@@ -285,7 +285,11 @@ export const useAlertTableCols = (
             const isoString = date.toISOString();
             // Get the format from column format settings or use default
             const formatOption =
-              columnTimeFormats[context.column.id] || "timeago";
+              (context.table.options.meta as any)?.columnTimeFormats?.[
+              context.column.id
+              ] ||
+              columnTimeFormats[context.column.id] ||
+              "timeago";
             return (
               <span title={isoString}>
                 {formatDateTime(date, formatOption)}
@@ -321,7 +325,11 @@ export const useAlertTableCols = (
 
           let isList = isListColumn(context.column);
           let listFormatOption =
-            columnListFormats[context.column.id] || "badges";
+            (context.table.options.meta as any)?.columnListFormats?.[
+            context.column.id
+            ] ||
+            columnListFormats[context.column.id] ||
+            "badges";
           if (isList) {
             // Type check and convert value to the expected type for formatList
             if (typeof value === "string") {
@@ -603,7 +611,12 @@ export const useAlertTableCols = (
         const isoString = date.toISOString();
 
         // Get the format from column format settings or use default
-        const formatOption = columnTimeFormats[context.column.id] || "timeago";
+        const formatOption =
+          (context.table.options.meta as any)?.columnTimeFormats?.[
+          context.column.id
+          ] ||
+          columnTimeFormats[context.column.id] ||
+          "timeago";
 
         return (
           <span title={isoString}>{formatDateTime(date, formatOption)}</span>

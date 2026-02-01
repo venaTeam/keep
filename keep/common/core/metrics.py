@@ -143,3 +143,22 @@ workflow_queue_size = Gauge(
     labelnames=["tenant_id"],
     multiprocess_mode="livesum",
 )
+
+
+### INCIDENTS
+INCIDENT_METRIC_PREFIX = "keep_incident_"
+
+incidents_opened_total = Counter(
+    f"{INCIDENT_METRIC_PREFIX}opened_total",
+    "Total number of incidents opened",
+    labelnames=["tenant_id", "rule_id", "rule_name"],
+)
+
+### MAINTENANCE
+MAINTENANCE_METRIC_PREFIX = "keep_maintenance_"
+
+alerts_maintenance_silenced_total = Counter(
+    f"{MAINTENANCE_METRIC_PREFIX}silenced_total",
+    "Total number of alerts silenced by maintenance window",
+    labelnames=["tenant_id", "maintenance_window_id", "maintenance_window_name"],
+)

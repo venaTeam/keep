@@ -14,12 +14,12 @@ from keep.common.core.config import config
 from keep.common.core.db import (
     create_workflow_execution,
     get_enrichment,
-
     get_timeouted_workflow_exections,
     get_workflows_that_should_run,
 )
-from keep.common.core.db import finish_workflow_execution as finish_workflow_execution_db
-
+from keep.common.core.db import (
+    finish_workflow_execution as finish_workflow_execution_db,
+)
 from keep.common.core.metrics import (
     workflow_execution_errors_total,
     workflow_execution_status,
@@ -29,7 +29,6 @@ from keep.common.core.metrics import (
 )
 from keep.common.models.alert import AlertDto
 from keep.common.models.incident import IncidentDto
-
 from keep.providers.providers_factory import ProviderConfigurationException
 from keep.workflowmanager.workflow import Workflow, WorkflowStrategy
 from keep.workflowmanager.workflowstore import WorkflowStore

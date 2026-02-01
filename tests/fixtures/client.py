@@ -5,11 +5,11 @@ import sys
 import pytest
 from fastapi.testclient import TestClient
 
-from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.api.core.dependencies import get_event_producer
 from keep.api.core.messaging import EventProducer
-from keep.common.models.db.tenant import TenantApiKey
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.common.event_management.process_event_task import process_event
+from keep.common.models.db.tenant import TenantApiKey
 
 
 class MockEventProducer(EventProducer):
@@ -72,8 +72,8 @@ def test_app(monkeypatch, request, db_session):
 
         # Import and return the app instance
         from keep.api.api import get_app
-        from keep.common.core.init import provision_resources
         from keep.api.routes.dashboard import provision_dashboards
+        from keep.common.core.init import provision_resources
 
         provision_resources(provision_dashboards_func=provision_dashboards)
         app = get_app()

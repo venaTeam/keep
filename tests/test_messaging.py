@@ -1,10 +1,13 @@
-from unittest.mock import AsyncMock, MagicMock, patch
 import json
-import pytest
-from keep.api.core.messaging import KafkaEventProducer, RedisEventProducer
-from keep.api.core.dependencies import get_event_producer
-from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 import os
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
+from keep.api.core.dependencies import get_event_producer
+from keep.api.core.messaging import KafkaEventProducer, RedisEventProducer
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+
 
 @pytest.fixture
 def mock_kafka_producer():

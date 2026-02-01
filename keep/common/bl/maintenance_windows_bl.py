@@ -6,7 +6,10 @@ import celpy
 from opentelemetry import trace
 from sqlmodel import Session
 
-from keep.common.consts import KEEP_CORRELATION_ENABLED, MAINTENANCE_WINDOW_ALERT_STRATEGY
+from keep.common.consts import (
+    KEEP_CORRELATION_ENABLED,
+    MAINTENANCE_WINDOW_ALERT_STRATEGY,
+)
 from keep.common.core.db import (
     add_audit,
     get_alert_by_event_id,
@@ -20,11 +23,11 @@ from keep.common.core.db import (
 )
 from keep.common.core.dependencies import get_pusher_client
 from keep.common.core.metrics import alerts_maintenance_silenced_total
+from keep.common.event_management.notification_cache import get_notification_cache
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
 from keep.common.models.db.alert import Alert, AlertAudit
 from keep.common.models.db.maintenance_window import MaintenanceWindowRule
-from keep.common.event_management.notification_cache import get_notification_cache
 from keep.common.utils.cel_utils import preprocess_cel_expression
 from keep.rulesengine.rulesengine import RulesEngine
 from keep.workflowmanager.workflowmanager import WorkflowManager

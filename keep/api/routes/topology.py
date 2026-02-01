@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
 from keep.common.core.db import get_session, get_session_sync
+from keep.common.event_management.process_topology_task import process_topology
 from keep.common.models.db.topology import (
     DeleteServicesRequest,
     TopologyApplicationDtoIn,
@@ -20,7 +21,6 @@ from keep.common.models.db.topology import (
     TopologyServiceDtoOut,
     TopologyServiceUpdateRequestDTO,
 )
-from keep.common.event_management.process_topology_task import process_topology
 from keep.functions import cyaml
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory

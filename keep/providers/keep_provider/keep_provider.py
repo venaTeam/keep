@@ -10,8 +10,8 @@ from html import unescape
 import yaml
 
 from keep.common.core.db import get_alerts_with_filters
-from keep.common.models.alert import AlertDto, AlertStatus
 from keep.common.event_management.process_event_task import process_event
+from keep.common.models.alert import AlertDto, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_exception import ProviderException
 from keep.iohandler.iohandler import IOHandler

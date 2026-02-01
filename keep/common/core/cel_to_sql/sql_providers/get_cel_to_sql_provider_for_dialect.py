@@ -5,7 +5,6 @@ from keep.common.core.cel_to_sql.sql_providers.postgresql import CelToPostgreSql
 from keep.common.core.cel_to_sql.sql_providers.sqlite import CelToSqliteProvider
 
 
-
 def get_cel_to_sql_provider(
     properties_metadata: PropertiesMetadata,
 ) -> BaseCelToSqlProvider:

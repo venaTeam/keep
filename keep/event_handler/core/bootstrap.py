@@ -24,8 +24,8 @@ class Bootstrap:
     async def run_on_starting(self):
         """Runs the legacy on_starting hooks in a separate thread."""
         try:
-            from keep.common.core.init import init_services
             from keep.common.core.config import config
+            from keep.common.core.init import init_services
             # Default to noauth if not specified
             auth_type = config("AUTH_TYPE", default="noauth")
 

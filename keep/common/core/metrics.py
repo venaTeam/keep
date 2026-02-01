@@ -1,4 +1,5 @@
 import os
+
 from prometheus_client import Counter, Gauge, Histogram, Summary
 
 # This MUST be called before any prometheus_client import

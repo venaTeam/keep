@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Response
-from prometheus_client import CONTENT_TYPE_LATEST, CollectorRegistry, generate_latest, multiprocess
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    CollectorRegistry,
+    generate_latest,
+    multiprocess,
+)
 
 router = APIRouter()
 

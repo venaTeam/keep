@@ -1,7 +1,10 @@
 import json
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
 from keep.event_handler.core.kafka_consumer import KafkaEventConsumer
+
 
 @pytest.mark.asyncio
 async def test_consume_loop_success_commits():

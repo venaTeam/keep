@@ -2,9 +2,8 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+
 from keep.common.core.config import config
-
-
 from keep.event_handler.core.bootstrap import Bootstrap
 
 logger = logging.getLogger(__name__)

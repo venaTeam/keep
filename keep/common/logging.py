@@ -1,17 +1,18 @@
 import http.client
 import inspect
+import json
 import logging
 import logging.config
 import logging.handlers
 import os
+import queue
 import sys
 import threading
 import uuid
-import queue
-import requests
-import json
 from datetime import datetime
 from threading import Timer
+
+import requests
 
 # tb: small hack to avoid the InsecureRequestWarning logs
 import urllib3

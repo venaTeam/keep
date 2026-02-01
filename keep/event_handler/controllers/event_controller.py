@@ -3,7 +3,6 @@ import functools
 import logging
 
 from keep.common.event_management.process_event_task import process_event
-
 from keep.event_handler.models.event_dto import EventDTO
 
 logger = logging.getLogger(__name__)

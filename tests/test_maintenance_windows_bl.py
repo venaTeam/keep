@@ -7,6 +7,7 @@ from uuid import uuid4
 import pytest
 
 import keep.common.consts
+from keep.api.routes.maintenance import update_maintenance_rule
 from keep.common.bl.maintenance_windows_bl import MaintenanceWindowsBl
 from keep.common.core.db import (
     get_alerts_by_status,
@@ -19,7 +20,6 @@ from keep.common.models.db.maintenance_window import (
     MaintenanceRuleCreate,
     MaintenanceWindowRule,
 )
-from keep.api.routes.maintenance import update_maintenance_rule
 from keep.functions import cyaml
 from keep.workflowmanager.workflowstore import WorkflowStore
 from tests.fixtures.workflow_manager import workflow_manager  # noqa

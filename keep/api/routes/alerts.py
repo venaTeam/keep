@@ -14,16 +14,15 @@ from pusher import Pusher
 from sqlalchemy_utils import UUIDType
 from sqlmodel import Session
 
+from keep.api.core.dependencies import get_event_producer
+from keep.api.core.messaging import EventProducer
+from keep.api.routes.preset import pull_data_from_providers
 from keep.common.bl.enrichments_bl import EnrichmentsBl
 from keep.common.core.alerts import (
     get_alert_facets,
     get_alert_facets_data,
     get_alert_potential_facet_fields,
     query_last_alerts,
-)
-from keep.common.core.metrics import (
-    alert_ingestion_error_total,
-    alert_ingestion_total,
 )
 from keep.common.core.cel_to_sql.sql_providers.base import CelToSqlException
 from keep.common.core.db import dismiss_error_alerts as dismiss_error_alerts_db
@@ -44,9 +43,11 @@ from keep.common.core.dependencies import (
     extract_generic_body,
     get_pusher_client,
 )
-from keep.api.core.dependencies import get_event_producer
 from keep.common.core.elastic import ElasticClient
-from keep.api.core.messaging import EventProducer
+from keep.common.core.metrics import (
+    alert_ingestion_error_total,
+    alert_ingestion_total,
+)
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (
     AlertDto,
@@ -67,7 +68,6 @@ from keep.common.models.facet import FacetOptionsQueryDto
 from keep.common.models.query import QueryDto
 from keep.common.models.search_alert import SearchAlertsRequest
 from keep.common.models.time_stamp import TimeStampFilter
-from keep.api.routes.preset import pull_data_from_providers
 from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.common.utils.time_stamp_helpers import get_time_stamp_filter
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity

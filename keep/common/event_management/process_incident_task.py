@@ -5,8 +5,8 @@ from sqlmodel import Session
 
 from keep.common.bl.incidents_bl import IncidentBl
 from keep.common.core.db import engine, get_incident_by_fingerprint, get_incident_by_id
-from keep.common.models.incident import IncidentDto
 from keep.common.event_management.process_event_task import process_event
+from keep.common.models.incident import IncidentDto
 
 TIMES_TO_RETRY_JOB = 5  # the number of times to retry the job in case of failure
 logger = logging.getLogger(__name__)

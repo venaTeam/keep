@@ -1,6 +1,7 @@
 from fastapi import APIRouter
+from prometheus_client import REGISTRY, Histogram
 from pydantic import BaseModel
-from prometheus_client import Histogram, REGISTRY
+
 
 def get_or_create_histogram(name, documentation, labelnames, buckets):
     try:

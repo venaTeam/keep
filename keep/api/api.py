@@ -22,21 +22,11 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette_context import plugins
 from starlette_context.middleware import RawContextMiddleware
 
-import keep.common.logging
 import keep.common.core.metrics
+import keep.common.logging
 import keep.common.observability
 import keep.common.utils.import_ee
-from keep.common.arq_pool import get_pool
-from keep.common.consts import (
-    KEEP_ARQ_QUEUE_MAINTENANCE,
-    MAINTENANCE_WINDOW_ALERT_STRATEGY,
-    REDIS,
-)
-from keep.common.core.config import config
-from keep.common.core.db import dispose_session
-from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.api.core.limiter import limiter
-from keep.common.logging import CONFIG as logging_config
 from keep.api.middlewares import LoggingMiddleware
 from keep.api.routes import (
     actions,
@@ -57,17 +47,27 @@ from keep.api.routes import (
     providers,
     pusher,
     rules,
+    rum,
     settings,
     status,
     tags,
     topology,
     whoami,
     workflows,
-    rum,
 )
 from keep.api.routes.auth import groups as auth_groups
 from keep.api.routes.auth import permissions, roles, users
+from keep.common.arq_pool import get_pool
+from keep.common.consts import (
+    KEEP_ARQ_QUEUE_MAINTENANCE,
+    MAINTENANCE_WINDOW_ALERT_STRATEGY,
+    REDIS,
+)
+from keep.common.core.config import config
+from keep.common.core.db import dispose_session
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.common.event_management import process_watcher_task
+from keep.common.logging import CONFIG as logging_config
 from keep.event_subscriber.event_subscriber import EventSubscriber
 from keep.identitymanager.identitymanagerfactory import (
     IdentityManagerFactory,

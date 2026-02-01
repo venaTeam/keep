@@ -13,7 +13,11 @@ from keep.common.bl.incidents_bl import IncidentBl
 from keep.common.consts import OPENAI_MODEL_NAME
 from keep.common.core.db import get_session_sync
 from keep.common.models.alert import AlertDto
-from keep.common.models.db.ai_suggestion import AIFeedback, AISuggestion, AISuggestionType
+from keep.common.models.db.ai_suggestion import (
+    AIFeedback,
+    AISuggestion,
+    AISuggestionType,
+)
 from keep.common.models.db.topology import TopologyServiceDtoOut
 from keep.common.models.incident import (
     IncidentCandidate,

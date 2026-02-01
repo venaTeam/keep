@@ -5,13 +5,13 @@ import threading
 import time
 from datetime import datetime
 
-from keep.common.core.db import get_activity_report, get_or_creat_posthog_instance_id
 from keep.api.core.posthog import (
     KEEP_VERSION,
     POSTHOG_DISABLED,
     is_posthog_reachable,
     posthog_client,
 )
+from keep.common.core.db import get_activity_report, get_or_creat_posthog_instance_id
 
 logger = logging.getLogger(__name__)
 UPTIME_REPORTING_CADENCE = 60 * 60  # 1 hour

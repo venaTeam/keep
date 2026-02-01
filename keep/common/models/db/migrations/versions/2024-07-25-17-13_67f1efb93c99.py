@@ -6,13 +6,13 @@ Create Date: 2024-07-25 17:13:04.428633
 
 """
 import warnings
+
 import sqlalchemy as sa
 from alembic import op
 from pydantic import BaseModel
+from sqlalchemy import exc as sa_exc
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Session
-from sqlalchemy import exc as sa_exc
-
 
 # revision identifiers, used by Alembic.
 revision = "67f1efb93c99"

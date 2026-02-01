@@ -1,14 +1,14 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 import json
 import pytest
-from keep.common.core.messaging import KafkaEventProducer, RedisEventProducer
-from keep.common.core.dependencies import get_event_producer
+from keep.api.core.messaging import KafkaEventProducer, RedisEventProducer
+from keep.api.core.dependencies import get_event_producer
 from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 import os
 
 @pytest.fixture
 def mock_kafka_producer():
-    with patch("keep.common.core.messaging.AIOKafkaProducer") as mock:
+    with patch("keep.api.core.messaging.AIOKafkaProducer") as mock:
         producer_instance = AsyncMock()
         mock.return_value = producer_instance
         yield producer_instance
@@ -27,8 +27,8 @@ async def test_get_event_producer_kafka():
     # Mock environment to return KAFKA
     with patch.dict(os.environ, {"MESSAGING_TYPE": "KAFKA"}):
         # We need to reset the global instance for the test
-        with patch("keep.common.core.dependencies._kafka_producer_instance", None):
-            with patch("keep.common.core.dependencies.KafkaEventProducer") as MockProducer:
+        with patch("keep.api.core.dependencies._kafka_producer_instance", None):
+            with patch("keep.api.core.dependencies.KafkaEventProducer") as MockProducer:
                 producer = await get_event_producer()
                 assert producer is not None
                 MockProducer.assert_called_once()
@@ -39,7 +39,7 @@ async def test_get_event_producer_kafka():
 async def test_get_event_producer_redis(mock_arq_pool):
     # Mock environment to return REDIS
     with patch.dict(os.environ, {"MESSAGING_TYPE": "REDIS"}):
-        with patch("keep.common.core.dependencies.get_pool", new_callable=AsyncMock) as mock_get_pool:
+        with patch("keep.api.core.dependencies.get_pool", new_callable=AsyncMock) as mock_get_pool:
             mock_get_pool.return_value = mock_arq_pool
             producer = await get_event_producer()
             assert isinstance(producer, RedisEventProducer)

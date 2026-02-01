@@ -42,11 +42,11 @@ from keep.common.core.db import get_alert_audit as get_alert_audit_db
 from keep.common.core.db import get_error_alerts as get_error_alerts_db
 from keep.common.core.dependencies import (
     extract_generic_body,
-    get_event_producer,
     get_pusher_client,
 )
+from keep.api.core.dependencies import get_event_producer
 from keep.common.core.elastic import ElasticClient
-from keep.common.core.messaging import EventProducer
+from keep.api.core.messaging import EventProducer
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (
     AlertDto,

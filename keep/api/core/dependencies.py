@@ -1,5 +1,4 @@
 import logging
-import os
 
 from keep.api.core.messaging import (
     EventProducer,

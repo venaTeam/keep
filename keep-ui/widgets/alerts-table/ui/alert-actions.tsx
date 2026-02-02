@@ -145,10 +145,8 @@ export default function AlertActions({
         <AlertChangeStatusModal
           alert={modalAlert}
           presetName="resolve"
-          handleClose={() => {
-            setModalAlert(null);
-            clearRowSelection();
-          }}
+          handleClose={() => setModalAlert(null)}
+          onSuccess={clearRowSelection}
         />
       )}
       <Button
@@ -158,7 +156,6 @@ export default function AlertActions({
         title={isAllDismissed ? "Restore" : "Dismiss"}
         onClick={() => {
           setDismissModalAlert?.(selectedAlerts);
-          clearRowSelection();
         }}
       >
         {isAllDismissed ? "Restore" : "Dismiss"}{" "}

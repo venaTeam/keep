@@ -5,8 +5,9 @@ import sys
 import pytest
 from fastapi.testclient import TestClient
 
-from keep.common.core.dependencies import SINGLE_TENANT_UUID, get_event_producer
-from keep.common.core.messaging import EventProducer
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.api.core.dependencies import get_event_producer
+from keep.api.core.messaging import EventProducer
 from keep.common.models.db.tenant import TenantApiKey
 from keep.common.event_management.process_event_task import process_event
 

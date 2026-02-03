@@ -42,11 +42,11 @@ from keep.common.core.db import get_alert_audit as get_alert_audit_db
 from keep.common.core.db import get_error_alerts as get_error_alerts_db
 from keep.common.core.dependencies import (
     extract_generic_body,
-    get_event_producer,
     get_pusher_client,
 )
+from keep.api.core.dependencies import get_event_producer
 from keep.common.core.elastic import ElasticClient
-from keep.common.core.messaging import EventProducer
+from keep.api.core.messaging import EventProducer
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import (
     AlertDto,
@@ -417,6 +417,11 @@ def assign_alert(
         dispose_on_new_alert = body.dispose_on_new_alert
         note = body.note
 
+    # Build action description with note if present (matching pattern from get_enrichment_metadata)
+    action_description = f"Alert assigned to {user_email}"
+    if note:
+        action_description += f" - With note: {note}"
+
     enrichments_bl = EnrichmentsBl(tenant_id, session)
     if dispose_on_new_alert:
         enrichments_bl.enrich_entity(
@@ -427,7 +432,7 @@ def assign_alert(
             },
             action_type=ActionType.ACKNOWLEDGE,
             action_callee=user_email,
-            action_description=f"Alert assigned to {user_email}",
+            action_description=action_description,
             dispose_on_new_alert=True,
         )
         if note:
@@ -438,7 +443,7 @@ def assign_alert(
                 },
                 action_type=ActionType.ACKNOWLEDGE,
                 action_callee=user_email,
-                action_description=f"Note added by {user_email}",
+                action_description=f"Note added by {user_email} - {note}",
                 dispose_on_new_alert=False,
             )
     else:
@@ -451,7 +456,7 @@ def assign_alert(
             },
             action_type=ActionType.ACKNOWLEDGE,
             action_callee=user_email,
-            action_description=f"Alert assigned to {user_email}",
+            action_description=action_description,
             dispose_on_new_alert=False,
         )
     return {"status": "ok"}

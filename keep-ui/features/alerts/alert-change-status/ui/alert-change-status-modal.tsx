@@ -27,12 +27,14 @@ interface Props {
   alert: AlertDto | AlertDto[] | null | undefined;
   handleClose: () => void;
   presetName: string;
+  onSuccess?: () => void;
 }
 
 export function AlertChangeStatusModal({
   alert,
   handleClose,
   presetName,
+  onSuccess,
 }: Props) {
   const api = useApi();
   const [disposeOnNewAlert, setDisposeOnNewAlert] = useState(true);
@@ -97,6 +99,7 @@ export function AlertChangeStatusModal({
 
       toast.success("Alert status changed successfully!");
       clearAndClose();
+      onSuccess?.();
       await alertsMutator();
       await presetsMutator();
     } catch (error) {
@@ -129,6 +132,7 @@ export function AlertChangeStatusModal({
 
       toast.success("Alert(s) status changed successfully!");
       clearAndClose();
+      onSuccess?.();
       await alertsMutator();
       await presetsMutator();
     } catch (error) {

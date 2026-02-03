@@ -113,6 +113,7 @@ interface Props {
   setDismissModalAlert?: (alert: AlertDto[] | null) => void;
   setChangeStatusAlert?: (alert: AlertDto) => void;
   setAssignModalAlert?: (alert: AlertDto | null) => void;
+  onRegisterResetSelection?: (resetFn: () => void) => void;
   onReload?: (query: AlertsQuery) => void;
   onQueryChange?: (query: AlertsTableDataQuery) => void;
 }
@@ -134,6 +135,7 @@ export function AlertTableServerSide({
   setDismissModalAlert,
   setChangeStatusAlert,
   setAssignModalAlert,
+  onRegisterResetSelection,
   onReload,
   onQueryChange,
 }: Props) {
@@ -295,6 +297,13 @@ export function AlertTableServerSide({
       }),
     [filterCel, searchCel, setPaginationState]
   );
+
+  // Register the reset selection function with the parent so it can be called when dismiss modal succeeds
+  useEffect(() => {
+    if (onRegisterResetSelection) {
+      onRegisterResetSelection(table.resetRowSelection);
+    }
+  }, [onRegisterResetSelection, table.resetRowSelection]);
 
   const selectedAlertsFingerprints = Object.keys(table.getState().rowSelection);
 

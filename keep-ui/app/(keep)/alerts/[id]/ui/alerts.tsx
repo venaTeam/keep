@@ -77,6 +77,8 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
   const [viewEnrichAlertModal, setEnrichAlertModal] =
     useState<AlertDto | null>();
   const [isEnrichSidebarOpen, setIsEnrichSidebarOpen] = useState(false);
+  // Store the reset selection callback to call when dismiss/status change succeeds
+  const [resetAlertsSelection, setResetAlertsSelection] = useState<(() => void) | null>(null);
   const { dynamicPresets: savedPresets = [], isLoading: _isPresetsLoading } =
     usePresets({
       revalidateOnFocus: false,
@@ -191,6 +193,7 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
         setChangeStatusAlert={setChangeStatusAlert}
         setAssignModalAlert={setAssignModalAlert}
         mutateAlerts={mutateAlerts}
+        onRegisterResetSelection={setResetAlertsSelection}
         onReload={reloadAlerts}
         onQueryChange={setAlertsTableDataQuery}
       />
@@ -203,6 +206,7 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
         alert={dismissModalAlert}
         preset={selectedPreset.name}
         handleClose={() => setDismissModalAlert(null)}
+        onSuccess={() => resetAlertsSelection?.()}
       />
       <AlertChangeStatusModal
         alert={changeStatusAlert}

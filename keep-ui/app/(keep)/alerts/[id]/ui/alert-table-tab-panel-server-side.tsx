@@ -25,6 +25,7 @@ interface Props {
   setChangeStatusAlert: (alert: AlertDto | null) => void;
   setAssignModalAlert: (alert: AlertDto | null) => void;
   mutateAlerts: () => void;
+  onRegisterResetSelection?: (resetFn: () => void) => void;
   onReload?: (query: AlertsQuery) => void;
   onQueryChange?: (query: AlertsTableDataQuery) => void;
 }
@@ -44,6 +45,7 @@ export default function AlertTableTabPanelServerSide({
   setChangeStatusAlert,
   setAssignModalAlert,
   mutateAlerts,
+  onRegisterResetSelection,
   onReload,
   onQueryChange,
 }: Props) {
@@ -103,6 +105,7 @@ export default function AlertTableTabPanelServerSide({
       setDismissModalAlert={setDismissModalAlert}
       setChangeStatusAlert={setChangeStatusAlert}
       setAssignModalAlert={setAssignModalAlert}
+      onRegisterResetSelection={onRegisterResetSelection}
       onReload={onReload}
       onQueryChange={onQueryChange}
     />

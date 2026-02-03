@@ -5,7 +5,6 @@ import time
 import requests
 
 from keep.api.core.demo_mode import launch_demo_mode_thread
-from keep.api.core.report_uptime import launch_uptime_reporting_thread
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ def main():
 
     threads = []
     threads.append(launch_demo_mode_thread(keep_api_url, keep_api_key))
-    threads.append(launch_uptime_reporting_thread())
+
 
     logger.info("Background server jobs threads launched, joining them.")
 

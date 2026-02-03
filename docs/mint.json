@@ -21,11 +21,6 @@
       "url": "https://platform.keephq.dev/"
     }
   ],
-  "analytics": {
-    "posthog": {
-      "apiKey": "phc_mYqciA4RO5g48K6KnmZtftn5xQa5625Aao7vsVC0gJ9"
-    }
-  },
   "anchors": [],
   "navigation": [
     {
@@ -90,7 +85,10 @@
     },
     {
       "group": "Incidents",
-      "pages": ["incidents/overview", "incidents/facets"]
+      "pages": [
+        "incidents/overview",
+        "incidents/facets"
+      ]
     },
     {
       "group": "Workflow Automation",
@@ -226,7 +224,6 @@
             "providers/documentation/pagertree-provider",
             "providers/documentation/parseable-provider",
             "providers/documentation/pingdom-provider",
-            "providers/documentation/posthog-provider",
             "providers/documentation/planner-provider",
             "providers/documentation/postgresql-provider",
             "providers/documentation/prometheus-provider",
@@ -322,14 +319,19 @@
         },
         {
           "group": "Local LLM",
-          "pages": ["deployment/local-llm/keep-with-litellm"]
+          "pages": [
+            "deployment/local-llm/keep-with-litellm"
+          ]
         },
         "deployment/stress-testing"
       ]
     },
     {
       "group": "Development",
-      "pages": ["development/getting-started", "development/external-url"]
+      "pages": [
+        "development/getting-started",
+        "development/external-url"
+      ]
     },
     {
       "group": "Keep CLI",
@@ -368,7 +370,10 @@
                 "cli/commands/workflow-runs",
                 {
                   "group": "keep workflow runs",
-                  "pages": ["cli/commands/runs-logs", "cli/commands/runs-list"]
+                  "pages": [
+                    "cli/commands/runs-logs",
+                    "cli/commands/runs-list"
+                  ]
                 }
               ]
             },

@@ -5622,58 +5622,7 @@ def get_resource_ids_by_resource_type(
         return result.all()
 
 
-def get_or_creat_posthog_instance_id(session: Optional[Session] = None):
-    POSTHOG_INSTANCE_ID_KEY = "posthog_instance_id"
-    with Session(engine) as session:
-        system = session.exec(
-            select(System).where(System.name == POSTHOG_INSTANCE_ID_KEY)
-        ).first()
-        if system:
-            return system.value
 
-        system = System(
-            id=str(uuid4()),
-            name=POSTHOG_INSTANCE_ID_KEY,
-            value=str(uuid4()),
-        )
-        session.add(system)
-        session.commit()
-        session.refresh(system)
-        return system.value
-
-
-def get_activity_report(session: Optional[Session] = None):
-    from keep.common.models.db.user import User
-
-    last_24_hours = datetime.utcnow() - timedelta(hours=24)
-    activity_report = {}
-    with Session(engine) as session:
-        activity_report["tenants_count"] = session.query(Tenant).count()
-        activity_report["providers_count"] = session.query(Provider).count()
-        activity_report["users_count"] = session.query(User).count()
-        activity_report["rules_count"] = session.query(Rule).count()
-        activity_report["last_24_hours_incidents_count"] = (
-            session.query(Incident)
-            .filter(Incident.creation_time >= last_24_hours)
-            .count()
-        )
-        activity_report["last_24_hours_alerts_count"] = (
-            session.query(Alert).filter(Alert.timestamp >= last_24_hours).count()
-        )
-        activity_report["last_24_hours_rules_created"] = (
-            session.query(Rule).filter(Rule.creation_time >= last_24_hours).count()
-        )
-        activity_report["last_24_hours_workflows_created"] = (
-            session.query(Workflow)
-            .filter(Workflow.creation_time >= last_24_hours)
-            .count()
-        )
-        activity_report["last_24_hours_workflows_executed"] = (
-            session.query(WorkflowExecution)
-            .filter(WorkflowExecution.started >= last_24_hours)
-            .count()
-        )
-    return activity_report
 
 
 def get_last_alerts_by_fingerprints(

@@ -54,9 +54,7 @@ export function getConfig(): InternalConfig {
     API_URL: process.env.API_URL,
     // could be relative (e.g. for ingress) or absolute (e.g. for cloud run)
     API_URL_CLIENT: API_URL_CLIENT,
-    POSTHOG_KEY: process.env.POSTHOG_KEY,
-    POSTHOG_DISABLED: process.env.POSTHOG_DISABLED,
-    POSTHOG_HOST: process.env.POSTHOG_HOST,
+
     SENTRY_DISABLED: process.env.SENTRY_DISABLED,
     READ_ONLY: process.env.KEEP_READ_ONLY === "true",
     OPEN_AI_API_KEY_SET:

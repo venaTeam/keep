@@ -10,7 +10,7 @@ from prometheus_client import (
     multiprocess,
 )
 
-from keep.common.core.config import config
+from keep.api.config import KEEP_METRICS_LIMIT
 from keep.common.core.db import (
     get_last_alerts_for_incidents,
     get_last_incidents,
@@ -131,7 +131,7 @@ def get_metrics(
 
 
 @router.get("/dumb", include_in_schema=False)
-@limiter.limit(config("KEEP_LIMIT_CONCURRENCY", default="10/minute", cast=str))
+@limiter.limit(KEEP_METRICS_LIMIT)
 async def get_dumb(request: Request) -> JSONResponse:
     """
     This endpoint is used to test the rate limiting.

@@ -190,9 +190,7 @@ const mockConfig: InternalConfig = {
   PUSHER_PORT: 6001,
   PUSHER_APP_KEY: "test",
   PUSHER_CLUSTER: "test",
-  POSTHOG_KEY: "test",
-  POSTHOG_HOST: "localhost",
-  POSTHOG_DISABLED: "true",
+
   READ_ONLY: false,
   OPEN_AI_API_KEY_SET: false,
   NOISY_ALERTS_ENABLED: false,

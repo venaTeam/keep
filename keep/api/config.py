@@ -2,11 +2,45 @@ import logging
 import keep.common.logging
 from keep.common.core.config import starlette_config
 from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes
+from importlib import metadata
 
 # We read AUTH_TYPE directly to avoid importing keep.api.api which triggers a cascade of imports
 # that might fail during early startup or in restricted environments.
 # Using cast=str to ensure we always get a string, enforcing type if passing objects by mistake
 AUTH_TYPE = starlette_config("AUTH_TYPE", default=IdentityManagerTypes.NOAUTH.value, cast=str).lower()
+try:
+    KEEP_VERSION = metadata.version("keep")
+except Exception:
+    KEEP_VERSION = starlette_config("KEEP_VERSION", default="unknown")
+
+HOST = starlette_config("KEEP_HOST", default="0.0.0.0")
+PORT = starlette_config("PORT", default=8080, cast=int)
+SCHEDULER = starlette_config("SCHEDULER", default="true", cast=bool)
+CONSUMER = starlette_config("CONSUMER", default="true", cast=bool)
+TOPOLOGY = starlette_config("KEEP_TOPOLOGY_PROCESSOR", default="false", cast=bool)
+WATCHER = starlette_config("WATCHER", default="false", cast=bool)
+KEEP_DEBUG_TASKS = starlette_config("KEEP_DEBUG_TASKS", default="false", cast=bool)
+
+KEEP_USE_LIMITER = starlette_config("KEEP_USE_LIMITER", default="false", cast=bool)
+MAINTENANCE_WINDOWS = starlette_config("MAINTENANCE_WINDOWS", default="false", cast=bool)
+
+KEEP_API_URL = starlette_config("KEEP_API_URL", default=None)
+KEEP_METRICS = starlette_config("KEEP_METRICS", default="true", cast=bool)
+KEEP_OTEL_ENABLED = starlette_config("KEEP_OTEL_ENABLED", default="true", cast=bool)
+KEEP_WORKERS = starlette_config("KEEP_WORKERS", default=None, cast=int)
+KEEP_LIMIT_CONCURRENCY = starlette_config("KEEP_LIMIT_CONCURRENCY", default=None, cast=int)
+# Used for limiter default limits (defaults to 100/minute if env is not set)
+# Note: This shares the env var name with Uvicorn concurrency but expects string format for SlowAPI
+KEEP_LIMITER_DEFAULT_LIMIT = starlette_config("KEEP_LIMIT_CONCURRENCY", default="100/minute", cast=str)
+KEEP_METRICS_LIMIT = starlette_config("KEEP_LIMIT_CONCURRENCY", default="10/minute", cast=str)
+
+KEEP_EXTRACT_IDENTITY = starlette_config("KEEP_EXTRACT_IDENTITY", default="true", cast=bool)
+KEEP_READ_ONLY = starlette_config("KEEP_READ_ONLY", default="false", cast=bool)
+KEEP_PROVIDER_DISTRIBUTION_ENABLED = starlette_config("KEEP_PROVIDER_DISTRIBUTION_ENABLED", default="true", cast=bool)
+KEEP_PLATFORM_URL = starlette_config("KEEP_PLATFORM_URL", default="https://platform.keephq.dev")
+
+
+
 
 keep.common.logging.setup_logging()
 logger = logging.getLogger(__name__)

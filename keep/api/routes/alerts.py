@@ -417,6 +417,11 @@ def assign_alert(
         dispose_on_new_alert = body.dispose_on_new_alert
         note = body.note
 
+    # Build action description with note if present (matching pattern from get_enrichment_metadata)
+    action_description = f"Alert assigned to {user_email}"
+    if note:
+        action_description += f" - With note: {note}"
+
     enrichments_bl = EnrichmentsBl(tenant_id, session)
     if dispose_on_new_alert:
         enrichments_bl.enrich_entity(
@@ -427,7 +432,7 @@ def assign_alert(
             },
             action_type=ActionType.ACKNOWLEDGE,
             action_callee=user_email,
-            action_description=f"Alert assigned to {user_email}",
+            action_description=action_description,
             dispose_on_new_alert=True,
         )
         if note:
@@ -438,7 +443,7 @@ def assign_alert(
                 },
                 action_type=ActionType.ACKNOWLEDGE,
                 action_callee=user_email,
-                action_description=f"Note added by {user_email}",
+                action_description=f"Note added by {user_email} - {note}",
                 dispose_on_new_alert=False,
             )
     else:
@@ -451,7 +456,7 @@ def assign_alert(
             },
             action_type=ActionType.ACKNOWLEDGE,
             action_callee=user_email,
-            action_description=f"Alert assigned to {user_email}",
+            action_description=action_description,
             dispose_on_new_alert=False,
         )
     return {"status": "ok"}

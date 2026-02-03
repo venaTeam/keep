@@ -42,12 +42,14 @@ interface Props {
   preset: string;
   alert: AlertDto[] | null | undefined;
   handleClose: () => void;
+  onSuccess?: () => void;
 }
 
 export function AlertDismissModal({
   preset: presetName,
   alert: alerts,
   handleClose,
+  onSuccess,
 }: Props) {
   const [dismissComment, setDismissComment] = useState<string>("");
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -135,6 +137,7 @@ export function AlertDismissModal({
           position: "top-right",
         }
       );
+      onSuccess?.();
       await alertsMutator();
       await presetsMutator();
     } catch (error) {

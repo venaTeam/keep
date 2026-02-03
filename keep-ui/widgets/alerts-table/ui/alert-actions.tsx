@@ -149,10 +149,8 @@ export default function AlertActions({
         <AlertChangeStatusModal
           alert={modalAlert}
           presetName="resolve"
-          handleClose={() => {
-            setModalAlert(null);
-            clearRowSelection();
-          }}
+          handleClose={() => setModalAlert(null)}
+          onSuccess={clearRowSelection}
         />
       )}
       {/* Restore button - only show if there are dismissed alerts */}

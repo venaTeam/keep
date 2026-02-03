@@ -106,7 +106,6 @@ export const AlertKnownKeys = [
   "alertMenu",
   "group",
   "extraPayload",
-  "note",
 ];
 
 export interface ViewedAlert {

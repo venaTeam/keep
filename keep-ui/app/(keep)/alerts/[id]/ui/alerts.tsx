@@ -12,6 +12,7 @@ import { ManualRunWorkflowModal } from "@/features/workflows/manual-run-workflow
 import { AlertDismissModal } from "@/features/alerts/dismiss-alert";
 import { ViewAlertModal } from "@/features/alerts/view-raw-alert";
 import { AlertChangeStatusModal } from "@/features/alerts/alert-change-status";
+import { AlertAssignModal } from "@/features/alerts/alert-assign";
 import { EnrichAlertSidePanel } from "@/features/alerts/enrich-alert";
 import { FacetDto } from "@/features/filter";
 import { useApi } from "@/shared/lib/hooks/useApi";
@@ -71,10 +72,13 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
     AlertDto[] | null
   >();
   const [changeStatusAlert, setChangeStatusAlert] = useState<AlertDto | null>();
+  const [assignModalAlert, setAssignModalAlert] = useState<AlertDto | null>();
   const [viewAlertModal, setViewAlertModal] = useState<AlertDto | null>();
   const [viewEnrichAlertModal, setEnrichAlertModal] =
     useState<AlertDto | null>();
   const [isEnrichSidebarOpen, setIsEnrichSidebarOpen] = useState(false);
+  // Store the reset selection callback to call when dismiss/status change succeeds
+  const [resetAlertsSelection, setResetAlertsSelection] = useState<(() => void) | null>(null);
   const { dynamicPresets: savedPresets = [], isLoading: _isPresetsLoading } =
     usePresets({
       revalidateOnFocus: false,
@@ -187,7 +191,9 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
         setRunWorkflowModalAlert={setRunWorkflowModalAlert}
         setDismissModalAlert={setDismissModalAlert}
         setChangeStatusAlert={setChangeStatusAlert}
+        setAssignModalAlert={setAssignModalAlert}
         mutateAlerts={mutateAlerts}
+        onRegisterResetSelection={setResetAlertsSelection}
         onReload={reloadAlerts}
         onQueryChange={setAlertsTableDataQuery}
       />
@@ -200,11 +206,17 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
         alert={dismissModalAlert}
         preset={selectedPreset.name}
         handleClose={() => setDismissModalAlert(null)}
+        onSuccess={() => resetAlertsSelection?.()}
       />
       <AlertChangeStatusModal
         alert={changeStatusAlert}
         presetName={selectedPreset.name}
         handleClose={() => setChangeStatusAlert(null)}
+      />
+      <AlertAssignModal
+        alert={assignModalAlert}
+        presetName={selectedPreset.name}
+        handleClose={() => setAssignModalAlert(null)}
       />
       <AlertMethodModal
         alerts={alerts || []}

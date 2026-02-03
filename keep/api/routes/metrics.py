@@ -1,7 +1,7 @@
 from typing import List
 
 import chevron
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import APIRouter, Query, Request, Response
 from fastapi.responses import JSONResponse
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
@@ -10,54 +10,24 @@ from prometheus_client import (
     multiprocess,
 )
 
-from keep.api.core.config import config
-from keep.api.core.db import (
+from keep.api.config import KEEP_METRICS_LIMIT
+from keep.common.core.db import (
     get_last_alerts_for_incidents,
     get_last_incidents,
     get_workflow_executions_count,
 )
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.api.core.limiter import limiter
-from keep.api.models.alert import AlertDto
-from keep.identitymanager.authenticatedentity import AuthenticatedEntity
-from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
+from keep.common.models.alert import AlertDto
 
 router = APIRouter()
 
 CONTENT_TYPE_LATEST = "text/plain; version=0.0.4; charset=utf-8"
-NO_AUTH_METRICS = config("KEEP_NO_AUTH_METRICS", default=False, cast=bool)
-
-if NO_AUTH_METRICS:
-
-    @router.get("/processing", include_in_schema=False)
-    async def get_processing_metrics(
-        request: Request,
-    ):
-        registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry)
-        metrics = generate_latest(registry)
-        return Response(content=metrics, media_type=CONTENT_TYPE_LATEST)
-
-else:
-
-    @router.get("/processing", include_in_schema=False)
-    async def get_processing_metrics(
-        request: Request,
-        authenticated_entity: AuthenticatedEntity = Depends(
-            IdentityManagerFactory.get_auth_verifier(["read:metrics"])
-        ),
-    ):
-        registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry)
-        metrics = generate_latest(registry)
-        return Response(content=metrics, media_type=CONTENT_TYPE_LATEST)
 
 
 @router.get("")
 def get_metrics(
     labels: List[str] = Query(None),
-    authenticated_entity: AuthenticatedEntity = Depends(
-        IdentityManagerFactory.get_auth_verifier(["read:metrics"])
-    ),
 ):
     """
     This endpoint is used by Prometheus to scrape such metrics from the application:
@@ -71,29 +41,26 @@ def get_metrics(
     ```
     scrape_configs:
     - job_name: "scrape_keep"
-      scrape_interval: 5m  # It's important to scrape not too often to avoid rate limiting.
-      static_configs:
-      - targets: ["https://api.keephq.dev"]  # Or your own domain.
-      authorization:
-        type: Bearer
-        credentials: "{Your API Key}"
+    scrape_interval: 5m  # It's important to scrape not too often to avoid rate limiting.
+    static_configs:
+    - targets: ["https://api.keephq.dev"]  # Or your own domain.
 
-      # Optional, you can add labels to exported incidents.
-      # Label values will be equal to the last incident's alert payload value matching the label.
-      # Attention! Don't add "flaky" labels which could change from alert to alert within the same incident.
-      # Good labels: ['labels.department', 'labels.team'], bad labels: ['labels.severity', 'labels.pod_id']
-      # Check Keep -> Feed -> "extraPayload" column, it will help in writing labels.
+    # Optional, you can add labels to exported incidents.
+    # Label values will be equal to the last incident's alert payload value matching the label.
+    # Attention! Don't add "flaky" labels which could change from alert to alert within the same incident.
+    # Good labels: ['labels.department', 'labels.team'], bad labels: ['labels.severity', 'labels.pod_id']
+    # Check Keep -> Feed -> "extraPayload" column, it will help in writing labels.
 
-      params:
+    params:
         labels: ['labels.service', 'labels.queue']
-      # Will resuld as: "labels_service" and "labels_queue".
+    # Will resuld as: "labels_service" and "labels_queue".
     ```
     """
     # We don't use im-memory metrics countrs here which is typical for prometheus exporters,
     # they would make us expose our app's pod id's. This is a customer-facing endpoint
     # we're deploying to SaaS, and we want to hide our internal infra.
 
-    tenant_id = authenticated_entity.tenant_id
+    tenant_id = SINGLE_TENANT_UUID
 
     export = str()
 
@@ -144,14 +111,27 @@ def get_metrics(
     export += "\n\n"
     export += "# HELP workflows_executions_total The total number of workflows.\r\n"
     export += "# TYPE workflows_executions_total counter\n"
-    export += f"workflows_executions_total {{status=\"success\"}} {workflow_execution_counts['success']}\n"
-    export += f"workflows_executions_total {{status=\"other\"}} {workflow_execution_counts['other']}\n"
+    export += f'workflows_executions_total {{status="success"}} {workflow_execution_counts["success"]}\n'
+    export += f'workflows_executions_total {{status="other"}} {workflow_execution_counts["other"]}\n'
+
+    # Exporting standard application metrics (prometheus_client)
+    # Exporting standard application metrics (prometheus_client)
+    try:
+        registry = CollectorRegistry()
+        multiprocess.MultiProcessCollector(registry)
+        # generate_latest returns bytes, so we decode to string to append to export
+        export += generate_latest(registry).decode("utf-8")
+    except Exception:
+        # Fallback to default registry if multiprocess collection fails
+        # This is useful for local development or if configuration is improper
+        from prometheus_client import REGISTRY
+        export += generate_latest(REGISTRY).decode("utf-8")
 
     return Response(content=export, media_type=CONTENT_TYPE_LATEST)
 
 
 @router.get("/dumb", include_in_schema=False)
-@limiter.limit(config("KEEP_LIMIT_CONCURRENCY", default="10/minute", cast=str))
+@limiter.limit(KEEP_METRICS_LIMIT)
 async def get_dumb(request: Request) -> JSONResponse:
     """
     This endpoint is used to test the rate limiting.

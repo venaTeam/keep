@@ -23,7 +23,9 @@ interface Props {
   setRunWorkflowModalAlert: (alert: AlertDto | null) => void;
   setDismissModalAlert: (alert: AlertDto[] | null) => void;
   setChangeStatusAlert: (alert: AlertDto | null) => void;
+  setAssignModalAlert: (alert: AlertDto | null) => void;
   mutateAlerts: () => void;
+  onRegisterResetSelection?: (resetFn: () => void) => void;
   onReload?: (query: AlertsQuery) => void;
   onQueryChange?: (query: AlertsTableDataQuery) => void;
 }
@@ -41,7 +43,9 @@ export default function AlertTableTabPanelServerSide({
   setRunWorkflowModalAlert,
   setDismissModalAlert,
   setChangeStatusAlert,
+  setAssignModalAlert,
   mutateAlerts,
+  onRegisterResetSelection,
   onReload,
   onQueryChange,
 }: Props) {
@@ -76,6 +80,7 @@ export default function AlertTableTabPanelServerSide({
     setRunWorkflowModalAlert: setRunWorkflowModalAlert,
     setDismissModalAlert: setDismissModalAlert,
     setChangeStatusAlert: setChangeStatusAlert,
+    setAssignModalAlert: setAssignModalAlert,
     presetName: preset.name,
     presetNoisy: preset.is_noisy,
   });
@@ -99,6 +104,8 @@ export default function AlertTableTabPanelServerSide({
       setRunWorkflowModalAlert={setRunWorkflowModalAlert}
       setDismissModalAlert={setDismissModalAlert}
       setChangeStatusAlert={setChangeStatusAlert}
+      setAssignModalAlert={setAssignModalAlert}
+      onRegisterResetSelection={onRegisterResetSelection}
       onReload={onReload}
       onQueryChange={onQueryChange}
     />

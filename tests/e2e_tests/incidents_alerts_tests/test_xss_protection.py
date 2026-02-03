@@ -1,5 +1,6 @@
 import pytest
 from playwright.sync_api import Page
+
 from tests.e2e_tests.incidents_alerts_tests.incidents_alerts_setup import (
     create_fake_alert,
     upload_alert,
@@ -113,9 +114,9 @@ def test_legit_html_content(
         html_content = incident_row.inner_html()
         assert "<h2>" in html_content, "H2 tag not found in HTML"
         assert "<code>" in html_content, "Code tag not found in HTML"
-        assert (
-            '<a href="https://google.com">' in html_content
-        ), "Link tag not found in HTML"
+        assert '<a href="https://google.com">' in html_content, (
+            "Link tag not found in HTML"
+        )
     except Exception:
         save_failure_artifacts(browser, log_entries=[])
         raise

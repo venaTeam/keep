@@ -2,14 +2,14 @@ import logging
 
 from fastapi import APIRouter, Depends
 
-from keep.api.core.db import (
+from keep.common.core.db import (
     get_alerts_count,
     get_first_alert_datetime,
     get_incidents_count,
     get_or_create_external_ai_settings,
     update_extrnal_ai_settings,
 )
-from keep.api.models.ai_external import ExternalAIConfigAndMetadataDto
+from keep.common.models.ai_external import ExternalAIConfigAndMetadataDto
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

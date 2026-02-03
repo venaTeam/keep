@@ -6,3 +6,5 @@ keep-ui/.env.local
 .vercel/
 .vscode/
 .github/
+keep.db
+docker-compose*

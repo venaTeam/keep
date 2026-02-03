@@ -111,11 +111,11 @@ def debug(msg: str) -> None:
 
 def generate_msg(alert: any, options: any) -> any:
     level = alert["rule"]["level"]
-    title = (
-        alert["rule"]["description"] if "description" in alert["rule"] else "N/A"
-    )
+    title = alert["rule"]["description"] if "description" in alert["rule"] else "N/A"
     rule_id = alert["rule"]["id"]
-    agent_id = alert["agentless"]["host"] if "agentless" in alert else alert["agent"]["id"]
+    agent_id = (
+        alert["agentless"]["host"] if "agentless" in alert else alert["agent"]["id"]
+    )
     agent_name = "Agentless Host" if "agentless" in alert else alert["agent"]["name"]
     full_log = alert["full_log"] if "full_log" in alert else "N/A"
 

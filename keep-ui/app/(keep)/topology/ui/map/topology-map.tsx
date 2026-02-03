@@ -59,7 +59,7 @@ import { areSetsEqual } from "@/utils/helpers";
 import { getLayoutedElements } from "@/app/(keep)/topology/ui/map/getLayoutedElements";
 import { getNodesAndEdgesFromTopologyData } from "@/app/(keep)/topology/ui/map/getNodesAndEdgesFromTopologyData";
 import { useIncidents } from "@/utils/hooks/useIncidents";
-import { EdgeBase, Connection } from "@xyflow/system";
+import { Connection } from "@xyflow/react";
 import { AddEditNodeSidePanel } from "./AddEditNodeSidePanel";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import {
@@ -152,8 +152,7 @@ export function TopologyMap({
   const [nodes, setNodes] = useState<TopologyNode[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
-  const reactFlowInstanceRef = useRef<ReactFlowInstance<TopologyNode, Edge>>();
-
+  const reactFlowInstanceRef = useRef<ReactFlowInstance<TopologyNode, Edge> | null>(null);
   const highlightNodes = useCallback((nodeIds: string[]) => {
     setNodes((nds) =>
       nds.map((n) => {
@@ -263,7 +262,7 @@ export function TopologyMap({
   const edgeReconnectSuccessful = useRef(true);
 
   const onConnect = useCallback(
-    async (params: EdgeBase | Connection) => {
+    async (params: Edge | Connection) => {
       const sourceService = getServiceById(params.source);
       const targetService = getServiceById(params.target);
       if (
@@ -295,7 +294,7 @@ export function TopologyMap({
   }, []);
 
   const onReconnect = useCallback(
-    async (oldEdge: EdgeBase, newConnection: Connection) => {
+    async (oldEdge: Edge, newConnection: Connection) => {
       edgeReconnectSuccessful.current = true;
       if (
         getServiceById(oldEdge.source)?.is_manual === false ||

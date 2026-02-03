@@ -4,22 +4,21 @@ import uuid
 from time import sleep
 
 import pytest
-from sqlalchemy import desc, text
 
-from keep.api.core.db import create_rule as create_rule_db
-from keep.api.core.db import (
+from keep.common.core.db import create_rule as create_rule_db
+from keep.common.core.db import (
     enrich_incidents_with_alerts,
     get_incident_alerts_by_incident_id,
     get_last_incidents,
+    set_last_alert,
 )
-from keep.api.core.db import get_rules as get_rules_db
-from keep.api.core.db import set_last_alert
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.alert import Alert, Incident
-from keep.api.models.db.incident import IncidentSeverity, IncidentStatus
-from keep.api.models.db.rule import CreateIncidentOn, ResolveOn
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.common.core.db import get_rules as get_rules_db
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.alert import Alert, Incident
+from keep.common.models.db.incident import IncidentSeverity, IncidentStatus
+from keep.common.models.db.rule import CreateIncidentOn, ResolveOn
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.rulesengine.rulesengine import RulesEngine
 from tests.fixtures.client import client, test_app  # noqa
 
@@ -349,7 +348,6 @@ def test_incident_severity(db_session):
 
 
 def test_incident_no_auto_resolution(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -464,7 +462,6 @@ def test_incident_no_auto_resolution(db_session, create_alert):
 
 
 def test_incident_resolution_on_all(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -585,7 +582,6 @@ def test_incident_resolution_on_all(db_session, create_alert):
 def test_incident_resolution_on_edge(
     db_session, create_alert, direction, second_fire_order
 ):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -700,7 +696,6 @@ def test_incident_resolution_on_edge(
 
 
 def test_rule_multiple_alerts(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -796,7 +791,6 @@ def test_rule_multiple_alerts(db_session, create_alert):
 
 
 def test_rule_event_groups_expires(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -1970,7 +1964,6 @@ def test_incident_prefix_multiple_incidents(db_session):
 
 
 def test_rule_alerts_threshold(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -2042,7 +2035,6 @@ def test_rule_alerts_threshold(db_session, create_alert):
 
 
 def test_rule_multiple_alerts_with_threshold(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -2253,7 +2245,6 @@ def test_incident_created_without_assignee(db_session):
 
 
 def test_rule_alerts_threshold_with_grouping(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -2275,10 +2266,7 @@ def test_rule_alerts_threshold_with_grouping(db_session, create_alert):
         "Critical Alert G1.1",
         AlertStatus.FIRING,
         datetime.datetime.utcnow(),
-        {
-            "severity": AlertSeverity.CRITICAL.value,
-            "group": "group-1"
-        },
+        {"severity": AlertSeverity.CRITICAL.value, "group": "group-1"},
     )
 
     # No incident yet
@@ -2311,7 +2299,9 @@ def test_rule_alerts_threshold_with_grouping(db_session, create_alert):
     assert db_session.query(Incident).filter(Incident.is_visible == True).count() == 0
     # But two hidden groups are there
     assert db_session.query(Incident).filter(Incident.is_visible == False).count() == 2
-    incident_2 = db_session.query(Incident).order_by(Incident.creation_time.desc()).first()
+    incident_2 = (
+        db_session.query(Incident).order_by(Incident.creation_time.desc()).first()
+    )
 
     enrich_incidents_with_alerts(SINGLE_TENANT_UUID, [incident_2], db_session)
 
@@ -2328,7 +2318,6 @@ def test_rule_alerts_threshold_with_grouping(db_session, create_alert):
             "group": "group-1",
         },
     )
-
 
     # One incident was official started
     assert db_session.query(Incident).filter(Incident.is_visible == True).count() == 1
@@ -2354,7 +2343,6 @@ def test_rule_alerts_threshold_with_grouping(db_session, create_alert):
 
 
 def test_rule_alerts_threshold_same_fingerprint(db_session, create_alert):
-
     create_rule_db(
         tenant_id=SINGLE_TENANT_UUID,
         name="test-rule",
@@ -2451,7 +2439,6 @@ def test_rule_alerts_threshold_same_fingerprint(db_session, create_alert):
     )
     assert alert_count == 1
     assert len(alerts) == 1
-
 
     last_alert = db_session.query(Alert).order_by(Alert.timestamp.desc()).first()
     last_alert_dto = convert_db_alerts_to_dto_alerts(

@@ -10,7 +10,6 @@ services:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
       - API_URL=http://keep-backend:8080
-      - POSTHOG_DISABLED=true
       - SENTRY_DISABLED=true
 
   # Backend Services
@@ -19,7 +18,6 @@ services:
     image: "%KEEPBACKEND_IMAGE%"
     environment:
       - AUTH_TYPE=NO_AUTH
-      - POSTHOG_DISABLED=true
       - SECRET_MANAGER_DIRECTORY=/app
       - SQLALCHEMY_WARN_20=1
       - REDIS=${REDIS:-false}
@@ -44,7 +42,6 @@ services:
       - NEXT_PUBLIC_API_URL=http://localhost:8081
       - AUTH_TYPE=DB
       - API_URL=http://keep-backend-db-auth:8080
-      - POSTHOG_DISABLED=true
       - SENTRY_DISABLED=true
       - AUTH_DEBUG=true
 
@@ -65,7 +62,6 @@ services:
       - PUSHER_PORT=6001
       - USE_NGROK=false
       - AUTH_TYPE=DB
-      - POSTHOG_DISABLED=true
       - SECRET_MANAGER_DIRECTORY=/app
       - SQLALCHEMY_WARN_20=1
       - KEEP_JWT_SECRET=verysecretkey

@@ -1,8 +1,9 @@
-import json
 import dataclasses
+import json
+from typing import Any, Dict, Optional
+
 import pydantic
 import requests
-from typing import Optional, Dict, Any
 
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_exception import ProviderException
@@ -91,18 +92,18 @@ class VllmProvider(BaseProvider):
                 json=payload,
             )
             response.raise_for_status()
-            
+
             # Parse the response
             result = response.json()
-            
+
             # Extract the generated text from the response
 
             # Adjust this based on your vLLM API response structure
             try:
-                generated_text = result["choices"][0]['text']
+                generated_text = result["choices"][0]["text"]
             except KeyError:
                 generated_text = ""
-            
+
             # Try to parse as JSON if it's meant to be structured
             if structured_output_format:
                 try:
@@ -121,8 +122,8 @@ class VllmProvider(BaseProvider):
 
 
 if __name__ == "__main__":
-    import os
     import logging
+    import os
 
     logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
     context_manager = ContextManager(

@@ -1,107 +1,65 @@
 import logging
-import os
-
-import keep.api.logging
-from keep.api.alert_deduplicator.deduplication_rules_provisioning import (
-    provision_deduplication_rules_from_env,
-)
-from keep.api.api import AUTH_TYPE
-from keep.api.core.db_on_start import migrate_db, try_create_single_tenant
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.tenant_configuration import TenantConfiguration
-from keep.api.routes.dashboard import provision_dashboards
+import keep.common.logging
+from keep.common.core.config import starlette_config
 from keep.identitymanager.identitymanagerfactory import IdentityManagerTypes
-from keep.providers.providers_factory import ProvidersFactory
-from keep.providers.providers_service import ProvidersService
-from keep.workflowmanager.workflowstore import WorkflowStore
+from importlib import metadata
 
-PORT = int(os.environ.get("PORT", 8080))
-PROVISION_RESOURCES = os.environ.get("PROVISION_RESOURCES", "true") == "true"
+# We read AUTH_TYPE directly to avoid importing keep.api.api which triggers a cascade of imports
+# that might fail during early startup or in restricted environments.
+# Using cast=str to ensure we always get a string, enforcing type if passing objects by mistake
+AUTH_TYPE = starlette_config("AUTH_TYPE", default=IdentityManagerTypes.NOAUTH.value, cast=str).lower()
+try:
+    KEEP_VERSION = metadata.version("keep")
+except Exception:
+    KEEP_VERSION = starlette_config("KEEP_VERSION", default="unknown")
 
-keep.api.logging.setup_logging()
+HOST = starlette_config("KEEP_HOST", default="0.0.0.0")
+PORT = starlette_config("PORT", default=8080, cast=int)
+SCHEDULER = starlette_config("SCHEDULER", default="true", cast=bool)
+CONSUMER = starlette_config("CONSUMER", default="true", cast=bool)
+TOPOLOGY = starlette_config("KEEP_TOPOLOGY_PROCESSOR", default="false", cast=bool)
+WATCHER = starlette_config("WATCHER", default="false", cast=bool)
+KEEP_DEBUG_TASKS = starlette_config("KEEP_DEBUG_TASKS", default="false", cast=bool)
+
+KEEP_USE_LIMITER = starlette_config("KEEP_USE_LIMITER", default="false", cast=bool)
+MAINTENANCE_WINDOWS = starlette_config("MAINTENANCE_WINDOWS", default="false", cast=bool)
+
+KEEP_API_URL = starlette_config("KEEP_API_URL", default=None)
+KEEP_METRICS = starlette_config("KEEP_METRICS", default="true", cast=bool)
+KEEP_OTEL_ENABLED = starlette_config("KEEP_OTEL_ENABLED", default="true", cast=bool)
+KEEP_WORKERS = starlette_config("KEEP_WORKERS", default=None, cast=int)
+KEEP_LIMIT_CONCURRENCY = starlette_config("KEEP_LIMIT_CONCURRENCY", default=None, cast=int)
+# Used for limiter default limits (defaults to 100/minute if env is not set)
+# Note: This shares the env var name with Uvicorn concurrency but expects string format for SlowAPI
+KEEP_LIMITER_DEFAULT_LIMIT = starlette_config("KEEP_LIMIT_CONCURRENCY", default="100/minute", cast=str)
+KEEP_METRICS_LIMIT = starlette_config("KEEP_LIMIT_CONCURRENCY", default="10/minute", cast=str)
+
+KEEP_EXTRACT_IDENTITY = starlette_config("KEEP_EXTRACT_IDENTITY", default="true", cast=bool)
+KEEP_READ_ONLY = starlette_config("KEEP_READ_ONLY", default="false", cast=bool)
+KEEP_PROVIDER_DISTRIBUTION_ENABLED = starlette_config("KEEP_PROVIDER_DISTRIBUTION_ENABLED", default="true", cast=bool)
+KEEP_PLATFORM_URL = starlette_config("KEEP_PLATFORM_URL", default="https://platform.keephq.dev")
+
+
+
+
+keep.common.logging.setup_logging()
 logger = logging.getLogger(__name__)
 
-
-def provision_resources():
-    if PROVISION_RESOURCES:
-        logger.info("Loading providers into cache")
-        # provision providers from env. relevant only on single tenant.
-        logger.info("Provisioning providers and workflows")
-        ProvidersService.provision_providers(SINGLE_TENANT_UUID)
-        logger.info("Providers loaded successfully")
-        WorkflowStore.provision_workflows(SINGLE_TENANT_UUID)
-        logger.info("Workflows provisioned successfully")
-        provision_dashboards(SINGLE_TENANT_UUID)
-        logger.info("Dashboards provisioned successfully")
-        logger.info("Provisioning deduplication rules")
-        provision_deduplication_rules_from_env(SINGLE_TENANT_UUID)
-        logger.info("Deduplication rules provisioned successfully")
-    else:
-        logger.info("Provisioning resources is disabled")
 
 
 def on_starting(server=None):
     """This function is called by the gunicorn server when it starts"""
-    logger.info("Keep server starting")
-
-    migrate_db()
-
-    # Load this early and use preloading
-    # https://www.joelsleppy.com/blog/gunicorn-application-preloading/
-    # @tb: 👏 @Matvey-Kuk
-    ProvidersFactory.get_all_providers()
-    # Load tenant configuration early
-    TenantConfiguration()
-
-    # Create single tenant if it doesn't exist
-    if AUTH_TYPE in [
-        IdentityManagerTypes.DB.value,
-        IdentityManagerTypes.NOAUTH.value,
-        IdentityManagerTypes.OAUTH2PROXY.value,
-        IdentityManagerTypes.ONELOGIN.value,
-        "no_auth",  # backwards compatibility
-        "single_tenant",  # backwards compatibility
-    ]:
-        excluded_from_default_user = [
-            IdentityManagerTypes.OAUTH2PROXY.value,
-            IdentityManagerTypes.ONELOGIN.value,
-        ]
-        # for oauth2proxy, we don't want to create the default user
-        try_create_single_tenant(
-            SINGLE_TENANT_UUID,
-            create_default_user=(
-                False if AUTH_TYPE in excluded_from_default_user else True
-            ),
-        )
-
-    provision_resources()
-
-    if os.environ.get("USE_NGROK", "false") == "true":
-        from pyngrok import ngrok
-        from pyngrok.conf import PyngrokConfig
-
-        ngrok_config = PyngrokConfig(
-            auth_token=os.environ.get("NGROK_AUTH_TOKEN", None)
-        )
-        # If you want to use a custom domain, set the NGROK_DOMAIN & NGROK_AUTH_TOKEN environment variables
-        # read https://ngrok.com/blog-post/free-static-domains-ngrok-users -> https://dashboard.ngrok.com/cloud-edge/domains
-        ngrok_connection = ngrok.connect(
-            PORT,
-            pyngrok_config=ngrok_config,
-            domain=os.environ.get("NGROK_DOMAIN", None),
-        )
-        public_url = ngrok_connection.public_url
-        logger.info(f"ngrok tunnel: {public_url}")
-        os.environ["KEEP_API_URL"] = public_url
-
-    logger.info("Keep server started")
+    from keep.common.core.init import init_services
+    from keep.api.routes.dashboard import provision_dashboards
+    
+    init_services(auth_type=AUTH_TYPE, provision_dashboards_func=provision_dashboards)
 
 
 def post_worker_init(worker):
     # We need to reinitialize logging in each worker because gunicorn forks the worker processes
     print("Init logging in worker")
     logging.getLogger().handlers = []  # noqa
-    keep.api.logging.setup_logging()  # noqa
+    keep.common.logging.setup_logging()  # noqa
     print("Logging initialized in worker")
 
 

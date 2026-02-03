@@ -112,6 +112,8 @@ interface Props {
   setRunWorkflowModalAlert?: (alert: AlertDto) => void;
   setDismissModalAlert?: (alert: AlertDto[] | null) => void;
   setChangeStatusAlert?: (alert: AlertDto) => void;
+  setAssignModalAlert?: (alert: AlertDto | null) => void;
+  onRegisterResetSelection?: (resetFn: () => void) => void;
   onReload?: (query: AlertsQuery) => void;
   onQueryChange?: (query: AlertsTableDataQuery) => void;
 }
@@ -132,6 +134,8 @@ export function AlertTableServerSide({
   setRunWorkflowModalAlert,
   setDismissModalAlert,
   setChangeStatusAlert,
+  setAssignModalAlert,
+  onRegisterResetSelection,
   onReload,
   onQueryChange,
 }: Props) {
@@ -144,9 +148,9 @@ export function AlertTableServerSide({
 
   const alertsQueryRef = useRef<AlertsQuery | null>(null);
   const [rowStyle] = useAlertRowStyle();
-  
+
   // Check if this is a static preset that should never use backend
-  const isStaticPreset = 
+  const isStaticPreset =
     !presetId ||
     STATIC_PRESET_IDS.includes(presetId) ||
     STATIC_PRESETS_NAMES.includes(presetName);
@@ -172,7 +176,7 @@ export function AlertTableServerSide({
     // Only use backend for non-static presets with valid IDs
     useBackend: !isStaticPreset && !!presetId,
   });
-  
+
   const a11yContainerRef = useRef<HTMLDivElement>(null);
   const { data: configData } = useConfig();
   const noisyAlertsEnabled = configData?.NOISY_ALERTS_ENABLED;
@@ -293,6 +297,13 @@ export function AlertTableServerSide({
       }),
     [filterCel, searchCel, setPaginationState]
   );
+
+  // Register the reset selection function with the parent so it can be called when dismiss modal succeeds
+  useEffect(() => {
+    if (onRegisterResetSelection) {
+      onRegisterResetSelection(table.resetRowSelection);
+    }
+  }, [onRegisterResetSelection, table.resetRowSelection]);
 
   const selectedAlertsFingerprints = Object.keys(table.getState().rowSelection);
 
@@ -456,8 +467,8 @@ export function AlertTableServerSide({
     // todo: remove searchParams after reading
     router.replace(
       pathname +
-        "?" +
-        searchParamsWithoutCreateIncidentsFromLastAlerts.toString()
+      "?" +
+      searchParamsWithoutCreateIncidentsFromLastAlerts.toString()
     );
     // call create incident with AI from last 25 alerts
     // api/incidents?createIncidentsFromLastAlerts=25
@@ -482,7 +493,7 @@ export function AlertTableServerSide({
     (newOrder: ColumnOrderState) => {
       if (useBackend) {
         // For backend presets, preserve ALL column configuration
-        updateMultipleColumnConfigs({ 
+        updateMultipleColumnConfigs({
           columnOrder: newOrder,
           columnVisibility: columnVisibility,
           columnRenameMapping: columnRenameMapping,
@@ -509,7 +520,7 @@ export function AlertTableServerSide({
     (newVisibility: VisibilityState) => {
       if (useBackend) {
         // For backend presets, preserve ALL column configuration
-        updateMultipleColumnConfigs({ 
+        updateMultipleColumnConfigs({
           columnVisibility: newVisibility,
           columnOrder: columnOrder,
           columnRenameMapping: columnRenameMapping,
@@ -699,6 +710,7 @@ export function AlertTableServerSide({
         ) : (
           <AlertPresetManager
             presetName={presetName}
+            celValue={searchCel}
             onCelChanges={setSearchCel}
             table={table}
             isGroupingActive={isGroupingActive}
@@ -761,6 +773,7 @@ export function AlertTableServerSide({
         setRunWorkflowModalAlert={setRunWorkflowModalAlert}
         setDismissModalAlert={setDismissModalAlert}
         setChangeStatusAlert={setChangeStatusAlert}
+        setAssignModalAlert={setAssignModalAlert}
         setIsIncidentSelectorOpen={() => {
           if (selectedAlert) {
             table

@@ -59,11 +59,14 @@ class VaultSecretManager(BaseSecretManager):
             "Secret retrieved successfully", extra={"secret_name": secret_name}
         )
         secret_value = secret["data"]["data"].get("value")
-        if is_json: 
+        if is_json:
             try:
                 secret_value = json.loads(secret_value)
             except json.JSONDecodeError as e:
-                self.logger.error("Failed to parse secret as JSON", extra={"secret_name": secret_name, "error": str(e)})
+                self.logger.error(
+                    "Failed to parse secret as JSON",
+                    extra={"secret_name": secret_name, "error": str(e)},
+                )
                 raise
         return secret_value
 

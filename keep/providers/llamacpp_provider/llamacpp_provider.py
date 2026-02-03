@@ -1,4 +1,5 @@
 import dataclasses
+
 import pydantic
 import requests
 
@@ -16,7 +17,7 @@ class LlamacppProviderAuthConfig:
             "description": "Llama.cpp Server Host URL",
             "sensitive": False,
         },
-        default="http://localhost:8080"
+        default="http://localhost:8080",
     )
 
 
@@ -55,7 +56,7 @@ class LlamacppProvider(BaseProvider):
             "n_predict": max_tokens,
             "temperature": 0.7,
             "stop": ["\n\n"],  # Common stop sequence
-            "stream": False
+            "stream": False,
         }
 
         try:
@@ -63,7 +64,7 @@ class LlamacppProvider(BaseProvider):
             response = requests.post(api_url, json=payload)
             response.raise_for_status()
             content = response.json()["content"]
-            
+
             return {
                 "response": content,
             }

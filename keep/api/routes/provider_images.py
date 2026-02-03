@@ -4,8 +4,8 @@ import os
 from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile
 from sqlmodel import Session, select
 
-from keep.api.core.db import get_session
-from keep.api.models.db.provider_image import ProviderImage
+from keep.common.core.db import get_session
+from keep.common.models.db.provider_image import ProviderImage
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

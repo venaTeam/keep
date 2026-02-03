@@ -4,24 +4,24 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import ValidationError
-from sqlalchemy import and_, or_, exists
+from sqlalchemy import and_, exists, or_
 from sqlalchemy.orm import joinedload, selectinload
 from sqlmodel import Session, select
 
-from keep.api.core.db_utils import get_aggreated_field
-from keep.api.models.db.topology import (
+from keep.common.core.db_utils import get_aggreated_field
+from keep.common.models.db.topology import (
     TopologyApplication,
     TopologyApplicationDtoIn,
     TopologyApplicationDtoOut,
     TopologyService,
     TopologyServiceApplication,
-    TopologyServiceDependency,
-    TopologyServiceDtoOut,
     TopologyServiceCreateRequestDTO,
-    TopologyServiceUpdateRequestDTO,
+    TopologyServiceDependency,
     TopologyServiceDependencyCreateRequestDto,
-    TopologyServiceDependencyUpdateRequestDto,
     TopologyServiceDependencyDto,
+    TopologyServiceDependencyUpdateRequestDto,
+    TopologyServiceDtoOut,
+    TopologyServiceUpdateRequestDTO,
     TopologyServiceYAML,
 )
 
@@ -524,7 +524,6 @@ class TopologiesService:
     @staticmethod
     def delete_services(service_ids: list[int], tenant_id: str, session: Session):
         try:
-
             # Asserting that all the services that we are trying to delete were created manually, if this assertion
             # fails we do not proceed with deletion at all
             if validate_non_manual_exists(
@@ -715,30 +714,29 @@ class TopologiesService:
                     TopologyService.tenant_id == tenant_id
                 )
             ).delete(synchronize_session=False)
-    
+
             # Delete all service-application links for this tenant
             session.query(TopologyServiceApplication).filter(
                 TopologyServiceApplication.service.has(
                     TopologyService.tenant_id == tenant_id
                 )
             ).delete(synchronize_session=False)
-    
+
             # Delete all applications for this tenant
             session.query(TopologyApplication).filter(
                 TopologyApplication.tenant_id == tenant_id
             ).delete(synchronize_session=False)
-    
+
             # Delete all services for this tenant
             session.query(TopologyService).filter(
                 TopologyService.tenant_id == tenant_id
             ).delete(synchronize_session=False)
-    
+
             session.commit()
         except Exception as e:
             session.rollback()
             logger.error(f"Error during cleanup before import: {e}")
             raise e
-        
 
     @staticmethod
     def import_to_db(topology_data: dict, session: Session, tenant_id: str):

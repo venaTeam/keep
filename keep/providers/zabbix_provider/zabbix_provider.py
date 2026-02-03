@@ -13,7 +13,7 @@ from typing import Union
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.base.provider_exceptions import ProviderMethodException
@@ -346,7 +346,7 @@ class ZabbixProvider(BaseProvider):
         for acknowledge in problem.get("result", [])[0].get("acknowledges", []):
             if acknowledge.get("action") == "4":
                 time = datetime.datetime.fromtimestamp(int(acknowledge.get("clock")))
-                messages.append(f'{time}: {acknowledge.get("message")}')
+                messages.append(f"{time}: {acknowledge.get('message')}")
         return messages
 
     def change_severity(
@@ -375,15 +375,21 @@ class ZabbixProvider(BaseProvider):
             if 0 <= severity_int <= 5:
                 severity = severity_int
             else:
-                raise ValueError(f"Invalid severity number: {new_severity}. Must be between 0-5.")
+                raise ValueError(
+                    f"Invalid severity number: {new_severity}. Must be between 0-5."
+                )
         else:
             # Handle string input
             severity_lower = new_severity.lower().strip()
             if severity_lower in ZabbixProvider.SEVERITY_NAME_TO_ID_MAP:
                 severity = ZabbixProvider.SEVERITY_NAME_TO_ID_MAP[severity_lower]
             else:
-                valid_severities = list(ZabbixProvider.SEVERITY_NAME_TO_ID_MAP.keys()) + ["0", "1", "2", "3", "4", "5"]
-                raise ValueError(f"Invalid severity: {new_severity}. Valid values are: {valid_severities}")
+                valid_severities = list(
+                    ZabbixProvider.SEVERITY_NAME_TO_ID_MAP.keys()
+                ) + ["0", "1", "2", "3", "4", "5"]
+                raise ValueError(
+                    f"Invalid severity: {new_severity}. Valid values are: {valid_severities}"
+                )
 
         self.__send_request(
             "event.acknowledge", {"eventids": id, "severity": severity, "action": 8}
@@ -410,10 +416,10 @@ class ZabbixProvider(BaseProvider):
                     validated_scopes[scope.name] = "Permission denied"
                     continue
                 else:
-                    if error and any(phrase in error.lower() for phrase in [
-                        "invalid parameter",
-                        "incorrect arguments"
-                    ]):
+                    if error and any(
+                        phrase in error.lower()
+                        for phrase in ["invalid parameter", "incorrect arguments"]
+                    ):
                         # This is OK, it means the request is broken but we have access to the endpoint.
                         pass
                     else:
@@ -509,11 +515,15 @@ class ZabbixProvider(BaseProvider):
             if severity_stripped.isdigit():
                 severity_int = int(severity_stripped)
                 if 0 <= severity_int <= 5:
-                    return ZabbixProvider.SEVERITIES_MAP.get(severity_int, AlertSeverity.INFO)
+                    return ZabbixProvider.SEVERITIES_MAP.get(
+                        severity_int, AlertSeverity.INFO
+                    )
 
             # If not a valid integer string, handle as text
             severity_lower = severity_stripped.lower()
-            severity_int = ZabbixProvider.SEVERITY_NAME_TO_ID_MAP.get(severity_lower, 1)  # Default to Information
+            severity_int = ZabbixProvider.SEVERITY_NAME_TO_ID_MAP.get(
+                severity_lower, 1
+            )  # Default to Information
             return ZabbixProvider.SEVERITIES_MAP.get(severity_int, AlertSeverity.INFO)
 
         # Fallback for any other type

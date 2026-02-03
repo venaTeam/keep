@@ -27,6 +27,7 @@ export enum WidgetType {
   PRESET = "PRESET",
   METRIC = "METRIC",
   GENERICS_METRICS = "GENERICS_METRICS",
+  SERVICE_NOW = "SERVICE_NOW",
 }
 
 export enum PresetPanelType {
@@ -39,6 +40,10 @@ export interface WidgetData extends LayoutItem {
   preset?: Preset;
   name: string;
   widgetType: WidgetType;
+  // Service Now widget config
+  serviceNowTeam?: string;
+  serviceNowStatus?: "open" | "in_progress" | "both";
+  serviceNowDetection?: "direct" | "hamal" | "all";
   genericMetrics?: GenericsMetrics;
   metric?: MetricsWidget;
   presetPanelType?: PresetPanelType;

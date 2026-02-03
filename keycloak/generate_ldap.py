@@ -94,16 +94,16 @@ ou: users
             f.write(
                 f"""dn: {user_dn}
 objectClass: inetOrgPerson
-uid: {user['uid']}
-sn: {user['sn']}
-givenName: {user['givenName']}
-cn: {user['cn']}
-displayName: {user['cn']}
+uid: {user["uid"]}
+sn: {user["sn"]}
+givenName: {user["givenName"]}
+cn: {user["cn"]}
+displayName: {user["cn"]}
 userPassword: password123
-mail: {user['mail']}
+mail: {user["mail"]}
 o: Keep Organization
 employeeType: Developer
-memberOf: cn={user['team']},ou=groups,{BASE_DN}
+memberOf: cn={user["team"]},ou=groups,{BASE_DN}
 
 """
             )

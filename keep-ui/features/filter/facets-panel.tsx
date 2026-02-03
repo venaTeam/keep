@@ -11,6 +11,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import clsx from "clsx";
 import { FacetStoreProvider, useFacetsConfig, useNewFacetStore } from "./store";
 import { useStore } from "zustand";
+import type { JSX } from "react";
 
 export interface FacetsPanelProps {
   panelId: string;

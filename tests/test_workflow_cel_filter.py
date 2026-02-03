@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
-from keep.api.models.db.workflow import Workflow
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.db.workflow import Workflow
 
 # from keep.workflowmanager.workflowmanager import WorkflowManager
 from tests.fixtures.workflow_manager import workflow_manager  # noqa
@@ -553,7 +553,9 @@ def test_cel_expression_with_null_field_bug(
     # This assertion should pass if the bug is fixed
     assert (
         len(workflow_manager.scheduler.workflows_to_run) == workflows_to_run_before + 1
-    ), f"Expected workflow to be triggered, but got {len(workflow_manager.scheduler.workflows_to_run) - workflows_to_run_before} new workflows"
+    ), (
+        f"Expected workflow to be triggered, but got {len(workflow_manager.scheduler.workflows_to_run) - workflows_to_run_before} new workflows"
+    )
 
     assert workflow_manager.scheduler.workflows_to_run[-1]["workflow_id"] == workflow.id
 

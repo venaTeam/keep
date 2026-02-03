@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Form, HTTPException
 from pusher import Pusher
 
-from keep.api.core.dependencies import get_pusher_client
+from keep.common.core.dependencies import get_pusher_client
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

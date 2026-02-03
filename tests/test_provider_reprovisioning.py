@@ -65,7 +65,7 @@ def test_provider_reprovisioning_with_updated_config(
         for event_handler in app.router.on_startup:
             asyncio.run(event_handler())
 
-        from keep.api.config import provision_resources
+        from keep.common.core.init import provision_resources
 
         provision_resources()
 

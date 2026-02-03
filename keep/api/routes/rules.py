@@ -3,14 +3,14 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from keep.api.core.cel_to_sql.cel_ast_converter import CelToAstConverter
-from keep.api.core.db import create_rule as create_rule_db
-from keep.api.core.db import delete_rule as delete_rule_db
-from keep.api.core.db import get_rule_distribution as get_rule_distribution_db
-from keep.api.core.db import get_rule_incidents_count_db
-from keep.api.core.db import get_rules as get_rules_db
-from keep.api.core.db import update_rule as update_rule_db
-from keep.api.models.db.rule import CreateIncidentOn, ResolveOn
+from keep.common.core.cel_to_sql.cel_ast_converter import CelToAstConverter
+from keep.common.core.db import create_rule as create_rule_db
+from keep.common.core.db import delete_rule as delete_rule_db
+from keep.common.core.db import get_rule_distribution as get_rule_distribution_db
+from keep.common.core.db import get_rule_incidents_count_db
+from keep.common.core.db import get_rules as get_rules_db
+from keep.common.core.db import update_rule as update_rule_db
+from keep.common.models.db.rule import CreateIncidentOn, ResolveOn
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
 

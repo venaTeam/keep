@@ -466,6 +466,7 @@ export const config = {
       return {
         ...session,
         accessToken: token.accessToken as string,
+        refreshToken: token.refreshToken,
         tenantId: token.tenantId as string,
         userRole: token.role as string,
         user: {

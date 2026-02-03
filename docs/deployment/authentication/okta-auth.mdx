@@ -1,0 +1,60 @@
+---
+title: "Okta Authentication"
+---
+
+<Tip>
+Keep Cloud: ✅ <br/>
+Keep Enterprise On-Premises: ✅ <br/>
+Keep Open Source: ✅
+</Tip>
+
+Keep can integrate with Okta for SSO/OIDC authentication. Use this option when your organization already manages identities with Okta and you want centralized access control for Keep.
+
+### When to Use
+
+- You have an Okta tenant and want to reuse existing users/groups.
+- You require SSO/OIDC for compliance reasons.
+- You plan to manage users and groups entirely in Okta (Keep will not create users automatically unless allowed).
+
+### Setup Instructions
+
+To enable Okta authentication, configure the following environment variables.
+
+#### Frontend Environment Variables
+
+| Environment Variable | Description | Required | Default |
+|----------------------|-------------|:--------:|:-------:|
+| AUTH_TYPE | Set to `OKTA` | ✅ | - |
+| OKTA_DOMAIN | Base Okta domain (e.g. `https://dev-123456.okta.com`) | ✅ | - |
+| OKTA_CLIENT_ID | Okta OIDC app client ID | ✅ | - |
+| OKTA_CLIENT_SECRET | Okta OIDC app client secret | ✅ | - |
+
+#### Backend Environment Variables
+
+| Environment Variable | Description | Required | Default |
+|----------------------|-------------|:--------:|:-------:|
+| AUTH_TYPE | Set to `OKTA` | ✅ | - |
+| OKTA_DOMAIN | Base Okta domain | ✅ | - |
+| OKTA_CLIENT_ID | Okta OIDC app client ID | ✅ | - |
+| OKTA_CLIENT_SECRET | Okta OIDC app client secret | ✅ | - |
+
+> Additional fields such as audience / issuer may be required depending on your Okta application configuration. Configure them via `KEEP_OKTA_ISSUER` / `KEEP_OKTA_AUDIENCE` if needed.
+
+### Okta Application Notes
+
+1. Create an OIDC application in Okta (web type).
+2. Add allowed callback URLs pointing to your Keep UI (e.g., `https://<keep-url>/auth/callback`).
+3. Enable refresh tokens if you want longer sessions.
+4. Assign the application to the groups/users that should access Keep.
+
+### Example docker-compose override
+
+```yaml
+environment:
+  AUTH_TYPE: "OKTA"
+  OKTA_DOMAIN: "https://dev-123456.okta.com"
+  OKTA_CLIENT_ID: "xxxxxxxx"
+  OKTA_CLIENT_SECRET: "yyyyyyyy"
+```
+
+

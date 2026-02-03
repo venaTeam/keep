@@ -1,13 +1,11 @@
-import os
-import logging
 import argparse
-
 import asyncio
+import logging
+import os
 
 from keep.api.core.demo_mode import (
-    simulate_alerts,
-    simulate_alerts_worker,
     simulate_alerts_async,
+    simulate_alerts_worker,
 )
 
 logging.basicConfig(

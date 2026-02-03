@@ -1,5 +1,6 @@
 import { PlusIcon } from "@radix-ui/react-icons";
 import { Badge, Icon } from "@tremor/react";
+import type { JSX } from "react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
 type GroupedByCellProps = {

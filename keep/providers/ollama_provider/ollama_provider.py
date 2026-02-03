@@ -1,5 +1,6 @@
-import json
 import dataclasses
+import json
+
 import pydantic
 import requests
 
@@ -115,10 +116,7 @@ if __name__ == "__main__":
             structured_output_format={
                 "type": "object",
                 "properties": {
-                    "environment": {
-                        "type": "string",
-                        "enum": ['production', 'debug']
-                    },
+                    "environment": {"type": "string", "enum": ["production", "debug"]},
                 },
                 "required": ["environment"],
             },

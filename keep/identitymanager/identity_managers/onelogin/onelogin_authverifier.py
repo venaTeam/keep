@@ -1,15 +1,22 @@
 import logging
+
 import jwt
 from fastapi import Depends, HTTPException
-from keep.api.core.config import config
-from keep.api.core.db import user_exists, create_user, update_user_last_sign_in, update_user_role
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
 
+from keep.common.core.config import config
+from keep.common.core.db import (
+    create_user,
+    update_user_last_sign_in,
+    update_user_role,
+    user_exists,
+)
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.authverifierbase import AuthVerifierBase, oauth2_scheme
 from keep.identitymanager.rbac import get_role_by_role_name
 
 logger = logging.getLogger(__name__)
+
 
 class OneLoginAuthVerifier(AuthVerifierBase):
     """Handles SSO authentication for OneLogin"""
@@ -27,11 +34,10 @@ class OneLoginAuthVerifier(AuthVerifierBase):
             config("ONELOGIN_WEBHOOK_ROLE", default="keep_webhook"): "webhook",
         }
 
-        if (
-            not self.onelogin_issuer
-            or not self.onelogin_client_id
-        ):
-            raise Exception("Missing ONELOGIN_ISSUER or ONELOGIN_CLIENT_ID environment variable")
+        if not self.onelogin_issuer or not self.onelogin_client_id:
+            raise Exception(
+                "Missing ONELOGIN_ISSUER or ONELOGIN_CLIENT_ID environment variable"
+            )
 
         # Remove trailing slash if present on issuer
         if self.onelogin_issuer.endswith("/"):
@@ -43,7 +49,9 @@ class OneLoginAuthVerifier(AuthVerifierBase):
 
         self.logger.info("OneLogin Auth Verifier initialized")
 
-    def _verify_bearer_token(self, token: str = Depends(oauth2_scheme)) -> AuthenticatedEntity:
+    def _verify_bearer_token(
+        self, token: str = Depends(oauth2_scheme)
+    ) -> AuthenticatedEntity:
         if not token:
             raise HTTPException(status_code=401, detail="No token provided")
         try:
@@ -55,12 +63,16 @@ class OneLoginAuthVerifier(AuthVerifierBase):
                 token,
                 key=signing_key,
                 algorithms=["RS256"],
-                audience= self.onelogin_client_id,
+                audience=self.onelogin_client_id,
                 issuer=self.onelogin_issuer,
-                options={"verify_exp": True}
+                options={"verify_exp": True},
             )
 
-            user_name = payload.get("email") or payload.get("sub") or payload.get("preferred_username")
+            user_name = (
+                payload.get("email")
+                or payload.get("sub")
+                or payload.get("preferred_username")
+            )
 
             onelogin_groups = payload.get("groups", [])
             # When one configures basic roles on OneLogin it comes as a list but when you perform a role mapping it comes as comma separated string
@@ -81,8 +93,10 @@ class OneLoginAuthVerifier(AuthVerifierBase):
                 self.logger.debug(f"Checking for role {role}")
                 for onelogin_grp in onelogin_groups:
                     self.logger.debug(f"Checking for onelogin group {onelogin_grp}")
-                    mapped_role_name=self.role_mappings.get(onelogin_grp, "")
-                    self.logger.debug(f"Checking for mapped role name {mapped_role_name}")
+                    mapped_role_name = self.role_mappings.get(onelogin_grp, "")
+                    self.logger.debug(
+                        f"Checking for mapped role name {mapped_role_name}"
+                    )
                     if role == mapped_role_name:
                         try:
                             self.logger.debug(f"Getting role {mapped_role_name}")
@@ -97,7 +111,9 @@ class OneLoginAuthVerifier(AuthVerifierBase):
                     break
             # if no valid role was found, throw a 403 exception
             if not mapped_role:
-                self.logger.warning(f"No valid role-group mapping found among {onelogin_groups}")
+                self.logger.warning(
+                    f"No valid role-group mapping found among {onelogin_groups}"
+                )
                 raise HTTPException(
                     status_code=403,
                     detail=f"No valid role found among {onelogin_groups}",
@@ -105,7 +121,7 @@ class OneLoginAuthVerifier(AuthVerifierBase):
 
             # auto provision user
             if self.auto_create_user and not user_exists(
-                    tenant_id=SINGLE_TENANT_UUID, username=user_name
+                tenant_id=SINGLE_TENANT_UUID, username=user_name
             ):
                 self.logger.info(f"Auto provisioning user: {user_name}")
                 create_user(
@@ -124,7 +140,9 @@ class OneLoginAuthVerifier(AuthVerifierBase):
                     )
                     self.logger.debug(f"Last login updated for user: {user_name}")
                 except Exception:
-                    self.logger.warning(f"Failed to update last login for user: {user_name}")
+                    self.logger.warning(
+                        f"Failed to update last login for user: {user_name}"
+                    )
                     pass
                 # update role
                 self.logger.debug(f"Updating role for user: {user_name}")
@@ -139,17 +157,21 @@ class OneLoginAuthVerifier(AuthVerifierBase):
                     self.logger.warning(f"Failed to update role for user: {user_name}")
                     pass
 
-            self.logger.info(f"User {user_name} authenticated with role {mapped_role.get_name()}")
+            self.logger.info(
+                f"User {user_name} authenticated with role {mapped_role.get_name()}"
+            )
             return AuthenticatedEntity(
                 tenant_id=SINGLE_TENANT_UUID,
                 email=user_name,
                 role=mapped_role.get_name(),
-                token=token
+                token=token,
             )
 
         except jwt.exceptions.InvalidKeyError as e:
             self.logger.error(f"Invalid key error during token validation: {str(e)}")
-            raise HTTPException(status_code=401, detail="Invalid signing key - token validation failed")
+            raise HTTPException(
+                status_code=401, detail="Invalid signing key - token validation failed"
+            )
         except jwt.ExpiredSignatureError:
             self.logger.warning("Token has expired")
             raise HTTPException(status_code=401, detail="Token has expired")
@@ -158,4 +180,6 @@ class OneLoginAuthVerifier(AuthVerifierBase):
             raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
         except Exception as e:
             self.logger.exception("Failed to validate token")
-            raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
+            raise HTTPException(
+                status_code=401, detail=f"Token validation failed: {str(e)}"
+            )

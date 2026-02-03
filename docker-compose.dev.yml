@@ -21,6 +21,8 @@ services:
       service: keep-backend-common
     build:
       dockerfile: docker/Dockerfile.dev.api
+    ports:
+      - "8080:8080"
     volumes:
       - .:/app
       - ./state:/state

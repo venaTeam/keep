@@ -1,6 +1,7 @@
 import { ShortNumber } from "@/components/ui";
 import { Text } from "@tremor/react";
 import clsx from "clsx";
+import type { JSX } from "react";
 
 export interface FacetValueProps {
   label: string;

@@ -1,18 +1,19 @@
 import enum
 import logging
-
-from keep.api.core.alerts import query_last_alerts
-from keep.api.core.db import get_last_alerts
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.core.elastic import ElasticClient
-from keep.api.core.tenant_configuration import TenantConfiguration
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.preset import PresetDto, PresetSearchQuery
-from keep.api.models.query import QueryDto
-from keep.api.models.time_stamp import TimeStampFilter
-from keep.api.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
-from keep.rulesengine.rulesengine import RulesEngine
 from datetime import datetime, timedelta, timezone
+
+from keep.common.core.alerts import query_last_alerts
+from keep.common.core.db import get_last_alerts
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.core.elastic import ElasticClient
+from keep.common.core.tenant_configuration import TenantConfiguration
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.preset import PresetDto, PresetSearchQuery
+from keep.common.models.query import QueryDto
+from keep.common.models.time_stamp import TimeStampFilter
+from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
+from keep.rulesengine.rulesengine import RulesEngine
+
 
 class SearchMode(enum.Enum):
     """The search mode for the search engine"""

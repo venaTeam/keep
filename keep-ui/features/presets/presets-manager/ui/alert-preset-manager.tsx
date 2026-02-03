@@ -20,6 +20,7 @@ interface Props {
   presetName: string;
   // TODO: pass specific functions not the whole table?
   table?: Table<AlertDto>;
+  celValue?: string | null;
   onCelChanges?: (cel: string) => void;
   // Group expansion controls
   isGroupingActive?: boolean;
@@ -30,6 +31,7 @@ interface Props {
 export function AlertPresetManager({
   presetName,
   table,
+  celValue,
   onCelChanges,
   isGroupingActive = false,
   onToggleAllGroups,
@@ -66,18 +68,18 @@ export function AlertPresetManager({
     setIsPresetModalOpen(false);
     const encodedPresetName = encodeURIComponent(preset.name.toLowerCase());
     const newUrl = `/alerts/${encodedPresetName}`;
-    
+
     // Check if we're updating an existing preset and the name has changed
     const oldPresetName = selectedPreset?.name?.toLowerCase();
     const newPresetName = preset.name.toLowerCase();
     const isNameChanged = selectedPreset && oldPresetName !== newPresetName;
-    
+
     if (isNameChanged) {
       // For name changes, we need to ensure the preset data is fresh before navigating
       try {
         // Wait for the preset list to be revalidated
         await mutatePresets();
-        
+
         // Use window.location to force a full page reload which ensures
         // the new preset is properly loaded
         window.location.href = newUrl;
@@ -116,23 +118,23 @@ export function AlertPresetManager({
 
   const presetData = isDynamic
     ? {
-        CEL: presetCEL,
-        name: selectedPreset.name,
-        isPrivate: selectedPreset.is_private,
-        isNoisy: selectedPreset.is_noisy,
-        tags: selectedPreset.tags,
-        groupColumn: selectedPreset.group_column,
-        counterShowsFiringOnly: selectedPreset.counter_shows_firing_only,
-      }
+      CEL: presetCEL,
+      name: selectedPreset.name,
+      isPrivate: selectedPreset.is_private,
+      isNoisy: selectedPreset.is_noisy,
+      tags: selectedPreset.tags,
+      groupColumn: selectedPreset.group_column,
+      counterShowsFiringOnly: selectedPreset.counter_shows_firing_only,
+    }
     : {
-        CEL: presetCEL,
-        name: undefined,
-        isPrivate: undefined,
-        isNoisy: undefined,
-        tags: undefined,
-        groupColumn: undefined,
-        counterShowsFiringOnly: true,
-      };
+      CEL: presetCEL,
+      name: undefined,
+      isPrivate: undefined,
+      isNoisy: undefined,
+      tags: undefined,
+      groupColumn: undefined,
+      counterShowsFiringOnly: true,
+    };
 
   // for future use
   const getGroupableColumns = () => {
@@ -153,6 +155,7 @@ export function AlertPresetManager({
         <AlertsRulesBuilder
           table={table}
           defaultQuery=""
+          celValue={celValue}
           selectedPreset={selectedPreset}
           setIsModalOpen={setIsPresetModalOpen}
           setPresetCEL={setPresetCEL}

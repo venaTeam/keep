@@ -17,7 +17,7 @@ workflow:
     - name: infra-prod-slack
       if: "'{{ alert.team }}' == 'infra' and '{{ alert.env }}' == 'prod'"
       provider:
-        type: slack
+        type: console
         config: "{{ providers.slack-prod }}"
         with:
           channel: prod-infra-alerts
@@ -30,7 +30,7 @@ workflow:
     - name: http-api-errors-slack
       if: "'{{ alert.monitor_name }}' == 'Http API Errors'"
       provider:
-        type: slack
+        type: console
         config: "{{ providers.slack-prod }}"
         with:
           channel: backend-team-alerts

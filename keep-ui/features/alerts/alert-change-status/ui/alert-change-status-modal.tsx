@@ -1,4 +1,4 @@
-import { Button, Title, Subtitle, Switch } from "@tremor/react";
+import { Button, Title, Subtitle, Switch, Textarea } from "@tremor/react";
 import Modal from "@/components/ui/Modal";
 import { useState, useEffect } from "react";
 import { AlertDto, Status } from "@/entities/alerts/model";
@@ -14,7 +14,6 @@ import { useApi } from "@/shared/lib/hooks/useApi";
 import { Select, showErrorToast, Tooltip } from "@/shared/ui";
 
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
-import ReactQuill from "react-quill-new";
 
 const statusIcons = {
   [Status.Firing]: <ExclamationCircleIcon className="w-5 h-5 text-red-500 mr-2" />,
@@ -28,12 +27,14 @@ interface Props {
   alert: AlertDto | AlertDto[] | null | undefined;
   handleClose: () => void;
   presetName: string;
+  onSuccess?: () => void;
 }
 
 export function AlertChangeStatusModal({
   alert,
   handleClose,
   presetName,
+  onSuccess,
 }: Props) {
   const api = useApi();
   const [disposeOnNewAlert, setDisposeOnNewAlert] = useState(true);
@@ -89,7 +90,7 @@ export function AlertChangeStatusModal({
               dismissUntil: "",
             }),
             ...(noteContent && noteContent.trim() !== "" && {
-              note: noteContent,
+              note: noteContent.trim(),
             }),
           },
           fingerprint: alert.fingerprint,
@@ -98,6 +99,7 @@ export function AlertChangeStatusModal({
 
       toast.success("Alert status changed successfully!");
       clearAndClose();
+      onSuccess?.();
       await alertsMutator();
       await presetsMutator();
     } catch (error) {
@@ -121,7 +123,7 @@ export function AlertChangeStatusModal({
               dismissUntil: "",
             }),
             ...(noteContent && noteContent.trim() !== "" && {
-              note: noteContent,
+              note: noteContent.trim(),
             }),
           },
           fingerprints: Array.from(fingerprints),
@@ -130,6 +132,7 @@ export function AlertChangeStatusModal({
 
       toast.success("Alert(s) status changed successfully!");
       clearAndClose();
+      onSuccess?.();
       await alertsMutator();
       await presetsMutator();
     } catch (error) {
@@ -176,12 +179,12 @@ export function AlertChangeStatusModal({
         </div>
         <div className="mt-4">
           <Subtitle >Add Note</Subtitle>
-          <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-            <ReactQuill
+          <div className="mt-4">
+            <Textarea
               value={noteContent}
-              onChange={(value: string) => setNoteContent(value)}
-              theme="snow"
+              onChange={(e) => setNoteContent(e.target.value)}
               placeholder="Add the reason for status change here..."
+              rows={4}
             />
           </div>
         </div>
@@ -234,12 +237,12 @@ export function AlertChangeStatusModal({
         </div>
         <div className="mt-4">
           <Subtitle >Add Note</Subtitle>
-          <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-            <ReactQuill
+          <div className="mt-4">
+            <Textarea
               value={noteContent}
-              onChange={(value: string) => setNoteContent(value)}
-              theme="snow"
+              onChange={(e) => setNoteContent(e.target.value)}
               placeholder="Add the reason for status change here..."
+              rows={4}
             />
           </div>
         </div>

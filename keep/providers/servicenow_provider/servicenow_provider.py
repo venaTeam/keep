@@ -2,15 +2,15 @@
 ServicenowProvider is a class that implements the BaseProvider interface for Service Now updates.
 """
 
-import os
 import dataclasses
 import json
+import os
 
 import pydantic
 import requests
 from requests.auth import HTTPBasicAuth
 
-from keep.api.models.db.topology import TopologyServiceInDto
+from keep.common.models.db.topology import TopologyServiceInDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.exceptions.provider_exception import ProviderException
 from keep.providers.base.base_provider import BaseTopologyProvider
@@ -295,8 +295,7 @@ class ServicenowProvider(BaseTopologyProvider):
             "sys_id",
             "ip_address",
             "mac_address",
-            "owned_by.name"
-            "manufacturer.name",  # Retrieve the name of the manufacturer
+            "owned_by.namemanufacturer.name",  # Retrieve the name of the manufacturer
             "short_description",
             "environment",
         ]
@@ -324,7 +323,7 @@ class ServicenowProvider(BaseTopologyProvider):
                     "provider_id": self.provider_id,
                 },
             )
-            # Retry without params, may happen because of lack of permissions. 
+            # Retry without params, may happen because of lack of permissions.
             # The following code is tolerant to missing data.
             cmdb_response = requests.get(
                 f"{self.authentication_config.service_now_base_url}/api/now/table/cmdb_ci",

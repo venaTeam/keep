@@ -12,9 +12,10 @@ import { Table } from "@tanstack/react-table";
 
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 import { useConfig } from "@/utils/hooks/useConfig";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, BellIcon } from "@heroicons/react/24/outline";
 import { ChevronDoubleRightIcon } from "@heroicons/react/24/solid";
 import { AlertChangeStatusModal } from "@/features/alerts/alert-change-status/ui/alert-change-status-modal";
+import { CreatePresetModal } from "./create-preset-modal";
 
 interface Props {
   selectedAlertsFingerprints: string[];
@@ -45,6 +46,7 @@ export default function AlertActions({
   const revalidateMultiple = useRevalidateMultiple();
   const presetsMutator = () => revalidateMultiple(["/preset"]);
   const [modalAlert, setModalAlert] = useState<AlertDto | AlertDto[] | null>(null);
+  const [isCreatePresetModalOpen, setIsCreatePresetModalOpen] = useState(false);
 
   // TODO: refactor
   const searchParams = useSearchParams();
@@ -56,8 +58,13 @@ export default function AlertActions({
     .getSelectedRowModel()
     .rows.map((row) => row.original);
 
-  async function addOrUpdatePreset() {
-    const newPresetName = prompt("Enter new preset name");
+  // Categorize alerts by dismissed status for showing appropriate actions
+  const dismissedAlerts = selectedAlerts.filter((a) => a.dismissed);
+  const activeAlerts = selectedAlerts.filter((a) => !a.dismissed);
+  const hasDismissedAlerts = dismissedAlerts.length > 0;
+  const hasActiveAlerts = activeAlerts.length > 0;
+
+  async function addOrUpdatePreset(newPresetName: string) {
     if (newPresetName) {
       const distinctAlertNames = Array.from(
         new Set(selectedAlerts.map((alert) => alert.name))
@@ -142,29 +149,39 @@ export default function AlertActions({
         <AlertChangeStatusModal
           alert={modalAlert}
           presetName="resolve"
-          handleClose={() => {
-            setModalAlert(null);
-            clearRowSelection();
-          }}
+          handleClose={() => setModalAlert(null)}
+          onSuccess={clearRowSelection}
         />
       )}
-      <Button
-        icon={SilencedDoorbellNotification}
-        size="xs"
-        color="red"
-        title="Delete"
-        onClick={() => {
-          setDismissModalAlert?.(selectedAlerts);
-          clearRowSelection();
-        }}
-      >
-        Dismiss {selectedAlertsFingerprints.length} alert(s)
-      </Button>
+      {/* Restore button - only show if there are dismissed alerts */}
+      {hasDismissedAlerts && (
+        <Button
+          icon={BellIcon}
+          size="xs"
+          color="orange"
+          title="Restore"
+          onClick={() => setDismissModalAlert?.(dismissedAlerts)}
+        >
+          Restore {dismissedAlerts.length} alert(s)
+        </Button>
+      )}
+      {/* Dismiss button - only show if there are active (non-dismissed) alerts */}
+      {hasActiveAlerts && (
+        <Button
+          icon={SilencedDoorbellNotification}
+          size="xs"
+          color="red"
+          title="Dismiss"
+          onClick={() => setDismissModalAlert?.(activeAlerts)}
+        >
+          Dismiss {activeAlerts.length} alert(s)
+        </Button>
+      )}
       <Button
         icon={PlusIcon}
         size="xs"
         color="orange"
-        onClick={async () => await addOrUpdatePreset()}
+        onClick={() => setIsCreatePresetModalOpen(true)}
         tooltip="Save current filter as a view"
       >
         Create Preset
@@ -202,6 +219,11 @@ export default function AlertActions({
         isOpen={isCreateIncidentWithAIOpen}
         alerts={selectedAlerts}
         handleClose={hideCreateIncidentWithAI}
+      />
+      <CreatePresetModal
+        isOpen={isCreatePresetModalOpen}
+        handleClose={() => setIsCreatePresetModalOpen(false)}
+        handleCreate={addOrUpdatePreset}
       />
     </div>
   );

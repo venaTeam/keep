@@ -10,7 +10,7 @@ from urllib.parse import urlencode, urljoin
 import pydantic
 import requests
 
-from keep.api.models.db.topology import TopologyServiceInDto
+from keep.common.models.db.topology import TopologyServiceInDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseTopologyProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
@@ -224,15 +224,15 @@ class ArgocdProvider(BaseTopologyProvider):
                         )
 
                 if len(applications) > 0:
-                    service_topology[metadata["uid"]].application_relations = (
-                        applications
-                    )
+                    service_topology[
+                        metadata["uid"]
+                    ].application_relations = applications
 
             for node in nodes:
                 if node["kind"] == "Application":
-                    service_topology[metadata["uid"]].dependencies[
-                        node["uid"]
-                    ] = "unknown"
+                    service_topology[metadata["uid"]].dependencies[node["uid"]] = (
+                        "unknown"
+                    )
 
         return list(service_topology.values()), {}
 
@@ -244,9 +244,13 @@ class ArgocdProvider(BaseTopologyProvider):
         repos = []
         if "sources" in spec:
             # Handle multiple sources
-            repos.extend(source.get("repoURL") for source in spec["sources"] if source.get("repoURL"))
+            repos.extend(
+                source.get("repoURL")
+                for source in spec["sources"]
+                if source.get("repoURL")
+            )
         elif "source" in spec and spec["source"].get("repoURL"):
             # Handle single source
             repos.append(spec["source"]["repoURL"])
-        
+
         return ", ".join(repos) if repos else None

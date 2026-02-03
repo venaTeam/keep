@@ -10,40 +10,56 @@ import {
   TabPanel,
   TabPanels,
   Callout,
+  Textarea,
 } from "@tremor/react";
 import Modal from "@/components/ui/Modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AlertDto } from "@/entities/alerts/model";
+import { AlertDto, Status } from "@/entities/alerts/model";
 import { set, isSameDay, isAfter } from "date-fns";
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { toast } from "react-toastify";
-import "react-quill-new/dist/quill.snow.css";
 import { useApi } from "@/shared/lib/hooks/useApi";
-import { showErrorToast } from "@/shared/ui";
+import { Select, showErrorToast } from "@/shared/ui";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  PauseIcon,
+  CircleStackIcon,
+} from "@heroicons/react/24/outline";
 import "./alert-dismiss-modal.css";
-import dynamic from "next/dynamic";
 
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+const statusIcons = {
+  [Status.Firing]: <ExclamationCircleIcon className="w-5 h-5 text-red-500 mr-2" />,
+  [Status.Resolved]: <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />,
+  [Status.Acknowledged]: <PauseIcon className="w-5 h-5 text-gray-500 mr-2" />,
+  [Status.Suppressed]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
+  [Status.Pending]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
+};
 
 interface Props {
   preset: string;
   alert: AlertDto[] | null | undefined;
   handleClose: () => void;
+  onSuccess?: () => void;
 }
 
 export function AlertDismissModal({
   preset: presetName,
   alert: alerts,
   handleClose,
+  onSuccess,
 }: Props) {
   const [dismissComment, setDismissComment] = useState<string>("");
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
   const [showError, setShowError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [disposeOnNewAlert, setDisposeOnNewAlert] = useState<boolean>(true);
+  const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 
+  const isRestore = alerts?.every((a) => a.dismissed);
   const revalidateMultiple = useRevalidateMultiple();
   const presetsMutator = () => revalidateMultiple(["/preset"]);
   const { alertsMutator } = useAlerts();
@@ -89,14 +105,18 @@ export function AlertDismissModal({
     const dismissUntil =
       selectedTab === 0 ? null : selectedDateTime?.toISOString();
 
+    const plainTextNote = dismissComment.trim();
+
     const enrichments: {
       dismissed: boolean;
       note: string;
-      dismissUntil: string;
+      dismissUntil?: string;
+      status?: Status | null;
     } = {
       dismissed: !alerts[0]?.dismissed,
-      note: dismissComment,
-      dismissUntil: dismissUntil || "",
+      note: plainTextNote,
+      ...(!isRestore && { dismissUntil: dismissUntil || "" }),
+      ...(isRestore && selectedStatus && { status: selectedStatus }),
     };
 
     const requestData = {
@@ -105,13 +125,19 @@ export function AlertDismissModal({
     };
 
     try {
-      await api.post(
-        `/alerts/batch_enrich?dispose_on_new_alert=true`,
-        requestData
+      const endpoint = isRestore
+        ? "/alerts/batch_enrich?dispose_on_new_alert=false"
+        : `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`;
+
+      await api.post(endpoint, requestData);
+      toast.success(
+        `${alerts.length} alerts ${isRestore ? "restored" : "dismissed"
+        } successfully!`,
+        {
+          position: "top-right",
+        }
       );
-      toast.success(`${alerts.length} alerts dismissed successfully!`, {
-        position: "top-right",
-      });
+      onSuccess?.();
       await alertsMutator();
       await presetsMutator();
     } catch (error) {
@@ -127,6 +153,8 @@ export function AlertDismissModal({
     setSelectedDateTime(null);
     setDismissComment("");
     setShowError(false);
+    setDisposeOnNewAlert(true);
+    setSelectedStatus(null);
     handleClose();
   };
 
@@ -147,15 +175,66 @@ export function AlertDismissModal({
       isOpen={isOpen}
       className="overflow-visible"
       beforeTitle={alerts?.[0]?.name}
-      title="Dismiss Alert"
+      title={isRestore ? "Restore Alert(s)" : "Dismiss Alert(s)"}
     >
-      {alerts && alerts.length == 1 && alerts[0].dismissed ? (
+      {isRestore ? (
         <>
-          <Subtitle className="text-center">
-            Are you sure you want to restore this alert?
-          </Subtitle>
-          <div className="flex justify-center mt-4 space-x-2">
-            <Button onClick={handleDismissChange} color="orange">
+          <Callout color="orange" title="Restoring Alerts" className="mb-2.5">
+            This will restore the alert(s) and set their status.
+          </Callout>
+          <div className="flex mt-2.5 items-center mb-4">
+            <Subtitle className="flex items-center font-bold mr-2">
+              New status:
+            </Subtitle>
+            <Select
+              options={Object.values(Status).map((status) => ({
+                value: status,
+                label: (
+                  <div className="flex items-center">
+                    {statusIcons[status]}
+                    <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                  </div>
+                ),
+              }))}
+              value={
+                selectedStatus
+                  ? {
+                    value: selectedStatus,
+                    label: (
+                      <div className="flex items-center">
+                        {statusIcons[selectedStatus]}
+                        <span>
+                          {selectedStatus.charAt(0).toUpperCase() +
+                            selectedStatus.slice(1)}
+                        </span>
+                      </div>
+                    ),
+                  }
+                  : null
+              }
+              onChange={(option) => setSelectedStatus(option?.value || null)}
+              placeholder="Select new status"
+              className="w-56"
+            />
+          </div>
+          <Title>Restore Note</Title>
+          <div className="mt-4">
+            <Textarea
+              value={dismissComment}
+              onChange={(e) => setDismissComment(e.target.value)}
+              placeholder="Add your restore note here..."
+              rows={4}
+            />
+          </div>
+          <div className="flex justify-end mt-4 space-x-2">
+            <Button variant="secondary" color="orange" onClick={clearAndClose}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDismissChange}
+              color="orange"
+              loading={isLoading}
+            >
               Restore
             </Button>
           </div>
@@ -163,10 +242,19 @@ export function AlertDismissModal({
       ) : (
         <>
           <Callout color="orange" title="Dismissing Alerts" className="mb-2.5">
-            {`This will dismiss the alert until an alert with the same fingerprint comes in${
-              selectedTab === 1 ? ` or until ${selectedDateTime}.` : "."
-            }`}
+            {`This will dismiss the alert until an alert with the same fingerprint comes in${selectedTab === 1 ? ` or until ${selectedDateTime}.` : "."
+              }`}
           </Callout>
+          <div className="flex justify-end mb-4">
+            <Button
+              variant={disposeOnNewAlert ? "primary" : "secondary"}
+              size="xs"
+              onClick={() => setDisposeOnNewAlert(!disposeOnNewAlert)}
+              tooltip={disposeOnNewAlert ? "Dispose the dismissal when a new alert comes in." : "Keep the dismissal when a new alert comes in."}
+            >
+              {disposeOnNewAlert ? "Disposing on new alerts" : "Keeping on new alerts"}
+            </Button>
+          </div>
           <TabGroup
             index={selectedTab}
             onIndexChange={(index: number) => handleTabChange(index)}
@@ -214,13 +302,14 @@ export function AlertDismissModal({
               </TabPanel>
             </TabPanels>
           </TabGroup>
-          <Title>Dismiss Comment</Title>
-          <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-            <ReactQuill
+          <Title>{isRestore ? "Restore Note" : "Dismiss Comment"}</Title>
+          <div className="mt-4">
+            <Textarea
               value={dismissComment}
-              onChange={(value: string) => setDismissComment(value)}
-              theme="snow"
-              placeholder="Add your dismiss comment here..."
+              onChange={(e) => setDismissComment(e.target.value)}
+              placeholder={`Add your ${isRestore ? "restore" : "dismiss"
+                } note here...`}
+              rows={4}
             />
           </div>
           <div className="mt-4 flex justify-end gap-2">

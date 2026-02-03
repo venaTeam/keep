@@ -1,15 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import "react-quill-new/dist/quill.snow.css";
-import { Button } from "@tremor/react";
+import { Button, Textarea } from "@tremor/react";
 import { AlertDto } from "@/entities/alerts/model";
 import Modal from "@/components/ui/Modal";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
-import dynamic from "next/dynamic";
-
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 interface AlertNoteModalProps {
   handleClose: () => void;
@@ -34,37 +30,12 @@ export const AlertNoteModal = ({
   // if this modal should not be open, do nothing
   if (!alert) return null;
 
-  const formats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "list",
-    "bullet",
-    "link",
-    "align",
-    "blockquote",
-    "code-block",
-    "color",
-  ];
-
-  const modules = {
-    toolbar: [
-      [{ header: "1" }, { header: "2" }],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["bold", "italic", "underline"],
-      ["link"],
-      [{ align: [] }],
-      ["blockquote", "code-block"], // Add quote and code block options to the toolbar
-      [{ color: [] }], // Add color option to the toolbar
-    ],
-  };
-
   const saveNote = async () => {
     try {
+      const trimmedNote = noteContent.trim();
       // build the formData
       const requestData = {
-        note: noteContent,
+        note: trimmedNote,
         fingerprint: alert.fingerprint,
       };
       await api.post(`/alerts/enrich/note`, requestData);
@@ -90,16 +61,13 @@ export const AlertNoteModal = ({
       beforeTitle={alert?.name}
       title="Add Note"
     >
-      <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-        {/* WYSIWYG editor */}
-        <ReactQuill
+      <div className="mt-4">
+        <Textarea
           value={noteContent}
-          onChange={(value: string) => setNoteContent(value)}
-          theme="snow" // Use the Snow theme
+          onChange={(e) => setNoteContent(e.target.value)}
           placeholder="Add your note here..."
-          modules={readOnly ? { toolbar: [] } : modules}
-          readOnly={readOnly}
-          formats={formats} // Add formats
+          rows={6}
+          disabled={readOnly}
         />
       </div>
       <div className="mt-4 flex justify-end gap-2">

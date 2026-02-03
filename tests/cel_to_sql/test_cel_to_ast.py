@@ -1,7 +1,8 @@
 import datetime
+
 import pytest
 
-from keep.api.core.cel_to_sql.ast_nodes import (
+from keep.common.core.cel_to_sql.ast_nodes import (
     ComparisonNode,
     ComparisonNodeOperator,
     ConstantNode,
@@ -12,7 +13,7 @@ from keep.api.core.cel_to_sql.ast_nodes import (
     UnaryNode,
     UnaryNodeOperator,
 )
-from keep.api.core.cel_to_sql.cel_ast_converter import CelToAstConverter
+from keep.common.core.cel_to_sql.cel_ast_converter import CelToAstConverter
 
 
 @pytest.mark.parametrize(
@@ -171,9 +172,12 @@ def test_simple_comparison_node(
     assert actual.first_operand.path == expected_property_path
 
 
-@pytest.mark.parametrize("cel, args", [
-    ("fakeProp in ['string', 12345, true]", ["string", 12345, True]),
-])
+@pytest.mark.parametrize(
+    "cel, args",
+    [
+        ("fakeProp in ['string', 12345, true]", ["string", 12345, True]),
+    ],
+)
 def test_simple_comparison_node_in(cel, args):
     actual = CelToAstConverter.convert_to_ast(cel)
 
@@ -187,7 +191,7 @@ def test_simple_comparison_node_in(cel, args):
     # verify that each element in the list is a ConstantNode with the correct value and type
     for i, arg in enumerate(actual.second_operand):
         assert isinstance(arg, ConstantNode)
-        assert type(arg.value) == type(args[i])
+        assert isinstance(arg.value, type(args[i]))
         assert arg.value == args[i]
 
 
@@ -240,6 +244,7 @@ def test_simple_logical_node(cel, operator):
     # Check that left.operand is PropertyAccessNode
     assert isinstance(actual.right.operand, PropertyAccessNode)
     assert actual.right.operand.path == ["secondFakeProp"]
+
 
 @pytest.mark.parametrize(
     "cel, operator",

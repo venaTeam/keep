@@ -41,7 +41,7 @@ import {
 } from "@/features/workflows/ai-assistant/lib/utils";
 import { AddTriggerOrStepSkeleton } from "./AddTriggerOrStepSkeleton";
 import { foreachTemplate, getTriggerTemplate } from "../../builder/lib/utils";
-import { capture } from "@/shared/lib/capture";
+
 import { useConfig } from "@/utils/hooks/useConfig";
 import "@copilotkit/react-ui/styles.css";
 import "./chat.css";
@@ -158,7 +158,7 @@ export function WorkflowBuilderChat({
     [nodes, steps, selectedNode]
   );
 
-  const { setMessages } = useCopilotChat();
+  const { reset } = useCopilotChat();
 
   useCopilotAction({
     name: "changeWorkflowName",
@@ -1033,7 +1033,6 @@ Example: 'node_123__empty_true'`,
   // });
 
   const handleSubmitMessage = useCallback((_message: string) => {
-    capture("workflow_chat_message_submitted");
   }, []);
 
   const [debugInfoVisible, setDebugInfoVisible] = useState(false);
@@ -1060,7 +1059,7 @@ Example: 'node_123__empty_true'`,
             <Button
               variant="secondary"
               size="xs"
-              onClick={() => setMessages([])}
+              onClick={() => reset()}
             >
               Reset
             </Button>

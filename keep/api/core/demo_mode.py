@@ -10,12 +10,12 @@ import aiohttp
 import requests
 from requests.models import PreparedRequest
 
-from keep.api.core.db import get_session_sync
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.logging import CONFIG
-from keep.api.models.db.topology import TopologyServiceInDto
-from keep.api.tasks.process_topology_task import process_topology
-from keep.api.utils.tenant_utils import get_or_create_api_key
+from keep.common.core.db import get_session_sync
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.logging import CONFIG
+from keep.common.models.db.topology import TopologyServiceInDto
+from keep.common.event_management.process_topology_task import process_topology
+from keep.common.utils.tenant_utils import get_or_create_api_key
 from keep.providers.providers_factory import ProvidersFactory
 
 logging.config.dictConfig(CONFIG)
@@ -279,6 +279,7 @@ def get_or_create_correlation_rules(keep_api_key, keep_api_url):
             )
             response.raise_for_status()
 
+
 def get_installed_providers(keep_api_key, keep_api_url):
     response = requests.get(
         f"{keep_api_url}/providers",
@@ -390,7 +391,10 @@ def perform_demo_ai(keep_api_key, keep_api_url):
             )
             response.raise_for_status()
 
+
 number_of_errors_before_restart = 10
+
+
 async def safe_run_async_worker(worker, *args, **kwargs):
     number_of_errors = 0
     while True:
@@ -399,7 +403,7 @@ async def safe_run_async_worker(worker, *args, **kwargs):
             extra={
                 "args_": args,
                 "kwargs_": kwargs,
-            }
+            },
         )
         try:
             await worker(*args, **kwargs)
@@ -424,10 +428,18 @@ async def safe_run_async_worker(worker, *args, **kwargs):
             continue
         break
 
+
 def simulate_alerts(*args, **kwargs):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.create_task(safe_run_async_worker(simulate_alerts_worker, worker_id=0, keep_api_key=kwargs.get("keep_api_key"), rps=0))
+    loop.create_task(
+        safe_run_async_worker(
+            simulate_alerts_worker,
+            worker_id=0,
+            keep_api_key=kwargs.get("keep_api_key"),
+            rps=0,
+        )
+    )
     loop.create_task(safe_run_async_worker(simulate_alerts_async, *args, **kwargs))
     loop.run_forever()
 
@@ -512,7 +524,6 @@ async def simulate_alerts_async(
                 shoot = target_rps * 100
 
             for _ in range(shoot):
-
                 send_alert_url_params = {}
 
                 # choose provider based on weights
@@ -552,7 +563,6 @@ async def simulate_alerts_async(
                     )
 
                 for _ in range(num_iterations):
-
                     prepared_request = PreparedRequest()
                     prepared_request.prepare_url(send_alert_url, send_alert_url_params)
                     await REQUESTS_QUEUE.put((prepared_request.url, alert))
@@ -614,7 +624,6 @@ def launch_demo_mode_thread(
 
 
 async def simulate_alerts_worker(worker_id, keep_api_key, rps=1):
-
     headers = {"x-api-key": keep_api_key, "Content-type": "application/json"}
 
     async with aiohttp.ClientSession() as session:

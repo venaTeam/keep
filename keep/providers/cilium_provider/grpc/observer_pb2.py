@@ -4,6 +4,7 @@
 # source: observer.proto
 # Protobuf Python Version: 5.27.2
 """Generated protocol buffer code."""
+
 # from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
@@ -37,9 +38,9 @@ _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "observer_pb2", _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
     _globals["DESCRIPTOR"]._loaded_options = None
-    _globals["DESCRIPTOR"]._serialized_options = (
-        b"Z(github.com/cilium/cilium/api/v1/observer"
-    )
+    _globals[
+        "DESCRIPTOR"
+    ]._serialized_options = b"Z(github.com/cilium/cilium/api/v1/observer"
     _globals["_GETFLOWSREQUEST_EXPERIMENTAL"].fields_by_name[
         "field_mask"
     ]._loaded_options = None

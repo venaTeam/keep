@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'kafka-exporter'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+  - job_name: "keep"
+    static_configs:
+      - targets: ["keep-backend:8080"]
+    metrics_path: "/metrics"
+    http_headers:
+      x-api-key:
+        values:
+          - "keep-api-key"
+  - job_name: "keep-event-handler"
+    static_configs:
+      - targets: ["keep-event-handler:8080"]
+    metrics_path: "/v1/metrics"
+    http_headers:
+      x-api-key:
+        values:
+          - "keep-api-key"  

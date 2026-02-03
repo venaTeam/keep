@@ -1,22 +1,15 @@
 import logging
 import os
 import time
-from importlib import metadata
 
 import jwt
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from keep.api.core.config import config
-from keep.api.core.db import get_api_key
+from keep.api.config import KEEP_EXTRACT_IDENTITY
+from keep.common.core.db import get_api_key
 
 logger = logging.getLogger(__name__)
-try:
-    KEEP_VERSION = metadata.version("keep")
-except Exception:
-    KEEP_VERSION = os.environ.get("KEEP_VERSION", "unknown")
-
-KEEP_EXTRACT_IDENTITY = config("KEEP_EXTRACT_IDENTITY", default="true", cast=bool)
 
 
 def _extract_identity(request: Request, attribute="email") -> str:
@@ -43,7 +36,6 @@ def _extract_identity(request: Request, attribute="email") -> str:
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
-
     async def dispatch(self, request: Request, call_next):
         identity = _extract_identity(request, attribute="keep_tenant_id")
         logger.info(

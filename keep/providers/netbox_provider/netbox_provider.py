@@ -2,7 +2,7 @@
 NetBox combines IP address management (IPAM) and datacenter infrastructure management (DCIM) with powerful APIs and extensions, serving as the ideal "source of truth" for network automation. Thousands of organizations worldwide rely on NetBox for their infrastructure.
 """
 
-from keep.api.models.alert import AlertDto
+from keep.common.models.alert import AlertDto
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig
@@ -46,7 +46,6 @@ class NetboxProvider(BaseProvider):
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> AlertDto:
-
         data = event.get("data", {})
         snapshots = event.get("snapshots", {})
 

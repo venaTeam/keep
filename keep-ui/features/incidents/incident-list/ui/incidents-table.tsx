@@ -257,7 +257,7 @@ export default function IncidentsTable({
       id: "assignee",
       header: "Assignee",
       cell: ({ row }) => (
-        <UserStatefulAvatar email={row.original.assignee} size="xs" />
+        row.original.assignee || "Not assigned"
       ),
     }),
     columnHelper.accessor("creation_time", {

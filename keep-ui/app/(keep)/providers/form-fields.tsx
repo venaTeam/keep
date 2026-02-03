@@ -338,7 +338,7 @@ export function FileField({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   const [selected, setSelected] = useState<string>();
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLInputElement| null>(null);
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();

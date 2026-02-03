@@ -10,8 +10,8 @@ import requests
 import yaml
 from fastapi import HTTPException
 
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.action import Action
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.action import Action
 from keep.contextmanager.contextmanager import ContextManager
 from keep.functions import cyaml
 from keep.parser.parser import Parser, ParserUtils
@@ -54,9 +54,9 @@ def test_parse_sanity_check(db_session):
         SINGLE_TENANT_UUID, workflow_path, providers_path
     )
     assert parsed_workflows is not None
-    assert (
-        len(parsed_workflows) > 0
-    ), "caution: the expected output is a list with at least one alert, instead got non "
+    assert len(parsed_workflows) > 0, (
+        "caution: the expected output is a list with at least one alert, instead got non "
+    )
     for index, parse_workflow in enumerate(parsed_workflows):
         print(
             "validating parsed alert #"
@@ -73,7 +73,7 @@ def test_parse_sanity_check(db_session):
             isinstance(item, str) for item in parse_workflow.workflow_tags
         )
         assert len(parse_workflow.workflow_steps) > 0 and all(
-            type(item) == Step for item in parse_workflow.workflow_steps
+            isinstance(item, Step) for item in parse_workflow.workflow_steps
         )
 
 
@@ -107,7 +107,7 @@ class TestParseProvidersFromEnv:
     def test_parse_providers_from_env_providers(self, monkeypatch, context_manager):
         # ARRANGE
         providers_dict = {
-            "slack-demo": {"authentication": {"webhook_url": "https://not.a.real.url"}}
+            "console-demo": {"authentication": {}}
         }
         monkeypatch.setenv("KEEP_PROVIDERS", json.dumps(providers_dict))
 
@@ -121,7 +121,7 @@ class TestParseProvidersFromEnv:
         self, monkeypatch, context_manager
     ):
         # ARRANGE
-        providers_str = '{"slack-demo": {"authentication": {"webhook_url": '
+        providers_str = '{"console-demo": {"authentication": {'
         monkeypatch.setenv("KEEP_PROVIDERS", providers_str)
 
         # ACT
@@ -302,7 +302,6 @@ reusable_actions_path = str(path_to_test_resources / "reusable_actions_for_testi
 
 
 class TestReusableActionWithWorkflow:
-
     def test_if_action_is_expanded(self, db_session):
         workflow_store = WorkflowStore()
         workflows = workflow_store.get_workflows_from_path(
@@ -322,8 +321,8 @@ class TestReusableActionWithWorkflow:
                 assert "provider" in action_data
 
             assert (
-                actions.get("@trigger-slack2", {}).get("provider", {}).get("type")
-                == "slack"
+                actions.get("@trigger-console", {}).get("provider", {}).get("type")
+                == "console"
             )
 
     def test_load_actions_config(self, db_session):
@@ -372,8 +371,8 @@ class TestReusableActionWithWorkflow:
         action = Action(
             id=str(uuid.uuid4()),
             tenant_id=SINGLE_TENANT_UUID,
-            use="@trigger-slack",
-            name="trigger-slack",
+            use="@trigger-console",
+            name="trigger-console",
             description="None",
             action_raw=yaml.dump(workflow_action),
             installed_by="pytest",
@@ -392,7 +391,6 @@ class TestReusableActionWithWorkflow:
 
 
 class TestParserUtils:
-
     def test_deep_merge_dict(self):
         """Dictionary: if the merge combines recursively and prioritize values of source"""
         source = {"1": {"s11": "s11", "s12": "s12"}, "2": {"s21": "s21"}}

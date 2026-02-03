@@ -13,7 +13,7 @@ from urllib.parse import urlencode, urljoin
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity
+from keep.common.models.alert import AlertDto, AlertSeverity
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
@@ -51,7 +51,7 @@ class OpenobserveProviderAuthConfig:
             "required": True,
             "description": "OpenObserve host url",
             "hint": "e.g. http://localhost",
-            "validation": "any_http_url"
+            "validation": "any_http_url",
         },
     )
 
@@ -60,7 +60,7 @@ class OpenobserveProviderAuthConfig:
             "required": True,
             "description": "OpenObserve Port",
             "hint": "e.g. 5080",
-            "validation": "port"
+            "validation": "port",
         },
     )
     organisationID: str = dataclasses.field(
@@ -109,10 +109,14 @@ class OpenobserveProvider(BaseProvider):
         Validates required configuration for OpenObserve provider.
         """
         if self.is_installed or self.is_provisioned:
-            host = self.config.authentication['openObserveHost']
+            host = self.config.authentication["openObserveHost"]
             if not (host.startswith("http://") or host.startswith("https://")):
-                scheme = "http://" if ("localhost" in host or "127.0.0.1" in host) else "https://"
-                self.config.authentication['openObserveHost'] = scheme + host
+                scheme = (
+                    "http://"
+                    if ("localhost" in host or "127.0.0.1" in host)
+                    else "https://"
+                )
+                self.config.authentication["openObserveHost"] = scheme + host
 
         self.authentication_config = OpenobserveProviderAuthConfig(
             **self.config.authentication
@@ -203,7 +207,6 @@ class OpenobserveProvider(BaseProvider):
             if res["code"] == 200:
                 self.logger.info("Alert template Updated Successfully")
             else:
-
                 self.logger.error(
                     "Failed to update Alert Template",
                     extra={"code": res["code"], "error": res["message"]},
@@ -215,7 +218,6 @@ class OpenobserveProvider(BaseProvider):
             )
 
     def __create_alert_template(self):
-
         # This is the template used for creating the alert template in openobserve
         template = open(rf"{Path(__file__).parent}/alerttemplate.json", "rt")
         data = template.read()
@@ -437,7 +439,7 @@ class OpenobserveProvider(BaseProvider):
                             continue
                     row_name = row_data.pop("name", "")
                     if row_name:
-                        row_data['row_name'] = row_name
+                        row_data["row_name"] = row_name
                     group_by_keys = list(row_data.keys())
                     logger.info(
                         "Formatting aggregated alert with group by keys",
@@ -457,7 +459,9 @@ class OpenobserveProvider(BaseProvider):
 
                     alert_dto = AlertDto(
                         id=f"{alert_id}",
-                        name=f"{alert_name}: {row_name}" if row_name else f"{alert_name}",
+                        name=f"{alert_name}: {row_name}"
+                        if row_name
+                        else f"{alert_name}",
                         severity=severity,
                         environment=environment,
                         startedAt=startedAt,
@@ -469,7 +473,7 @@ class OpenobserveProvider(BaseProvider):
                         value=value,
                         alert_url=alert_url,  # I'm not putting on URL since sometimes it doesn't return full URL so pydantic will throw an error
                         **event,
-                        **row_data
+                        **row_data,
                     )
                     # calculate the fingerprint based on name + group_by_value
                     alert_dto.fingerprint = OpenobserveProvider.get_alert_fingerprint(

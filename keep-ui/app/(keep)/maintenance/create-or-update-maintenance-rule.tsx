@@ -35,6 +35,17 @@ const DEFAULT_IGNORE_STATUSES = [
     "acknowledged",
 ]
 
+const roundTime =(dateToRound: Date) =>{
+  if (dateToRound.getMinutes() % 15 != 0) {
+    const minToadd = 15 - (dateToRound.getMinutes() % 15);
+    dateToRound.setMinutes(dateToRound.getMinutes() + minToadd);
+    dateToRound.setSeconds(0);
+    dateToRound.setMilliseconds(0);
+  }
+  return dateToRound;
+}
+
+
 export default function CreateOrUpdateMaintenanceRule({
   maintenanceToEdit,
   editCallback,
@@ -44,7 +55,7 @@ export default function CreateOrUpdateMaintenanceRule({
   const [maintenanceName, setMaintenanceName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [celQuery, setCelQuery] = useState<string>("");
-  const [startTime, setStartTime] = useState<Date | null>(new Date());
+  const [startTime, setStartTime] = useState<Date | null>(roundTime(new Date()));
   const [endInterval, setEndInterval] = useState<number>(5);
   const [intervalType, setIntervalType] = useState<string>("minutes");
   const [enabled, setEnabled] = useState<boolean>(true);
@@ -57,7 +68,7 @@ export default function CreateOrUpdateMaintenanceRule({
       setMaintenanceName(maintenanceToEdit.name);
       setDescription(maintenanceToEdit.description ?? "");
       setCelQuery(maintenanceToEdit.cel_query);
-      setStartTime(new Date(maintenanceToEdit.start_time));
+      setStartTime(new Date(new Date(maintenanceToEdit.start_time + 'Z').toLocaleString("en-US", { timeZone: "Asia/Jerusalem" })));
       setSuppress(maintenanceToEdit.suppress);
       setEnabled(maintenanceToEdit.enabled);
       setIgnoreStatuses(maintenanceToEdit.ignore_statuses);
@@ -71,13 +82,33 @@ export default function CreateOrUpdateMaintenanceRule({
     setMaintenanceName("");
     setDescription("");
     setCelQuery("");
-    setStartTime(new Date());
+    setStartTime(roundTime(new Date()));
     setEndInterval(5);
     setSuppress(false);
     setEnabled(true);
     setIgnoreStatuses([]);
     router.replace("/maintenance");
   };
+
+  const isSameDay = (date1: Date, date2: Date):boolean => {
+    return date1.toDateString() === date2.toDateString();
+  }
+
+  const changeDatePicker = (date: Date):void => {
+    const currentDate = new Date();
+    if (startTime && !isSameDay(date, startTime)) {
+      if(isSameDay(date, currentDate) && 
+      (date.getHours() < currentDate.getHours() || (date.getHours() == currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
+        setStartTime(roundTime(currentDate));
+      }
+      else{
+        date?.setHours(startTime.getHours())
+        date?.setMinutes(startTime.getMinutes())
+        setStartTime(date);
+      }
+    }
+    else setStartTime(roundTime(date));
+  }
 
   const calculateDurationInSeconds = () => {
     let durationInSeconds = 0;
@@ -107,7 +138,7 @@ export default function CreateOrUpdateMaintenanceRule({
         name: maintenanceName,
         description: description,
         cel_query: celQuery,
-        start_time: startTime,
+        start_time: startTime?.toISOString(),
         duration_seconds: calculateDurationInSeconds(),
         suppress: suppress,
         enabled: enabled,
@@ -132,13 +163,14 @@ export default function CreateOrUpdateMaintenanceRule({
         name: maintenanceName,
         description: description,
         cel_query: celQuery,
-        start_time: startTime,
+        start_time: startTime?.toISOString(),
         duration_seconds: calculateDurationInSeconds(),
         suppress: suppress,
         enabled: enabled,
         ignore_statuses: ignoreStatuses,
       });
       exitEditMode();
+      clearForm();
       mutate();
       toast.success("Maintenance rule updated successfully");
     } catch (error) {
@@ -154,10 +186,6 @@ export default function CreateOrUpdateMaintenanceRule({
   const submitEnabled = (): boolean => {
     return !!maintenanceName && !!celQuery && !!startTime;
   };
-
-  const ignoreText = !suppress
-    ? "Alerts will not show in feed"
-    : "Alerts will show in suppressed status";
 
   return (
     <form
@@ -205,12 +233,14 @@ export default function CreateOrUpdateMaintenanceRule({
           Start At<span className="text-red-500 text-xs">*</span>
         </Text>
         <DatePicker
-          onChange={(date) => setStartTime(date)}
+          onChange={changeDatePicker}
           showTimeSelect
           selected={startTime}
           timeFormat="p"
           timeIntervals={15}
           minDate={new Date()}
+          minTime={startTime?.toDateString() == new Date().toDateString() ? new Date() : undefined}
+          maxTime={startTime?.toDateString() == new Date().toDateString() ? new Date(new Date().setHours(23, 59, 59, 999)) : undefined}
           timeCaption="Time"
           dateFormat="MMMM d, yyyy h:mm:ss aa"
           inline
@@ -240,18 +270,21 @@ export default function CreateOrUpdateMaintenanceRule({
       <div className="flex items-center space-x-3 mt-2.5 w-[300px] justify-between">
         <label
           htmlFor="ignoreSwitch"
-          className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
+          className="whitespace-nowrap text-tremor-default text-tremor-content dark:text-dark-tremor-content"
         >
-          {ignoreText}
+          Alerts Display Mode
         </label>
-        <Switch id="ignoreSwitch" checked={suppress} onChange={setSuppress} />
+        <Select value={(suppress ? "true" : "false")} onValueChange={(value) => setSuppress(value === "true")}>
+          <SelectItem value="true">Show in Suppressed Status</SelectItem>
+          <SelectItem value="false">Hide From Feed</SelectItem>
+        </Select>
       </div>
       <div className="flex items-center space-x-3 w-[300px] justify-between mt-2.5">
         <label
           htmlFor="enabledSwitch"
           className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
         >
-          Whether this rule is enabled or not
+          Enable Rule
         </label>
         <Switch id="enabledSwitch" checked={enabled} onChange={setEnabled} />
       </div>

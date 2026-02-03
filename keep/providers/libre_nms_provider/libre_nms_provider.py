@@ -7,7 +7,7 @@ import dataclasses
 import pydantic
 import requests
 
-from keep.api.models.alert import AlertDto, AlertSeverity, AlertStatus
+from keep.common.models.alert import AlertDto, AlertSeverity, AlertStatus
 from keep.contextmanager.contextmanager import ContextManager
 from keep.providers.base.base_provider import BaseProvider
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
@@ -181,7 +181,6 @@ To send alerts from LibreNMS to Keep, Use the following webhook url to configure
     def _format_alert(
         event: dict, provider_instance: "BaseProvider" = None
     ) -> AlertDto | list[AlertDto]:
-
         if event.get("description") == "":
             description = event.get("title", "Could not fetch description")
         else:

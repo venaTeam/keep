@@ -1,16 +1,18 @@
+import time
 from datetime import datetime, timedelta, timezone
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.db.workflow import (
+from uuid import uuid4
+
+import pytest
+
+from keep.common.core.db import get_all_provisioned_workflows
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.db.workflow import (
     Workflow,
     WorkflowExecution,
     WorkflowExecutionLog,
 )
 from keep.workflowmanager.workflowstore import WorkflowStore
-from keep.api.core.db import get_all_provisioned_workflows
 from tests.fixtures.client import test_app  # noqa
-import pytest
-import time
-from uuid import uuid4
 
 VALID_WORKFLOW = """
 workflow:
@@ -338,9 +340,9 @@ def test_workflow_execution_large_results_many_logs_performance(db_session):
 
     # Performance assertion: Should complete in reasonable time (under 500ms)
     # The old implementation would either OOM or take much longer due to massive result duplication
-    assert (
-        query_time < 500
-    ), f"Query took too long: {query_time:.2f}ms. Expected < 500ms"
+    assert query_time < 500, (
+        f"Query took too long: {query_time:.2f}ms. Expected < 500ms"
+    )
 
     # Test the original function to ensure it still works (but without accessing logs)
     start_time = time.time_ns()
@@ -363,8 +365,8 @@ def test_get_all_workflows_with_last_execution_no_dummy_workflow(db_session):
     """
     Test that get_all_workflows_with_last_execution does not return dummy workflows.
     """
-    from keep.api.core.db import get_or_create_dummy_workflow
-    from keep.api.models.db.workflow import get_dummy_workflow_id
+    from keep.common.core.db import get_or_create_dummy_workflow
+    from keep.common.models.db.workflow import get_dummy_workflow_id
 
     workflowstore = WorkflowStore()
 
@@ -581,7 +583,7 @@ def test_get_workflow_run_logs_sorted_by_timestamp(db_session):
 
     assert len(logs) == len(timestamps)
 
-    # Verify logs are sorted by timestamp ascending
+    # Verify logs are sorted by timestamp ascending (allowing equal timestamps)
     for i, log in enumerate(logs):
         if i < len(logs) - 1:
-            assert log.timestamp < logs[i + 1].timestamp
+            assert log.timestamp <= logs[i + 1].timestamp

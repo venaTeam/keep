@@ -13,7 +13,6 @@ from keep.providers.base.base_provider import BaseProvider, ProviderHealthMixin
 from keep.providers.models.provider_config import ProviderConfig, ProviderScope
 from keep.validation.fields import NoSchemeUrl, UrlPort
 
-
 DEFAULT_TIMEOUT_SECONDS = 120  # Not to hang the thread forever, only for extreme cases
 
 

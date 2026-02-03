@@ -36,6 +36,9 @@ export function getConfig(): InternalConfig {
 
   return {
     AUTH_TYPE: authType,
+    KEYCLOAK_SECRET: process.env.KEYCLOAK_SECRET,
+    KEYCLOAK_ID: process.env.KEYCLOAK_ID,
+    KEYCLOAK_ISSUER: process.env.KEYCLOAK_ISSUER,
     PUSHER_DISABLED: process.env.PUSHER_DISABLED === "true",
     // could be relative (for ingress) or absolute (e.g. Pusher)
     PUSHER_HOST: process.env.PUSHER_HOST,
@@ -51,9 +54,7 @@ export function getConfig(): InternalConfig {
     API_URL: process.env.API_URL,
     // could be relative (e.g. for ingress) or absolute (e.g. for cloud run)
     API_URL_CLIENT: API_URL_CLIENT,
-    POSTHOG_KEY: process.env.POSTHOG_KEY,
-    POSTHOG_DISABLED: process.env.POSTHOG_DISABLED,
-    POSTHOG_HOST: process.env.POSTHOG_HOST,
+
     SENTRY_DISABLED: process.env.SENTRY_DISABLED,
     READ_ONLY: process.env.KEEP_READ_ONLY === "true",
     OPEN_AI_API_KEY_SET:

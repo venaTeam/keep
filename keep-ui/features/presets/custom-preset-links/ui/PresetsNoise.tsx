@@ -7,6 +7,7 @@ import { AlertsQuery } from "@/entities/alerts/model";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
+import { usePathname } from "next/navigation"
 
 interface PresetsNoiseProps {
   presets: Preset[];
@@ -14,10 +15,18 @@ interface PresetsNoiseProps {
 
 export const PresetsNoise = ({ presets }: PresetsNoiseProps) => {
   const api = useApi();
-  const noisyPresets = useMemo(
-    () => presets?.filter((preset) => preset.is_noisy),
-    [presets]
-  );
+  const pathname = usePathname();
+  const noisyPresets = useMemo(() => {
+    const currentPath = (pathname || "").toLowerCase();
+    const activePreset = presets?.find(
+      (preset) => `/alerts/${preset.name.toLocaleLowerCase()}` === currentPath
+    );
+
+    if (activePreset && activePreset.is_noisy) {
+      return [activePreset]
+    }
+    return []
+  }, [presets, pathname]);
 
   const { data: shouldDoNoise } = useSWR(
     () =>
@@ -39,11 +48,11 @@ export const PresetsNoise = ({ presets }: PresetsNoiseProps) => {
           offset: 0,
         };
 
-        const { count: matchingAlertsCount } = await api.post(
+        const matchingAlerts = await api.post(
           "/alerts/query",
           query
         );
-        shouldDoNoise = !!matchingAlertsCount;
+        shouldDoNoise = !!matchingAlerts.results;
 
         if (shouldDoNoise) {
           break;
@@ -51,6 +60,11 @@ export const PresetsNoise = ({ presets }: PresetsNoiseProps) => {
       }
 
       return shouldDoNoise;
+    },
+    {
+      revalidateIfStale: true,
+      revalidateOnReconnect: true,
+      revalidateOnFocus: true,
     }
   );
 

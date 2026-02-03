@@ -1,6 +1,7 @@
 import { IncidentData } from "./models";
 import { IncidentSeverityMetric } from "./incident-severity-metric";
 import { PieChart } from "./pie-chart";
+import type { JSX } from "react";
 
 interface IncidentsReportProps {
   incidentsReportData: IncidentData;

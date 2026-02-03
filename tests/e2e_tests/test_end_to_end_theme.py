@@ -112,9 +112,9 @@ def test_theme(browser: Page, setup_page_logging, failure_artifacts):
             "rgb(253, 186, 116)",
             "rgb(251, 146, 60)",
         ]
-        assert (
-            background_color in expected_keep_colors
-        ), f"Expected {expected_keep_colors}, got {background_color}"
+        assert background_color in expected_keep_colors, (
+            f"Expected {expected_keep_colors}, got {background_color}"
+        )
 
         # Open settings again
         try:
@@ -151,9 +151,9 @@ def test_theme(browser: Page, setup_page_logging, failure_artifacts):
             "rgb(187, 247, 208)",
             "rgb(191, 219, 254)",
         ]
-        assert (
-            background_color in expected_basic_colors
-        ), f"Expected {expected_basic_colors}, got {background_color}"
+        assert background_color in expected_basic_colors, (
+            f"Expected {expected_basic_colors}, got {background_color}"
+        )
 
     except Exception:
         save_failure_artifacts(browser)

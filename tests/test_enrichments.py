@@ -1,24 +1,23 @@
 # test_enrichments.py
 import time
+import uuid
 from datetime import datetime
 from unittest.mock import MagicMock, Mock, patch
-import uuid
 
 import pytest
 from sqlalchemy import text
 from tenacity import sleep
 
-from keep.api.bl.enrichments_bl import EnrichmentsBl
-from keep.api.core.dependencies import SINGLE_TENANT_UUID
-from keep.api.models.action_type import ActionType
-from keep.api.models.alert import AlertDto, AlertStatus
-from keep.api.models.db.alert import Alert
-from keep.api.models.db.extraction import ExtractionRule
-from keep.api.models.db.mapping import MappingRule
-from keep.api.models.db.topology import TopologyService
-from keep.api.models.db.workflow import Workflow
-from keep.workflowmanager.workflowmanager import WorkflowManager
-from tests.fixtures.client import client, setup_api_key, test_app
+from keep.common.bl.enrichments_bl import EnrichmentsBl
+from tests.fixtures.client import client, test_app  # noqa
+from keep.common.core.dependencies import SINGLE_TENANT_UUID
+from keep.common.models.action_type import ActionType
+from keep.common.models.alert import AlertDto, AlertStatus
+from keep.common.models.db.alert import Alert
+from keep.common.models.db.extraction import ExtractionRule
+from keep.common.models.db.mapping import MappingRule
+from keep.common.models.db.topology import TopologyService
+from keep.common.models.db.workflow import Workflow
 from tests.fixtures.workflow_manager import (
     wait_for_workflow_execution,
     wait_for_workflow_in_run_queue,
@@ -29,7 +28,7 @@ from tests.fixtures.workflow_manager import (
 def patch_get_tenants_configurations():
     """Automatically patch get_tenants_configurations for all tests."""
     with patch(
-        "keep.api.core.tenant_configuration.TenantConfiguration._TenantConfiguration.get_configuration",
+        "keep.common.core.tenant_configuration.TenantConfiguration._TenantConfiguration.get_configuration",
         return_value=None,
     ):
         yield
@@ -65,9 +64,7 @@ def mock_alert_dto():
 
 def test_run_extraction_rules_no_rules_applies(mock_session, mock_alert_dto):
     # Assuming there are no extraction rules
-    mock_session.query.return_value.filter.return_value.filter.return_value.order_by.return_value.all.return_value = (
-        []
-    )
+    mock_session.query.return_value.filter.return_value.filter.return_value.order_by.return_value.all.return_value = []
 
     enrichment_bl = EnrichmentsBl(tenant_id="test_tenant", db=mock_session)
     result_event = enrichment_bl.run_extraction_rules(mock_alert_dto)
@@ -130,9 +127,7 @@ def test_run_extraction_rules_event_is_dict(mock_session):
 
 
 def test_run_extraction_rules_no_rules(mock_session, mock_alert_dto):
-    mock_session.query.return_value.filter.return_value.filter.return_value.order_by.return_value.all.return_value = (
-        []
-    )
+    mock_session.query.return_value.filter.return_value.filter.return_value.order_by.return_value.all.return_value = []
 
     enrichment_bl = EnrichmentsBl(tenant_id="test_tenant", db=mock_session)
     result_event = enrichment_bl.run_extraction_rules(mock_alert_dto)
@@ -207,9 +202,11 @@ def test_run_extraction_rules_with_conditions(mock_session, mock_alert_dto):
     ]
 
     # Mocking the CEL environment to return True for the condition
-    with patch("chevron.render", return_value="test_source"), patch(
-        "celpy.Environment"
-    ) as mock_env, patch("celpy.celpy.json_to_cel") as mock_json_to_cel:
+    with (
+        patch("chevron.render", return_value="test_source"),
+        patch("celpy.Environment") as mock_env,
+        patch("celpy.celpy.json_to_cel") as mock_json_to_cel,
+    ):
         mock_env.return_value.compile.return_value = None
         mock_program = Mock()
         mock_env.return_value.program.return_value = mock_program
@@ -269,25 +266,25 @@ def test_run_mapping_rules_with_regex_match(mock_session, mock_alert_dto):
     mock_alert_dto.name = "keep-backend-service"
     del mock_alert_dto.service
     enrichment_bl.run_mapping_rules(mock_alert_dto)
-    assert (
-        mock_alert_dto.service == "backend_service"
-    ), "Service should match 'backend_service' for 'keep-backend-service'"
+    assert mock_alert_dto.service == "backend_service", (
+        "Service should match 'backend_service' for 'keep-backend-service'"
+    )
 
     # Test case where the alert name matches the regex pattern without 'keep-' prefix
     mock_alert_dto.name = "backend-service"
     del mock_alert_dto.service
     enrichment_bl.run_mapping_rules(mock_alert_dto)
-    assert (
-        mock_alert_dto.service == "backend_service"
-    ), "Service should match 'backend_service' for 'backend-service'"
+    assert mock_alert_dto.service == "backend_service", (
+        "Service should match 'backend_service' for 'backend-service'"
+    )
 
     # Test case where the alert name does not match any regex pattern
     mock_alert_dto.name = "unmatched-service"
     del mock_alert_dto.service
     enrichment_bl.run_mapping_rules(mock_alert_dto)
-    assert (
-        hasattr(mock_alert_dto, "service") is False
-    ), "Service should not match any entry"
+    assert hasattr(mock_alert_dto, "service") is False, (
+        "Service should not match any entry"
+    )
 
 
 def test_run_mapping_rules_no_match(mock_session, mock_alert_dto):
@@ -313,9 +310,9 @@ def test_run_mapping_rules_no_match(mock_session, mock_alert_dto):
     # Test case where no entry matches the regex pattern
     mock_alert_dto.name = "unmatched-service"
     enrichment_bl.run_mapping_rules(mock_alert_dto)
-    assert (
-        hasattr(mock_alert_dto, "service") is False
-    ), "Service should not match any entry"
+    assert hasattr(mock_alert_dto, "service") is False, (
+        "Service should not match any entry"
+    )
 
 
 def test_check_matcher_with_and_condition(mock_session, mock_alert_dto):
@@ -635,12 +632,12 @@ def test_topology_mapping_rule_enrichment(mock_session, mock_alert_dto):
 
     # Mock the get_topology_data_by_dynamic_matcher to return the mock topology service
     with patch(
-        "keep.api.bl.enrichments_bl.get_topology_data_by_dynamic_matcher",
+        "keep.common.bl.enrichments_bl.get_topology_data_by_dynamic_matcher",
         return_value=mock_topology_service,
     ):
         # Mock the enrichment database function so no actual DB actions occur
         with patch(
-            "keep.api.bl.enrichments_bl.enrich_alert_db"
+            "keep.common.bl.enrichments_bl.enrich_alert_db"
         ) as mock_enrich_alert_db:
             # Run the mapping rule logic for the topology
             result_event = enrichment_bl.run_mapping_rules(mock_alert_dto)

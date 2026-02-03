@@ -55,7 +55,6 @@ def test_get_workflow_from_dict_raises_exception():
 
 
 def test_get_workflow_results():
-
     mock_action1 = Mock(name="action1")
     mock_action1.name = "action1"
     mock_action1.provider.results = {"result": "value1"}

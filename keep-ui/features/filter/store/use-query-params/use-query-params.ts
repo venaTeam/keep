@@ -71,8 +71,14 @@ function replaceQueryParams(searchParams: URLSearchParams): void {
   );
 }
 
+function cloneSearchParams(
+  params: ReadonlyURLSearchParams | URLSearchParams | null
+): URLSearchParams {
+  return params ? new URLSearchParams(params.toString()) : new URLSearchParams();
+}
+
 export function useQueryParams(store: StoreApi<FacetsPanelState>) {
-  const searchParamsRef = useRef<ReadonlyURLSearchParams>();
+  const searchParamsRef = useRef<ReadonlyURLSearchParams | null>(null);
   searchParamsRef.current = useSearchParams();
   const pathname = usePathname();
   const facets = useStore(store, (state) => state.facets);
@@ -106,7 +112,7 @@ export function useQueryParams(store: StoreApi<FacetsPanelState>) {
 
   useEffect(() => {
     return () => {
-      const newParams = new URLSearchParams(searchParamsRef.current);
+      const newParams = cloneSearchParams(searchParamsRef.current);
       const facetQueryParams = Array.from(newParams.entries()).filter(([key]) =>
         key.startsWith(facetQueryParamPrefix)
       );
@@ -148,7 +154,7 @@ export function useQueryParams(store: StoreApi<FacetsPanelState>) {
       {}
     );
     const facetsStatePatch: Record<string, any> = {};
-    const queryParams = new URLSearchParams(searchParamsRef.current);
+    const queryParams = cloneSearchParams(searchParamsRef.current);
     const facetEntries = Array.from(queryParams.entries()).filter(([key]) =>
       key.startsWith(facetQueryParamPrefix)
     );
@@ -190,7 +196,7 @@ export function useQueryParams(store: StoreApi<FacetsPanelState>) {
     }
 
     const timeoutId = setTimeout(() => {
-      const oldQueryParams = new URLSearchParams(searchParamsRef.current);
+      const oldQueryParams = cloneSearchParams(searchParamsRef.current);
 
       const facetQueryParams = buildFacetQueryParams(
         formattedFacets,

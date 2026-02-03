@@ -1,4 +1,4 @@
-import { Button, Title, Subtitle } from "@tremor/react";
+import { Button, Title, Subtitle, Textarea } from "@tremor/react";
 import Modal from "@/components/ui/Modal";
 import { useState } from "react";
 import { AlertDto } from "@/entities/alerts/model";
@@ -7,10 +7,6 @@ import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
-import dynamic from "next/dynamic";
-import "react-quill-new/dist/quill.snow.css";
-
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 interface Props {
     alert: AlertDto | null | undefined;
@@ -49,7 +45,7 @@ export function AlertAssignModal({
                 `/alerts/${alert.fingerprint}/assign/${lastReceived}`,
                 {
                     dispose_on_new_alert: disposeOnNewAlert,
-                    note: noteContent && noteContent.trim() !== "" ? noteContent : null,
+                    note: noteContent && noteContent.trim() !== "" ? noteContent.trim() : null,
                 }
             );
 
@@ -81,12 +77,12 @@ export function AlertAssignModal({
             </div>
             <div className="mt-4">
                 <Subtitle>Add Note</Subtitle>
-                <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-                    <ReactQuill
+                <div className="mt-4">
+                    <Textarea
                         value={noteContent}
-                        onChange={(value: string) => setNoteContent(value)}
-                        theme="snow"
+                        onChange={(e) => setNoteContent(e.target.value)}
                         placeholder="Add a note..."
+                        rows={4}
                     />
                 </div>
             </div>

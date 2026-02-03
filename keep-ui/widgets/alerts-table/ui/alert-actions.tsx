@@ -57,8 +57,12 @@ export default function AlertActions({
   const selectedAlerts = table
     .getSelectedRowModel()
     .rows.map((row) => row.original);
-  const isAllDismissed =
-    selectedAlerts.length > 0 && selectedAlerts.every((a) => a.dismissed);
+
+  // Categorize alerts by dismissed status for showing appropriate actions
+  const dismissedAlerts = selectedAlerts.filter((a) => a.dismissed);
+  const activeAlerts = selectedAlerts.filter((a) => !a.dismissed);
+  const hasDismissedAlerts = dismissedAlerts.length > 0;
+  const hasActiveAlerts = activeAlerts.length > 0;
 
   async function addOrUpdatePreset(newPresetName: string) {
     if (newPresetName) {
@@ -149,18 +153,30 @@ export default function AlertActions({
           onSuccess={clearRowSelection}
         />
       )}
-      <Button
-        icon={isAllDismissed ? BellIcon : SilencedDoorbellNotification}
-        size="xs"
-        color={isAllDismissed ? "orange" : "red"}
-        title={isAllDismissed ? "Restore" : "Dismiss"}
-        onClick={() => {
-          setDismissModalAlert?.(selectedAlerts);
-        }}
-      >
-        {isAllDismissed ? "Restore" : "Dismiss"}{" "}
-        {selectedAlertsFingerprints.length} alert(s)
-      </Button>
+      {/* Restore button - only show if there are dismissed alerts */}
+      {hasDismissedAlerts && (
+        <Button
+          icon={BellIcon}
+          size="xs"
+          color="orange"
+          title="Restore"
+          onClick={() => setDismissModalAlert?.(dismissedAlerts)}
+        >
+          Restore {dismissedAlerts.length} alert(s)
+        </Button>
+      )}
+      {/* Dismiss button - only show if there are active (non-dismissed) alerts */}
+      {hasActiveAlerts && (
+        <Button
+          icon={SilencedDoorbellNotification}
+          size="xs"
+          color="red"
+          title="Dismiss"
+          onClick={() => setDismissModalAlert?.(activeAlerts)}
+        >
+          Dismiss {activeAlerts.length} alert(s)
+        </Button>
+      )}
       <Button
         icon={PlusIcon}
         size="xs"

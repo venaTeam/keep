@@ -42,8 +42,7 @@ export const AlertTimeline: React.FC<AlertTimelineProps> = ({
   const content = auditContent.map((entry, index) => (
     <div
       key={index}
-      className="flex items-start space-x-4 ml-6"
-      style={{ width: "400px" }}
+      className="flex items-start space-x-4 ml-6 w-full"
     >
       {entry.user_id.toLowerCase() === "system" ? (
         <DynamicImageProviderIcon
@@ -61,11 +60,11 @@ export const AlertTimeline: React.FC<AlertTimelineProps> = ({
           </span>
         </span>
       )}
-      <div className="flex flex-col justify-center flex-grow overflow-hidden">
+      <div className="flex flex-col justify-center flex-grow min-w-0">
         <Subtitle className="text-sm text-orange-500 font-semibold whitespace-normal overflow-wrap-break-word">
           {entry.action}
         </Subtitle>
-        <Subtitle className="text-xs whitespace-normal overflow-wrap-break-word">
+        <Subtitle className="text-xs whitespace-normal break-words">
           {entry.description}
         </Subtitle>
       </div>

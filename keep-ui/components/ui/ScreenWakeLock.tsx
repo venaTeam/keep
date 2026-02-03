@@ -10,6 +10,14 @@ export default function WakeLock() {
       try {
         if ("wakeLock" in navigator) {
           wakeLock = await navigator.wakeLock.request("screen");
+          console.log("Wake Lock is active!");
+
+          wakeLock.addEventListener("release", () => {
+            console.log("Wake Lock released!");
+          });
+        } else {
+          console.warn("Wake Lock API not supported in this browser.");
+        }
       } catch (err: any) {
         console.error(`Wake Lock failed: ${err.name}, ${err.message}`);
       }

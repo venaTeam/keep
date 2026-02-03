@@ -631,7 +631,7 @@ def enrich_alert_note(
     return _enrich_alert(
         enriched_data,
         authenticated_entity=authenticated_entity,
-        dispose_on_new_alert=True,
+        dispose_on_new_alert=False,
         session=session,
     )
 

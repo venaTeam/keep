@@ -1,19 +1,29 @@
 import logging
 from contextlib import asynccontextmanager
+from typing import Optional
 
 from fastapi import FastAPI
+
 from keep.common.core.config import config
-
-
 from keep.event_handler.core.bootstrap import Bootstrap
+from keep.event_handler.core.kafka_consumer import EventConsumer
 
 logger = logging.getLogger(__name__)
 
+# Global reference to consumer for health checks
+# This is set during lifespan and can be accessed by health endpoints
+_consumer_instance: Optional[EventConsumer] = None
 
+
+def get_consumer() -> Optional[EventConsumer]:
+    """Get the current consumer instance for health checks."""
+    return _consumer_instance
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global _consumer_instance
+    
     # Startup
     logger.info("Starting Event Handler Service")
     
@@ -39,6 +49,12 @@ async def lifespan(app: FastAPI):
 
     # Start the consumer (whether Redis or Kafka)
     await consumer.start()
+    
+    # Store reference for health checks
+    _consumer_instance = consumer
+    
+    # Store in app state as well for dependency injection
+    app.state.consumer = consumer
 
     yield
 
@@ -47,5 +63,7 @@ async def lifespan(app: FastAPI):
 
     if consumer:
         await consumer.stop()
+    
+    _consumer_instance = None
 
     logger.info("Event Handler Service stopped")

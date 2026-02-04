@@ -53,13 +53,18 @@ COPY keep/event_handler /app/keep/event_handler
 # Enterprise Edition
 COPY ee /app/ee
 
-# Entrypoint script
-# Entrypoint script
-# Deprecated: COPY keep/entrypoint.sh /app/keep/entrypoint.sh
-# RUN chmod +x /app/keep/entrypoint.sh
-# ENTRYPOINT ["/app/keep/entrypoint.sh"]
+# Entrypoint script with mode selection
+# 
+# Modes:
+# 1. Default (CONSUMER_MODE not set or false): HTTP server with gunicorn for health checks and Redis consumer
+# 2. CONSUMER_MODE=true: Dedicated Kafka consumer process (recommended for Kafka deployments)
+#
+# For Kafka deployments, use CONSUMER_MODE=true to run the consumer as a dedicated process.
+# This avoids gunicorn worker timeout issues that can cause consumption to stop.
+#
+# Example k8s deployment:
+#   - API pods: MESSAGING_TYPE=KAFKA, CONSUMER_MODE=false (or unset)
+#   - Consumer pods: MESSAGING_TYPE=KAFKA, CONSUMER_MODE=true
 
-# Worker command
-# We use Gunicorn with Uvicorn workers for production stability
-# The number of workers is controlled by KEEP_EVENT_WORKERS env var (default in config or here)
-CMD ["sh", "-c", "gunicorn keep.event_handler.main:app --bind 0.0.0.0:8080 --workers ${KEEP_EVENT_WORKERS:-1} --worker-class uvicorn.workers.UvicornWorker --timeout 120"]
+# Default command with mode selection
+CMD ["sh", "-c", "if [ \"${CONSUMER_MODE}\" = \"true\" ]; then python -m keep.event_handler.consumer_main; else gunicorn keep.event_handler.main:app --bind 0.0.0.0:8080 --workers ${KEEP_EVENT_WORKERS:-1} --worker-class uvicorn.workers.UvicornWorker --timeout 120; fi"]

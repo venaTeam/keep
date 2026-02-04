@@ -24,7 +24,6 @@ import asyncio
 import logging
 import signal
 import sys
-from typing import Optional
 
 from dotenv import find_dotenv, load_dotenv
 

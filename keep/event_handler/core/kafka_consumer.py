@@ -232,7 +232,7 @@ class KafkaEventConsumer(EventConsumer):
                     trace_id = payload.get("trace_id", "unknown")
                     
                     self.logger.info(
-                        f"Received event from Kafka",
+                        "Received event from Kafka",
                         extra={
                             "trace_id": trace_id,
                             "partition": msg.partition,
@@ -268,7 +268,7 @@ class KafkaEventConsumer(EventConsumer):
                             
                         except Exception as e:
                             self.logger.warning(
-                                f"Error processing Kafka message",
+                                "Error processing Kafka message",
                                 extra={
                                     "trace_id": trace_id,
                                     "attempt": attempt + 1,
@@ -292,7 +292,7 @@ class KafkaEventConsumer(EventConsumer):
                     self._last_processing_duration_ms = processing_duration_ms
                     
                     self.logger.info(
-                        f"Successfully processed and committed message",
+                        "Successfully processed and committed message",
                         extra={
                             "trace_id": trace_id,
                             "processing_duration_ms": round(processing_duration_ms, 2),
@@ -303,7 +303,7 @@ class KafkaEventConsumer(EventConsumer):
                     # Warn if processing took a long time
                     if processing_duration_ms > 30000:  # 30 seconds
                         self.logger.warning(
-                            f"Slow message processing detected",
+                            "Slow message processing detected",
                             extra={
                                 "trace_id": trace_id,
                                 "processing_duration_ms": round(processing_duration_ms, 2),
@@ -318,7 +318,7 @@ class KafkaEventConsumer(EventConsumer):
                     self._last_error = str(e)
                     
                     self.logger.exception(
-                        f"Error processing Kafka message - NOT committing",
+                        "Error processing Kafka message - NOT committing",
                         extra={
                             "trace_id": trace_id,
                             "processing_duration_ms": round(processing_duration_ms, 2),
@@ -337,7 +337,7 @@ class KafkaEventConsumer(EventConsumer):
             
         except Exception as e:
             self.logger.exception(
-                f"Kafka consumer loop crashed",
+                "Kafka consumer loop crashed",
                 extra={
                     "error": str(e),
                     "messages_processed": self._messages_processed,

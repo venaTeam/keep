@@ -13,7 +13,6 @@ from fastapi import (
     Request,
     Response,
 )
-from pusher import Pusher
 from sqlmodel import Session
 
 from keep.common.arq_pool import get_pool
@@ -39,7 +38,8 @@ from keep.common.core.db import (
     merge_incidents_to_id,
 )
 
-from keep.common.core.dependencies import extract_generic_body, get_pusher_client
+from keep.common.core.dependencies import extract_generic_body
+from keep.common.core.sse import notify_sse
 from keep.common.core.incidents import (
     get_incident_facets,
     get_incident_facets_data,
@@ -100,11 +100,10 @@ def create_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> IncidentDto:
     tenant_id = authenticated_entity.tenant_id
-    incident_bl = IncidentBl(tenant_id, session, pusher_client)
+    incident_bl = IncidentBl(tenant_id, session)
     return incident_bl.create_incident(incident_dto)
 
 
@@ -178,7 +177,7 @@ def get_all_incidents(
         authenticated_entity=authenticated_entity,
     )
 
-    incident_bl = IncidentBl(tenant_id, session=None, pusher_client=None)
+    incident_bl = IncidentBl(tenant_id, session=None)
 
     try:
         result = incident_bl.query_incidents(
@@ -393,11 +392,10 @@ def update_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> IncidentDto:
     tenant_id = authenticated_entity.tenant_id
-    incident_bl = IncidentBl(tenant_id, session=session, pusher_client=pusher_client)
+    incident_bl = IncidentBl(tenant_id, session=session)
 
     current_incident = get_incident_by_id(tenant_id, incident_id)
     if not current_incident:
@@ -430,11 +428,10 @@ def bulk_delete_incidents(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ):
     tenant_id = authenticated_entity.tenant_id
-    incident_bl = IncidentBl(tenant_id, session, pusher_client)
+    incident_bl = IncidentBl(tenant_id, session)
     incident_bl.bulk_delete_incidents(incident_ids)
     return Response(status_code=202)
 
@@ -448,11 +445,10 @@ def delete_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ):
     tenant_id = authenticated_entity.tenant_id
-    incident_bl = IncidentBl(tenant_id, session, pusher_client)
+    incident_bl = IncidentBl(tenant_id, session)
     incident_bl.delete_incident(incident_id)
     return Response(status_code=202)
 
@@ -468,7 +464,6 @@ async def split_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> SplitIncidentResponseDto:
     tenant_id = authenticated_entity.tenant_id
@@ -480,7 +475,7 @@ async def split_incident(
             "alert_fingerprints": command.alert_fingerprints,
         },
     )
-    incident_bl = IncidentBl(tenant_id, session, pusher_client)
+    incident_bl = IncidentBl(tenant_id, session)
     await incident_bl.add_alerts_to_incident(
         incident_id=command.destination_incident_id,
         alert_fingerprints=command.alert_fingerprints,
@@ -698,11 +693,10 @@ async def add_alerts_to_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ):
     tenant_id = authenticated_entity.tenant_id
-    incident_bl = IncidentBl(tenant_id, session, pusher_client)
+    incident_bl = IncidentBl(tenant_id, session)
     await incident_bl.add_alerts_to_incident(
         incident_id, alert_fingerprints, is_created_by_ai
     )
@@ -722,10 +716,9 @@ def delete_alerts_from_incident(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
     session=Depends(get_session),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
 ):
     tenant_id = authenticated_entity.tenant_id
-    incident_bl = IncidentBl(tenant_id, session, pusher_client)
+    incident_bl = IncidentBl(tenant_id, session)
     incident_bl.delete_alerts_from_incident(
         incident_id=incident_id, alert_fingerprints=fingerprints
     )
@@ -873,7 +866,6 @@ def change_incident_severity(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
     session: Session = Depends(get_session),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
 ) -> IncidentDto:
     tenant_id = authenticated_entity.tenant_id
     logger.info(
@@ -885,7 +877,7 @@ def change_incident_severity(
         },
     )
     incident_bl = IncidentBl(
-        tenant_id, session, pusher_client, user=authenticated_entity.email
+        tenant_id, session, user=authenticated_entity.email
     )
     incident_dto = incident_bl.update_severity(
         incident_id, change.severity, change.comment
@@ -900,7 +892,6 @@ def add_comment(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher = Depends(get_pusher_client),
     session: Session = Depends(get_session),
 ) -> AlertAudit:
     extra = {
@@ -933,10 +924,7 @@ def add_comment(
     session.commit()
     session.refresh(comment)
 
-    if pusher_client:
-        pusher_client.trigger(
-            f"private-{authenticated_entity.tenant_id}", "incident-comment", {}
-        )
+    notify_sse(authenticated_entity.tenant_id, "incident-comment", {})
 
     logger.info("Added comment to incident", extra=extra)
     return comment
@@ -986,13 +974,12 @@ async def commit_with_ai(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
     session: Session = Depends(get_session),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
 ) -> List[IncidentDto]:
     tenant_id = authenticated_entity.tenant_id
 
     # Create business logic instances
     ai_feedback_bl = AISuggestionBl(tenant_id, session)
-    incident_bl = IncidentBl(tenant_id, session, pusher_client)
+    incident_bl = IncidentBl(tenant_id, session)
 
     # Commit incidents with feedback
     committed_incidents = await ai_feedback_bl.commit_incidents(
@@ -1004,16 +991,11 @@ async def commit_with_ai(
         incident_bl=incident_bl,
     )
 
-    # Notify about changes if pusher client is available
-    if pusher_client:
-        try:
-            pusher_client.trigger(
-                f"private-{tenant_id}",
-                "incident-change",
-                {},
-            )
-        except Exception as e:
-            logger.error(f"Failed to notify client: {str(e)}")
+    # Notify about changes
+    try:
+        notify_sse(tenant_id, "incident-change", {})
+    except Exception as e:
+        logger.error(f"Failed to notify client: {str(e)}")
 
     return committed_incidents
 
@@ -1058,7 +1040,6 @@ async def enrich_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
     db_session: Session = Depends(get_session),
 ) -> Response:
     """Enrich incident with additional data."""
@@ -1081,19 +1062,14 @@ async def enrich_incident(
         force=enrichment.force,
     )
 
-    # Notify clients if pusher is available
-    if pusher_client:
-        try:
-            pusher_client.trigger(
-                f"private-{tenant_id}",
-                "incident-change",
-                {},
-            )
-        except Exception as e:
-            logger.exception(
-                "Failed to notify clients about incident change",
-                extra={"error": str(e)},
-            )
+    # Notify clients about incident change
+    try:
+        notify_sse(tenant_id, "incident-change", {})
+    except Exception as e:
+        logger.exception(
+            "Failed to notify clients about incident change",
+            extra={"error": str(e)},
+        )
 
     return Response(status_code=202)
 
@@ -1109,7 +1085,6 @@ async def unenrich_incident(
     authenticated_entity: AuthenticatedEntity = Depends(
         IdentityManagerFactory.get_auth_verifier(["write:incident"])
     ),
-    pusher_client: Pusher | None = Depends(get_pusher_client),
 ) -> Response:
     """Unenrich incident additional data."""
     tenant_id = authenticated_entity.tenant_id
@@ -1141,18 +1116,13 @@ async def unenrich_incident(
         force=True,
     )
 
-    # Notify clients if pusher is available
-    if pusher_client:
-        try:
-            pusher_client.trigger(
-                f"private-{tenant_id}",
-                "incident-change",
-                {},
-            )
-        except Exception as e:
-            logger.exception(
-                "Failed to notify clients about incident change",
-                extra={"error": str(e)},
-            )
+    # Notify clients about incident change
+    try:
+        notify_sse(tenant_id, "incident-change", {})
+    except Exception as e:
+        logger.exception(
+            "Failed to notify clients about incident change",
+            extra={"error": str(e)},
+        )
 
     return Response(status_code=202)

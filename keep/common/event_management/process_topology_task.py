@@ -4,7 +4,7 @@ import logging
 from sqlalchemy import and_
 
 from keep.common.core.db import get_session_sync
-from keep.common.core.dependencies import get_pusher_client
+from keep.common.core.sse import notify_sse
 from keep.common.models.db.topology import (
     TopologyApplicationDtoIn,
     TopologyService,
@@ -145,13 +145,11 @@ def process_topology(
         )
 
     try:
-        pusher_client = get_pusher_client()
-        if pusher_client:
-            pusher_client.trigger(
-                f"private-{tenant_id}",
-                "topology-update",
-                {"providerId": provider_id, "providerType": provider_type},
-            )
+        notify_sse(
+            tenant_id,
+            "topology-update",
+            {"providerId": provider_id, "providerType": provider_type},
+        )
     except Exception:
         logger.exception("Failed to push topology update to the client")
 

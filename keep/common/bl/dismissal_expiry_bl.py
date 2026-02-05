@@ -13,8 +13,8 @@ from sqlmodel import Session, select
 
 from keep.common.core.db import get_session_sync
 from keep.common.core.db_utils import get_json_extract_field
-from keep.common.core.dependencies import get_pusher_client
 from keep.common.core.elastic import ElasticClient
+from keep.common.core.sse import notify_sse
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto
 from keep.common.models.db.alert import Alert, AlertAudit, AlertEnrichment
@@ -326,23 +326,21 @@ class DismissalExpiryBl:
 
                 # Notify UI of change
                 try:
-                    pusher_client = get_pusher_client()
-                    if pusher_client:
-                        pusher_client.trigger(
-                            f"private-{enrichment.tenant_id}",
-                            "alert-update",
-                            {
-                                "fingerprint": enrichment.alert_fingerprint,
-                                "action": "dismissal_expired",
-                            },
-                        )
-                        logger.info(
-                            f"Sent UI notification for fingerprint {enrichment.alert_fingerprint}",
-                            extra={
-                                "tenant_id": enrichment.tenant_id,
-                                "fingerprint": enrichment.alert_fingerprint,
-                            },
-                        )
+                    notify_sse(
+                        enrichment.tenant_id,
+                        "alert-update",
+                        {
+                            "fingerprint": enrichment.alert_fingerprint,
+                            "action": "dismissal_expired",
+                        },
+                    )
+                    logger.info(
+                        f"Sent UI notification for fingerprint {enrichment.alert_fingerprint}",
+                        extra={
+                            "tenant_id": enrichment.tenant_id,
+                            "fingerprint": enrichment.alert_fingerprint,
+                        },
+                    )
                 except Exception as e:
                     logger.error(
                         f"Failed to send UI notification for fingerprint {enrichment.alert_fingerprint}: {e}",

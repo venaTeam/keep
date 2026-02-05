@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useWebsocket } from "@/utils/hooks/usePusher";
+import { useWebsocket } from "@/utils/hooks/useSSE";
 import { Observable } from "rxjs";
 import { v4 as generateGuid } from "uuid";
 

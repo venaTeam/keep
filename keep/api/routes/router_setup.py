@@ -17,10 +17,10 @@ from keep.api.routes import (
     preset,
     provider_images,
     providers,
-    pusher,
     rules,
     rum,
     settings,
+    sse_routes,
     status,
     tags,
     topology,
@@ -43,7 +43,7 @@ def setup_routers(app: FastAPI):
         workflows.router, prefix="/workflows", tags=["workflows", "alerts"]
     )
     app.include_router(whoami.router, prefix="/whoami", tags=["whoami"])
-    app.include_router(pusher.router, prefix="/pusher", tags=["pusher"])
+    app.include_router(sse_routes.router, prefix="/sse", tags=["sse"])
     app.include_router(status.router, prefix="/status", tags=["status"])
     app.include_router(rules.router, prefix="/rules", tags=["rules"])
     app.include_router(preset.router, prefix="/preset", tags=["preset"])

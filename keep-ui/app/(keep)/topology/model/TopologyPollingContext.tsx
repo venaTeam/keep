@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useWebsocket } from "@/utils/hooks/usePusher";
+import { useWebsocket } from "@/utils/hooks/useSSE";
 import { toast } from "react-toastify";
 
 interface TopologyUpdate {

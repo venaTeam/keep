@@ -1,4 +1,4 @@
-import { useWebsocket } from "./usePusher";
+import { useWebsocket } from "./useSSE";
 import { useCallback, useEffect } from "react";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { AIConfig, AILogs, AIStats } from "@/app/(keep)/ai/model";

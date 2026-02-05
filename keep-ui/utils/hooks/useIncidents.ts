@@ -6,7 +6,7 @@ import {
 } from "@/entities/incidents/model";
 import { PaginatedWorkflowExecutionDto } from "@/shared/api/workflow-executions";
 import useSWR, { SWRConfiguration } from "swr";
-import { useWebsocket } from "./usePusher";
+import { useWebsocket } from "./useSSE";
 import { use, useCallback, useEffect, useState } from "react";
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { useApi } from "@/shared/lib/hooks/useApi";

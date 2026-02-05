@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useWebsocket } from "@/utils/hooks/usePusher";
+import { useWebsocket } from "@/utils/hooks/useSSE";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 
 const PRESET_POLLING_INTERVAL = 5 * 1000; // Once per 5 seconds

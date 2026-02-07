@@ -34,6 +34,10 @@ import { IncidentAlertsTableBodySkeleton } from "./incident-alert-table-body-ske
 import { IncidentAlertsActions } from "./incident-alert-actions";
 import { AlertSidebar } from "@/features/alerts/alert-detail-sidebar";
 import { ViewAlertModal } from "@/features/alerts/view-raw-alert";
+import { AlertChangeStatusModal } from "@/features/alerts/alert-change-status";
+import { AlertDismissModal } from "@/features/alerts/dismiss-alert";
+import { ManualRunWorkflowModal } from "@/features/workflows/manual-run-workflow";
+import { AlertAssignModal } from "@/features/alerts/alert-assign";
 import { IncidentAlertActionTray } from "./incident-alert-action-tray";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
 import { AlertsTableBody } from "@/widgets/alerts-table/ui/alerts-table-body";
@@ -100,14 +104,20 @@ export default function IncidentAlerts({ incident }: Props) {
 
   // State for ViewAlertModal (opened by view button)
   const [viewAlertModal, setViewAlertModal] = useState<AlertDto | null>(null);
-  
+
   // State for AlertSidebar (opened by row click)
   const [selectedAlert, setSelectedAlert] = useState<AlertDto | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  
+
   // Add state for incident selector modal (needed by AlertSidebar)
   const [isIncidentSelectorOpen, setIsIncidentSelectorOpen] = useState(false);
+
+  // State for alert action modals
+  const [changeStatusAlert, setChangeStatusAlert] = useState<AlertDto | null>(null);
+  const [dismissModalAlert, setDismissModalAlert] = useState<AlertDto[] | null>(null);
+  const [runWorkflowModalAlert, setRunWorkflowModalAlert] = useState<AlertDto | null>(null);
+  const [assignModalAlert, setAssignModalAlert] = useState<AlertDto | null>(null);
 
   const extraColumns = [
     columnHelper.accessor("is_created_by_ai", {
@@ -363,11 +373,34 @@ export default function IncidentAlerts({ incident }: Props) {
         isOpen={isSidebarOpen}
         toggle={handleSidebarClose}
         alert={selectedAlert}
-        // These optional props are passed to maintain feature parity with the main alerts table
-        setRunWorkflowModalAlert={undefined}
-        setDismissModalAlert={undefined}
-        setChangeStatusAlert={undefined}
+        setRunWorkflowModalAlert={setRunWorkflowModalAlert}
+        setDismissModalAlert={setDismissModalAlert}
+        setChangeStatusAlert={setChangeStatusAlert}
+        setAssignModalAlert={setAssignModalAlert}
         setIsIncidentSelectorOpen={setIsIncidentSelectorOpen}
+      />
+
+      {/* Alert Action Modals */}
+      <AlertChangeStatusModal
+        alert={changeStatusAlert}
+        presetName="incident-alerts"
+        handleClose={() => setChangeStatusAlert(null)}
+        onSuccess={() => mutateAlerts()}
+      />
+      <AlertDismissModal
+        alert={dismissModalAlert}
+        preset="incident-alerts"
+        handleClose={() => setDismissModalAlert(null)}
+        onSuccess={() => mutateAlerts()}
+      />
+      <ManualRunWorkflowModal
+        alert={runWorkflowModalAlert}
+        onClose={() => setRunWorkflowModalAlert(null)}
+      />
+      <AlertAssignModal
+        alert={assignModalAlert}
+        presetName="incident-alerts"
+        handleClose={() => setAssignModalAlert(null)}
       />
     </>
   );

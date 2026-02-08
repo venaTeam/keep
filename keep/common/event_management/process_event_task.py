@@ -47,6 +47,14 @@ from keep.common.core.metrics import (
     deduplication_duration_seconds,
     rules_engine_duration_seconds,
 )
+from keep.common.core.otel_metrics import (
+    record_alert_enrichment_duration,
+    record_alert_ingestion,
+    record_alert_ingestion_error,
+    record_deduplication,
+    record_deduplication_duration,
+    record_rules_engine_duration,
+)
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
 from keep.common.models.db.alert import Alert, AlertAudit, AlertRaw
@@ -427,6 +435,10 @@ def __save_to_db(
                 },
             )
             formatted_event.pushed = True
+            
+            # Record alert ingestion (OTEL)
+            source = formatted_event.source[0] if formatted_event.source else "keep"
+            record_alert_ingestion(source=source, status="success")
 
             started_at = started_at_for_fingerprints.get(
                 formatted_event.fingerprint, None
@@ -1098,16 +1110,28 @@ def __handle_formatted_events(
         deduplication_duration_seconds.labels(
             provider_type=provider_type or "generic"
         ).observe(time.time() - start_dedup_time)
+        record_deduplication_duration(
+            provider_type=provider_type or "generic",
+            duration_seconds=time.time() - start_dedup_time
+        )
         
         if dedup_count > 0:
             deduplication_events_total.labels(
                 provider_type=provider_type or "generic", status="duplicated"
             ).inc(dedup_count)
+            record_deduplication(
+                provider_type=provider_type or "generic",
+                status="duplicated"
+            )
         
         # also count non-duplicated events to know the ratio
         deduplication_events_total.labels(
             provider_type=provider_type or "generic", status="new"
         ).inc(len(formatted_events))
+        record_deduplication(
+             provider_type=provider_type or "generic",
+             status="new"
+        )
 
     with tracer.start_as_current_span("process_event_save_to_db"):
         # save to db
@@ -1245,6 +1269,10 @@ def __handle_formatted_events(
                 rules_engine_duration_seconds.labels(
                     provider_type=provider_type or "generic"
                 ).observe(time.time() - start_rules_time)
+                record_rules_engine_duration(
+                    provider_type=provider_type or "generic",
+                    duration_seconds=time.time() - start_rules_time
+                )
 
     if MAINTENANCE_WINDOW_ALERT_STRATEGY == "recover_previous_status":
         enriched_formatted_events.extend(ignored_events)
@@ -1818,6 +1846,10 @@ def process_event(
             )
 
         events_error_counter.inc()
+        record_alert_ingestion_error(
+             source=provider_type or "unknown",
+             error_type=error_type
+        )
 
         # Retrying only if context is present (running the job in arq worker)
         if bool(ctx):
@@ -1844,6 +1876,10 @@ def process_event(
         alert_enrichment_duration_seconds.labels(
             source=provider_type or "unknown"
         ).observe(time.time() - start_time)
+        record_alert_enrichment_duration(
+            source=provider_type or "unknown",
+            duration_seconds=time.time() - start_time
+        )
         if session is not None:
             try:
                 logger.debug(

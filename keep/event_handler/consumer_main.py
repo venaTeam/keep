@@ -18,6 +18,12 @@ Environment Variables:
     KAFKA_BOOTSTRAP_SERVERS: Kafka broker addresses
     KAFKA_TOPIC: Topic to consume from (default: keep-events)
     KAFKA_CONSUMER_GROUP: Consumer group ID (default: keep-event-handler)
+    
+    # OTEL Metrics (optional - push metrics to collector)
+    METRIC_OTEL_ENABLED: Set to "true" to enable OTEL metrics export
+    OTEL_EXPORTER_OTLP_ENDPOINT: OTLP collector endpoint (e.g., http://otel-collector:4318)
+    OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: Specific metrics endpoint (overrides base)
+    OTEL_METRICS_EXPORT_INTERVAL_MS: Export interval in ms (default: 10000)
 """
 
 import asyncio
@@ -28,7 +34,6 @@ import sys
 from dotenv import find_dotenv, load_dotenv
 
 import keep.common.logging
-import keep.common.observability
 from keep.common.core.config import config
 
 # Load environment variables early
@@ -55,8 +60,17 @@ class ConsumerRunner:
     async def initialize(self):
         """Initialize required services before starting consumer."""
         from keep.event_handler.core.bootstrap import Bootstrap
+        from keep.common.core.otel_metrics import setup_otel_metrics
         
         logger.info("Initializing consumer services...")
+        
+        # Initialize OTEL metrics (push to collector)
+        otel_enabled = setup_otel_metrics(service_name="keep-event-handler-consumer")
+        if otel_enabled:
+            logger.info("OTEL metrics export enabled - metrics will be pushed to collector")
+        else:
+            logger.info("OTEL metrics export disabled - set METRIC_OTEL_ENABLED=true to enable")
+        
         bootstrap = await Bootstrap.get_instance()
         await bootstrap.run_on_starting()
         logger.info("Consumer services initialized successfully")

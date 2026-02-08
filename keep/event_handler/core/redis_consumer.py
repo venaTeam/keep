@@ -5,6 +5,7 @@ from typing import Optional
 
 from keep.event_handler.core.bootstrap import Bootstrap
 from keep.event_handler.core.kafka_consumer import EventConsumer
+from keep.event_handler.api.routes.v1.metrics import CONSUMER_RUNNING
 
 
 class RedisEventConsumer(EventConsumer):
@@ -24,10 +25,12 @@ class RedisEventConsumer(EventConsumer):
         self._worker_task = loop.create_task(bootstrap.run_arq_worker(self._worker_id))
         self._running = True
         self._started_at = datetime.utcnow()
+        CONSUMER_RUNNING.set(1)
 
     async def stop(self):
         self.logger.info("Stopping Redis Consumer")
         self._running = False
+        CONSUMER_RUNNING.set(0)
         if self._worker_task:
             if not self._worker_task.done():
                 self._worker_task.cancel()
@@ -45,4 +48,3 @@ class RedisEventConsumer(EventConsumer):
             "worker_id": self._worker_id,
             "task_done": self._worker_task.done() if self._worker_task else None,
         }
-

@@ -24,6 +24,8 @@ app = FastAPI(
 # Include routers
 app.include_router(health.router, prefix="/v1", tags=["health"])
 app.include_router(metrics.router, prefix="/v1", tags=["metrics"])
+# Expose metrics at /metrics (root) for standard Prometheus scraping
+app.include_router(metrics.router, tags=["metrics-root"])
 # For backward compatibility / ease of use, logic at root is also handled in health router via @router.get("/")
 app.include_router(health.router, tags=["root"])
 

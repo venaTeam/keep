@@ -12,6 +12,17 @@ from keep.common.consts import MAX_PROCESSING_RETRIES
 from keep.common.core.config import config
 from keep.event_handler.controllers.event_controller import process_event_wrapper
 from keep.event_handler.models.event_dto import EventDTO
+from keep.event_handler.api.routes.v1.metrics import (
+    MESSAGES_PROCESSED,
+    MESSAGES_PROCESSING_TIME,
+    CONSUMER_RUNNING,
+)
+from keep.common.core.otel_metrics import (
+    record_event_in,
+    record_event_processed,
+    record_event_error,
+    set_consumer_running,
+)
 
 
 class EventConsumer(abc.ABC):
@@ -150,6 +161,8 @@ class KafkaEventConsumer(EventConsumer):
         await self.consumer.start()
         self._running = True
         self._started_at = datetime.utcnow()
+        CONSUMER_RUNNING.set(1)
+        set_consumer_running(True)  # OTEL gauge
 
         # Create a background task to consume messages
         loop = asyncio.get_running_loop()
@@ -163,6 +176,8 @@ class KafkaEventConsumer(EventConsumer):
 
         self.logger.info("Stopping Kafka Consumer")
         self._running = False
+        CONSUMER_RUNNING.set(0)
+        set_consumer_running(False)  # OTEL gauge
         
         if self._task:
             self._task.cancel()
@@ -239,6 +254,9 @@ class KafkaEventConsumer(EventConsumer):
                             "offset": msg.offset,
                         }
                     )
+                    
+                    # Record event received (OTEL - pushed to collector if enabled)
+                    record_event_in()
 
                     # Construct DTO
                     event_dto = EventDTO(
@@ -285,11 +303,19 @@ class KafkaEventConsumer(EventConsumer):
                     # Commit offset after successful processing
                     await self.consumer.commit()
                     
-                    # Update metrics
+                    # Update internal metrics
                     processing_duration_ms = (time.time() - processing_start) * 1000
+                    processing_duration_sec = processing_duration_ms / 1000
                     self._messages_processed += 1
                     self._last_message_time = datetime.utcnow()
                     self._last_processing_duration_ms = processing_duration_ms
+                    
+                    # Record Prometheus metrics
+                    MESSAGES_PROCESSED.labels(status="success").inc()
+                    MESSAGES_PROCESSING_TIME.observe(processing_duration_sec)
+                    
+                    # Record OTEL Keep metrics (pushed to collector if enabled)
+                    record_event_processed()
                     
                     self.logger.info(
                         "Successfully processed and committed message",
@@ -314,8 +340,16 @@ class KafkaEventConsumer(EventConsumer):
                 except Exception as e:
                     # Critical: Do NOT commit. Log exception.
                     processing_duration_ms = (time.time() - processing_start) * 1000
+                    processing_duration_sec = processing_duration_ms / 1000
                     self._messages_failed += 1
                     self._last_error = str(e)
+                    
+                    # Record Prometheus failure metrics
+                    MESSAGES_PROCESSED.labels(status="failed").inc()
+                    MESSAGES_PROCESSING_TIME.observe(processing_duration_sec)
+                    
+                    # Record OTEL Keep failure metrics (pushed to collector if enabled)
+                    record_event_error()
                     
                     self.logger.exception(
                         "Error processing Kafka message - NOT committing",

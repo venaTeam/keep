@@ -86,7 +86,7 @@ class KafkaEventConsumer(EventConsumer):
         conf = {
             "bootstrap.servers": self.bootstrap_servers,
             "group.id": self.group_id,
-            "auto.offset.reset": "latest",
+            "auto.offset.reset": "earliest",
             "enable.auto.commit": False,  # Manual commit after processing
             "session.timeout.ms": self._session_timeout,
             "max.poll.interval.ms": self._max_poll_interval,
@@ -155,7 +155,6 @@ class KafkaEventConsumer(EventConsumer):
     def _on_assign(self, consumer, partitions):
         """Callback when partitions are assigned."""
         self.logger.info(f"Partitions assigned: {[p.partition for p in partitions]}")
-        consumer.assign(partitions)
 
     def _on_revoke(self, consumer, partitions):
         """Callback when partitions are revoked (rebalance)."""

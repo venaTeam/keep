@@ -74,10 +74,7 @@ services:
       - postgres
       - keep-arq-redis
 
-  keep-websocket-server:
-    extends:
-      file: docker-compose.common.yml
-      service: keep-websocket-server-common
+
 
   # Redis for ARQ
   keep-arq-redis:

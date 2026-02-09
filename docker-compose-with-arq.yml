@@ -29,10 +29,7 @@ services:
     depends_on:
       - keep-arq-redis
 
-  keep-websocket-server:
-    extends:
-      file: docker-compose.common.yml
-      service: keep-websocket-server-common
+
 
   keep-arq-redis:
     image: redis/redis-stack

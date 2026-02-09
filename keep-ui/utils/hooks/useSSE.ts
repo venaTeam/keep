@@ -1,8 +1,7 @@
 /**
  * Server-Sent Events (SSE) hook for real-time notifications.
  *
- * This hook provides a replacement for the Pusher/WebSocket real-time
- * communication, using browser-native EventSource for SSE.
+ * This hook uses browser-native EventSource for SSE communication.
  */
 
 import { useCallback, useEffect, useRef } from "react";
@@ -169,5 +168,4 @@ export const useSSE = () => {
   };
 };
 
-// Export with the same name as the old hook for easier migration
-export const useWebsocket = useSSE;
+

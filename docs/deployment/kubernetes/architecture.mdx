@@ -9,17 +9,17 @@ Keep architecture composes of two main components:
 
 1. **Keep API** - A FastAPI-based backend server that handles business logic and API endpoints.
 2. **Keep Frontend** -  A Next.js-based frontend interface for user interaction.
-3. **Websocket Server** - A Soketi server for real-time updates without page refreshes.
+
 4. **Database Server** - A database used to store and manage persistent data. Supported databases include SQLite, PostgreSQL, MySQL, and SQL Server.
 
 ## Kubernetes Architecture
 
-Keep uses a single unified NGINX ingress controller to route traffic to all components (frontend, backend, and websocket). The ingress handles path-based routing:
+Keep uses a single unified NGINX ingress controller to route traffic to all components (frontend and backend). The ingress handles path-based routing:
 
 By default:
 - `/` routed to **Frontend** (configurable via `global.ingress.frontendPrefix`)
 - `/v2` routed to **Backend** (configurable via `global.ingress.backendPrefix`)
-- `/websocket` routed to **WebSocket** (configurable via `global.ingress.websocketPrefix`)
+
 
 ### General Components
 
@@ -65,15 +65,7 @@ By default:
 | Database PersistentVolume | Provides persistent storage for the database | Optional | [db-pv.yaml](https://github.com/keephq/helm-charts/blob/main/charts/keep/templates/db-pv.yaml) |
 | Database PersistentVolumeClaim | Claims the persistent storage for the database | Optional | [db-pvc.yaml](https://github.com/keephq/helm-charts/blob/main/charts/keep/templates/db-pvc.yaml) |
 
-#### WebSocket Components
-<Tip>WebSocket components are optional. You can spin up Keep with your own *Pusher compatible* WebSocket server.</Tip>
 
-| Kubernetes Resource | Purpose | Required/Optional | Source |
-|:-------------------:|:-------:|:-----------------:|:------:|
-| WebSocket Deployment | Manages the WebSocket server containers (Soketi) | Optional | [websocket-server.yaml](https://github.com/keephq/helm-charts/blob/main/charts/keep/templates/websocket-server.yaml) |
-| WebSocket Service | Exposes the WebSocket deployment within the cluster | Required (if WebSocket enabled) | [websocket-server-service.yaml](https://github.com/keephq/helm-charts/blob/main/charts/keep/templates/websocket-server-service.yaml) |
-| WebSocket Route (OpenShift) | Exposes the WebSocket service to external traffic on OpenShift | Optional | [websocket-server-route.yaml](https://github.com/keephq/helm-charts/blob/main/charts/keep/templates/websocket-server-route.yaml) |
-| WebSocket HorizontalPodAutoscaler | Automatically scales the number of WebSocket server pods | Optional | [websocket-server-hpa.yaml](https://github.com/keephq/helm-charts/blob/main/charts/keep/templates/websocket-server-hpa.yaml) |
 
 These tables provide a comprehensive overview of the Kubernetes resources used in the Keep architecture, organized by component type. Each table describes the purpose of each resource, indicates whether it's required or optional, and provides a direct link to the source template in the Keep Helm charts GitHub repository.
 
@@ -124,8 +116,7 @@ backend:
     port: 8080           # Port on which the backend API is exposed.
 ```
 
-#### 3. WebSocket Server Configuration
-Keep uses Soketi as its websocket server. To learn how to configure it, please see [Soketi docs](https://github.com/soketi/charts/tree/master/charts/soketi).
+
 
 
 #### 4. Database Configuration

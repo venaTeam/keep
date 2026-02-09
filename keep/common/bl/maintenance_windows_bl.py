@@ -319,7 +319,9 @@ class MaintenanceWindowsBl:
                         tenant, "incident-change"
                     ):
                         try:
-                            notify_sse(tenant, "incident-change", {})
+                            # Include incident IDs in the notification
+                            incident_ids = [str(inc.id) for inc in incidents]
+                            notify_sse(tenant, "incident-change", {"incident_ids": incident_ids})
                         except Exception:
                             logger.exception(
                                 "Failed to tell the client to pull incidents"

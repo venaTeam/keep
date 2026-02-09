@@ -993,7 +993,9 @@ async def commit_with_ai(
 
     # Notify about changes
     try:
-        notify_sse(tenant_id, "incident-change", {})
+        # Include incident IDs in the notification
+        incident_ids = [str(inc.id) for inc in committed_incidents]
+        notify_sse(tenant_id, "incident-change", {"incident_ids": incident_ids})
     except Exception as e:
         logger.error(f"Failed to notify client: {str(e)}")
 
@@ -1064,7 +1066,7 @@ async def enrich_incident(
 
     # Notify clients about incident change
     try:
-        notify_sse(tenant_id, "incident-change", {})
+        notify_sse(tenant_id, "incident-change", {"incident_id": str(incident_id)})
     except Exception as e:
         logger.exception(
             "Failed to notify clients about incident change",
@@ -1118,7 +1120,7 @@ async def unenrich_incident(
 
     # Notify clients about incident change
     try:
-        notify_sse(tenant_id, "incident-change", {})
+        notify_sse(tenant_id, "incident-change", {"incident_id": str(incident_id)})
     except Exception as e:
         logger.exception(
             "Failed to notify clients about incident change",

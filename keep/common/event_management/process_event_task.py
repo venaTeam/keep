@@ -12,6 +12,7 @@ from typing import List
 # third-parties
 import dateutil
 from arq import Retry
+import requests
 from fastapi.datastructures import FormData
 from opentelemetry import trace
 from sqlalchemy.orm.attributes import flag_modified
@@ -1255,18 +1256,37 @@ def __handle_formatted_events(
         # Get the notification cache
         notification_cache = get_notification_cache()
 
-        # Tell the client to poll alerts
-        if notification_cache.should_notify(tenant_id, "poll-alerts"):
-            try:
-                notify_sse(tenant_id, "poll-alerts", {})
-                logger.info("Told client to poll alerts")
-            except Exception:
-                logger.exception("Failed to tell client to poll alerts")
-                pass
+        # Tell the client to poll alerts via API (since event handler runs in a separate process)
+
+        # Tell the client to poll alerts via API (since event handler runs in a separate process)
+        # We don't use throttling here to ensure real-time updates (client will append instead of full refresh)
+        try:
+            api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
+            logger.info(f"Notifying API at {api_url} to poll alerts for {tenant_id}")
+            
+            # Serialize alerts to dicts
+            alerts_payload = [alert.dict() for alert in enriched_formatted_events]
+            
+            response = requests.post(
+                f"{api_url}/sse/notify",
+                json={
+                    "tenant_id": tenant_id,
+                    "event": "poll-alerts",
+                    "data": {"alerts": alerts_payload}
+                },
+                timeout=5
+            )
+            response.raise_for_status()
+            logger.info(f"Successfully told client to poll alerts via API ({response.status_code})")
+        except Exception as e:
+            logger.warning(f"Failed to tell client to poll alerts: {e}")
+            pass
 
         if incidents and notification_cache.should_notify(tenant_id, "incident-change"):
             try:
-                notify_sse(tenant_id, "incident-change", {})
+                # Include incident IDs in the notification
+                incident_ids = [str(inc.id) for inc in incidents]
+                notify_sse(tenant_id, "incident-change", {"incident_ids": incident_ids})
             except Exception:
                 logger.exception("Failed to tell the client to pull incidents")
 

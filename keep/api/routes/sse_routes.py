@@ -127,3 +127,34 @@ async def sse_subscribe(
             "X-Accel-Buffering": "no",  # Disable nginx buffering
         },
     )
+
+
+from pydantic import BaseModel
+
+
+class SSENotification(BaseModel):
+    tenant_id: str
+    event: str
+    data: dict = {}
+
+
+@router.post("/notify", status_code=204)
+async def sse_notify(
+    notification: SSENotification,
+    # authenticated_entity: AuthenticatedEntity = Depends(get_sse_authenticated_entity),
+) -> None:
+    """
+    Internal endpoint to trigger SSE notifications from other services (e.g. event handler).
+    """
+    logger.info(
+        f"Received SSE notification request via API",
+        extra={
+            "tenant_id": notification.tenant_id,
+            "event": notification.event,
+        }
+    )
+    await sse_broadcaster.notify(
+        notification.tenant_id,
+        notification.event,
+        notification.data
+    )

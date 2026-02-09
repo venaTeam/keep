@@ -14,7 +14,6 @@ let sharedEventSource: EventSource | null = null;
 let sharedHandlers: Map<string, Set<(data: any) => void>> = new Map();
 let connectionAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
-const RECONNECT_DELAY_MS = 3000;
 
 // Known event types that the backend can send
 const SSE_EVENT_TYPES = [
@@ -35,37 +34,23 @@ export const useSSE = () => {
 
   // Initialize SSE connection
   useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/8c802fa3-a512-4e69-abbd-05224549bef4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useSSE.ts:useEffect',message:'SSE useEffect triggered',data:{apiUrl:configData?.API_URL,configData:configData?'loaded':'null',sessionExists:!!session,isInitialized:isInitializedRef.current,sharedEventSourceExists:!!sharedEventSource},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
-    // #endregion
-
     // Prevent multiple initializations
     if (isInitializedRef.current) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/8c802fa3-a512-4e69-abbd-05224549bef4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useSSE.ts:earlyReturn1',message:'Already initialized, returning early',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
       return;
     }
 
     // Check if SSE is disabled (using PUSHER_DISABLED for backward compatibility)
     if (configData?.PUSHER_DISABLED === true) {
-      console.log("useSSE: Real-time notifications disabled");
       return;
     }
 
     // Don't connect if we don't have config yet
     if (configData === null || configData === undefined) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/8c802fa3-a512-4e69-abbd-05224549bef4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useSSE.ts:earlyReturn2',message:'Config not ready, returning early',data:{configData},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
       return;
     }
 
     // Check if we already have a connection
     if (sharedEventSource !== null && sharedEventSource.readyState !== EventSource.CLOSED) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/8c802fa3-a512-4e69-abbd-05224549bef4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useSSE.ts:earlyReturn3',message:'EventSource already exists',data:{readyState:sharedEventSource?.readyState},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
       isInitializedRef.current = true;
       return;
     }
@@ -87,38 +72,25 @@ export const useSSE = () => {
       sseUrl += `?token=${encodeURIComponent(session.accessToken)}`;
     }
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/8c802fa3-a512-4e69-abbd-05224549bef4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useSSE.ts:beforeCreate',message:'About to create EventSource',data:{sseUrl,sseBaseUrl,hasToken:!!session?.accessToken},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,C'})}).catch(()=>{});
-    // #endregion
-
     console.log("useSSE: Creating new EventSource connection");
 
     try {
       sharedEventSource = new EventSource(sseUrl);
 
       sharedEventSource.onopen = () => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/8c802fa3-a512-4e69-abbd-05224549bef4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useSSE.ts:onopen',message:'EventSource connection opened',data:{readyState:sharedEventSource?.readyState},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         console.log("useSSE: Connection opened successfully");
         connectionAttempts = 0;
       };
 
       sharedEventSource.onerror = (error) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/8c802fa3-a512-4e69-abbd-05224549bef4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useSSE.ts:onerror',message:'EventSource error occurred',data:{errorType:error?.type,readyState:sharedEventSource?.readyState,connectionAttempts},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
-        // #endregion
         console.error("useSSE: Connection error:", error);
 
         // EventSource will auto-reconnect, but we track attempts
         if (sharedEventSource?.readyState === EventSource.CLOSED) {
           connectionAttempts++;
-          if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
-            console.log(
-              `useSSE: Connection closed, will retry (attempt ${connectionAttempts}/${MAX_RECONNECT_ATTEMPTS})`
-            );
-          } else {
+          if (connectionAttempts >= MAX_RECONNECT_ATTEMPTS) {
             console.error("useSSE: Max reconnection attempts reached");
+            sharedEventSource?.close();
           }
         }
       };
@@ -131,7 +103,7 @@ export const useSSE = () => {
             try {
               // Parse the data - the backend sends JSON
               const data = JSON.parse(event.data);
-              console.log(`useSSE: Received event '${eventType}':`, data);
+
               handlers.forEach((handler) => {
                 try {
                   handler(data);
@@ -144,10 +116,6 @@ export const useSSE = () => {
               });
             } catch (parseError) {
               // If JSON parsing fails, pass the raw data
-              console.log(
-                `useSSE: Received non-JSON event '${eventType}':`,
-                event.data
-              );
               handlers.forEach((handler) => {
                 try {
                   handler(event.data);
@@ -177,8 +145,6 @@ export const useSSE = () => {
 
   // Bind a callback to an event
   const bind = useCallback((event: string, callback: (data: any) => void) => {
-    console.log(`useSSE: Binding to event '${event}'`);
-
     if (!sharedHandlers.has(event)) {
       sharedHandlers.set(event, new Set());
     }
@@ -188,8 +154,6 @@ export const useSSE = () => {
 
   // Unbind a callback from an event
   const unbind = useCallback((event: string, callback: (data: any) => void) => {
-    console.log(`useSSE: Unbinding from event '${event}'`);
-
     const handlers = sharedHandlers.get(event);
     if (handlers) {
       handlers.delete(callback);
@@ -199,37 +163,9 @@ export const useSSE = () => {
     }
   }, []);
 
-  // These are kept for API compatibility but are no-ops for SSE
-  const subscribe = useCallback(() => {
-    console.log("useSSE: subscribe() called (no-op for SSE)");
-    return undefined;
-  }, []);
-
-  const unsubscribe = useCallback(() => {
-    console.log("useSSE: unsubscribe() called (no-op for SSE)");
-    return undefined;
-  }, []);
-
-  const trigger = useCallback((event: string, data: any) => {
-    console.log(
-      `useSSE: trigger() called (no-op for SSE - use REST API instead)`,
-      { event, data }
-    );
-    return undefined;
-  }, []);
-
-  const channel = useCallback(() => {
-    console.log("useSSE: channel() called (no-op for SSE)");
-    return undefined;
-  }, []);
-
   return {
-    subscribe,
-    unsubscribe,
     bind,
     unbind,
-    trigger,
-    channel,
   };
 };
 

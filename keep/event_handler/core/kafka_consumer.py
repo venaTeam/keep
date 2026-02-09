@@ -155,6 +155,7 @@ class KafkaEventConsumer(EventConsumer):
     def _on_assign(self, consumer, partitions):
         """Callback when partitions are assigned."""
         self.logger.info(f"Partitions assigned: {[p.partition for p in partitions]}")
+        consumer.assign(partitions)
 
     def _on_revoke(self, consumer, partitions):
         """Callback when partitions are revoked (rebalance)."""

@@ -33,10 +33,7 @@ services:
       kafka:
         condition: service_healthy
 
-  keep-websocket-server:
-    extends:
-      file: docker-compose-lite.yml
-      service: keep-websocket-server
+
 
   postgres:
     extends:

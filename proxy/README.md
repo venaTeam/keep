@@ -20,7 +20,7 @@ The setup consists of several services:
 - **Nginx**: Serves as a reverse proxy/tunnel
 - **Keep Frontend**: The Keep UI service configured to use the proxy
 - **Keep Backend**: The Keep API service
-- **Keep WebSocket**: The WebSocket server for real-time updates
+
 
 ## Network Architecture
 

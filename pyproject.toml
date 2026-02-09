@@ -37,7 +37,7 @@ opentelemetry-sdk = "1.29.0"
 opentelemetry-instrumentation-fastapi = "0.50b0"
 opentelemetry-instrumentation-logging = "0.50b0"
 pyngrok = "^7.0.2"
-websocket-client = "^1.6.0"
+
 google-cloud-storage = "^2.10.0"
 auth0-python = "^4.4.1"
 asyncio = "^3.4.3"

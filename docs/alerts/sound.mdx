@@ -6,7 +6,7 @@ Sound notifications ensure you never miss important updates or alerts.
 
 ## How It Works
 1. **Preset Notifications**: Mark a preset as "noisy," and any alert linked to it will play a sound. Alternatively, set individual alerts as `isNoisy=true` to trigger sounds through linked presets.
-2. **Real-Time Alerts**: With WebSocket enabled, alerts arrive instantly. The server notifies the browser, which retrieves and processes new alerts immediately.
+2. **Real-Time Alerts**: Alerts arrive instantly via Server-Sent Events (SSE). The server notifies the browser, which retrieves and processes new alerts immediately.
 
 ## Who Hears Notifications?
 Users with Keep open in their browser and the noisy preset visible in their navigation bar. Presets can be filtered to control notifications.

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useWebsocket } from "@/utils/hooks/useSSE";
+import { useSSE } from "@/utils/hooks/useSSE";
 import { toast } from "react-toastify";
 
 interface TopologyUpdate {
@@ -16,7 +16,7 @@ export const TopologyPollingContextProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [pollTopology, setPollTopology] = useState(0);
-  const { bind, unbind } = useWebsocket();
+  const { bind, unbind } = useSSE();
 
   useEffect(() => {
     const handleIncoming = (data: TopologyUpdate) => {

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useWebsocket } from "@/utils/hooks/useSSE";
+import { useSSE } from "@/utils/hooks/useSSE";
 
 export const useAlertPolling = (isEnabled: boolean, onEvent: (data?: any) => void) => {
-  const { bind, unbind } = useWebsocket();
+  const { bind, unbind } = useSSE();
 
   useEffect(() => {
     if (!isEnabled) {

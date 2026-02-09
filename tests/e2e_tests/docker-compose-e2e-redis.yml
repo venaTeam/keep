@@ -48,10 +48,7 @@ services:
     volumes:
       - keep-db-data:/app
 
-  keep-websocket-server:
-    extends:
-      file: docker-compose.common.yml
-      service: keep-websocket-server-common
+
 
   keep-redis:
     image: redis/redis-stack

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useWebsocket } from "@/utils/hooks/useSSE";
+import { useSSE } from "@/utils/hooks/useSSE";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 
 const PRESET_POLLING_INTERVAL = 5 * 1000; // Once per 5 seconds
 
 export function usePresetPolling() {
-  const { bind, unbind } = useWebsocket();
+  const { bind, unbind } = useSSE();
   const revalidateMultiple = useRevalidateMultiple();
   const lastPollTimeRef = useRef(0);
 

@@ -97,7 +97,7 @@ def test_firing_counter_reset_on_acknowledge(db_session, client, test_app):
     # Get a simulated prometheus alert
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    alert2 = provider.simulate_alert()
+
 
     # Send the alert
     response = client.post(

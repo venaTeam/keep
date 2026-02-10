@@ -12,7 +12,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
-from starlette.concurrency import iterate_in_threadpool
+from pydantic import BaseModel
 
 from keep.common.core.sse import sse_broadcaster
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
@@ -107,7 +107,7 @@ async def sse_subscribe(
     tenant_id = authenticated_entity.tenant_id
     
     logger.info(
-        f"SSE subscription started",
+        "SSE subscription started",
         extra={
             "tenant_id": tenant_id,
             "email": authenticated_entity.email,
@@ -129,8 +129,6 @@ async def sse_subscribe(
     )
 
 
-from pydantic import BaseModel
-
 
 class SSENotification(BaseModel):
     tenant_id: str
@@ -147,7 +145,7 @@ async def sse_notify(
     Internal endpoint to trigger SSE notifications from other services (e.g. event handler).
     """
     logger.info(
-        f"Received SSE notification request via API",
+        "Received SSE notification request via API",
         extra={
             "tenant_id": notification.tenant_id,
             "event": notification.event,

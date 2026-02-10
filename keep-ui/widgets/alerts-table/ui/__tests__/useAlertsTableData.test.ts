@@ -79,10 +79,24 @@ describe("useAlertsTableData", () => {
     expect(result.current.alertsError).toBeInstanceOf(Error);
   });
 
-  it("updates alerts when polling token changes", () => {
-    (useAlertPolling as jest.Mock).mockReturnValue({ data: "token" });
+  it("calls mutate when SSE event is received", () => {
+    let sseCallback: ((data?: any) => void) | null = null;
+    (useAlertPolling as jest.Mock).mockImplementation(
+      (isEnabled: boolean, callback: (data?: any) => void) => {
+        sseCallback = callback;
+      }
+    );
+
     const { result } = renderHook(() => useAlertsTableData(defaultQuery));
-    expect(result.current.alertsChangeToken).toBe("token");
+
+    // Simulate SSE event
+    act(() => {
+      if (sseCallback) {
+        sseCallback();
+      }
+    });
+
+    expect(mockMutate).toHaveBeenCalled();
   });
 
   it("generates correct facetsCel for absolute timeFrame", () => {

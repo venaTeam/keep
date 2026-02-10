@@ -43,6 +43,9 @@ from keep.contextmanager.contextmanager import ContextManager
 original_request = requests.Session.request  # noqa
 load_dotenv(find_dotenv())
 
+# Register fixture plugins
+pytest_plugins = ["tests.fixtures.workflow_manager"]
+
 
 class PusherMock:
     def __init__(self):

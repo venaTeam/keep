@@ -1135,7 +1135,6 @@ def test_cross_tenant_exposure_issue_2768(db_session, create_alert):
 
 
 def test_incident_bl_create_incident(db_session):
-    pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
@@ -1172,17 +1171,7 @@ def test_incident_bl_create_incident(db_session):
         assert incident.is_candidate is False
         assert incident.is_predicted is False
 
-        # Check pusher
 
-        assert len(pusher.triggers) == 1
-        channel, event_name, data = pusher.triggers[0]
-        assert channel == f"private-{SINGLE_TENANT_UUID}"
-        assert event_name == "incident-change"
-        assert isinstance(data, dict)
-        assert "incident_id" in data
-        assert (
-            data["incident_id"] is None
-        )  # For new incidents we don't send incident.id
 
         # Check workflow manager
         assert len(workflow_manager.events) == 1
@@ -1204,7 +1193,6 @@ def test_incident_bl_create_incident(db_session):
 
 
 def test_incident_bl_update_incident(db_session):
-    pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
@@ -1257,18 +1245,8 @@ def test_incident_bl_update_incident(db_session):
         assert wf_incident_dto.id == incident_dto.id
         assert wf_action == "updated"
 
-        # Check pusher
-        assert len(pusher.triggers) == 2  # 1 for create, 1 for update
-        channel, event_name, data = pusher.triggers[-1]
-        assert channel == f"private-{SINGLE_TENANT_UUID}"
-        assert event_name == "incident-change"
-        assert isinstance(data, dict)
-        assert "incident_id" in data
-        assert data["incident_id"] == str(incident_dto.id)
-
 
 def test_incident_bl_delete_incident(db_session):
-    pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
 
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
@@ -1305,15 +1283,7 @@ def test_incident_bl_delete_incident(db_session):
         )
         assert incidents_count == 0
 
-        # Check pusher
-        assert len(pusher.triggers) == 2  # Created, deleted
 
-        channel, event_name, data = pusher.triggers[-1]
-        assert channel == f"private-{SINGLE_TENANT_UUID}"
-        assert event_name == "incident-change"
-        assert isinstance(data, dict)
-        assert "incident_id" in data
-        assert data["incident_id"] is None
 
         # Check workflow manager
         assert len(workflow_manager.events) == 2  # Created, deleted
@@ -1325,7 +1295,6 @@ def test_incident_bl_delete_incident(db_session):
 
 @pytest.mark.asyncio
 async def test_incident_bl_add_alert_to_incident(db_session, create_alert):
-    pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
     elastic_client = ElasticClientMock()
 
@@ -1375,16 +1344,6 @@ async def test_incident_bl_add_alert_to_incident(db_session, create_alert):
             )
             assert alert_to_incident is not None
 
-            # Check pusher
-            assert len(pusher.triggers) == 2  # Created, update
-
-            channel, event_name, data = pusher.triggers[-1]
-            assert channel == f"private-{SINGLE_TENANT_UUID}"
-            assert event_name == "incident-change"
-            assert isinstance(data, dict)
-            assert "incident_id" in data
-            assert data["incident_id"] == str(incident_dto.id)
-
             # Check workflow manager
             assert len(workflow_manager.events) == 2  # Created, update
             wf_tenant_id, wf_incident_dto, wf_action = workflow_manager.events[-1]
@@ -1403,7 +1362,6 @@ async def test_incident_bl_add_alert_to_incident(db_session, create_alert):
 
 @pytest.mark.asyncio
 async def test_incident_bl_delete_alerts_from_incident(db_session, create_alert):
-    pusher = PusherMock()
     workflow_manager = WorkflowManagerMock()
     elastic_client = ElasticClientMock()
 
@@ -1468,16 +1426,7 @@ async def test_incident_bl_delete_alerts_from_incident(db_session, create_alert)
             )
             assert alerts_to_incident_count == 0
 
-            # Check pusher
-            # Created, updated (added event), updated(deleted event)
-            assert len(pusher.triggers) == 3
 
-            channel, event_name, data = pusher.triggers[-1]
-            assert channel == f"private-{SINGLE_TENANT_UUID}"
-            assert event_name == "incident-change"
-            assert isinstance(data, dict)
-            assert "incident_id" in data
-            assert data["incident_id"] == str(incident_dto.id)
 
             # Check workflow manager
             # Created, updated (added event), updated(deleted event)

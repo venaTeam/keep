@@ -962,7 +962,7 @@ async def test_split_incident(db_session, create_alert):
     critical_alert = next(
         a for a in alerts if a.event["severity"] == AlertSeverity.CRITICAL.value
     )
-    incident_bl = IncidentBl(SINGLE_TENANT_UUID, db_session, pusher_client=None)
+    incident_bl = IncidentBl(SINGLE_TENANT_UUID, db_session)
 
     # Move alert to destination incident
     await incident_bl.add_alerts_to_incident(
@@ -1140,7 +1140,7 @@ def test_incident_bl_create_incident(db_session):
 
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
-            tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
+            tenant_id=SINGLE_TENANT_UUID, session=db_session
         )
 
         incidents_count = db_session.query(Incident).count()
@@ -1209,7 +1209,7 @@ def test_incident_bl_update_incident(db_session):
 
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
-            tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
+            tenant_id=SINGLE_TENANT_UUID, session=db_session
         )
         incident_dto_in = IncidentDtoIn(
             **{
@@ -1273,7 +1273,7 @@ def test_incident_bl_delete_incident(db_session):
 
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         incident_bl = IncidentBl(
-            tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
+            tenant_id=SINGLE_TENANT_UUID, session=db_session
         )
         # Check error if no incident found
         with pytest.raises(HTTPException, match="Incident not found"):
@@ -1332,7 +1332,7 @@ async def test_incident_bl_add_alert_to_incident(db_session, create_alert):
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         with patch("keep.common.bl.incidents_bl.ElasticClient", elastic_client):
             incident_bl = IncidentBl(
-                tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
+                tenant_id=SINGLE_TENANT_UUID, session=db_session
             )
             incident_dto_in = IncidentDtoIn(
                 **{
@@ -1410,7 +1410,7 @@ async def test_incident_bl_delete_alerts_from_incident(db_session, create_alert)
     with patch("keep.common.bl.incidents_bl.WorkflowManager", workflow_manager):
         with patch("keep.common.bl.incidents_bl.ElasticClient", elastic_client):
             incident_bl = IncidentBl(
-                tenant_id=SINGLE_TENANT_UUID, session=db_session, pusher_client=pusher
+                tenant_id=SINGLE_TENANT_UUID, session=db_session
             )
             incident_dto_in = IncidentDtoIn(
                 **{

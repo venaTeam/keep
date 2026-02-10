@@ -8,7 +8,7 @@ connection queues and broadcasts events to all connected clients.
 import asyncio
 import json
 import logging
-from typing import Any, AsyncGenerator, Dict, List, Optional
+from typing import Any, AsyncGenerator, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class SSEBroadcaster:
                 self._connections[tenant_id] = []
             self._connections[tenant_id].append(queue)
             logger.info(
-                f"SSE client subscribed",
+                "SSE client subscribed",
                 extra={
                     "tenant_id": tenant_id,
                     "total_connections": len(self._connections[tenant_id])
@@ -75,7 +75,7 @@ class SSEBroadcaster:
                         if not self._connections[tenant_id]:
                             del self._connections[tenant_id]
                         logger.info(
-                            f"SSE client disconnected",
+                            "SSE client disconnected",
                             extra={
                                 "tenant_id": tenant_id,
                                 "remaining_connections": len(self._connections.get(tenant_id, []))
@@ -97,7 +97,7 @@ class SSEBroadcaster:
             connections = self._connections.get(tenant_id, [])
             if not connections:
                 logger.debug(
-                    f"No SSE connections for tenant, skipping notification",
+                    "No SSE connections for tenant, skipping notification",
                     extra={"tenant_id": tenant_id, "event": event}
                 )
                 return
@@ -109,12 +109,12 @@ class SSEBroadcaster:
                     queue.put_nowait(sse_message)
                 except asyncio.QueueFull:
                     logger.warning(
-                        f"SSE queue full for tenant",
+                        "SSE queue full for tenant",
                         extra={"tenant_id": tenant_id, "event": event}
                     )
             
             logger.debug(
-                f"SSE event broadcast",
+                "SSE event broadcast",
                 extra={
                     "tenant_id": tenant_id,
                     "event": event,
@@ -165,11 +165,11 @@ def notify_sse(tenant_id: str, event: str, data: Any) -> None:
             asyncio.run(sse_broadcaster.notify(tenant_id, event, data))
         except Exception as e:
             logger.warning(
-                f"Failed to send SSE notification (no event loop)",
+                "Failed to send SSE notification (no event loop)",
                 extra={"tenant_id": tenant_id, "event": event, "error": str(e)}
             )
     except Exception as e:
         logger.warning(
-            f"Failed to send SSE notification",
+            "Failed to send SSE notification",
             extra={"tenant_id": tenant_id, "event": event, "error": str(e)}
         )

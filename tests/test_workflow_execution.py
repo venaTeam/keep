@@ -27,8 +27,7 @@ from keep.identitymanager.identity_managers.db.db_authverifier import (  # noqa
 from keep.workflowmanager.workflowstore import WorkflowStore
 from tests.fixtures.client import client, test_app  # noqa
 from tests.fixtures.workflow_manager import (
-    wait_for_workflow_execution,
-    workflow_manager,  
+    wait_for_workflow_execution,  
 )
 
 MAX_WAIT_FOR_WORKFLOW_EXECUTION_COUNT = 30

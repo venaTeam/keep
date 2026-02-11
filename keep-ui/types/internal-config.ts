@@ -7,8 +7,7 @@ export interface InternalConfig {
   KEYCLOAK_ISSUER: string | undefined;
 
   // Real-time notifications (SSE)
-  // PUSHER_DISABLED is kept for backward compatibility - it disables real-time notifications
-  PUSHER_DISABLED: boolean;
+  SSE_DISABLED: boolean;
 
   // the API URL is used by the server to make requests to the API
   API_URL: string | undefined;

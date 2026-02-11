@@ -39,8 +39,8 @@ export function getConfig(): InternalConfig {
     KEYCLOAK_SECRET: process.env.KEYCLOAK_SECRET,
     KEYCLOAK_ID: process.env.KEYCLOAK_ID,
     KEYCLOAK_ISSUER: process.env.KEYCLOAK_ISSUER,
-    // Real-time notifications (SSE) - PUSHER_DISABLED is kept for backward compatibility
-    PUSHER_DISABLED: process.env.PUSHER_DISABLED === "true",
+    // Real-time notifications (SSE)
+    SSE_DISABLED: process.env.SSE_DISABLED === "true",
     // The API URL is used by the server to make requests to the API
     //   note that we need two different URLs for the client and the server
     //   because in some environments, e.g. docker-compose, the server can get keep-backend

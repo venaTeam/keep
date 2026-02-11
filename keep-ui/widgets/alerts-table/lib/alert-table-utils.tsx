@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
 import {
   ColumnDef,
   FilterFn,
@@ -200,9 +200,13 @@ interface GenerateAlertTableColsArg {
   extraColumns?: AccessorKeyColumnDef<AlertDto, boolean | undefined>[];
 }
 
+// Stable default values for optional array/object props to avoid useMemo invalidation
+const EMPTY_EXTRA_COLUMNS: AccessorKeyColumnDef<AlertDto, boolean | undefined>[] = [];
+const EMPTY_ADDITIONAL_COLS: string[] = [];
+
 export const useAlertTableCols = (
   {
-    additionalColsToGenerate = [],
+    additionalColsToGenerate = EMPTY_ADDITIONAL_COLS,
     isCheckboxDisplayed,
     isMenuDisplayed,
     setNoteModalAlert,
@@ -214,7 +218,7 @@ export const useAlertTableCols = (
     presetName,
     presetNoisy = false,
     MenuComponent,
-    extraColumns = [],
+    extraColumns = EMPTY_EXTRA_COLUMNS,
   }: GenerateAlertTableColsArg = { presetName: "feed" }
 ) => {
   const [expandedToggles, setExpandedToggles] = useState<RowSelectionState>({});
@@ -236,7 +240,21 @@ export const useAlertTableCols = (
     {}
   );
 
-  const filteredAndGeneratedCols = additionalColsToGenerate.map((colName) =>
+  // Use refs for values that change frequently but shouldn't trigger column recreation.
+  // Cell render functions read from these refs to get the latest values without
+  // causing the useMemo (column definitions) to be invalidated.
+  const isRowExpandedRef = useRef(isRowExpanded);
+  isRowExpandedRef.current = isRowExpanded;
+  const providersDataRef = useRef(providersData);
+  providersDataRef.current = providersData;
+  const expandedTogglesRef = useRef(expandedToggles);
+  expandedTogglesRef.current = expandedToggles;
+  const columnTimeFormatsRef = useRef(columnTimeFormats);
+  columnTimeFormatsRef.current = columnTimeFormats;
+  const columnListFormatsRef = useRef(columnListFormats);
+  columnListFormatsRef.current = columnListFormats;
+
+  const filteredAndGeneratedCols = useMemo(() => additionalColsToGenerate.map((colName) =>
     columnHelper.accessor(
       (row) => getNestedValue(row, colName),
       {
@@ -262,7 +280,7 @@ export const useAlertTableCols = (
         cell: (context) => {
           const value = context.getValue();
           const row = context.row;
-          const isExpanded = isRowExpanded?.(row.original.fingerprint);
+          const isExpanded = isRowExpandedRef.current?.(row.original.fingerprint);
 
           if (typeof value === "object" && value !== null) {
             return (
@@ -288,7 +306,7 @@ export const useAlertTableCols = (
               (context.table.options.meta as any)?.columnTimeFormats?.[
               context.column.id
               ] ||
-              columnTimeFormats[context.column.id] ||
+              columnTimeFormatsRef.current[context.column.id] ||
               "timeago";
             return (
               <span title={isoString}>
@@ -297,7 +315,7 @@ export const useAlertTableCols = (
             );
           }
           if (context.column.id === "providerId") {
-            const provider = providersData?.installed_providers?.find(
+            const provider = providersDataRef.current?.installed_providers?.find(
               (provider) => provider.id === value
             );
             return provider?.details?.name || value;
@@ -328,7 +346,7 @@ export const useAlertTableCols = (
             (context.table.options.meta as any)?.columnListFormats?.[
             context.column.id
             ] ||
-            columnListFormats[context.column.id] ||
+            columnListFormatsRef.current[context.column.id] ||
             "badges";
           if (isList) {
             // Type check and convert value to the expected type for formatList
@@ -367,324 +385,343 @@ export const useAlertTableCols = (
         },
       }
     )
-  ) as ColumnDef<AlertDto>[];
+  ) as ColumnDef<AlertDto>[], [additionalColsToGenerate, rowStyle, columnRenameMapping]);
 
-  return [
-    columnHelper.display({
-      id: "severity",
-      maxSize: 2,
-      header: () => <></>,
-      cell: (context) => (
-        <TableSeverityCell
-          severity={context.row.original.severity as unknown as UISeverity}
-        />
-      ),
-      meta: {
-        tdClassName: "w-1 !p-0",
-        thClassName: "w-1 !p-0",
-      },
-    }),
-    ...(isCheckboxDisplayed
-      ? [
-        columnHelper.display({
-          id: "checkbox",
-          maxSize: 16,
-          minSize: 16,
-          header: (context) => (
-            <TableIndeterminateCheckbox
-              checked={context.table.getIsAllRowsSelected()}
-              indeterminate={context.table.getIsSomeRowsSelected()}
-              onChange={context.table.getToggleAllRowsSelectedHandler()}
-            />
-          ),
-          cell: (context) => (
-            <TableIndeterminateCheckbox
-              checked={context.row.getIsSelected()}
-              indeterminate={context.row.getIsSomeSelected()}
-              onChange={context.row.getToggleSelectedHandler()}
-            />
-          ),
-        }),
-      ]
-      : ([] as ColumnDef<AlertDto>[])),
-    // noisy column
-    ...(noisyAlertsEnabled
-      ? [
-        columnHelper.display({
-          id: "noise",
-          size: 5,
-          header: () => <></>,
-          cell: (context) => {
-            // Get the status of the alert
-            const status = context.row.original.status;
-            const isNoisy = context.row.original.isNoisy;
-
-            // Return null if presetNoisy is not true
-            if (!presetNoisy && !isNoisy) {
-              return null;
-            } else if (presetNoisy) {
-              // Decide which icon to display based on the status
-              if (status === "firing") {
-                return (
-                  <Icon icon={MdOutlineNotificationsActive} color="red" />
-                );
-              } else {
-                return <Icon icon={MdOutlineNotificationsOff} color="red" />;
-              }
-            }
-            // else, noisy alert in non noisy preset
-            else {
-              if (status === "firing") {
-                return (
-                  <Icon icon={MdOutlineNotificationsActive} color="red" />
-                );
-              } else {
-                return null;
-              }
-            }
-          },
-          meta: {
-            tdClassName: "p-0",
-            thClassName: "p-0",
-          },
-          enableSorting: false,
-        }),
-      ]
-      : []),
-    columnHelper.accessor("status", {
-      id: "status",
-      header: () => <></>, // Empty header like source column
-      enableGrouping: true,
-      getGroupingValue: (row) => row.status,
-      maxSize: 16,
-      minSize: 16,
-      size: 16,
-      enableResizing: false,
-      cell: (context) => (
-        <div className="flex items-center justify-center">
-          <Icon
-            icon={getStatusIcon(context.getValue(), context.row.original.isNoisy)}
-            size="sm"
-            color={getStatusColor(context.getValue())}
-            className="!p-0 h-32px w-32px"
-            tooltip={context.getValue()}
+  return useMemo(() => {
+    return [
+      columnHelper.display({
+        id: "severity",
+        maxSize: 2,
+        header: () => <></>,
+        cell: (context) => (
+          <TableSeverityCell
+            severity={context.row.original.severity as unknown as UISeverity}
           />
-        </div>
-      ),
-      meta: {
-        tdClassName: "!p-0 w-4 sm:w-8 !box-border", // Same styling as source
-        thClassName: "!p-0 w-4 sm:w-8 !box-border",
-      },
-    }),
-    // Source column with exact 40px width ( see alert-table-headers )
-    columnHelper.accessor("source", {
-      id: "source",
-      header: () => <></>,
-      minSize: 24,
-      maxSize: 24,
-      size: 24, // Fixed size that won't change
-      enableSorting: false,
-      getGroupingValue: (row) => row.source,
-      enableResizing: false,
-      cell: (context) => {
-        return (
-          <div className="flex items-center justify-center w-[24px] h-[24px]">
-            {context.getValue().map((source, index) => {
-              return (
-                <DynamicImageProviderIcon
-                  className={clsx(
-                    "inline-block",
-                    // Use fixed pixel sizes instead of responsive sizing
-                    "size-6",
-                    index == 0 ? "" : "-ml-2"
-                  )}
-                  key={source}
-                  alt={source}
-                  height={24}
-                  width={24}
-                  title={source}
-                  providerType={source}
-                  src={`/icons/${source}-icon.png`}
-                  id={`${source}-icon-${index}`}
-                />
-              );
-            })}
-          </div>
-        );
-      },
-      meta: {
-        tdClassName: "!p-1 w-10 !box-border !flex-none", // Force fixed width with flex-none
-        thClassName: "!p-1 w-10 !box-border !flex-none",
-      },
-    }),
-    // Name column butted up against source
-    columnHelper.accessor("name", {
-      id: "name",
-      header: getColumnDisplayName("name", "Name", columnRenameMapping),
-      enableGrouping: true,
-      enableResizing: true,
-      getGroupingValue: (row) => row.name,
-      // Set fixed maximum size to prevent overflow
-      minSize: 150,
-      maxSize: 200, // Reduce from 250 to 200 to constrain more tightly
-      // Use a consistent width for all row states
-      size: 180, // Add a fixed size to ensure consistent width
-      cell: (context) => {
-        const row = context.row;
-        const expanded = isRowExpanded?.(row.original.fingerprint);
-
-        return (
-          // Remove w-full class which can cause expansion
-          <div className={expanded ? "max-w-[180px] overflow-hidden" : ""}>
-            <AlertName
-              alert={context.row.original}
-              expanded={expanded}
-              // Remove flex-grow which can cause expansion
-              className={expanded ? "max-w-[180px] overflow-hidden" : ""}
-            />
-          </div>
-        );
-      },
-      meta: {
-        // Remove w-full from tdClassName to prevent automatic expansion
-        tdClassName: "name-cell",
-        thClassName: "name-cell",
-      },
-    }),
-
-    columnHelper.accessor("description", {
-      id: "description",
-      header: getColumnDisplayName(
-        "description",
-        "Description",
-        columnRenameMapping
-      ),
-      enableGrouping: true,
-      // Increase default minSize to give description more space
-      minSize: 200,
-      // Let it grow more when expanded
-      cell: (context) => {
-        const value = context.getValue();
-        const row = context.row;
-        const expanded = isRowExpanded?.(row.original.fingerprint);
-
-        return (
-          <div
-            title={expanded ? undefined : value}
-            className={clsx(
-              // Give description more space and control overflow
-              expanded ? "w-full break-words" : "",
-              // Set fixed width when expanded to prevent layout issues
-              expanded ? "max-w-[100%]" : ""
-            )}
-          >
-            <div
-              className={clsx(
-                // Always use whitespace-pre-wrap for consistency
-                "whitespace-pre-wrap",
-                // Only truncate when not expanded
-                !expanded &&
-                (rowStyle === "default"
-                  ? "truncate line-clamp-1"
-                  : "truncate line-clamp-3")
-              )}
-            >
-              {value}
-            </div>
-          </div>
-        );
-      },
-    }),
-    columnHelper.accessor("lastReceived", {
-      id: "lastReceived",
-      header: getColumnDisplayName(
-        "lastReceived",
-        "Last Received",
-        columnRenameMapping
-      ),
-      filterFn: isDateWithinRange,
-      minSize: 80,
-      maxSize: 80,
-      cell: (context) => {
-        const value = context.getValue();
-        const date = value instanceof Date ? value : new Date(value);
-        const isoString = date.toISOString();
-
-        // Get the format from column format settings or use default
-        const formatOption =
-          (context.table.options.meta as any)?.columnTimeFormats?.[
-          context.column.id
-          ] ||
-          columnTimeFormats[context.column.id] ||
-          "timeago";
-
-        return (
-          <span title={isoString}>{formatDateTime(date, formatOption)}</span>
-        );
-      },
-    }),
-    columnHelper.accessor("assignee", {
-      id: "assignee",
-      header: getColumnDisplayName("assignee", "Assignee", columnRenameMapping),
-      enableGrouping: true,
-      getGroupingValue: (row) => row.assignee,
-      minSize: 100,
-      cell: (context) => <AlertAssignee assignee={context.getValue()} />,
-    }),
-    columnHelper.display({
-      id: "extraPayload",
-      header: "Extra Payload",
-      minSize: 200,
-      cell: (context) => (
-        <AlertExtraPayload
-          alert={context.row.original}
-          isToggled={
-            // When menu is not displayed, it means we're in History mode and therefore
-            // we need to use the alert id as the key to keep the state of the toggles and not the fingerprint
-            // because all fingerprints are the same. (it's the history of that fingerprint :P)
-            isMenuDisplayed
-              ? expandedToggles[context.row.original.fingerprint]
-              : expandedToggles[context.row.id]
-          }
-          setIsToggled={(newValue) =>
-            setExpandedToggles({
-              ...expandedToggles,
-              [isMenuDisplayed
-                ? context.row.original.fingerprint
-                : context.row.id]: newValue,
-            })
-          }
-        />
-      ),
-    }),
-    ...filteredAndGeneratedCols,
-    ...extraColumns,
-    ...((isMenuDisplayed
-      ? [
-        columnHelper.display({
-          id: "alertMenu",
-          minSize: 120,
-          cell: (context) =>
-            MenuComponent ? (
-              MenuComponent(context.row.original)
-            ) : (
-              <AlertMenu
-                presetName={presetName.toLowerCase()}
-                alert={context.row.original}
-                setRunWorkflowModalAlert={setRunWorkflowModalAlert}
-                setDismissModalAlert={setDismissModalAlert}
-                setChangeStatusAlert={setChangeStatusAlert}
-                setTicketModalAlert={setTicketModalAlert}
-                setNoteModalAlert={setNoteModalAlert}
-                setAssignModalAlert={setAssignModalAlert}
+        ),
+        meta: {
+          tdClassName: "w-1 !p-0",
+          thClassName: "w-1 !p-0",
+        },
+      }),
+      ...(isCheckboxDisplayed
+        ? [
+          columnHelper.display({
+            id: "checkbox",
+            maxSize: 16,
+            minSize: 16,
+            header: (context) => (
+              <TableIndeterminateCheckbox
+                checked={context.table.getIsAllRowsSelected()}
+                indeterminate={context.table.getIsSomeRowsSelected()}
+                onChange={context.table.getToggleAllRowsSelectedHandler()}
               />
             ),
-          meta: {
-            tdClassName: "p-0 md:p-2",
-            thClassName: "p-0 md:p-2",
-          },
-        }),
-      ]
-      : []) as ColumnDef<AlertDto>[]),
-  ] as ColumnDef<AlertDto>[];
+            cell: (context) => (
+              <TableIndeterminateCheckbox
+                checked={context.row.getIsSelected()}
+                indeterminate={context.row.getIsSomeSelected()}
+                onChange={context.row.getToggleSelectedHandler()}
+              />
+            ),
+          }),
+        ]
+        : ([] as ColumnDef<AlertDto>[])),
+      // noisy column
+      ...(noisyAlertsEnabled
+        ? [
+          columnHelper.display({
+            id: "noise",
+            size: 5,
+            header: () => <></>,
+            cell: (context) => {
+              // Get the status of the alert
+              const status = context.row.original.status;
+              const isNoisy = context.row.original.isNoisy;
+
+              // Return null if presetNoisy is not true
+              if (!presetNoisy && !isNoisy) {
+                return null;
+              } else if (presetNoisy) {
+                // Decide which icon to display based on the status
+                if (status === "firing") {
+                  return (
+                    <Icon icon={MdOutlineNotificationsActive} color="red" />
+                  );
+                } else {
+                  return <Icon icon={MdOutlineNotificationsOff} color="red" />;
+                }
+              }
+              // else, noisy alert in non noisy preset
+              else {
+                if (status === "firing") {
+                  return (
+                    <Icon icon={MdOutlineNotificationsActive} color="red" />
+                  );
+                } else {
+                  return null;
+                }
+              }
+            },
+            meta: {
+              tdClassName: "p-0",
+              thClassName: "p-0",
+            },
+            enableSorting: false,
+          }),
+        ]
+        : []),
+      columnHelper.accessor("status", {
+        id: "status",
+        header: () => <></>, // Empty header like source column
+        enableGrouping: true,
+        getGroupingValue: (row) => row.status,
+        maxSize: 16,
+        minSize: 16,
+        size: 16,
+        enableResizing: false,
+        cell: (context) => (
+          <div className="flex items-center justify-center">
+            <Icon
+              icon={getStatusIcon(context.getValue(), context.row.original.isNoisy)}
+              size="sm"
+              color={getStatusColor(context.getValue())}
+              className="!p-0 h-32px w-32px"
+              tooltip={context.getValue()}
+            />
+          </div>
+        ),
+        meta: {
+          tdClassName: "!p-0 w-4 sm:w-8 !box-border", // Same styling as source
+          thClassName: "!p-0 w-4 sm:w-8 !box-border",
+        },
+      }),
+      // Source column with exact 40px width ( see alert-table-headers )
+      columnHelper.accessor("source", {
+        id: "source",
+        header: () => <></>,
+        minSize: 24,
+        maxSize: 24,
+        size: 24, // Fixed size that won't change
+        enableSorting: false,
+        getGroupingValue: (row) => row.source,
+        enableResizing: false,
+        cell: (context) => {
+          return (
+            <div className="flex items-center justify-center w-[24px] h-[24px]">
+              {context.getValue().map((source, index) => {
+                return (
+                  <DynamicImageProviderIcon
+                    className={clsx(
+                      "inline-block",
+                      // Use fixed pixel sizes instead of responsive sizing
+                      "size-6",
+                      index == 0 ? "" : "-ml-2"
+                    )}
+                    key={source}
+                    alt={source}
+                    height={24}
+                    width={24}
+                    title={source}
+                    providerType={source}
+                    src={`/icons/${source}-icon.png`}
+                    id={`${source}-icon-${index}`}
+                  />
+                );
+              })}
+            </div>
+          );
+        },
+        meta: {
+          tdClassName: "!p-1 w-10 !box-border !flex-none", // Force fixed width with flex-none
+          thClassName: "!p-1 w-10 !box-border !flex-none",
+        },
+      }),
+      // Name column butted up against source
+      columnHelper.accessor("name", {
+        id: "name",
+        header: getColumnDisplayName("name", "Name", columnRenameMapping),
+        enableGrouping: true,
+        enableResizing: true,
+        getGroupingValue: (row) => row.name,
+        // Set fixed maximum size to prevent overflow
+        minSize: 150,
+        maxSize: 200, // Reduce from 250 to 200 to constrain more tightly
+        // Use a consistent width for all row states
+        size: 180, // Add a fixed size to ensure consistent width
+        cell: (context) => {
+          const row = context.row;
+          const expanded = isRowExpandedRef.current?.(row.original.fingerprint);
+
+          return (
+            // Remove w-full class which can cause expansion
+            <div className={expanded ? "max-w-[180px] overflow-hidden" : ""}>
+              <AlertName
+                alert={context.row.original}
+                expanded={expanded}
+                // Remove flex-grow which can cause expansion
+                className={expanded ? "max-w-[180px] overflow-hidden" : ""}
+              />
+            </div>
+          );
+        },
+        meta: {
+          // Remove w-full from tdClassName to prevent automatic expansion
+          tdClassName: "name-cell",
+          thClassName: "name-cell",
+        },
+      }),
+
+      columnHelper.accessor("description", {
+        id: "description",
+        header: getColumnDisplayName(
+          "description",
+          "Description",
+          columnRenameMapping
+        ),
+        enableGrouping: true,
+        // Increase default minSize to give description more space
+        minSize: 200,
+        // Let it grow more when expanded
+        cell: (context) => {
+          const value = context.getValue();
+          const row = context.row;
+          const expanded = isRowExpandedRef.current?.(row.original.fingerprint);
+
+          return (
+            <div
+              title={expanded ? undefined : value}
+              className={clsx(
+                // Give description more space and control overflow
+                expanded ? "w-full break-words" : "",
+                // Set fixed width when expanded to prevent layout issues
+                expanded ? "max-w-[100%]" : ""
+              )}
+            >
+              <div
+                className={clsx(
+                  // Always use whitespace-pre-wrap for consistency
+                  "whitespace-pre-wrap",
+                  // Only truncate when not expanded
+                  !expanded &&
+                  (rowStyle === "default"
+                    ? "truncate line-clamp-1"
+                    : "truncate line-clamp-3")
+                )}
+              >
+                {value}
+              </div>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("lastReceived", {
+        id: "lastReceived",
+        header: getColumnDisplayName(
+          "lastReceived",
+          "Last Received",
+          columnRenameMapping
+        ),
+        filterFn: isDateWithinRange,
+        minSize: 80,
+        maxSize: 80,
+        cell: (context) => {
+          const value = context.getValue();
+          const date = value instanceof Date ? value : new Date(value);
+          const isoString = date.toISOString();
+
+          // Get the format from column format settings or use default
+          const formatOption =
+            (context.table.options.meta as any)?.columnTimeFormats?.[
+            context.column.id
+            ] ||
+            columnTimeFormatsRef.current[context.column.id] ||
+            "timeago";
+
+          return (
+            <span title={isoString}>{formatDateTime(date, formatOption)}</span>
+          );
+        },
+      }),
+      columnHelper.accessor("assignee", {
+        id: "assignee",
+        header: getColumnDisplayName("assignee", "Assignee", columnRenameMapping),
+        enableGrouping: true,
+        getGroupingValue: (row) => row.assignee,
+        minSize: 100,
+        cell: (context) => <AlertAssignee assignee={context.getValue()} />,
+      }),
+      columnHelper.display({
+        id: "extraPayload",
+        header: "Extra Payload",
+        minSize: 200,
+        cell: (context) => (
+          <AlertExtraPayload
+            alert={context.row.original}
+            isToggled={
+              // When menu is not displayed, it means we're in History mode and therefore
+              // we need to use the alert id as the key to keep the state of the toggles and not the fingerprint
+              // because all fingerprints are the same. (it's the history of that fingerprint :P)
+              isMenuDisplayed
+                ? expandedTogglesRef.current[context.row.original.fingerprint]
+                : expandedTogglesRef.current[context.row.id]
+            }
+            setIsToggled={(newValue) =>
+              setExpandedToggles({
+                ...expandedTogglesRef.current,
+                [isMenuDisplayed
+                  ? context.row.original.fingerprint
+                  : context.row.id]: newValue,
+              })
+            }
+          />
+        ),
+      }),
+      ...filteredAndGeneratedCols,
+      ...extraColumns,
+      ...((isMenuDisplayed
+        ? [
+          columnHelper.display({
+            id: "alertMenu",
+            minSize: 120,
+            cell: (context) =>
+              MenuComponent ? (
+                MenuComponent(context.row.original)
+              ) : (
+                <AlertMenu
+                  presetName={presetName.toLowerCase()}
+                  alert={context.row.original}
+                  setRunWorkflowModalAlert={setRunWorkflowModalAlert}
+                  setDismissModalAlert={setDismissModalAlert}
+                  setChangeStatusAlert={setChangeStatusAlert}
+                  setTicketModalAlert={setTicketModalAlert}
+                  setNoteModalAlert={setNoteModalAlert}
+                  setAssignModalAlert={setAssignModalAlert}
+                />
+              ),
+            meta: {
+              tdClassName: "p-0 md:p-2",
+              thClassName: "p-0 md:p-2",
+            },
+          }),
+        ]
+        : []) as ColumnDef<AlertDto>[]),
+    ] as ColumnDef<AlertDto>[];
+  }, [
+    isCheckboxDisplayed,
+    isMenuDisplayed,
+    noisyAlertsEnabled,
+    presetNoisy,
+    presetName,
+    rowStyle,
+    columnRenameMapping,
+    filteredAndGeneratedCols,
+    extraColumns,
+    MenuComponent,
+    setNoteModalAlert,
+    setTicketModalAlert,
+    setRunWorkflowModalAlert,
+    setDismissModalAlert,
+    setChangeStatusAlert,
+    setAssignModalAlert,
+  ]);
 };

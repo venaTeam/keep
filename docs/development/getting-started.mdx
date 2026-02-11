@@ -102,12 +102,7 @@ Run Keep from your VS Code (or Cursor) after cloning the repo by adding this con
         "env": {
             "PYDEVD_DISABLE_FILE_VALIDATION": "1",
             "PYTHONPATH": "${workspaceFolder}/",
-            "PUSHER_APP_ID": "1",
             "SECRET_MANAGER_DIRECTORY": "./state/",
-            "PUSHER_HOST": "localhost",
-            "PUSHER_PORT": "6001",
-            "PUSHER_APP_KEY": "keepappkey",
-            "PUSHER_APP_SECRET": "keepappsecret",
             "LOG_FORMAT": "dev_terminal",
         }
       },
@@ -152,10 +147,7 @@ cp keep-ui/.env.local.example keep-ui/.env.local;
 echo "\n\n\n\nNEXTAUTH_SECRET="$(openssl rand -hex 32) >> keep-ui/.env.local;
 ```
 
-Launch Pusher ([soketi](https://soketi.app/)) container in parallel:
-```bash
-docker run -d -p 6001:6001 -p 9601:9601 -e SOKETI_USER_AUTHENTICATION_TIMEOUT=3000 -e SOKETI_DEFAULT_APP_KEY=keepappkey -e SOKETI_DEFAULT_APP_SECRET=keepappsecret -e SOKETI_DEFAULT_APP_ID=1 quay.io/soketi/soketi:1.4-16-debian
-```
+
 
 
 ## VS Code (or Cursor) + Docker

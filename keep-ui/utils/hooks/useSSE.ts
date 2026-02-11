@@ -38,8 +38,8 @@ export const useSSE = () => {
       return;
     }
 
-    // Check if SSE is disabled (using PUSHER_DISABLED for backward compatibility)
-    if (configData?.PUSHER_DISABLED === true) {
+    // Check if SSE is disabled
+    if (configData?.SSE_DISABLED === true) {
       return;
     }
 

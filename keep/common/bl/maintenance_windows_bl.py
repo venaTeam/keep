@@ -314,8 +314,8 @@ class MaintenanceWindowsBl:
                                 "tenant_id": tenant,
                             },
                         )
-                    pusher_cache = get_notification_cache()
-                    if incidents and pusher_cache.should_notify(
+                    notification_cache = get_notification_cache()
+                    if incidents and notification_cache.should_notify(
                         tenant, "incident-change"
                     ):
                         try:
@@ -340,7 +340,7 @@ class MaintenanceWindowsBl:
                         if not filtered_alerts:
                             continue
                         presets_do_update.append(preset_dto)
-                    if pusher_cache.should_notify(tenant, "poll-presets"):
+                    if notification_cache.should_notify(tenant, "poll-presets"):
                         try:
                             notify_sse(
                                 tenant,

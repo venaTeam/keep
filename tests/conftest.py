@@ -47,7 +47,8 @@ load_dotenv(find_dotenv())
 pytest_plugins = ["tests.fixtures.workflow_manager"]
 
 
-class PusherMock:
+class SSEMock:
+    """Legacy mock class - not actively used anymore after SSE migration"""
     def __init__(self):
         self.triggers = []
 

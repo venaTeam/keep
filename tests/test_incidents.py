@@ -41,7 +41,7 @@ from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.rbac import Admin
 from keep.rulesengine.rulesengine import RulesEngine
-from tests.conftest import ElasticClientMock, PusherMock, WorkflowManagerMock
+from tests.conftest import ElasticClientMock, SSEMock, WorkflowManagerMock
 from tests.fixtures.client import client, test_app  # noqa
 
 

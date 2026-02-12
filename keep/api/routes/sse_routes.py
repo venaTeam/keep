@@ -65,7 +65,7 @@ async def get_sse_authenticated_entity(
     # Get the auth verifier and authenticate
     try:
         auth_verifier = IdentityManagerFactory.get_auth_verifier(["read:alert"])
-        authenticated_entity = await auth_verifier(request)
+        authenticated_entity = await auth_verifier(request, token=token)
         return authenticated_entity
     except Exception as e:
         # If authentication fails in noauth mode, fall back to single tenant

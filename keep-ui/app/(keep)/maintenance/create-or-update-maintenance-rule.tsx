@@ -67,6 +67,7 @@ export default function CreateOrUpdateMaintenanceRule({
   const [enabled, setEnabled] = useState<boolean>(maintenanceToEdit?.enabled ?? true);
   const [suppress, setSuppress] = useState<boolean>(maintenanceToEdit?.suppress ?? false);
   const [ignoreStatuses, setIgnoreStatuses] = useState<string[]>(maintenanceToEdit?.ignore_statuses ?? DEFAULT_IGNORE_STATUSES);
+  const [formResetKey, setFormResetKey] = useState(0);
   const editMode = maintenanceToEdit !== null;
   const router = useRouter();
   useEffect(() => {
@@ -93,6 +94,7 @@ export default function CreateOrUpdateMaintenanceRule({
     setSuppress(false);
     setEnabled(true);
     setIgnoreStatuses([]);
+    setFormResetKey((k) => k + 1);
     router.replace("/maintenance");
   };
 
@@ -241,7 +243,7 @@ export default function CreateOrUpdateMaintenanceRule({
       </div>
       <div className="mt-2.5">
         <AlertsRulesBuilder
-          key={maintenanceToEdit?.id ?? "new"}
+          key={`${maintenanceToEdit?.id ?? "new"}-${formResetKey}`}
           defaultQuery=""
           celValue={celQuery}
           updateOutputCEL={setCelQuery}

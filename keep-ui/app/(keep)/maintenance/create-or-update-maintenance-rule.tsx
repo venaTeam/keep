@@ -52,15 +52,21 @@ export default function CreateOrUpdateMaintenanceRule({
 }: Props) {
   const api = useApi();
   const { mutate } = useMaintenanceRules();
-  const [maintenanceName, setMaintenanceName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [celQuery, setCelQuery] = useState<string>("");
-  const [startTime, setStartTime] = useState<Date | null>(roundTime(new Date()));
-  const [endInterval, setEndInterval] = useState<number>(5);
+  const [maintenanceName, setMaintenanceName] = useState<string>(maintenanceToEdit?.name ?? "");
+  const [description, setDescription] = useState<string>(maintenanceToEdit?.description ?? "");
+  const [celQuery, setCelQuery] = useState<string>(maintenanceToEdit?.cel_query ?? "");
+  const [startTime, setStartTime] = useState<Date | null>(
+    maintenanceToEdit
+      ? new Date(new Date(maintenanceToEdit.start_time + 'Z').toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
+      : roundTime(new Date())
+  );
+  const [endInterval, setEndInterval] = useState<number>(
+    maintenanceToEdit?.duration_seconds ? maintenanceToEdit.duration_seconds / 60 : 5
+  );
   const [intervalType, setIntervalType] = useState<string>("minutes");
-  const [enabled, setEnabled] = useState<boolean>(true);
-  const [suppress, setSuppress] = useState<boolean>(false);
-  const [ignoreStatuses, setIgnoreStatuses] = useState<string[]>(DEFAULT_IGNORE_STATUSES);
+  const [enabled, setEnabled] = useState<boolean>(maintenanceToEdit?.enabled ?? true);
+  const [suppress, setSuppress] = useState<boolean>(maintenanceToEdit?.suppress ?? false);
+  const [ignoreStatuses, setIgnoreStatuses] = useState<string[]>(maintenanceToEdit?.ignore_statuses ?? DEFAULT_IGNORE_STATUSES);
   const editMode = maintenanceToEdit !== null;
   const router = useRouter();
   useEffect(() => {
@@ -235,11 +241,14 @@ export default function CreateOrUpdateMaintenanceRule({
       </div>
       <div className="mt-2.5">
         <AlertsRulesBuilder
-          defaultQuery={celQuery}
+          key={maintenanceToEdit?.id ?? "new"}
+          defaultQuery=""
+          celValue={celQuery}
           updateOutputCEL={setCelQuery}
           showSave={false}
           showSqlImport={false}
           applyOnTyping={true}
+          shouldSetQueryParam={false}
         />
         {celQuery && !isCelFilterExpression(celQuery) && (
           <div className="text-red-500 text-sm mt-1">

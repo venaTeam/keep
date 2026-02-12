@@ -31,11 +31,11 @@ interface Props {
 }
 
 const DEFAULT_IGNORE_STATUSES = [
-    "resolved",
-    "acknowledged",
+  "resolved",
+  "acknowledged",
 ]
 
-const roundTime =(dateToRound: Date) =>{
+const roundTime = (dateToRound: Date) => {
   if (dateToRound.getMinutes() % 15 != 0) {
     const minToadd = 15 - (dateToRound.getMinutes() % 15);
     dateToRound.setMinutes(dateToRound.getMinutes() + minToadd);
@@ -90,18 +90,18 @@ export default function CreateOrUpdateMaintenanceRule({
     router.replace("/maintenance");
   };
 
-  const isSameDay = (date1: Date, date2: Date):boolean => {
+  const isSameDay = (date1: Date, date2: Date): boolean => {
     return date1.toDateString() === date2.toDateString();
   }
 
-  const changeDatePicker = (date: Date):void => {
+  const changeDatePicker = (date: Date): void => {
     const currentDate = new Date();
     if (startTime && !isSameDay(date, startTime)) {
-      if(isSameDay(date, currentDate) && 
-      (date.getHours() < currentDate.getHours() || (date.getHours() == currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
+      if (isSameDay(date, currentDate) &&
+        (date.getHours() < currentDate.getHours() || (date.getHours() == currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
         setStartTime(roundTime(currentDate));
       }
-      else{
+      else {
         date?.setHours(startTime.getHours())
         date?.setMinutes(startTime.getMinutes())
         setStartTime(date);
@@ -183,8 +183,29 @@ export default function CreateOrUpdateMaintenanceRule({
     clearForm();
   };
 
+  // Ensure CEL is a proper filter expression with field references on the left side
+  const isCelFilterExpression = (cel: string): boolean => {
+    if (!cel.trim()) return false;
+    // Must contain at least one comparison operator or filter function
+    const hasOperator = /[=!<>]=?|\.contains\s*\(|\.startsWith\s*\(|\.endsWith\s*\(|\.matches\s*\(|\bin\b|\.has\s*\(/.test(cel);
+    if (!hasOperator) return false;
+
+    // Check that left operands are field identifiers, not literals
+    const parts = cel.split(/\s*(?:&&|\|\|)\s*/);
+    for (const part of parts) {
+      // Strip leading whitespace, parentheses, and negation
+      const trimmed = part.replace(/^[\s(!]+/, "");
+      if (!trimmed) continue;
+      // Reject if left side starts with a string literal, number, or boolean/null
+      if (/^["']/.test(trimmed) || /^\d/.test(trimmed) || /^(true|false|null)\b/.test(trimmed)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const submitEnabled = (): boolean => {
-    return !!maintenanceName && !!celQuery && !!startTime;
+    return !!maintenanceName && isCelFilterExpression(celQuery) && !!startTime;
   };
 
   return (
@@ -218,7 +239,13 @@ export default function CreateOrUpdateMaintenanceRule({
           updateOutputCEL={setCelQuery}
           showSave={false}
           showSqlImport={false}
+          applyOnTyping={true}
         />
+        {celQuery && !isCelFilterExpression(celQuery) && (
+          <div className="text-red-500 text-sm mt-1">
+            CEL expression must be a filter (e.g. name == &quot;test&quot;, severity &gt; &quot;info&quot;, source.contains(&quot;grafana&quot;)).
+          </div>
+        )}
       </div>
 
       <div className="mt-2.5">

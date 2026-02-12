@@ -146,6 +146,7 @@ type AlertsRulesBuilderProps = {
   minimal?: boolean;
   showToast?: boolean;
   shouldSetQueryParam?: boolean;
+  applyOnTyping?: boolean;
 };
 
 const SQL_QUERY_PLACEHOLDER = `SELECT *
@@ -193,6 +194,7 @@ export const AlertsRulesBuilder = ({
   showToast = false,
   shouldSetQueryParam = true,
   onCelChanges,
+  applyOnTyping = false,
 }: AlertsRulesBuilderProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -295,6 +297,18 @@ export const AlertsRulesBuilder = ({
     updateOutputCEL?.(appliedCel);
     onCelChanges?.(appliedCel);
   }, [appliedCel, updateOutputCEL]);
+
+  // When applyOnTyping is enabled, auto-apply valid CEL as the user types
+  // and clear it when the CEL becomes invalid so the parent form can disable submission.
+  useEffect(() => {
+    if (applyOnTyping) {
+      if (isValidCEL) {
+        setAppliedCel(celRules);
+      } else {
+        setAppliedCel("");
+      }
+    }
+  }, [applyOnTyping, celRules, isValidCEL]);
 
   const onGenerateQuery = () => {
     setCELRules(formatQuery(query, "cel"));
@@ -414,12 +428,14 @@ export const AlertsRulesBuilder = ({
                   Invalid Common Expression Logic expression.
                 </div>
               )}
-              <div className="flex items-center justify-end pt-1 px-2">
-                <span className="text-xs text-gray-400">
-                  <CornerDownLeft className="h-3 w-3 mr-1 inline-block" />
-                  Enter to apply
-                </span>
-              </div>
+              {!applyOnTyping && (
+                <div className="flex items-center justify-end pt-1 px-2">
+                  <span className="text-xs text-gray-400">
+                    <CornerDownLeft className="h-3 w-3 mr-1 inline-block" />
+                    Enter to apply
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

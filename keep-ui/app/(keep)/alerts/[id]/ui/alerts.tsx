@@ -230,6 +230,7 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
       <AlertNoteModal
         handleClose={() => setNoteModalAlert(null)}
         alert={noteModalAlert ?? null}
+        mutate={mutateAlerts}
       />
       <ManualRunWorkflowModal
         alert={runWorkflowModalAlert}

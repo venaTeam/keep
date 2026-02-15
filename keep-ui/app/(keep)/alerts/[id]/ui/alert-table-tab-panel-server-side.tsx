@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { FacetDto } from "@/features/filter";
 import { AlertTableServerSide } from "@/widgets/alerts-table/ui/alert-table-server-side";
 import { useAlertTableCols } from "@/widgets/alerts-table/lib/alert-table-utils";
@@ -49,7 +50,9 @@ export default function AlertTableTabPanelServerSide({
   onReload,
   onQueryChange,
 }: Props) {
-  const additionalColsToGenerate = [
+  // Compute a stable key representing the set of additional column names.
+  // This changes only when the actual set of extra keys changes, not when alert data updates.
+  const additionalColsKey = [
     ...new Set(
       alerts?.flatMap((alert) => {
         const keys = Object.keys(alert).filter(
@@ -68,7 +71,14 @@ export default function AlertTableTabPanelServerSide({
         });
       }) || []
     ),
-  ];
+  ]
+    .sort()
+    .join(",");
+
+  const additionalColsToGenerate = useMemo(
+    () => (additionalColsKey ? additionalColsKey.split(",") : []),
+    [additionalColsKey]
+  );
 
   const alertTableColumns = useAlertTableCols({
     additionalColsToGenerate: additionalColsToGenerate,

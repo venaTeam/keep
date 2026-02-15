@@ -1046,10 +1046,15 @@ def unenrich_alert(
         enrichments_object = get_enrichment(tenant_id, enrich_data.fingerprint)
         enrichments = enrichments_object.enrichments
 
+        # Build the set of keys to remove, including disposable_ variants
+        keys_to_remove = set(enrich_data.enrichments)
+        for key in enrich_data.enrichments:
+            keys_to_remove.add(f"disposable_{key}")
+
         new_enrichments = {
             key: value
             for key, value in enrichments.items()
-            if key not in enrich_data.enrichments
+            if key not in keys_to_remove
         }
 
         enrichement_bl.enrich_entity(

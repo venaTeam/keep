@@ -28,11 +28,14 @@ const SSE_EVENT_TYPES = [
 
 export const useSSE = () => {
   const { data: configData } = useConfig();
-  const { data: session } = useSession();
+  const { data: user_session, status } = useSession();
   const isInitializedRef = useRef(false);
 
   // Initialize SSE connection
   useEffect(() => {
+    const session = status === "unauthenticated" ? {
+      accessToken: "unauthenticated"
+    } : user_session;
     // Prevent multiple initializations
     if (isInitializedRef.current) {
       return;
@@ -47,6 +50,18 @@ export const useSSE = () => {
     if (configData === null || configData === undefined) {
       return;
     }
+
+    // Wait for authentication if auth is required (status will be loading initially)
+    // If unauthenticated, session might be null or guest.
+    // If authenticated, session.accessToken should be present.
+    if (status === "loading") {
+      return;
+    }
+
+    // For authenticated users, ensure we have a token (unless NO_AUTH configured backend side, but usually we want consistency)
+    // If status is unauthenticated, session.accessToken is usually "unauthenticated" or undefined.
+    // We proceed, but the header logic later will decide whether to attach a token.
+
 
     // Check if we already have a connection
     // Note: Since we are not using EventSource anymore, we check if we have an active reader/controller
@@ -79,11 +94,14 @@ export const useSSE = () => {
           "Connection": "keep-alive",
         };
 
-        if (session?.accessToken && session.accessToken !== "unauthenticated") {
+        // Logic from ApiClient.ts getHeaders()
+        if (session && session.accessToken && session.accessToken !== "unauthenticated") {
           headers["Authorization"] = `Bearer ${session.accessToken}`;
         }
+        headers["ngrok-skip-browser-warning"] = "true";
 
         const response = await fetch(sseUrl, {
+          method: "POST",
           headers,
           signal,
         });
@@ -194,7 +212,7 @@ export const useSSE = () => {
       controller.abort();
       isInitializedRef.current = false;
     };
-  }, [configData, session?.accessToken]);
+  }, [configData, user_session?.accessToken, status]);
 
   // Bind a callback to an event
   const bind = useCallback((event: string, callback: (data: any) => void) => {

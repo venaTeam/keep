@@ -53,14 +53,23 @@ async def get_sse_authenticated_entity(
             email=SINGLE_TENANT_EMAIL,
         )
     
+    # If not in query param, check authorization header
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+
     # If token is provided or we're in authenticated mode, use the identity manager
     if token:
         # Create a mock request with the token in the authorization header
         # so the auth verifier can process it
+        # Note: If it came from header, it's already there, but this ensures consistency if it came from query
         request.scope["headers"] = list(request.scope.get("headers", []))
         # Add authorization header if token is provided
-        auth_header = (b"authorization", f"Bearer {token}".encode())
-        request.scope["headers"].append(auth_header)
+        auth_header_tuple = (b"authorization", f"Bearer {token}".encode())
+        # Remove existing authorization header if present to avoid duplicates
+        request.scope["headers"] = [h for h in request.scope["headers"] if h[0] != b"authorization"]
+        request.scope["headers"].append(auth_header_tuple)
     
     # Get the auth verifier and authenticate
     try:
@@ -78,9 +87,11 @@ async def get_sse_authenticated_entity(
         raise
 
 
-@router.get("/subscribe")
+@router.post("/subscribe")
 async def sse_subscribe(
-    authenticated_entity: AuthenticatedEntity = Depends(get_sse_authenticated_entity),
+    authenticated_entity: AuthenticatedEntity = Depends(
+        IdentityManagerFactory.get_auth_verifier(["read:alert"])
+    ),
 ) -> StreamingResponse:
     """
     Subscribe to Server-Sent Events for real-time updates.

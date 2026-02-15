@@ -22,6 +22,7 @@ export default function Maintenance() {
       <div className="flex divide-x p-2">
         <div className="w-2/5 pr-2.5">
           <CreateOrUpdateMaintenanceRule
+            key={maintenanceToEdit?.id ?? "new"}
             maintenanceToEdit={maintenanceToEdit}
             editCallback={setMaintenanceToEdit}
           />

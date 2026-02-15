@@ -31,11 +31,11 @@ interface Props {
 }
 
 const DEFAULT_IGNORE_STATUSES = [
-    "resolved",
-    "acknowledged",
+  "resolved",
+  "acknowledged",
 ]
 
-const roundTime =(dateToRound: Date) =>{
+const roundTime = (dateToRound: Date) => {
   if (dateToRound.getMinutes() % 15 != 0) {
     const minToadd = 15 - (dateToRound.getMinutes() % 15);
     dateToRound.setMinutes(dateToRound.getMinutes() + minToadd);
@@ -52,15 +52,22 @@ export default function CreateOrUpdateMaintenanceRule({
 }: Props) {
   const api = useApi();
   const { mutate } = useMaintenanceRules();
-  const [maintenanceName, setMaintenanceName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [celQuery, setCelQuery] = useState<string>("");
-  const [startTime, setStartTime] = useState<Date | null>(roundTime(new Date()));
-  const [endInterval, setEndInterval] = useState<number>(5);
+  const [maintenanceName, setMaintenanceName] = useState<string>(maintenanceToEdit?.name ?? "");
+  const [description, setDescription] = useState<string>(maintenanceToEdit?.description ?? "");
+  const [celQuery, setCelQuery] = useState<string>(maintenanceToEdit?.cel_query ?? "");
+  const [startTime, setStartTime] = useState<Date | null>(
+    maintenanceToEdit
+      ? new Date(new Date(maintenanceToEdit.start_time + 'Z').toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
+      : roundTime(new Date())
+  );
+  const [endInterval, setEndInterval] = useState<number>(
+    maintenanceToEdit?.duration_seconds ? maintenanceToEdit.duration_seconds / 60 : 5
+  );
   const [intervalType, setIntervalType] = useState<string>("minutes");
-  const [enabled, setEnabled] = useState<boolean>(true);
-  const [suppress, setSuppress] = useState<boolean>(false);
-  const [ignoreStatuses, setIgnoreStatuses] = useState<string[]>(DEFAULT_IGNORE_STATUSES);
+  const [enabled, setEnabled] = useState<boolean>(maintenanceToEdit?.enabled ?? true);
+  const [suppress, setSuppress] = useState<boolean>(maintenanceToEdit?.suppress ?? false);
+  const [ignoreStatuses, setIgnoreStatuses] = useState<string[]>(maintenanceToEdit?.ignore_statuses ?? DEFAULT_IGNORE_STATUSES);
+  const [formResetKey, setFormResetKey] = useState(0);
   const editMode = maintenanceToEdit !== null;
   const router = useRouter();
   useEffect(() => {
@@ -87,21 +94,22 @@ export default function CreateOrUpdateMaintenanceRule({
     setSuppress(false);
     setEnabled(true);
     setIgnoreStatuses([]);
+    setFormResetKey((k) => k + 1);
     router.replace("/maintenance");
   };
 
-  const isSameDay = (date1: Date, date2: Date):boolean => {
+  const isSameDay = (date1: Date, date2: Date): boolean => {
     return date1.toDateString() === date2.toDateString();
   }
 
-  const changeDatePicker = (date: Date):void => {
+  const changeDatePicker = (date: Date): void => {
     const currentDate = new Date();
     if (startTime && !isSameDay(date, startTime)) {
-      if(isSameDay(date, currentDate) && 
-      (date.getHours() < currentDate.getHours() || (date.getHours() == currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
+      if (isSameDay(date, currentDate) &&
+        (date.getHours() < currentDate.getHours() || (date.getHours() == currentDate.getHours() && date.getMinutes() < currentDate.getMinutes()))) {
         setStartTime(roundTime(currentDate));
       }
-      else{
+      else {
         date?.setHours(startTime.getHours())
         date?.setMinutes(startTime.getMinutes())
         setStartTime(date);
@@ -183,8 +191,29 @@ export default function CreateOrUpdateMaintenanceRule({
     clearForm();
   };
 
+  // Ensure CEL is a proper filter expression with field references on the left side
+  const isCelFilterExpression = (cel: string): boolean => {
+    if (!cel.trim()) return false;
+    // Must contain at least one comparison operator or filter function
+    const hasOperator = /[=!<>]=?|\.contains\s*\(|\.startsWith\s*\(|\.endsWith\s*\(|\.matches\s*\(|\bin\b|\.has\s*\(/.test(cel);
+    if (!hasOperator) return false;
+
+    // Check that left operands are field identifiers, not literals
+    const parts = cel.split(/\s*(?:&&|\|\|)\s*/);
+    for (const part of parts) {
+      // Strip leading whitespace, parentheses, and negation
+      const trimmed = part.replace(/^[\s(!]+/, "");
+      if (!trimmed) continue;
+      // Reject if left side starts with a string literal, number, or boolean/null
+      if (/^["']/.test(trimmed) || /^\d/.test(trimmed) || /^(true|false|null)\b/.test(trimmed)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const submitEnabled = (): boolean => {
-    return !!maintenanceName && !!celQuery && !!startTime;
+    return !!maintenanceName && isCelFilterExpression(celQuery) && !!startTime;
   };
 
   return (
@@ -214,11 +243,20 @@ export default function CreateOrUpdateMaintenanceRule({
       </div>
       <div className="mt-2.5">
         <AlertsRulesBuilder
-          defaultQuery={celQuery}
+          key={`${maintenanceToEdit?.id ?? "new"}-${formResetKey}`}
+          defaultQuery=""
+          celValue={celQuery}
           updateOutputCEL={setCelQuery}
           showSave={false}
           showSqlImport={false}
+          applyOnTyping={true}
+          shouldSetQueryParam={false}
         />
+        {celQuery && !isCelFilterExpression(celQuery) && (
+          <div className="text-red-500 text-sm mt-1">
+            CEL expression must be a filter (e.g. name == &quot;test&quot;, severity &gt; &quot;info&quot;, source.contains(&quot;grafana&quot;)).
+          </div>
+        )}
       </div>
 
       <div className="mt-2.5">

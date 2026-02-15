@@ -11,12 +11,14 @@ interface AlertNoteModalProps {
   handleClose: () => void;
   alert: AlertDto | null;
   readOnly?: boolean;
+  mutate?: () => void;
 }
 
 export const AlertNoteModal = ({
   handleClose,
   alert,
   readOnly = false,
+  mutate,
 }: AlertNoteModalProps) => {
   const api = useApi();
   const [noteContent, setNoteContent] = useState<string>("");
@@ -33,14 +35,29 @@ export const AlertNoteModal = ({
   const saveNote = async () => {
     try {
       const trimmedNote = noteContent.trim();
-      // build the formData
-      const requestData = {
-        note: trimmedNote,
-        fingerprint: alert.fingerprint,
-      };
-      await api.post(`/alerts/enrich/note`, requestData);
 
-      handleNoteClose();
+      if (trimmedNote) {
+        // Save the note via enrich
+        const requestData = {
+          note: trimmedNote,
+          fingerprint: alert.fingerprint,
+        };
+        await api.post(`/alerts/enrich/note`, requestData);
+        // Update local alert object with the trimmed note
+        alert.note = trimmedNote;
+      } else {
+        // Empty note — remove it via unenrich so the note column disappears
+        await api.post(`/alerts/unenrich`, {
+          fingerprint: alert.fingerprint,
+          enrichments: ["note"],
+        });
+        // Clear the local alert note
+        alert.note = undefined;
+      }
+
+      setNoteContent("");
+      mutate?.();
+      handleClose();
     } catch (error) {
       showErrorToast(error, "Failed to save note");
     }
@@ -49,7 +66,6 @@ export const AlertNoteModal = ({
   const isOpen = alert !== null;
 
   const handleNoteClose = () => {
-    alert.note = noteContent;
     setNoteContent("");
     handleClose();
   };

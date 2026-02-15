@@ -6,6 +6,13 @@ ENV PYTHONFAULTHANDLER=1 \
 
 WORKDIR /app
 
+# Install system dependencies for confluent-kafka (librdkafka)
+RUN apt-get update && apt-get install -y \
+    librdkafka-dev \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Creating a virtual environment and installing dependencies
 ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -53,13 +60,19 @@ COPY keep/event_handler /app/keep/event_handler
 # Enterprise Edition
 COPY ee /app/ee
 
-# Entrypoint script
-# Entrypoint script
-# Deprecated: COPY keep/entrypoint.sh /app/keep/entrypoint.sh
-# RUN chmod +x /app/keep/entrypoint.sh
-# ENTRYPOINT ["/app/keep/entrypoint.sh"]
+# Expose ports
+# 8080 - Health check endpoint
+# 8081 - Prometheus metrics
+EXPOSE 8080 8081
 
-# Worker command
-# We use Gunicorn with Uvicorn workers for production stability
-# The number of workers is controlled by KEEP_EVENT_WORKERS env var (default in config or here)
-CMD ["sh", "-c", "gunicorn keep.event_handler.main:app --bind 0.0.0.0:8080 --workers ${KEEP_EVENT_WORKERS:-1} --worker-class uvicorn.workers.UvicornWorker --timeout 120"]
+# Default environment variables
+ENV MESSAGING_TYPE=KAFKA \
+    PROMETHEUS_METRICS_PORT=8081 \
+    HEALTH_CHECK_PORT=8080
+
+# Health check
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+#     CMD curl -f http://localhost:8080/health || exit 1
+
+# Run the standalone consumer (no gunicorn)
+CMD ["python", "-m", "keep.event_handler.consumer_main"]

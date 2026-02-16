@@ -87,11 +87,13 @@ async def get_sse_authenticated_entity(
         raise
 
 
+async def get_sse_auth_verifier(request: Request) -> AuthenticatedEntity:
+    verifier = IdentityManagerFactory.get_auth_verifier(["read:alert"])
+    return await verifier(request)
+
 @router.post("/subscribe")
 async def sse_subscribe(
-    authenticated_entity: AuthenticatedEntity = Depends(
-        IdentityManagerFactory.get_auth_verifier(["read:alert"])
-    ),
+    authenticated_entity: AuthenticatedEntity = Depends(get_sse_auth_verifier),
 ) -> StreamingResponse:
     """
     Subscribe to Server-Sent Events for real-time updates.

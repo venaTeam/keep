@@ -8,8 +8,9 @@ import { useCallback, useEffect, useRef } from "react";
 import { useConfig } from "./useConfig";
 import { useHydratedSession as useSession } from "@/shared/lib/hooks/useHydratedSession";
 
-// Shared EventSource instance and handlers across all hook instances
-let sharedEventSource: EventSource | null = null;
+// Shared connection controller and consumer count
+let globalAbortController: AbortController | null = null;
+let activeConsumers = 0;
 let sharedHandlers: Map<string, Set<(data: any) => void>> = new Map();
 let connectionAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -29,188 +30,140 @@ const SSE_EVENT_TYPES = [
 export const useSSE = () => {
   const { data: configData } = useConfig();
   const { data: user_session, status } = useSession();
-  const isInitializedRef = useRef(false);
 
   // Initialize SSE connection
   useEffect(() => {
-    const session = status === "unauthenticated" ? {
-      accessToken: "unauthenticated"
-    } : user_session;
-    // Prevent multiple initializations
-    if (isInitializedRef.current) {
-      return;
-    }
+    // If we can't connect yet, don't increment consumers or try to connect
+    if (configData?.SSE_DISABLED === true) return;
+    if (configData === null || configData === undefined) return;
+    if (status === "loading") return;
 
-    // Check if SSE is disabled
-    if (configData?.SSE_DISABLED === true) {
-      return;
-    }
+    activeConsumers++;
 
-    // Don't connect if we don't have config yet
-    if (configData === null || configData === undefined) {
-      return;
-    }
+    // Only establish a new connection if one doesn't exist
+    if (!globalAbortController) {
+      const sseBaseUrl = configData.API_URL;
+      if (!sseBaseUrl) {
+        console.error("useSSE: API_URL not configured, cannot establish SSE connection");
+        activeConsumers--; // Revert count since we failed/aborted
+        return;
+      }
 
-    // Wait for authentication if auth is required (status will be loading initially)
-    // If unauthenticated, session might be null or guest.
-    // If authenticated, session.accessToken should be present.
-    if (status === "loading") {
-      return;
-    }
+      const sseUrl = `${sseBaseUrl}/sse/subscribe`;
 
-    // For authenticated users, ensure we have a token (unless NO_AUTH configured backend side, but usually we want consistency)
-    // If status is unauthenticated, session.accessToken is usually "unauthenticated" or undefined.
-    // We proceed, but the header logic later will decide whether to attach a token.
+      // Create new global controller
+      globalAbortController = new AbortController();
+      const signal = globalAbortController.signal;
 
+      const connectSSE = async () => {
+        try {
+          console.log("useSSE: Connecting via fetch...");
 
-    // Check if we already have a connection
-    // Note: Since we are not using EventSource anymore, we check if we have an active reader/controller
-    // But shared logic is harder with custom fetch. 
-    // For simplicity/robustness, we'll implement a singleton connection manager pattern here locally, 
-    // or just rely on the existing singleton variables if possible.
-    // However, `sharedEventSource` is typed as EventSource. We need to change that.
+          const headers: HeadersInit = {
+            "Accept": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+          };
 
-    // Actually, let's keep the shared variable but change its type implicitly or wrap it.
-    // Since we are replacing the whole logic, let's just implement the fetch loop.
+          // Logic from ApiClient.ts getHeaders()
+          // We use the session from the component that triggered the connection
+          // This assumes all components share the same session context (which is true)
+          if (user_session && user_session.accessToken && user_session.accessToken !== "unauthenticated") {
+            headers["Authorization"] = `Bearer ${user_session.accessToken}`;
+          }
+          headers["ngrok-skip-browser-warning"] = "true";
 
-    const sseBaseUrl = configData.API_URL;
-    if (!sseBaseUrl) {
-      console.error("useSSE: API_URL not configured, cannot establish SSE connection");
-      return;
-    }
+          const response = await fetch(sseUrl, {
+            method: "POST",
+            headers,
+            signal,
+          });
 
-    const sseUrl = `${sseBaseUrl}/sse/subscribe`;
+          if (!response.ok) {
+            throw new Error(`SSE connection failed: ${response.status} ${response.statusText}`);
+          }
 
-    const controller = new AbortController();
-    const signal = controller.signal;
+          if (!response.body) {
+            throw new Error("SSE connection failed: No body");
+          }
 
-    const connectSSE = async () => {
-      try {
-        console.log("useSSE: Connecting via fetch...");
+          console.log("useSSE: Connected successfully");
+          connectionAttempts = 0;
 
-        const headers: HeadersInit = {
-          "Accept": "text/event-stream",
-          "Cache-Control": "no-cache",
-          "Connection": "keep-alive",
-        };
+          // Notify connected
+          const connectedHandlers = sharedHandlers.get("connected");
+          if (connectedHandlers) {
+            connectedHandlers.forEach(h => h({ status: "connected" }));
+          }
 
-        // Logic from ApiClient.ts getHeaders()
-        if (session && session.accessToken && session.accessToken !== "unauthenticated") {
-          headers["Authorization"] = `Bearer ${session.accessToken}`;
-        }
-        headers["ngrok-skip-browser-warning"] = "true";
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
 
-        const response = await fetch(sseUrl, {
-          method: "POST",
-          headers,
-          signal,
-        });
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-        if (!response.ok) {
-          throw new Error(`SSE connection failed: ${response.status} ${response.statusText}`);
-        }
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n\n");
+            buffer = lines.pop() || ""; // Keep incomplete chunk
 
-        if (!response.body) {
-          throw new Error("SSE connection failed: No body");
-        }
+            for (const block of lines) {
+              const linesInBlock = block.split("\n");
+              let eventType = "message";
+              let data = "";
 
-        console.log("useSSE: Connected successfully");
-        connectionAttempts = 0;
-
-        // Notify connected
-        const connectedHandlers = sharedHandlers.get("connected");
-        if (connectedHandlers) {
-          connectedHandlers.forEach(h => h({ status: "connected" }));
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n\n");
-          buffer = lines.pop() || ""; // Keep incomplete chunk
-
-          for (const block of lines) {
-            const linesInBlock = block.split("\n");
-            let eventType = "message";
-            let data = "";
-
-            for (const line of linesInBlock) {
-              if (line.startsWith("event: ")) {
-                eventType = line.substring(7).trim();
-              } else if (line.startsWith("data: ")) {
-                data = line.substring(6).trim();
+              for (const line of linesInBlock) {
+                if (line.startsWith("event: ")) {
+                  eventType = line.substring(7).trim();
+                } else if (line.startsWith("data: ")) {
+                  data = line.substring(6).trim();
+                }
               }
-            }
 
-            if (eventType && data) {
-              const handlers = sharedHandlers.get(eventType);
-              if (handlers) {
-                try {
-                  const parsedData = JSON.parse(data);
-                  handlers.forEach(h => h(parsedData));
-                } catch (e) {
-                  handlers.forEach(h => h(data));
+              if (eventType && data) {
+                const handlers = sharedHandlers.get(eventType);
+                if (handlers) {
+                  try {
+                    // Only log if it's not a heartbeat or similar frequent event if needed
+                    // console.log(`useSSE: Received ${eventType}`, data);
+                    const parsedData = JSON.parse(data);
+                    handlers.forEach(h => h(parsedData));
+                  } catch (e) {
+                    handlers.forEach(h => h(data));
+                  }
                 }
               }
             }
           }
+        } catch (error: any) {
+          if (signal.aborted) return;
+
+          console.error("useSSE: Connection error", error);
+          connectionAttempts++;
+
+          if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
+            console.log(`useSSE: Reconnecting in ${connectionAttempts * 1000}ms...`);
+            setTimeout(connectSSE, connectionAttempts * 1000); // Exponential backoff
+          }
         }
-      } catch (error: any) {
-        if (signal.aborted) return;
+      };
 
-        console.error("useSSE: Connection error", error);
-        connectionAttempts++;
-
-        if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
-          console.log(`useSSE: Reconnecting in ${connectionAttempts * 1000}ms...`);
-          setTimeout(connectSSE, connectionAttempts * 1000); // Exponential backoff
-        }
-      }
-    };
-
-    connectSSE();
-
-    isInitializedRef.current = true;
+      connectSSE();
+    }
 
     return () => {
-      // Cleanup: We don't abort the shared connection on unmount 
-      // because strict mode or other components might use it. 
-      // But if we wanted to be strict, we would check ref counts.
-      // For now, to match previous behavior (shared singleton), we let it run.
-      // BUT, with fetch loop, it's component-scoped unless we move it out.
-
-      // To properly replace `sharedEventSource`, we need to manage this globally properly.
-      // Since I am modifying the hook, this fetch loop will run PER component instance 
-      // which is NOT ideal (multiple connections).
-      // However, usually `useSSE` is used once in top level or sparingly.
-
-      // If `useSSE` is used in multiple places, we should move the fetch logic 
-      // outside the hook or use a singleton controller.
-      // Given the file structure, `sharedEventSource` suggests singleton intent.
-
-      // I will implement a check to ensure only ONE connection runs globally.
-      // But `controller` here is local.
-      // Let's rely on `isInitializedRef` for now for *this* component.
-      // If multiple components use useSSE, they will each spawn a fetch.
-      // The previous code used `sharedEventSource`.
-
-      // I should attempt to abort if I am the "owner" or just let it run?
-      // Actually, if I replace `sharedEventSource` logic with this local fetch, 
-      // I break the singleton nature.
-
-      // To preserve singleton: 
-      // I should assume this hook is called in a Layout component (singleton).
-      // If not, this change makes it multiple connections.
-      // But multiple connections is safer than broken auth!
-
-      controller.abort();
-      isInitializedRef.current = false;
+      activeConsumers--;
+      // If no more consumers, abort the global connection
+      if (activeConsumers <= 0) {
+        // Reset to 0 just in case
+        activeConsumers = 0;
+        if (globalAbortController) {
+          console.log("useSSE: No more consumers, aborting connection");
+          globalAbortController.abort();
+          globalAbortController = null;
+        }
+      }
     };
   }, [configData, user_session?.accessToken, status]);
 

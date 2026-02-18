@@ -1,16 +1,22 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useMemo } from "react";
 import { Table } from "@tanstack/table-core";
 import { Button, TextInput } from "@tremor/react";
 import { VisibilityState } from "@tanstack/react-table";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiRotateCcw } from "react-icons/fi";
 import { AlertDto } from "@/entities/alerts/model";
 import { usePresetColumnState } from "@/entities/presets/model";
+import {
+  DEFAULT_COLS,
+  DEFAULT_COLS_VISIBILITY,
+} from "@/widgets/alerts-table/lib/alert-table-utils";
 
 interface AlertColumnsSelectProps {
   table: Table<AlertDto>;
   presetName: string;
   presetId?: string;
   onClose?: () => void;
+  onResetGrouping?: () => void;
+  onResetFacets?: () => void;
 }
 
 export default function ColumnSelection({
@@ -18,6 +24,8 @@ export default function ColumnSelection({
   presetName,
   presetId,
   onClose,
+  onResetGrouping,
+  onResetFacets,
 }: AlertColumnsSelectProps) {
   const tableColumns = table.getAllColumns();
 
@@ -40,22 +48,26 @@ export default function ColumnSelection({
   // Local state to track checkbox changes before submission
   const [localColumnVisibility, setLocalColumnVisibility] =
     useState<VisibilityState>(columnVisibility);
-  
+
   // Use a ref to track the previous columnVisibility to prevent infinite loops
   const prevColumnVisibilityRef = React.useRef<VisibilityState>(columnVisibility);
 
+  // Detect if user has customized beyond defaults
+  const isCustomized = useMemo(() => {
+    const visKeys = Object.keys(columnVisibility);
+    const defaultKeys = Object.keys(DEFAULT_COLS_VISIBILITY);
+    if (visKeys.length !== defaultKeys.length) return true;
+    for (const key of visKeys) {
+      if (columnVisibility[key] !== DEFAULT_COLS_VISIBILITY[key]) return true;
+    }
+    if (JSON.stringify(columnOrder) !== JSON.stringify(DEFAULT_COLS)) return true;
+    return false;
+  }, [columnVisibility, columnOrder]);
+
   // Update local state when backend state changes
   React.useEffect(() => {
-    console.log('ColumnSelection: columnVisibility changed', {
-      presetName,
-      useBackend,
-      columnVisibility,
-      localColumnVisibility
-    });
-    
     // Only update if the columnVisibility has actually changed
     if (JSON.stringify(prevColumnVisibilityRef.current) !== JSON.stringify(columnVisibility)) {
-      console.log('ColumnSelection: updating localColumnVisibility');
       setLocalColumnVisibility(columnVisibility);
       prevColumnVisibilityRef.current = columnVisibility;
     }
@@ -97,7 +109,7 @@ export default function ColumnSelection({
       .filter((col) => col.getIsPinned() === false)
       .map((col) => col.id),
     // Include common enrichment fields that might not be in current data
-    ...COMMON_ENRICHMENT_FIELDS.filter(field => 
+    ...COMMON_ENRICHMENT_FIELDS.filter(field =>
       !tableColumns.some(col => col.id === field)
     )
   ];
@@ -115,14 +127,7 @@ export default function ColumnSelection({
     }
   }, [filteredColumns, isSearching]); // Only run when we're currently searching
 
-  // Debug logging for e2e tests
-  React.useEffect(() => {
-    if (searchTerm) {
-      console.log(`ColumnSelection: Searching for "${searchTerm}"`);
-      console.log(`ColumnSelection: Available columns:`, columnsOptions);
-      console.log(`ColumnSelection: Filtered columns:`, filteredColumns);
-    }
-  }, [searchTerm, columnsOptions, filteredColumns]);
+
 
   const handleSearchChange = (value: string) => {
     if (value) {
@@ -131,19 +136,31 @@ export default function ColumnSelection({
     setSearchTerm(value);
   };
 
+  const handleResetToDefault = async () => {
+    try {
+      await updateMultipleColumnConfigs({
+        columnVisibility: DEFAULT_COLS_VISIBILITY,
+        columnOrder: DEFAULT_COLS,
+        columnRenameMapping: {},
+        columnTimeFormats: {},
+        columnListFormats: {},
+      });
+      setLocalColumnVisibility(DEFAULT_COLS_VISIBILITY);
+      // Also reset grouping and facets if callbacks provided
+      onResetGrouping?.();
+      onResetFacets?.();
+      onClose?.();
+    } catch (error) {
+      console.error("Failed to reset column configuration:", error);
+    }
+  };
+
   const handleCheckboxChange = (column: string, checked: boolean) => {
-    console.log('ColumnSelection: handleCheckboxChange', {
-      column,
-      checked,
-      currentLocalState: localColumnVisibility
-    });
-    
     setLocalColumnVisibility((prev) => {
       const newState = {
         ...prev,
         [column]: checked,
       };
-      console.log('ColumnSelection: new local state', newState);
       return newState;
     });
   };
@@ -183,12 +200,33 @@ export default function ColumnSelection({
     <form onSubmit={onMultiSelectChange} className="flex flex-col h-full">
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-400 text-sm">Set table fields</span>
-          {useBackend && (
-            <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-              Synced across devices
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm">Set table fields</span>
+            {isCustomized && (
+              <span className="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full" data-testid="custom-view-indicator">
+                Customized
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {useBackend && (
+              <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                Synced across devices
+              </span>
+            )}
+            {isCustomized && (
+              <button
+                type="button"
+                onClick={handleResetToDefault}
+                className="text-xs text-gray-500 hover:text-orange-600 flex items-center gap-1 transition-colors"
+                data-testid="reset-to-default-button"
+                title="Reset columns to default view"
+              >
+                <FiRotateCcw size={12} />
+                Reset
+              </button>
+            )}
+          </div>
         </div>
         <TextInput
           icon={FiSearch}

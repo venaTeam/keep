@@ -10,10 +10,14 @@ import { useQueryParams } from "./use-query-params/use-query-params";
 import { useFacetsConfig } from "./use-facets-config";
 import { FacetsConfig } from "../models";
 import { useInitialStateHandler } from "./use-initial-state-handler";
+import { useFacetsStatePersistence } from "./use-facets-persistence";
 // import { useFacetsStateHandler } from "./use-facets-state-handler";
 
-export function useNewFacetStore(facetsConfig: FacetsConfig | undefined) {
-  const storeRef = useRef<ReturnType<typeof createFacetsPanelStore>| null>(null);
+export function useNewFacetStore(
+  facetsConfig: FacetsConfig | undefined,
+  persistenceKey?: string
+) {
+  const storeRef = useRef<ReturnType<typeof createFacetsPanelStore> | null>(null);
 
   if (!storeRef.current) {
     storeRef.current = createFacetsPanelStore(); // New store per provider
@@ -23,6 +27,7 @@ export function useNewFacetStore(facetsConfig: FacetsConfig | undefined) {
   useFacetsLoadingStateHandler(storeRef.current);
   useQueriesHandler(storeRef.current);
   useQueryParams(storeRef.current);
+  useFacetsStatePersistence(storeRef.current, persistenceKey);
 
   return storeRef.current;
 }

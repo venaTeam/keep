@@ -49,6 +49,7 @@ import AlertPagination from "./alert-pagination";
 import { useGroupExpansion } from "@/utils/hooks/useGroupExpansion";
 import { PageTitle } from "@/shared/ui";
 import SettingsSelection from "./SettingsSelection";
+import { useHydratedSession } from "@/shared/lib/hooks/useHydratedSession";
 
 interface PresetTab {
   name: string;
@@ -110,11 +111,14 @@ export function AlertTable({
   const a11yContainerRef = useRef<HTMLDivElement>(null);
   const { data: configData } = useConfig();
   const noisyAlertsEnabled = configData?.NOISY_ALERTS_ENABLED;
+  const { data: session } = useHydratedSession();
+  const userEmail = session?.user?.email;
+  const userPrefix = userEmail ? `${userEmail}-` : "";
 
   const { theme } = useAlertTableTheme();
 
   const [facetFilters, setFacetFilters] = useLocalStorage<FacetFilters>(
-    `alertFacetFilters-${presetName}`,
+    `alertFacetFilters-${userPrefix}${presetName}`,
     {
       severity: [],
       status: [],
@@ -126,12 +130,12 @@ export function AlertTable({
   );
 
   const [dynamicFacets, setDynamicFacets] = useLocalStorage<DynamicFacet[]>(
-    `dynamicFacets-${presetName}`,
+    `dynamicFacets-${userPrefix}${presetName}`,
     []
   );
 
   const [viewedAlerts, setViewedAlerts] = useLocalStorage<ViewedAlert[]>(
-    `viewed-alerts-${presetName}`,
+    `viewed-alerts-${userPrefix}${presetName}`,
     []
   );
   const [clearFiltersTriggered, setClearFiltersTriggered] = useState(false);
@@ -151,26 +155,26 @@ export function AlertTable({
   const columnsIds = getColumnsIds(columns);
 
   const [columnOrder, setColumnOrder] = useLocalStorage<ColumnOrderState>(
-    `column-order-${presetName}`,
+    `column-order-${userPrefix}${presetName}`,
     DEFAULT_COLS
   );
 
   const [columnVisibility, setColumnVisibility] = useLocalStorage<VisibilityState>(
-    `column-visibility-${presetName}`,
+    `column-visibility-${userPrefix}${presetName}`,
     DEFAULT_COLS_VISIBILITY
   );
 
   const [columnSizing, setColumnSizing] = useLocalStorage<ColumnSizingState>(
-    "table-sizes",
+    `table-sizes-${userPrefix}${presetName}`,
     {}
   );
   const [columnTimeFormats, setColumnTimeFormats] = useLocalStorage<
     Record<string, TimeFormatOption>
-  >(`column-time-formats-${presetName}`, {});
+  >(`column-time-formats-${userPrefix}${presetName}`, {});
 
   const [columnListFormats, setColumnListFormats] = useLocalStorage<
     Record<string, ListFormatOption>
-  >(`column-list-formats-${presetName}`, {});
+  >(`column-list-formats-${userPrefix}${presetName}`, {});
 
   const [sorting, setSorting] = useState<SortingState>(
     noisyAlertsEnabled ? [{ id: "noise", desc: true }] : []
@@ -195,7 +199,11 @@ export function AlertTable({
     useState<boolean>(false);
 
   // Add grouping state and group expansion state
-  const [grouping, setGrouping] = useState<GroupingState>([]);
+  // Persist grouping state per user/preset
+  const [grouping, setGrouping] = useLocalStorage<GroupingState>(
+    `column-grouping-${userPrefix}${presetName}`,
+    []
+  );
   const groupExpansionState = useGroupExpansion(true);
   const { toggleAll, areAllGroupsExpanded } = groupExpansionState;
   const isGroupingActive = grouping.length > 0;
@@ -399,7 +407,7 @@ export function AlertTable({
               onDelete={handleFacetDelete}
               table={table}
               showSkeleton={showSkeleton}
-            /> 
+            />
           </div>
 
           <div className="flex-1 flex flex-col min-w-0">
@@ -429,7 +437,7 @@ export function AlertTable({
                       columnVisibility={columnVisibility}
                       setColumnVisibility={handleColumnVisibilityChange}
                       columnRenameMapping={{}}
-                      setColumnRenameMapping={() => {}}
+                      setColumnRenameMapping={() => { }}
                     />
                     <AlertsTableBody
                       table={table}

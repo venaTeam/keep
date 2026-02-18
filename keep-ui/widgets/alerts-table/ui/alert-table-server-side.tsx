@@ -76,6 +76,7 @@ import { PaginationState } from "@/features/filter/pagination";
 import { useGroupExpansion } from "@/utils/hooks/useGroupExpansion";
 import { usePresetColumnState } from "@/entities/presets/model";
 import { STATIC_PRESET_IDS, STATIC_PRESETS_NAMES } from "@/entities/presets/model/constants";
+import { useHydratedSession } from "@/shared/lib/hooks/useHydratedSession";
 
 const AssigneeLabel = ({ email }: { email: string }) => {
   const user = useUser(email);
@@ -139,10 +140,19 @@ export function AlertTableServerSide({
   onReload,
   onQueryChange,
 }: Props) {
+  // Get user session early so all user-scoped localStorage keys have access
+  const { data: session } = useHydratedSession();
+  const userEmail = session?.user?.email;
+  const userPrefix = userEmail ? `${userEmail}-` : "";
+
   const [clearFiltersToken, setClearFiltersToken] = useState<string | null>(
     null
   );
-  const [grouping, setGrouping] = useState<GroupingState>([]);
+  // Persist grouping state per user/preset
+  const [grouping, setGrouping] = useLocalStorage<GroupingState>(
+    `column-grouping-${userPrefix}${presetName}`,
+    []
+  );
   const [filterCel, setFilterCel] = useState<string | null>(null);
   const [searchCel, setSearchCel] = useState<string | null>(null);
 
@@ -192,7 +202,7 @@ export function AlertTableServerSide({
   const columnsIds = getColumnsIds(columns);
 
   const [columnSizing, setColumnSizing] = useLocalStorage<ColumnSizingState>(
-    "table-sizes",
+    `table-sizes-${userPrefix}${presetName}`,
     {}
   );
 
@@ -688,7 +698,13 @@ export function AlertTableServerSide({
               />
             )}
 
-            <SettingsSelection table={table} presetName={presetName} presetId={presetId} />
+            <SettingsSelection
+              table={table}
+              presetName={presetName}
+              presetId={presetId}
+              onResetGrouping={() => setGrouping([])}
+              onResetFacets={() => setClearFiltersToken(Date.now().toString())}
+            />
           </div>
         </div>
       </div>
@@ -731,6 +747,7 @@ export function AlertTableServerSide({
               clearFiltersToken={clearFiltersToken}
               initialFacetsData={{ facets: initialFacets, facetOptions: null }}
               facetsConfig={facetsConfig}
+              persistenceKey={`facets-${userPrefix}${presetName}`}
               onCelChange={setFilterCel}
               revalidationToken={facetsPanelRefreshToken}
               isSilentReloading={isAsyncLoading}

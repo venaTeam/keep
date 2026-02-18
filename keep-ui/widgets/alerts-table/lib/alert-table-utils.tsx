@@ -725,4 +725,3 @@ export const useAlertTableCols = (
     setAssignModalAlert,
   ]);
 };
-

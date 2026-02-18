@@ -58,6 +58,7 @@ export function AlertDismissModal({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disposeOnNewAlert, setDisposeOnNewAlert] = useState<boolean>(true);
   const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
+  const [commentError, setCommentError] = useState<boolean>(false);
 
   const isRestore = alerts?.every((a) => a.dismissed);
   const revalidateMultiple = useRevalidateMultiple();
@@ -97,6 +98,11 @@ export function AlertDismissModal({
   const handleDismissChange = async () => {
     if (selectedTab === 1 && !selectedDateTime) {
       setShowError(true);
+      return;
+    }
+
+    if (!isRestore && !dismissComment.trim()) {
+      setCommentError(true);
       return;
     }
 
@@ -153,6 +159,7 @@ export function AlertDismissModal({
     setSelectedDateTime(null);
     setDismissComment("");
     setShowError(false);
+    setCommentError(false);
     setDisposeOnNewAlert(true);
     setSelectedStatus(null);
     handleClose();
@@ -302,13 +309,21 @@ export function AlertDismissModal({
               </TabPanel>
             </TabPanels>
           </TabGroup>
-          <Title>{isRestore ? "Restore Note" : "Dismiss Comment"}</Title>
+          <Title>
+            {isRestore ? "Restore Note" : "Dismiss Comment"}{" "}
+            {!isRestore && <span className="text-red-500">*</span>}
+          </Title>
           <div className="mt-4">
             <Textarea
               value={dismissComment}
-              onChange={(e) => setDismissComment(e.target.value)}
+              onChange={(e) => {
+                setDismissComment(e.target.value);
+                setCommentError(false);
+              }}
               placeholder={`Add your ${isRestore ? "restore" : "dismiss"
                 } note here...`}
+              error={commentError}
+              errorMessage="Comment is required"
               rows={4}
             />
           </div>

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { VisibilityState, ColumnOrderState } from "@tanstack/react-table";
 import { useLocalStorage } from "@/utils/hooks/useLocalStorage";
 import { usePresetColumnConfig } from "./usePresetColumnConfig";
@@ -11,6 +11,7 @@ import {
 } from "@/widgets/alerts-table/lib/alert-table-utils";
 import { STATIC_PRESETS_NAMES, STATIC_PRESET_IDS } from "./constants";
 import { ColumnConfiguration } from "./types";
+import { useHydratedSession } from "@/shared/lib/hooks/useHydratedSession";
 
 interface UsePresetColumnStateOptions {
   presetName: string;
@@ -18,11 +19,33 @@ interface UsePresetColumnStateOptions {
   useBackend?: boolean; // Flag to enable backend usage
 }
 
+/**
+ * Generates a user-scoped localStorage key prefix.
+ * When a user session is available, keys are prefixed with the user's email
+ * to ensure per-user isolation in shared browser environments.
+ */
+function getUserScopedKey(
+  baseName: string,
+  presetName: string,
+  userEmail?: string | null
+): string {
+  const userPrefix = userEmail ? `${userEmail}-` : "";
+  return `${baseName}-${userPrefix}${presetName}`;
+}
+
+/**
+ * One-time migration key names for localStorage migration tracking.
+ */
+const MIGRATION_KEY = "keephq-column-config-migrated-v1";
+
 export const usePresetColumnState = ({
   presetName,
   presetId,
   useBackend = false,
 }: UsePresetColumnStateOptions) => {
+  const { data: session } = useHydratedSession();
+  const userEmail = session?.user?.email;
+
   // Check if this is a static preset that should always use local storage
   // Check both by ID and by name as fallbacks
   const isStaticPreset =
@@ -38,32 +61,113 @@ export const usePresetColumnState = ({
       enabled: shouldUseBackend, // Use enabled flag to control fetching
     });
 
-  // Local storage fallbacks (existing implementation)
+  // User-scoped localStorage keys
+  const visibilityKey = getUserScopedKey(
+    "column-visibility",
+    presetName,
+    userEmail
+  );
+  const orderKey = getUserScopedKey("column-order", presetName, userEmail);
+  const renameMappingKey = getUserScopedKey(
+    "column-rename-mapping",
+    presetName,
+    userEmail
+  );
+  const timeFormatsKey = getUserScopedKey(
+    "column-time-formats",
+    presetName,
+    userEmail
+  );
+  const listFormatsKey = getUserScopedKey(
+    "column-list-formats",
+    presetName,
+    userEmail
+  );
+
+  // One-time migration from old unscoped keys to user-scoped keys
+  const migrationDone = useRef(false);
+  useEffect(() => {
+    if (
+      !userEmail ||
+      migrationDone.current ||
+      typeof window === "undefined" ||
+      typeof localStorage === "undefined"
+    ) {
+      return;
+    }
+
+    // Only migrate once per user/preset combination
+    const migrationMarker = `${MIGRATION_KEY}-${userEmail}-${presetName}`;
+    if (localStorage.getItem(migrationMarker)) {
+      migrationDone.current = true;
+      return;
+    }
+
+    const keysToMigrate = [
+      { oldSuffix: `column-visibility-${presetName}`, newKey: visibilityKey },
+      { oldSuffix: `column-order-${presetName}`, newKey: orderKey },
+      {
+        oldSuffix: `column-rename-mapping-${presetName}`,
+        newKey: renameMappingKey,
+      },
+      {
+        oldSuffix: `column-time-formats-${presetName}`,
+        newKey: timeFormatsKey,
+      },
+      {
+        oldSuffix: `column-list-formats-${presetName}`,
+        newKey: listFormatsKey,
+      },
+    ];
+
+    let migrated = false;
+    for (const { oldSuffix, newKey } of keysToMigrate) {
+      const oldFullKey = `keephq-${oldSuffix}`;
+      const newFullKey = `keephq-${newKey}`;
+      const oldValue = localStorage.getItem(oldFullKey);
+      const newValue = localStorage.getItem(newFullKey);
+
+      // Only migrate if old key exists and new user-scoped key doesn't
+      if (oldValue && !newValue) {
+        localStorage.setItem(newFullKey, oldValue);
+        migrated = true;
+      }
+    }
+
+    if (migrated) {
+      console.info(
+        `Migrated column config for preset "${presetName}" to user-scoped keys for ${userEmail}`
+      );
+    }
+    localStorage.setItem(migrationMarker, "true");
+    migrationDone.current = true;
+  }, [
+    userEmail,
+    presetName,
+    visibilityKey,
+    orderKey,
+    renameMappingKey,
+    timeFormatsKey,
+    listFormatsKey,
+  ]);
+
+  // Local storage fallbacks with user-scoped keys
   const [localColumnVisibility, setLocalColumnVisibility] =
-    useLocalStorage<VisibilityState>(
-      `column-visibility-${presetName}`,
-      DEFAULT_COLS_VISIBILITY
-    );
+    useLocalStorage<VisibilityState>(visibilityKey, DEFAULT_COLS_VISIBILITY);
 
   const [localColumnOrder, setLocalColumnOrder] =
-    useLocalStorage<ColumnOrderState>(
-      `column-order-${presetName}`,
-      DEFAULT_COLS
-    );
+    useLocalStorage<ColumnOrderState>(orderKey, DEFAULT_COLS);
 
   const [localColumnRenameMapping, setLocalColumnRenameMapping] =
-    useLocalStorage<ColumnRenameMapping>(
-      `column-rename-mapping-${presetName}`,
-      {}
-    );
+    useLocalStorage<ColumnRenameMapping>(renameMappingKey, {});
 
   const [localColumnTimeFormats, setLocalColumnTimeFormats] = useLocalStorage<
     Record<string, TimeFormatOption>
-  >(`column-time-formats-${presetName}`, {});
+  >(timeFormatsKey, {});
 
   const [localColumnListFormats, setLocalColumnListFormats] = useLocalStorage<
     Record<string, ListFormatOption>
-  >(`column-list-formats-${presetName}`, {});
+  >(listFormatsKey, {});
 
   // Determine which state to use - with fallback to local storage on error
   // Always return immediately with either backend or local data

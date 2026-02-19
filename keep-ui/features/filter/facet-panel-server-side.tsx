@@ -35,6 +35,8 @@ export interface FacetsPanelProps {
   clearFiltersToken?: string | null;
   isSilentReloading?: boolean;
   facetsConfig?: FacetsConfig;
+  /** Optional key for persisting facet selections to localStorage */
+  persistenceKey?: string;
   /** Callback to handle the change of the CEL when options toggle */
   onCelChange?: (cel: string) => void;
 }
@@ -49,6 +51,7 @@ export const FacetsPanelServerSide: React.FC<FacetsPanelProps> = ({
   clearFiltersToken,
   onCelChange = undefined,
   facetsConfig,
+  persistenceKey,
   isSilentReloading,
 }) => {
   const [isModalOpen, setIsModalOpen] = useLocalStorage<boolean>(
@@ -106,6 +109,7 @@ export const FacetsPanelServerSide: React.FC<FacetsPanelProps> = ({
         areFacetOptionsLoading={!isSilentReloading && facetOptionsLoading}
         clearFiltersToken={clearFiltersToken}
         facetsConfig={facetsConfig}
+        persistenceKey={persistenceKey}
         onCelChange={onCelChange}
         onAddFacet={() => setIsModalOpen(true)}
         onLoadFacetOptions={(facetId) =>

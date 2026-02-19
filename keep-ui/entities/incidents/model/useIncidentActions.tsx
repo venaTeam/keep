@@ -15,7 +15,8 @@ type UseIncidentActionsValue = {
   changeStatus: (
     incidentId: string,
     status: Status,
-    comment?: string
+    comment?: string,
+    disposeOnNewAlert?: boolean
   ) => Promise<void>;
   changeSeverity: (
     incidentId: string,
@@ -219,10 +220,9 @@ export function useIncidentActions(): UseIncidentActionsValue {
       if (
         !skipConfirmation &&
         !confirm(
-          `Are you sure you want to delete ${
-            incidentIds.length === 1
-              ? "this incident?"
-              : `${incidentIds.length} incidents?`
+          `Are you sure you want to delete ${incidentIds.length === 1
+            ? "this incident?"
+            : `${incidentIds.length} incidents?`
           }`
         )
       ) {
@@ -244,7 +244,7 @@ export function useIncidentActions(): UseIncidentActionsValue {
   );
 
   const changeStatus = useCallback(
-    async (incidentId: string, status: Status, comment?: string) => {
+    async (incidentId: string, status: Status, comment?: string, disposeOnNewAlert: boolean = false) => {
       if (!status) {
         showErrorToast(new Error("Please select a new status."));
         return;
@@ -254,6 +254,7 @@ export function useIncidentActions(): UseIncidentActionsValue {
         const result = await api.post(`/incidents/${incidentId}/status`, {
           status,
           comment,
+          dispose_on_new_alert: disposeOnNewAlert,
         });
 
         toast.success("Incident status changed successfully!");
@@ -325,10 +326,9 @@ export function useIncidentActions(): UseIncidentActionsValue {
       if (
         !skipConfirmation &&
         !confirm(
-          `Are you sure you want to unlink ${
-            alertFingerprints.length === 1
-              ? "alert"
-              : `${alertFingerprints.length} alerts`
+          `Are you sure you want to unlink ${alertFingerprints.length === 1
+            ? "alert"
+            : `${alertFingerprints.length} alerts`
           } from this incident?`
         )
       ) {

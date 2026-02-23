@@ -1,10 +1,12 @@
 /**
  * Server-Sent Events (SSE) hook for real-time notifications.
  *
- * This hook uses browser-native EventSource for SSE communication.
+ * This hook uses a fetch-based SSE connection with a global singleton pattern
+ * to ensure only ONE connection is active regardless of how many components
+ * use this hook.
  */
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useConfig } from "./useConfig";
 import { useHydratedSession as useSession } from "@/shared/lib/hooks/useHydratedSession";
 
@@ -45,7 +47,7 @@ export const useSSE = () => {
       const sseBaseUrl = configData.API_URL;
       if (!sseBaseUrl) {
         console.error("useSSE: API_URL not configured, cannot establish SSE connection");
-        activeConsumers--; // Revert count since we failed/aborted
+        activeConsumers--;
         return;
       }
 
@@ -65,9 +67,6 @@ export const useSSE = () => {
             "Connection": "keep-alive",
           };
 
-          // Logic from ApiClient.ts getHeaders()
-          // We use the session from the component that triggered the connection
-          // This assumes all components share the same session context (which is true)
           if (user_session && user_session.accessToken && user_session.accessToken !== "unauthenticated") {
             headers["Authorization"] = `Bearer ${user_session.accessToken}`;
           }
@@ -125,8 +124,6 @@ export const useSSE = () => {
                 const handlers = sharedHandlers.get(eventType);
                 if (handlers) {
                   try {
-                    // Only log if it's not a heartbeat or similar frequent event if needed
-                    // console.log(`useSSE: Received ${eventType}`, data);
                     const parsedData = JSON.parse(data);
                     handlers.forEach(h => h(parsedData));
                   } catch (e) {
@@ -144,7 +141,7 @@ export const useSSE = () => {
 
           if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
             console.log(`useSSE: Reconnecting in ${connectionAttempts * 1000}ms...`);
-            setTimeout(connectSSE, connectionAttempts * 1000); // Exponential backoff
+            setTimeout(connectSSE, connectionAttempts * 1000);
           }
         }
       };
@@ -154,9 +151,7 @@ export const useSSE = () => {
 
     return () => {
       activeConsumers--;
-      // If no more consumers, abort the global connection
       if (activeConsumers <= 0) {
-        // Reset to 0 just in case
         activeConsumers = 0;
         if (globalAbortController) {
           console.log("useSSE: No more consumers, aborting connection");
@@ -192,5 +187,3 @@ export const useSSE = () => {
     unbind,
   };
 };
-
-

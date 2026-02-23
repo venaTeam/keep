@@ -12,6 +12,7 @@ import { useHydratedSession as useSession } from "@/shared/lib/hooks/useHydrated
 // This prevents multiple fetch connections when useSSE() is called
 // from multiple components (SSEProvider, useAlertPolling, etc.)
 let globalController: AbortController | null = null;
+let globalToken: string | undefined = undefined; // track which token the connection uses
 let sharedHandlers: Map<string, Set<(data: any) => void>> = new Map();
 let connectionAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -53,11 +54,21 @@ export const useSSE = () => {
       return;
     }
 
-    // If a global connection already exists, skip — only the first
-    // component to mount creates the connection, all others just
-    // use bind/unbind on the shared handler map.
+    const currentToken = session?.accessToken;
+
+    // If a global connection already exists with the SAME token, skip.
+    // But if the token changed (e.g. refresh in production), tear down
+    // the old connection and reconnect with the new token.
     if (globalController) {
-      return;
+      if (globalToken === currentToken) {
+        return; // same token, connection is fine
+      }
+      // Token changed — kill old connection so we reconnect below
+      console.log("useSSE: Token changed, reconnecting with new token");
+      globalController.abort();
+      globalController = null;
+      globalToken = undefined;
+      connectionAttempts = 0;
     }
 
     const sseBaseUrl = configData.API_URL;
@@ -71,6 +82,7 @@ export const useSSE = () => {
     const controller = new AbortController();
     const signal = controller.signal;
     globalController = controller;
+    globalToken = currentToken;
 
     const connectSSE = async () => {
       try {
@@ -83,8 +95,8 @@ export const useSSE = () => {
         };
 
         // Logic from ApiClient.ts getHeaders()
-        if (session && session.accessToken && session.accessToken !== "unauthenticated") {
-          headers["Authorization"] = `Bearer ${session.accessToken}`;
+        if (currentToken && currentToken !== "unauthenticated") {
+          headers["Authorization"] = `Bearer ${currentToken}`;
         }
         headers["ngrok-skip-browser-warning"] = "true";
 
@@ -149,28 +161,38 @@ export const useSSE = () => {
             }
           }
         }
+
+        // Stream ended (server closed it, e.g. timeout or deploy).
+        // Reconnect unless we were intentionally aborted.
+        if (!signal.aborted) {
+          console.log("useSSE: Stream ended by server, reconnecting...");
+          globalController = null;
+          globalToken = undefined;
+          connectionAttempts++;
+          if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
+            setTimeout(connectSSE, connectionAttempts * 1000);
+          }
+        }
       } catch (error: any) {
         if (signal.aborted) return;
 
         console.error("useSSE: Connection error", error);
+        globalController = null;
+        globalToken = undefined;
         connectionAttempts++;
 
         if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
           console.log(`useSSE: Reconnecting in ${connectionAttempts * 1000}ms...`);
-          setTimeout(connectSSE, connectionAttempts * 1000); // Exponential backoff
+          setTimeout(connectSSE, connectionAttempts * 1000);
         }
       }
     };
 
     connectSSE();
 
-    // Cleanup: abort only if this component created the connection
-    return () => {
-      if (globalController === controller) {
-        controller.abort();
-        globalController = null;
-      }
-    };
+    // No cleanup on unmount — the connection is global and must persist
+    // across component mounts/unmounts. The connection is only torn down
+    // when the token changes (handled above) or the server closes it.
   }, [configData, user_session?.accessToken, status]);
 
   // Bind a callback to an event

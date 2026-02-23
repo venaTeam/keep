@@ -154,12 +154,31 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
         const currentResults = currentData?.queryResult?.results || [];
         const currentCount = currentData?.queryResult?.count || 0;
 
+        // Build a set of incoming fingerprints for fast lookup
+        const incomingFingerprints = new Set(
+          data.alerts.map((a: any) => a.fingerprint)
+        );
+
+        // Remove existing alerts that share a fingerprint with incoming ones
+        // (the incoming version is the latest), then prepend the new alerts
+        const dedupedResults = currentResults.filter(
+          (existing: any) => !incomingFingerprints.has(existing.fingerprint)
+        );
+
+        // Count only truly new alerts (fingerprints not already present)
+        const existingFingerprints = new Set(
+          currentResults.map((a: any) => a.fingerprint)
+        );
+        const newAlertCount = data.alerts.filter(
+          (a: any) => !existingFingerprints.has(a.fingerprint)
+        ).length;
+
         return {
           ...currentData,
           queryResult: {
             ...currentData?.queryResult,
-            results: [...data.alerts, ...currentResults],
-            count: currentCount + data.alerts.length,
+            results: [...data.alerts, ...dedupedResults],
+            count: currentCount + newAlertCount,
           },
         };
       }, { revalidate: false });

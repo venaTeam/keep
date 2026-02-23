@@ -1,18 +1,17 @@
 /**
  * Server-Sent Events (SSE) hook for real-time notifications.
  *
- * This hook uses a fetch-based SSE connection with a global singleton pattern
- * to ensure only ONE connection is active regardless of how many components
- * use this hook.
+ * This hook uses browser-native EventSource for SSE communication.
  */
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useConfig } from "./useConfig";
 import { useHydratedSession as useSession } from "@/shared/lib/hooks/useHydratedSession";
 
-// Shared connection controller and consumer count
-let globalAbortController: AbortController | null = null;
-let activeConsumers = 0;
+// Global singleton connection - shared across ALL hook instances
+// This prevents multiple fetch connections when useSSE() is called
+// from multiple components (SSEProvider, useAlertPolling, etc.)
+let globalController: AbortController | null = null;
 let sharedHandlers: Map<string, Set<(data: any) => void>> = new Map();
 let connectionAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -35,129 +34,141 @@ export const useSSE = () => {
 
   // Initialize SSE connection
   useEffect(() => {
-    // If we can't connect yet, don't increment consumers or try to connect
-    if (configData?.SSE_DISABLED === true) return;
-    if (configData === null || configData === undefined) return;
-    if (status === "loading") return;
+    const session = status === "unauthenticated" ? {
+      accessToken: "unauthenticated"
+    } : user_session;
 
-    activeConsumers++;
+    // Check if SSE is disabled
+    if (configData?.SSE_DISABLED === true) {
+      return;
+    }
 
-    // Only establish a new connection if one doesn't exist
-    if (!globalAbortController) {
-      const sseBaseUrl = configData.API_URL;
-      if (!sseBaseUrl) {
-        console.error("useSSE: API_URL not configured, cannot establish SSE connection");
-        activeConsumers--;
-        return;
-      }
+    // Don't connect if we don't have config yet
+    if (configData === null || configData === undefined) {
+      return;
+    }
 
-      const sseUrl = `${sseBaseUrl}/sse/subscribe`;
+    // Wait for authentication if auth is required (status will be loading initially)
+    if (status === "loading") {
+      return;
+    }
 
-      // Create new global controller
-      globalAbortController = new AbortController();
-      const signal = globalAbortController.signal;
+    // If a global connection already exists, skip — only the first
+    // component to mount creates the connection, all others just
+    // use bind/unbind on the shared handler map.
+    if (globalController) {
+      return;
+    }
 
-      const connectSSE = async () => {
-        try {
-          console.log("useSSE: Connecting via fetch...");
+    const sseBaseUrl = configData.API_URL;
+    if (!sseBaseUrl) {
+      console.error("useSSE: API_URL not configured, cannot establish SSE connection");
+      return;
+    }
 
-          const headers: HeadersInit = {
-            "Accept": "text/event-stream",
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-          };
+    const sseUrl = `${sseBaseUrl}/sse/subscribe`;
 
-          if (user_session && user_session.accessToken && user_session.accessToken !== "unauthenticated") {
-            headers["Authorization"] = `Bearer ${user_session.accessToken}`;
-          }
-          headers["ngrok-skip-browser-warning"] = "true";
+    const controller = new AbortController();
+    const signal = controller.signal;
+    globalController = controller;
 
-          const response = await fetch(sseUrl, {
-            method: "POST",
-            headers,
-            signal,
-          });
+    const connectSSE = async () => {
+      try {
+        console.log("useSSE: Connecting via fetch...");
 
-          if (!response.ok) {
-            throw new Error(`SSE connection failed: ${response.status} ${response.statusText}`);
-          }
+        const headers: HeadersInit = {
+          "Accept": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+        };
 
-          if (!response.body) {
-            throw new Error("SSE connection failed: No body");
-          }
+        // Logic from ApiClient.ts getHeaders()
+        if (session && session.accessToken && session.accessToken !== "unauthenticated") {
+          headers["Authorization"] = `Bearer ${session.accessToken}`;
+        }
+        headers["ngrok-skip-browser-warning"] = "true";
 
-          console.log("useSSE: Connected successfully");
-          connectionAttempts = 0;
+        const response = await fetch(sseUrl, {
+          method: "POST",
+          headers,
+          signal,
+        });
 
-          // Notify connected
-          const connectedHandlers = sharedHandlers.get("connected");
-          if (connectedHandlers) {
-            connectedHandlers.forEach(h => h({ status: "connected" }));
-          }
+        if (!response.ok) {
+          throw new Error(`SSE connection failed: ${response.status} ${response.statusText}`);
+        }
 
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-          let buffer = "";
+        if (!response.body) {
+          throw new Error("SSE connection failed: No body");
+        }
 
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+        console.log("useSSE: Connected successfully");
+        connectionAttempts = 0;
 
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n\n");
-            buffer = lines.pop() || ""; // Keep incomplete chunk
+        // Notify connected
+        const connectedHandlers = sharedHandlers.get("connected");
+        if (connectedHandlers) {
+          connectedHandlers.forEach(h => h({ status: "connected" }));
+        }
 
-            for (const block of lines) {
-              const linesInBlock = block.split("\n");
-              let eventType = "message";
-              let data = "";
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
 
-              for (const line of linesInBlock) {
-                if (line.startsWith("event: ")) {
-                  eventType = line.substring(7).trim();
-                } else if (line.startsWith("data: ")) {
-                  data = line.substring(6).trim();
-                }
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop() || ""; // Keep incomplete chunk
+
+          for (const block of lines) {
+            const linesInBlock = block.split("\n");
+            let eventType = "message";
+            let data = "";
+
+            for (const line of linesInBlock) {
+              if (line.startsWith("event: ")) {
+                eventType = line.substring(7).trim();
+              } else if (line.startsWith("data: ")) {
+                data = line.substring(6).trim();
               }
+            }
 
-              if (eventType && data) {
-                const handlers = sharedHandlers.get(eventType);
-                if (handlers) {
-                  try {
-                    const parsedData = JSON.parse(data);
-                    handlers.forEach(h => h(parsedData));
-                  } catch (e) {
-                    handlers.forEach(h => h(data));
-                  }
+            if (eventType && data) {
+              const handlers = sharedHandlers.get(eventType);
+              if (handlers) {
+                try {
+                  const parsedData = JSON.parse(data);
+                  handlers.forEach(h => h(parsedData));
+                } catch (e) {
+                  handlers.forEach(h => h(data));
                 }
               }
             }
           }
-        } catch (error: any) {
-          if (signal.aborted) return;
-
-          console.error("useSSE: Connection error", error);
-          connectionAttempts++;
-
-          if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
-            console.log(`useSSE: Reconnecting in ${connectionAttempts * 1000}ms...`);
-            setTimeout(connectSSE, connectionAttempts * 1000);
-          }
         }
-      };
+      } catch (error: any) {
+        if (signal.aborted) return;
 
-      connectSSE();
-    }
+        console.error("useSSE: Connection error", error);
+        connectionAttempts++;
 
+        if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
+          console.log(`useSSE: Reconnecting in ${connectionAttempts * 1000}ms...`);
+          setTimeout(connectSSE, connectionAttempts * 1000); // Exponential backoff
+        }
+      }
+    };
+
+    connectSSE();
+
+    // Cleanup: abort only if this component created the connection
     return () => {
-      activeConsumers--;
-      if (activeConsumers <= 0) {
-        activeConsumers = 0;
-        if (globalAbortController) {
-          console.log("useSSE: No more consumers, aborting connection");
-          globalAbortController.abort();
-          globalAbortController = null;
-        }
+      if (globalController === controller) {
+        controller.abort();
+        globalController = null;
       }
     };
   }, [configData, user_session?.accessToken, status]);

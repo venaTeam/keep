@@ -26,6 +26,8 @@ export interface FacetsPanelProps {
    * Key is the facet name, value is the list of option values to uncheck.
    **/
   facetsConfig?: FacetsConfig;
+  /** Optional key for persisting facet selections to localStorage */
+  persistenceKey?: string;
   renderFacetOptionLabel?: (
     facetName: string,
     optionDisplayName: string
@@ -49,6 +51,7 @@ export const FacetsPanel: React.FC<FacetsPanelProps> = ({
   areFacetOptionsLoading = false,
   clearFiltersToken,
   facetsConfig,
+  persistenceKey,
   onCelChange = undefined,
   onAddFacet = undefined,
   onDeleteFacet = undefined,
@@ -61,7 +64,7 @@ export const FacetsPanel: React.FC<FacetsPanelProps> = ({
   onCelChangeRef.current = onCelChange;
   const onReloadFacetOptionsRef = useRef(onReloadFacetOptions);
   onReloadFacetOptionsRef.current = onReloadFacetOptions;
-  const store = useNewFacetStore(facetsConfig);
+  const store = useNewFacetStore(facetsConfig, persistenceKey);
   const facetOptionQueries = useStore(
     store,
     (state) => state.queriesState.facetOptionQueries

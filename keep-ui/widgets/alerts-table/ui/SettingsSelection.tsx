@@ -21,12 +21,16 @@ interface SettingsSelectionProps {
   table: Table<AlertDto>;
   presetName: string;
   presetId?: string;
+  onResetGrouping?: () => void;
+  onResetFacets?: () => void;
 }
 
 export default function SettingsSelection({
   table,
   presetName,
   presetId,
+  onResetGrouping,
+  onResetFacets,
 }: SettingsSelectionProps) {
   const arrowRef = useRef(null);
   const { refs, floatingStyles, context } = useFloating({
@@ -87,6 +91,8 @@ export default function SettingsSelection({
                       presetName={presetName}
                       presetId={presetId}
                       onClose={close}
+                      onResetGrouping={onResetGrouping}
+                      onResetFacets={onResetFacets}
                     />
                   </TabPanel>
                   <TabPanel className="h-full" data-testid="panel-theme">

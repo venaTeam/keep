@@ -855,7 +855,7 @@ def change_incident_status(
     incident_bl = IncidentBl(tenant_id, session)
 
     new_incident_dto = incident_bl.change_status(
-        incident_id, change.status, authenticated_entity
+        incident_id, change.status, authenticated_entity, change.dispose_on_new_alert
     )
 
     return new_incident_dto

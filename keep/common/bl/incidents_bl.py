@@ -473,6 +473,7 @@ class IncidentBl:
         incident_id: UUID | str,
         new_status: IncidentStatus,
         change_by: AuthenticatedEntity,
+        dispose_on_new_alert: bool = False,
     ) -> IncidentDto:
         self.logger.info(
             "Fetching incident",
@@ -509,7 +510,7 @@ class IncidentBl:
                 action_type,
                 change_by.email,
                 action_description,
-                dispose_on_new_alert=True,
+                dispose_on_new_alert=dispose_on_new_alert,
             )
 
         if new_status == IncidentStatus.RESOLVED:

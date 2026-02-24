@@ -2,9 +2,9 @@ import clsx from "clsx";
 import { Status } from "@/entities/incidents/model";
 import { STATUS_ICONS } from "@/entities/incidents/ui";
 import Select, { ClassNamesConfig } from "react-select";
-import { useIncidentActions } from "@/entities/incidents/model";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { capitalize } from "@/utils/helpers";
+import { IncidentChangeStatusModal } from "./incident-change-status-modal";
 
 const customClassNames: ClassNamesConfig<any, false, any> = {
   container: () => "inline-flex",
@@ -41,16 +41,22 @@ export function IncidentChangeStatusSelect({
 }: Props) {
   // Use a portal to render the menu outside the table container with overflow: hidden
   const menuPortalTarget = useRef<HTMLElement | null>(null);
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(value);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<Status | null>(null);
   useEffect(() => {
     menuPortalTarget.current = document.body;
   }, []);
 
-  const { changeStatus } = useIncidentActions();
+  // Keep internal status in sync with prop
+  useEffect(() => {
+    setCurrentStatus(value);
+  }, [value]);
+
   const statusOptions = useMemo(
     () =>
       Object.values(Status)
-        .filter((status) => status != Status.Deleted || value == Status.Deleted)
+        .filter((status) => status != Status.Deleted || currentStatus == Status.Deleted)
         .map((status) => ({
           value: status,
           label: (
@@ -60,40 +66,59 @@ export function IncidentChangeStatusSelect({
             </div>
           ),
         })),
-    [value]
+    [currentStatus]
   );
 
   const handleChange = useCallback(
     (option: any) => {
-      const _asyncUpdate = async (option: any) => {
-        setIsDisabled(true);
-        await changeStatus(incidentId, option?.value || null);
-        onChange?.(option?.value || null);
-        setIsDisabled(false);
-      };
-      _asyncUpdate(option);
+      if (option?.value && option.value !== currentStatus) {
+        setPendingStatus(option.value);
+        setIsModalOpen(true);
+      }
     },
-    [incidentId, changeStatus, onChange]
+    [currentStatus]
+  );
+
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+    setPendingStatus(null);
+  }, []);
+
+  const handleModalSuccess = useCallback(
+    (newStatus: Status) => {
+      setCurrentStatus(newStatus);
+      onChange?.(newStatus);
+    },
+    [onChange]
   );
 
   const selectedOption = useMemo(
-    () => statusOptions.find((option) => option.value === value),
-    [statusOptions, value]
+    () => statusOptions.find((option) => option.value === currentStatus),
+    [statusOptions, currentStatus]
   );
 
   return (
-    <Select
-      instanceId={`incident-status-select-${incidentId}`}
-      className={className}
-      isSearchable={false}
-      options={statusOptions}
-      value={selectedOption}
-      onChange={handleChange}
-      isDisabled={isDisabled}
-      placeholder="Status"
-      classNames={customClassNames}
-      menuPortalTarget={menuPortalTarget.current}
-      menuPosition="fixed"
-    />
+    <>
+      <Select
+        instanceId={`incident-status-select-${incidentId}`}
+        className={className}
+        isSearchable={false}
+        options={statusOptions}
+        value={selectedOption}
+        onChange={handleChange}
+        placeholder="Status"
+        classNames={customClassNames}
+        menuPortalTarget={menuPortalTarget.current}
+        menuPosition="fixed"
+      />
+      <IncidentChangeStatusModal
+        incidentId={incidentId}
+        currentStatus={currentStatus}
+        initialStatus={pendingStatus}
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleModalSuccess}
+      />
+    </>
   );
 }

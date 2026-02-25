@@ -13,6 +13,7 @@ import { ThemeScript, WatchUpdateTheme } from "@/shared/ui";
 import "@/app/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { WorkflowModalProvider } from "@/features/workflows/manual-run-workflow";
+import ScreenWakeLock from "@/components/ui/ScreenWakeLock";
 import { SSEProvider } from "@/app/sse-provider";
 
 // If loading a variable font, you don't need to specify the font weight
@@ -35,6 +36,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         {/* ThemeScript must be the first thing to avoid flickering */}
         <ThemeScript />
         <ConfigProvider config={config}>
+          <ScreenWakeLock />
           <NextAuthProvider session={session}>
             <SSEProvider>
               <TopologyPollingContextProvider>

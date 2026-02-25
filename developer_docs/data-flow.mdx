@@ -68,26 +68,29 @@ flowchart TD
 
 ## Part 3: Real-time UI Updates
 
-Keep uses **Websockets (via Pusher)** to notify the UI when new data is available. This avoids aggressive polling and keeps the interface snappy.
+Keep uses **Server-Sent Events (SSE)** to push updates to the UI in real-time. This allows the backend to stream events to the browser over a single HTTP connection.
 
 ### Update Flow
-1.  **Notification**: After the Worker saves the alert, it sends a message to Pusher on a private channel (`private-{tenant_id}`).
-    *   Events: `poll-alerts`, `incident-change`, `poll-presets`.
-2.  **Reaction**: The Browser receives the text message (with no data payload).
-3.  **Fetch**: The Browser calls the API (`GET /alerts`) to fetch the latest state.
+1.  **Notification**: After the Worker saves the alert, it sends a notification to the API server (via HTTP POST).
+2.  **Broadcast**: The API server broadcasts the event to all connected clients via SSE.
+    *   Events: `poll-alerts`, `incident-change`, `poll-presets`, `topology-update`.
+3.  **Reaction**: The Browser receives the event.
+    *   For `poll-alerts`: The payload contains the new alerts, which are optimistically appended to the UI.
+    *   For other events: The UI may re-fetch data or update local state.
 
 ```mermaid
 sequenceDiagram
     participant Worker
-    participant Pusher
-    participant Browser
     participant API
+    participant Browser
 
-    Worker->>Pusher: Trigger "poll-alerts"
-    Pusher->>Browser: Send Event (WebSocket)
-    Browser->>API: GET /alerts (XHR call)
-    API-->>Browser: Return latest alerts JSON
-    Browser->>Browser: Re-render Table
+    Worker->>API: POST /sse/notify (Internal)
+    API->>Browser: Send Event (SSE)
+    par Handlers
+        Browser->>Browser: Optimistic Update (Append Alert)
+    and
+        Browser->>API: GET /alerts (Background Sync)
+    end
 ```
 
 ## The Alert Model (`AlertDto`)
@@ -282,13 +285,13 @@ Now that the alert is saved, we trigger the "smart" features:
 ```
 
 #### Step D: Client Updates
-Finally, we use **Pusher** (Websockets) to tell the frontend to refresh. This makes the UI feel "real-time" without polling.
+Finally, we use **Server-Sent Events (SSE)** to notify the frontend in real-time. This makes the UI feel "real-time" without polling.
 
 ```python
     # 7. Real-time UI Updates
     with tracer.start_as_current_span("process_event_notify_client"):
-        pusher_client = get_pusher_client()
-        # Triggers 'poll-alerts' event on the client
+        # Notify all connected SSE clients
+        await notify_sse_clients(tenant_id, "poll-alerts", alert_data)
         # ...
 ```
 

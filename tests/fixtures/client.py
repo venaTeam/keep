@@ -87,7 +87,7 @@ def test_app(monkeypatch, request, db_session):
 @pytest.fixture
 def client(test_app, db_session, monkeypatch):
     # Your existing environment setup
-    monkeypatch.setenv("PUSHER_DISABLED", "true")
+    monkeypatch.setenv("SSE_DISABLED", "true")
     monkeypatch.setenv("KEEP_DEBUG_TASKS", "true")
     monkeypatch.setenv("LOGGING_LEVEL", "DEBUG")
     monkeypatch.setenv("SQLALCHEMY_WARN_20", "1")

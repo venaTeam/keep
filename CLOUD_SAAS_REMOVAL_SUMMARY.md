@@ -156,7 +156,6 @@ These providers remain as they support self-hosted or on-premise deployments:
 - vllm_provider
 - wazuh_provider
 - webhook_provider
-- websocket_provider
 - youtrack_provider
 - zabbix_provider
 

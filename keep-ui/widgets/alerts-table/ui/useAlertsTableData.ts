@@ -34,11 +34,9 @@ function getDateRangeCel(timeFrame: TimeFrameV2 | null): string | null {
 
 export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
   const { useLastAlerts } = useAlerts();
-  const [shouldRefreshDate, setShouldRefreshDate] = useState<boolean>(false);
 
   const [canRevalidate, setCanRevalidate] = useState<boolean>(false);
   const [dateRangeCel, setDateRangeCel] = useState<string | null>(null);
-  const [isPolling, setIsPolling] = useState<boolean>(false);
   const [alertsQueryState, setAlertsQueryState] = useState<
     AlertsQuery | undefined
   >(undefined);
@@ -100,41 +98,6 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
 
   useEffect(() => updateAlertsCelDateRange(), [query?.timeFrame]);
 
-  const { data: alertsChangeToken } = useAlertPolling(!isPaused);
-
-  useEffect(() => {
-    // When refresh token comes, this code allows polling for certain time and then stops.
-    // Will start polling again when new refresh token comes.
-    // Why? Because events are throttled on BE side but we want to refresh the data frequently
-    // when keep gets ingested with data, and it requires control when to refresh from the UI side.
-    if (alertsChangeToken) {
-      setShouldRefreshDate(true);
-      const timeout = setTimeout(() => {
-        setShouldRefreshDate(false);
-      }, 15000);
-      return () => clearTimeout(timeout);
-    }
-  }, [alertsChangeToken]);
-
-  useEffect(() => {
-    if (isPaused) {
-      return;
-    }
-    // so that gap between poll is 2x of query time and minimum 3sec
-    const refreshInterval = Math.max((queryTimeInSeconds || 1000) * 2, 6000);
-    const interval = setInterval(() => {
-      if (!isPaused && shouldRefreshDate) {
-        setIsPolling(true);
-        updateAlertsCelDateRange();
-      }
-    }, refreshInterval);
-    return () => clearInterval(interval);
-  }, [isPaused, shouldRefreshDate]);
-
-  useEffect(() => {
-    setIsPolling(false);
-  }, [JSON.stringify(query)]);
-
   const mainCelQuery = useMemo(() => {
     if (!query || dateRangeCel === null) {
       return null;
@@ -182,6 +145,49 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
     revalidateOnMount: true,
   });
 
+  // Simple alert polling - refresh immediately when SSE event is received (like incidents)
+  useAlertPolling(!isPaused, (data) => {
+    // If we have alert data, updated the list optimistically without re-fetching
+    if (data?.alerts && Array.isArray(data.alerts)) {
+
+      mutateAlerts(async (currentData: any) => {
+        const currentResults = currentData?.queryResult?.results || [];
+        const currentCount = currentData?.queryResult?.count || 0;
+
+        // Build a set of incoming fingerprints for fast lookup
+        const incomingFingerprints = new Set(
+          data.alerts.map((a: any) => a.fingerprint)
+        );
+
+        // Remove existing alerts that share a fingerprint with incoming ones
+        // (the incoming version is the latest), then prepend the new alerts
+        const dedupedResults = currentResults.filter(
+          (existing: any) => !incomingFingerprints.has(existing.fingerprint)
+        );
+
+        // Count only truly new alerts (fingerprints not already present)
+        const existingFingerprints = new Set(
+          currentResults.map((a: any) => a.fingerprint)
+        );
+        const newAlertCount = data.alerts.filter(
+          (a: any) => !existingFingerprints.has(a.fingerprint)
+        ).length;
+
+        return {
+          ...currentData,
+          queryResult: {
+            ...currentData?.queryResult,
+            results: [...data.alerts, ...dedupedResults],
+            count: currentCount + newAlertCount,
+          },
+        };
+      }, { revalidate: false });
+    } else {
+      // Fallback for older backend or other events
+      mutateAlerts();
+    }
+  });
+
   const [alertsToReturn, setAlertsToReturn] = useState<
     AlertDto[] | undefined
   >();
@@ -204,9 +210,8 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
   return {
     alerts: alertsToReturn,
     totalCount,
-    alertsLoading: !isPolling && alertsLoading,
+    alertsLoading: alertsLoading,
     facetsCel: mainCelQuery,
-    alertsChangeToken: alertsChangeToken,
     alertsError: alertsError,
     mutateAlerts,
     facetsPanelRefreshToken,

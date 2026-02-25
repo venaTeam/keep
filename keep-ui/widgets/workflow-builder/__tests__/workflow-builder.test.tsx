@@ -185,11 +185,7 @@ const mockConfig: InternalConfig = {
   API_URL: "http://localhost:8000",
   API_URL_CLIENT: "http://localhost:8000",
   AUTH_TYPE: "test",
-  PUSHER_DISABLED: false,
-  PUSHER_HOST: "localhost",
-  PUSHER_PORT: 6001,
-  PUSHER_APP_KEY: "test",
-  PUSHER_CLUSTER: "test",
+  SSE_DISABLED: false,
 
   READ_ONLY: false,
   OPEN_AI_API_KEY_SET: false,

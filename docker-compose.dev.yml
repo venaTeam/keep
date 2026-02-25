@@ -27,7 +27,4 @@ services:
       - .:/app
       - ./state:/state
 
-  keep-websocket-server:
-    extends:
-      file: docker-compose.common.yml
-      service: keep-websocket-server-common
+

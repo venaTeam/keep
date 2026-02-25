@@ -12,6 +12,7 @@ from typing import List
 # third-parties
 import dateutil
 from arq import Retry
+import requests
 from fastapi.datastructures import FormData
 from opentelemetry import trace
 from sqlalchemy.orm.attributes import flag_modified
@@ -35,8 +36,8 @@ from keep.common.core.db import (
     get_started_at_for_alerts,
     set_last_alert,
 )
-from keep.common.core.dependencies import get_pusher_client
 from keep.common.core.elastic import ElasticClient
+from keep.common.core.sse import notify_sse
 from keep.common.core.metrics import (
     events_error_counter,
     events_in_counter,
@@ -1260,37 +1261,47 @@ def __handle_formatted_events(
         enriched_formatted_events.extend(ignored_events)
 
     with tracer.start_as_current_span("process_event_notify_client"):
-        pusher_client = get_pusher_client() if notify_client else None
-        if not pusher_client:
+        if not notify_client:
             return
         # Get the notification cache
-        pusher_cache = get_notification_cache()
+        notification_cache = get_notification_cache()
 
-        # Tell the client to poll alerts
-        if pusher_cache.should_notify(tenant_id, "poll-alerts"):
-            try:
-                pusher_client.trigger(
-                    f"private-{tenant_id}",
-                    "poll-alerts",
-                    "{}",
-                )
-                logger.info("Told client to poll alerts")
-            except Exception:
-                logger.exception("Failed to tell client to poll alerts")
-                pass
+        # Tell the client to poll alerts via API (since event handler runs in a separate process)
 
-        if incidents and pusher_cache.should_notify(tenant_id, "incident-change"):
+        # Tell the client to poll alerts via API (since event handler runs in a separate process)
+        # We don't use throttling here to ensure real-time updates (client will append instead of full refresh)
+        try:
+            api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
+            logger.info(f"Notifying API at {api_url} to poll alerts for {tenant_id}")
+            
+            # Serialize alerts to dicts
+            alerts_payload = [alert.dict() for alert in enriched_formatted_events]
+            
+            response = requests.post(
+                f"{api_url}/sse/notify",
+                json={
+                    "tenant_id": tenant_id,
+                    "event": "poll-alerts",
+                    "data": {"alerts": alerts_payload}
+                },
+                timeout=5
+            )
+            response.raise_for_status()
+            logger.info(f"Successfully told client to poll alerts via API ({response.status_code})")
+        except Exception as e:
+            logger.warning(f"Failed to tell client to poll alerts: {e}")
+            pass
+
+        if incidents and notification_cache.should_notify(tenant_id, "incident-change"):
             try:
-                pusher_client.trigger(
-                    f"private-{tenant_id}",
-                    "incident-change",
-                    {},
-                )
+                # Include incident IDs in the notification
+                incident_ids = [str(inc.id) for inc in incidents]
+                notify_sse(tenant_id, "incident-change", {"incident_ids": incident_ids})
             except Exception:
                 logger.exception("Failed to tell the client to pull incidents")
 
         # Now we need to update the presets
-        # send with pusher
+        # send with SSE
 
         try:
             presets = get_all_presets_dtos(tenant_id)
@@ -1305,20 +1316,20 @@ def __handle_formatted_events(
                 if not filtered_alerts:
                     continue
                 presets_do_update.append(preset_dto)
-            if pusher_cache.should_notify(tenant_id, "poll-presets"):
+            if notification_cache.should_notify(tenant_id, "poll-presets"):
                 try:
-                    pusher_client.trigger(
-                        f"private-{tenant_id}",
+                    notify_sse(
+                        tenant_id,
                         "poll-presets",
                         json.dumps(
                             [p.name.lower() for p in presets_do_update], default=str
                         ),
                     )
                 except Exception:
-                    logger.exception("Failed to send presets via pusher")
+                    logger.exception("Failed to send presets via SSE")
         except Exception:
             logger.exception(
-                "Failed to send presets via pusher",
+                "Failed to send presets via SSE",
                 extra={
                     "provider_type": provider_type,
                     "num_of_alerts": len(formatted_events),

@@ -6,12 +6,8 @@ export interface InternalConfig {
   KEYCLOAK_ID: string | undefined;
   KEYCLOAK_ISSUER: string | undefined;
 
-  // Pusher
-  PUSHER_DISABLED: boolean;
-  PUSHER_HOST: string | undefined;
-  PUSHER_PORT: number | undefined;
-  PUSHER_APP_KEY: string | undefined;
-  PUSHER_CLUSTER: string | undefined;
+  // Real-time notifications (SSE)
+  SSE_DISABLED: boolean;
 
   // the API URL is used by the server to make requests to the API
   API_URL: string | undefined;

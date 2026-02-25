@@ -19,7 +19,7 @@ The setup consists of several services:
 - **Filebeat**: Filebeat container to push keep-backend logs to logstash 
 - **Keep Frontend**: The Keep UI service configured to use the proxy
 - **Keep Backend**: The Keep API service
-- **Keep WebSocket**: The WebSocket server for real-time updates
+
 
 ## Configuration
 

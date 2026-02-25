@@ -1,5 +1,6 @@
-import { Fragment } from "react";
+import { Fragment, useCallback, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { useSSE } from "@/utils/hooks/useSSE";
 import { AlertDto } from "@/entities/alerts/model";
 import { Button, Title, Badge, Divider } from "@tremor/react";
 import { IoMdClose } from "react-icons/io";
@@ -62,6 +63,19 @@ export const AlertSidebar = ({
       ?.display_name || alert?.providerId;
 
   const { data: config } = useConfig();
+
+  // Subscribe to SSE events so the timeline updates in real-time
+  const { bind, unbind } = useSSE();
+  const onAlertEvent = useCallback(() => {
+    if (isOpen && alert) {
+      mutate();
+    }
+  }, [isOpen, alert, mutate]);
+
+  useEffect(() => {
+    bind("poll-alerts", onAlertEvent);
+    return () => unbind("poll-alerts", onAlertEvent);
+  }, [bind, unbind, onAlertEvent]);
 
   const handleRefresh = async () => {
     console.log("Refresh button clicked");

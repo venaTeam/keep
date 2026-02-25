@@ -33,10 +33,7 @@ services:
     depends_on:
       - kafka
 
-  keep-websocket-server:
-    extends:
-      file: docker-compose-lite.yml
-      service: keep-websocket-server
+
 
   postgres:
     extends:

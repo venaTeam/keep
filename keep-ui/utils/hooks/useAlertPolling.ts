@@ -1,27 +1,15 @@
-import { useEffect, useState } from "react";
-import { useWebsocket } from "@/utils/hooks/usePusher";
-import { Observable } from "rxjs";
-import { v4 as generateGuid } from "uuid";
+import { useEffect } from "react";
+import { useSSE } from "@/utils/hooks/useSSE";
 
-export const useAlertPolling = (isEnabled: boolean) => {
-  const { bind, unbind } = useWebsocket();
-  const [pollAlerts, setPollAlerts] = useState<string | null>(null);
-
-  console.log("useAlertPolling: Initializing");
+export const useAlertPolling = (isEnabled: boolean, onEvent: (data?: any) => void) => {
+  const { bind, unbind } = useSSE();
 
   useEffect(() => {
     if (!isEnabled) {
-      console.log("useAlertPolling: Disabling polling");
       return;
     }
 
-    const subscription = new Observable((subscriber) => {
-      const callback = () => subscriber.next(true);
-      bind("poll-alerts", callback);
-      return () => unbind("poll-alerts", callback);
-    }).subscribe(() => setPollAlerts(generateGuid()));
-    return () => subscription.unsubscribe();
-  }, [isEnabled, bind, unbind]);
-
-  return { data: pollAlerts };
+    bind("poll-alerts", onEvent);
+    return () => unbind("poll-alerts", onEvent);
+  }, [isEnabled, bind, unbind, onEvent]);
 };

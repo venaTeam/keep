@@ -56,6 +56,6 @@ By leveraging Keep Providers, users are able to deeply integrate Keep with the t
 - [vLLM](/providers/documentation/vllm-provider)
 - [Wazuh](/providers/documentation/wazuh-provider)
 - [Webhook](/providers/documentation/webhook-provider)
-- [Websocket](/providers/documentation/websocket-provider)
+
 - [YouTrack](/providers/documentation/youtrack-provider)
 - [Zabbix](/providers/documentation/zabbix-provider)

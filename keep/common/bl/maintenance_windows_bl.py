@@ -18,8 +18,8 @@ from keep.common.core.db import (
     recover_prev_alert_status,
     set_maintenance_windows_trace,
 )
-from keep.common.core.dependencies import get_pusher_client
 from keep.common.core.metrics import alerts_maintenance_silenced_total
+from keep.common.core.sse import notify_sse
 from keep.common.models.action_type import ActionType
 from keep.common.models.alert import AlertDto, AlertStatus
 from keep.common.models.db.alert import Alert, AlertAudit
@@ -314,17 +314,14 @@ class MaintenanceWindowsBl:
                                 "tenant_id": tenant,
                             },
                         )
-                    pusher_cache = get_notification_cache()
-                    if incidents and pusher_cache.should_notify(
+                    notification_cache = get_notification_cache()
+                    if incidents and notification_cache.should_notify(
                         tenant, "incident-change"
                     ):
-                        pusher_client = get_pusher_client()
                         try:
-                            pusher_client.trigger(
-                                f"private-{tenant}",
-                                "incident-change",
-                                {},
-                            )
+                            # Include incident IDs in the notification
+                            incident_ids = [str(inc.id) for inc in incidents]
+                            notify_sse(tenant, "incident-change", {"incident_ids": incident_ids})
                         except Exception:
                             logger.exception(
                                 "Failed to tell the client to pull incidents"
@@ -343,10 +340,10 @@ class MaintenanceWindowsBl:
                         if not filtered_alerts:
                             continue
                         presets_do_update.append(preset_dto)
-                    if pusher_cache.should_notify(tenant, "poll-presets"):
+                    if notification_cache.should_notify(tenant, "poll-presets"):
                         try:
-                            pusher_client.trigger(
-                                f"private-{tenant}",
+                            notify_sse(
+                                tenant,
                                 "poll-presets",
                                 json.dumps(
                                     [p.name.lower() for p in presets_do_update],
@@ -354,10 +351,10 @@ class MaintenanceWindowsBl:
                                 ),
                             )
                         except Exception:
-                            logger.exception("Failed to send presets via pusher")
+                            logger.exception("Failed to send presets via SSE")
                 except Exception:
                     logger.exception(
-                        "Failed to send presets via pusher",
+                        "Failed to send presets via SSE",
                         extra={
                             "provider_type": alert_dto.providerType,
                             "provider_id": alert_dto.providerId,

@@ -1,10 +1,10 @@
-import { 
-  getProviderBaseUrl, 
-  getTicketViewUrl, 
-  getTicketCreateUrl, 
+import {
+  getProviderBaseUrl,
+  getTicketViewUrl,
+  getTicketCreateUrl,
   findLinkedTicket,
   getTicketEnrichmentKey,
-  type LinkedTicket 
+  type LinkedTicket
 } from "../ticketing-utils";
 import { type Provider } from "@/shared/api/providers";
 import { Status, Severity, type IncidentDto } from "@/entities/incidents/model/models";
@@ -176,22 +176,22 @@ describe("ticketing-utils", () => {
   describe("getTicketCreateUrl", () => {
     it("should construct ServiceNow create URL with parameters", () => {
       const result = getTicketCreateUrl(mockServiceNowProvider, "Test description", "Test title");
-      expect(result).toBe("https://company.service-now.com/now/sow/record/incident/-1/params/short_description=Test title^description=Test description");
+      expect(result).toBe("https://company.service-now.com/now/sow/record/incident/-1/params?sysparm_query=short_description=Test%20title^description=Test%20description");
     });
 
     it("should construct Jira create URL with parameters", () => {
       const result = getTicketCreateUrl(mockJiraProvider, "Test description", "Test title");
-      expect(result).toBe("https://company.atlassian.net/secure/CreateIssue.jspa/title=Test title^description=Test description");
+      expect(result).toBe("https://company.atlassian.net/secure/CreateIssue.jspa?title=Test%20title&description=Test%20description");
     });
 
     it("should construct Zendesk create URL with parameters", () => {
       const result = getTicketCreateUrl(mockZendeskProvider, "Test description", "Test title");
-      expect(result).toBe("https://company.zendesk.com/agent/filters/new/title=Test title^description=Test description");
+      expect(result).toBe("https://company.zendesk.com/agent/filters/new?title=Test%20title&description=Test%20description");
     });
 
     it("should handle empty parameters", () => {
       const result = getTicketCreateUrl(mockJiraProvider);
-      expect(result).toBe("https://company.atlassian.net/secure/CreateIssue.jspa/title=^description=");
+      expect(result).toBe("https://company.atlassian.net/secure/CreateIssue.jspa?title=&description=");
     });
 
     it("should use configured ticket creation URL when available", () => {
@@ -205,7 +205,7 @@ describe("ticketing-utils", () => {
         }
       };
       const result = getTicketCreateUrl(providerWithCustomUrl, "Test description", "Test title");
-      expect(result).toBe("https://custom.service-now.com/custom/create/short_description=Test title^description=Test description");
+      expect(result).toBe("https://custom.service-now.com/custom/create?sysparm_query=short_description=Test%20title^description=Test%20description");
     });
   });
 

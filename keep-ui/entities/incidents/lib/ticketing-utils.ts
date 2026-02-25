@@ -42,12 +42,17 @@ export function getTicketCreateUrl(provider: Provider, description: string = "",
 
   let createUrl = provider.details.authentication.ticket_creation_url;
 
+  // URL-encode values so special characters don't break the URL
+  const encodedTitle = encodeURIComponent(title);
+  const encodedDescription = encodeURIComponent(description);
+
   // TODO: might need to add other providers here
   if (provider.type === "servicenow") {
-    createUrl = `${createUrl}/short_description=${title}^description=${description}`;
+    // ServiceNow uses sysparm_query to pre-populate fields on new record forms
+    createUrl = `${createUrl}?sysparm_query=short_description=${encodedTitle}^description=${encodedDescription}`;
   }
-  else{
-    createUrl = `${createUrl}/title=${title}^description=${description}`;
+  else {
+    createUrl = `${createUrl}?title=${encodedTitle}&description=${encodedDescription}`;
   }
 
   return createUrl;

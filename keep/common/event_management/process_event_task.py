@@ -12,7 +12,6 @@ from typing import List
 # third-parties
 import dateutil
 from arq import Retry
-import requests
 from fastapi.datastructures import FormData
 from opentelemetry import trace
 from sqlalchemy.orm.attributes import flag_modified
@@ -1274,8 +1273,6 @@ def __handle_formatted_events(
             api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
             logger.info(f"Notifying API at {api_url} to poll alerts for {tenant_id}")
             
-            # Serialize alerts to dicts
-            alerts_payload = [alert.dict() for alert in enriched_formatted_events]
             # Tell the client to pull alerts
             # TODO: send the actual payload
             notify_sse(tenant_id, "poll-alerts", {})

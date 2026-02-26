@@ -9,6 +9,9 @@ import asyncio
 import json
 import logging
 from typing import Any, AsyncGenerator, Dict, List
+import os
+import requests
+from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -140,11 +143,6 @@ class SSEBroadcaster:
 # Global broadcaster instance
 sse_broadcaster = SSEBroadcaster()
 
-
-import os
-import requests
-import threading
-from concurrent.futures import ThreadPoolExecutor
 
 # Use a bounded thread pool to avoid spawning infinite threads under extreme alert load
 _sse_executor = ThreadPoolExecutor(max_workers=10, thread_name_prefix="sse_notify")

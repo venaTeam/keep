@@ -195,11 +195,12 @@ def query_alerts(
     # Gathering alerts may take a while and we don't care if it will finish before we return the response.
     # In the worst case, gathered alerts will be pulled in the next request.
     # This approach is not good. We should continuesly pull alerts without relying on whether request is done or not.
-    bg_tasks.add_task(
-        pull_data_from_providers,
-        authenticated_entity.tenant_id,
-        request.state.trace_id,
-    )
+    if query.limit != 0:
+        bg_tasks.add_task(
+            pull_data_from_providers,
+            authenticated_entity.tenant_id,
+            request.state.trace_id,
+        )
 
     tenant_id = authenticated_entity.tenant_id
     logger.info(

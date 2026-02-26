@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useSSE } from "@/utils/hooks/useSSE";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 
-const PRESET_POLLING_INTERVAL = 5 * 1000; // Once per 5 seconds
+const PRESET_POLLING_INTERVAL = 3 * 1000; // Once per 3 seconds
 
 export function usePresetPolling() {
   const { bind, unbind } = useSSE();
@@ -21,8 +21,8 @@ export function usePresetPolling() {
 
       console.log("usePresetPolling: Revalidating preset data");
       lastPollTimeRef.current = currentTime;
-      revalidateMultiple(["/preset", "/preset?"], {
-        isExact: true,
+      revalidateMultiple(["/preset", "/alerts/query"], {
+        isExact: false,
       });
     },
     [revalidateMultiple]

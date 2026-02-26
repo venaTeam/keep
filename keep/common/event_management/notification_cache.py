@@ -3,7 +3,7 @@ import time
 from typing import Dict, Tuple
 
 # Get notification interval from env (how often to send SSE notifications)
-SSE_NOTIFICATION_INTERVAL = int(os.getenv("SSE_NOTIFICATION_INTERVAL", "15"))
+SSE_NOTIFICATION_INTERVAL = int(os.getenv("SSE_NOTIFICATION_INTERVAL", "3"))
 
 
 class NotificationCache:

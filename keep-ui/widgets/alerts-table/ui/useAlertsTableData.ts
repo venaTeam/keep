@@ -2,7 +2,7 @@ import { TimeFrameV2 } from "@/components/ui/DateRangePickerV2";
 import { AlertDto, AlertsQuery, useAlerts } from "@/entities/alerts/model";
 import { useAlertPolling } from "@/utils/hooks/useAlertPolling";
 import { v4 as uuidv4 } from "uuid";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface AlertsTableDataQuery {
   searchCel: string;
@@ -145,48 +145,37 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
     revalidateOnMount: true,
   });
 
-  // Simple alert polling - refresh immediately when SSE event is received (like incidents)
-  useAlertPolling(!isPaused, (data) => {
-    // If we have alert data, updated the list optimistically without re-fetching
-    if (data?.alerts && Array.isArray(data.alerts)) {
+  // Throttled alert polling - re-fetch from server when SSE event arrives.
+  // We throttle to avoid excessive API calls when alerts arrive rapidly.
+  const lastAlertPollRef = useRef(0);
+  const pendingPollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ALERT_POLL_INTERVAL = 3000; // Max one re-fetch every 3 seconds
 
-      mutateAlerts(async (currentData: any) => {
-        const currentResults = currentData?.queryResult?.results || [];
-        const currentCount = currentData?.queryResult?.count || 0;
+  const handlePollAlerts = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLastPoll = now - lastAlertPollRef.current;
 
-        // Build a set of incoming fingerprints for fast lookup
-        const incomingFingerprints = new Set(
-          data.alerts.map((a: any) => a.fingerprint)
-        );
-
-        // Remove existing alerts that share a fingerprint with incoming ones
-        // (the incoming version is the latest), then prepend the new alerts
-        const dedupedResults = currentResults.filter(
-          (existing: any) => !incomingFingerprints.has(existing.fingerprint)
-        );
-
-        // Count only truly new alerts (fingerprints not already present)
-        const existingFingerprints = new Set(
-          currentResults.map((a: any) => a.fingerprint)
-        );
-        const newAlertCount = data.alerts.filter(
-          (a: any) => !existingFingerprints.has(a.fingerprint)
-        ).length;
-
-        return {
-          ...currentData,
-          queryResult: {
-            ...currentData?.queryResult,
-            results: [...data.alerts, ...dedupedResults],
-            count: currentCount + newAlertCount,
-          },
-        };
-      }, { revalidate: false });
-    } else {
-      // Fallback for older backend or other events
+    const doFetch = () => {
+      lastAlertPollRef.current = Date.now();
       mutateAlerts();
+      setFacetsPanelRefreshToken(uuidv4());
+    };
+
+    if (timeSinceLastPoll >= ALERT_POLL_INTERVAL) {
+      // Enough time has passed, re-fetch immediately
+      doFetch();
+    } else if (!pendingPollTimerRef.current) {
+      // Schedule a deferred re-fetch for when the throttle window expires
+      const delay = ALERT_POLL_INTERVAL - timeSinceLastPoll;
+      pendingPollTimerRef.current = setTimeout(() => {
+        pendingPollTimerRef.current = null;
+        doFetch();
+      }, delay);
     }
-  });
+    // If a timer is already pending, do nothing — it will fire soon
+  }, [mutateAlerts, setFacetsPanelRefreshToken]);
+
+  useAlertPolling(!isPaused, handlePollAlerts);
 
   const [alertsToReturn, setAlertsToReturn] = useState<
     AlertDto[] | undefined

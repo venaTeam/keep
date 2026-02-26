@@ -1276,18 +1276,10 @@ def __handle_formatted_events(
             
             # Serialize alerts to dicts
             alerts_payload = [alert.dict() for alert in enriched_formatted_events]
-            
-            response = requests.post(
-                f"{api_url}/sse/notify",
-                json={
-                    "tenant_id": tenant_id,
-                    "event": "poll-alerts",
-                    "data": {"alerts": alerts_payload}
-                },
-                timeout=5
-            )
-            response.raise_for_status()
-            logger.info(f"Successfully told client to poll alerts via API ({response.status_code})")
+            # Tell the client to pull alerts
+            # TODO: send the actual payload
+            notify_sse(tenant_id, "poll-alerts", {})
+            logger.info("Told client to poll alerts")
         except Exception as e:
             logger.warning(f"Failed to tell client to poll alerts: {e}")
             pass
@@ -1318,13 +1310,7 @@ def __handle_formatted_events(
                 presets_do_update.append(preset_dto)
             if notification_cache.should_notify(tenant_id, "poll-presets"):
                 try:
-                    notify_sse(
-                        tenant_id,
-                        "poll-presets",
-                        json.dumps(
-                            [p.name.lower() for p in presets_do_update], default=str
-                        ),
-                    )
+                    notify_sse(tenant_id, "poll-presets", {"presets": [p.name.lower() for p in presets_do_update]})
                 except Exception:
                     logger.exception("Failed to send presets via SSE")
         except Exception:

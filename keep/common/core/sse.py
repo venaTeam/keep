@@ -141,35 +141,42 @@ class SSEBroadcaster:
 sse_broadcaster = SSEBroadcaster()
 
 
-def notify_sse(tenant_id: str, event: str, data: Any) -> None:
-    """
-    Synchronous wrapper to send SSE notifications.
-    
-    This function can be called from synchronous code and will
-    schedule the notification in the event loop.
-    
-    Args:
-        tenant_id: The tenant ID to notify
-        event: The event name/type
-        data: The event data
-    """
+import os
+import requests
+import threading
+from concurrent.futures import ThreadPoolExecutor
+
+# Use a bounded thread pool to avoid spawning infinite threads under extreme alert load
+_sse_executor = ThreadPoolExecutor(max_workers=10, thread_name_prefix="sse_notify")
+
+def _send_sse_http(tenant_id: str, event: str, data: Any):
     try:
-        loop = asyncio.get_running_loop()
-        asyncio.run_coroutine_threadsafe(
-            sse_broadcaster.notify(tenant_id, event, data),
-            loop
+        api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
+        
+        # Serialize the data payload first to ensure UUIDs/datetimes don't crash requests JSON encoder
+        serialized_data = json.loads(json.dumps(data, default=str))
+
+        requests.post(
+            f"{api_url}/sse/notify",
+            json={
+                "tenant_id": tenant_id,
+                "event": event,
+                "data": serialized_data
+            },
+            timeout=5
         )
-    except RuntimeError:
-        # No running event loop, try to run directly
-        try:
-            asyncio.run(sse_broadcaster.notify(tenant_id, event, data))
-        except Exception as e:
-            logger.warning(
-                "Failed to send SSE notification (no event loop)",
-                extra={"tenant_id": tenant_id, "event": event, "error": str(e)}
-            )
     except Exception as e:
         logger.warning(
-            "Failed to send SSE notification",
+            "Failed to send SSE notification via HTTP",
             extra={"tenant_id": tenant_id, "event": event, "error": str(e)}
         )
+
+def notify_sse(tenant_id: str, event: str, data: Any) -> None:
+    """
+    Synchronous wrapper to send SSE notifications globally.
+    
+    This uses a fixed ThreadPoolExecutor to shoot the event via HTTP POST back 
+    to the central keep-api, bridging any isolated workers (event-handler, watcher) 
+    back to the master WebSocket memory pool without blocking the caller or exhausting threads.
+    """
+    _sse_executor.submit(_send_sse_http, tenant_id, event, data)

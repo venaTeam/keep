@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import { IncidentDto } from "@/entities/incidents/model";
 import { IncidentChatClientPage } from "./chat/page.client";
-import { useIncident } from "@/utils/hooks/useIncidents";
+import { useIncident, usePollIncident } from "@/utils/hooks/useIncidents";
 import { IncidentHeader } from "./incident-header";
 import { IncidentTabsNavigation } from "./incident-tabs-navigation";
 import ResizableColumns from "@/components/ui/ResizableColumns";
@@ -20,6 +20,9 @@ export function IncidentLayoutClient({
   const { data: incident, mutate } = useIncident(initialIncident.id, {
     fallbackData: initialIncident,
   });
+
+  // Subscribe to SSE events for real-time incident updates (enrichments, fields, status)
+  usePollIncident(initialIncident.id);
 
   if (!incident) {
     return null;

@@ -238,6 +238,30 @@ export const usePollIncidentAlerts = (incidentId: string) => {
   }, [bind, unbind, handleIncoming]);
 };
 
+export const usePollIncident = (incidentId: string) => {
+  const { bind, unbind } = useSSE();
+  const { mutate } = useIncident(incidentId);
+  const handleIncoming = useCallback(
+    (data: IncidentUpdatePayload) => {
+      // Re-fetch if the event is for this specific incident or is a general update
+      if (
+        !data.incident_id ||
+        data.incident_id === incidentId ||
+        (data as any).incident_ids?.includes(incidentId)
+      ) {
+        mutate();
+      }
+    },
+    [mutate, incidentId]
+  );
+  useEffect(() => {
+    bind("incident-change", handleIncoming);
+    return () => {
+      unbind("incident-change", handleIncoming);
+    };
+  }, [bind, unbind, handleIncoming]);
+};
+
 export const usePollIncidents = (mutateIncidents: any, paused: boolean = false) => {
   const { bind, unbind } = useSSE();
   const [incidentChangeToken, setIncidentChangeToken] = useState<

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useSSE } from "@/utils/hooks/useSSE";
-import { useRevalidateMultiple } from "@/shared/lib/state-utils";
+import { useSWRConfig } from "swr";
 
 const PRESET_POLLING_INTERVAL = 3 * 1000; // Once per 3 seconds
 
 export function usePresetPolling() {
   const { bind, unbind } = useSSE();
-  const revalidateMultiple = useRevalidateMultiple();
+  const { mutate } = useSWRConfig();
   const lastPollTimeRef = useRef(0);
 
   const handleIncoming = useCallback(
@@ -15,28 +15,26 @@ export function usePresetPolling() {
       const timeSinceLastPoll = currentTime - lastPollTimeRef.current;
 
       if (timeSinceLastPoll < PRESET_POLLING_INTERVAL) {
-        console.log("usePresetPolling: Ignoring poll due to short interval");
         return;
       }
 
-      console.log("usePresetPolling: Revalidating preset data");
       lastPollTimeRef.current = currentTime;
-      revalidateMultiple(["/preset", "/alerts/query"], {
-        isExact: false,
-      });
+      // Revalidate preset definitions AND preset count queries (limit=0) only.
+      // We deliberately exclude the main table query (which has limit>0)
+      // to avoid flooding the API with heavy re-fetches under load.
+      mutate(
+        (key) =>
+          typeof key === "string" &&
+          (key.startsWith("/preset") ||
+            (key.startsWith("/alerts/query") && key.includes("limit=0")))
+      );
     },
-    [revalidateMultiple]
+    [mutate]
   );
 
   useEffect(() => {
-    console.log(
-      "usePresetPolling: Setting up event listener for 'poll-presets'"
-    );
     bind("poll-presets", handleIncoming);
     return () => {
-      console.log(
-        "usePresetPolling: Cleaning up event listener for 'poll-presets'"
-      );
       unbind("poll-presets", handleIncoming);
     };
   }, [bind, unbind, handleIncoming]);

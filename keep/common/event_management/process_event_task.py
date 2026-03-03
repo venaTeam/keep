@@ -1266,20 +1266,11 @@ def __handle_formatted_events(
         notification_cache = get_notification_cache()
 
         # Tell the client to poll alerts via API (since event handler runs in a separate process)
-
-        # Tell the client to poll alerts via API (since event handler runs in a separate process)
-        # We don't use throttling here to ensure real-time updates (client will append instead of full refresh)
         try:
-            api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
-            logger.info(f"Notifying API at {api_url} to poll alerts for {tenant_id}")
-            
-            # Tell the client to pull alerts
-            # TODO: send the actual payload
             notify_sse(tenant_id, "poll-alerts", {})
             logger.info("Told client to poll alerts")
         except Exception as e:
             logger.warning(f"Failed to tell client to poll alerts: {e}")
-            pass
 
         if incidents and notification_cache.should_notify(tenant_id, "incident-change"):
             try:

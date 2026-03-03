@@ -17,11 +17,9 @@ export const useAlerts = () => {
     return useSWR<AlertDto[]>(
       () =>
         api.isReady() && selectedAlert
-          ? `/alerts/${selectedAlert.fingerprint}/history?provider_id=${
-              selectedAlert.providerId
-            }&provider_type=${
-              selectedAlert.source ? selectedAlert.source[0] : ""
-            }`
+          ? `/alerts/${selectedAlert.fingerprint}/history?provider_id=${selectedAlert.providerId
+          }&provider_type=${selectedAlert.source ? selectedAlert.source[0] : ""
+          }`
           : null,
       (url) => api.get(url),
       options
@@ -173,10 +171,10 @@ export const useAlerts = () => {
       // adding "/alerts/query" so global revalidation works
       api.isReady() && query
         ? requestUrl +
-          Object.entries(queryToPost)
-            .sort(([fstKey], [scdKey]) => fstKey.localeCompare(scdKey))
-            .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
-            .join("&")
+        Object.entries(queryToPost)
+          .sort(([fstKey], [scdKey]) => fstKey.localeCompare(scdKey))
+          .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+          .join("&")
         : null;
 
     const swrValue = useSWR<any>(
@@ -208,7 +206,8 @@ export const useAlerts = () => {
       ...swrValue,
       data: results,
       queryTimeInSeconds: swrValue.data?.queryTimeInSeconds,
-      isLoading: swrValue.isLoading || !swrValue.data?.queryResult,
+      // Only show loading on initial load, NOT during revalidation when stale data exists
+      isLoading: swrValue.isLoading && !swrValue.data?.queryResult,
       totalCount: swrValue.data?.queryResult?.count as number,
       limit: swrValue.data?.queryResult?.limit as number,
       offset: swrValue.data?.queryResult?.offset as number,

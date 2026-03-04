@@ -153,8 +153,8 @@ export function AlertTableServerSide({
     `column-grouping-${userPrefix}${presetName}`,
     []
   );
-  const [filterCel, setFilterCel] = useState<string | null>(null);
-  const [searchCel, setSearchCel] = useState<string | null>(null);
+  const [filterCel, setFilterCel] = useState<string | null>("");
+  const [searchCel, setSearchCel] = useState<string | null>("");
 
   const alertsQueryRef = useRef<AlertsQuery | null>(null);
   const [rowStyle] = useAlertRowStyle();
@@ -317,7 +317,7 @@ export function AlertTableServerSide({
 
   const selectedAlertsFingerprints = Object.keys(table.getState().rowSelection);
 
-  let showSkeleton = isAsyncLoading;
+  let showSkeleton = isAsyncLoading && alerts.length === 0;
   const isTableEmpty = table.getPageCount() === 0;
   const showFilterEmptyState = isTableEmpty && !!filterCel;
   const showSearchEmptyState =

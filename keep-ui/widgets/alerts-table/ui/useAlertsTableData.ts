@@ -143,6 +143,7 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
   } = useLastAlerts(alertsQueryState, {
     revalidateOnFocus: false,
     revalidateOnMount: true,
+    dedupingInterval: 5000,
   });
 
   // Throttled alert polling - re-fetch from server when SSE event arrives.
@@ -195,6 +196,7 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
 
     setAlertsToReturn(alertsLoading ? undefined : alerts);
   }, [isPaused, alertsLoading, alerts]);
+
 
   return {
     alerts: alertsToReturn,

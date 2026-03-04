@@ -192,22 +192,20 @@ export const useAlerts = () => {
       options
     );
 
-    const [results, setResults] = useState<AlertDto[]>([]);
-
-    useEffect(() => {
-      if (swrValue.isLoading) {
-        return;
-      }
-
-      setResults(swrValue.data?.queryResult?.results || []);
-    }, [swrValue.data, swrValue.isLoading]);
+    // Derive results directly from SWR data in the same render cycle.
+    // Using useMemo eliminates the timing gap where isLoading=false but results hasn't updated.
+    const results = useMemo(
+      () => swrValue.data?.queryResult?.results || [],
+      [swrValue.data]
+    );
 
     return {
       ...swrValue,
       data: results,
       queryTimeInSeconds: swrValue.data?.queryTimeInSeconds,
-      // Only show loading on initial load, NOT during revalidation when stale data exists
-      isLoading: swrValue.isLoading && !swrValue.data?.queryResult,
+      // Only true before the API has EVER returned data for this key.
+      // During revalidation, SWR keeps stale data → stays false.
+      isLoading: !swrValue.data?.queryResult,
       totalCount: swrValue.data?.queryResult?.count as number,
       limit: swrValue.data?.queryResult?.limit as number,
       offset: swrValue.data?.queryResult?.offset as number,

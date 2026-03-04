@@ -145,14 +145,22 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
     revalidateOnMount: true,
   });
 
-  // Simple alert polling - refresh immediately when SSE event is received (like incidents)
+  // Simple alert polling - append incoming SSE events to the local cache
   useAlertPolling(!isPaused, (data) => {
-    // If we have alert data, updated the list optimistically without re-fetching
-    if (data?.alerts && Array.isArray(data.alerts)) {
+    // 1. MUST wait for DB to load first. If we mutate before the DB fetch completes,
+    // we overwrite the incoming DB data and SWR gets confused.
+    // Any alerts that happen during this loading period are already in the DB anyway.
+    if (alertsLoading || !alerts) {
+      return;
+    }
 
-      mutateAlerts(async (currentData: any) => {
-        const currentResults = currentData?.queryResult?.results || [];
-        const currentCount = currentData?.queryResult?.count || 0;
+    if (data?.alerts && Array.isArray(data.alerts)) {
+      // 2. Synchronous UI update (no 'async' keyword!)
+      mutateAlerts((currentData: any) => {
+        if (!currentData?.queryResult) return currentData;
+
+        const currentResults = currentData.queryResult.results || [];
+        const currentCount = currentData.queryResult.count || 0;
 
         // Build a set of incoming fingerprints for fast lookup
         const incomingFingerprints = new Set(
@@ -160,7 +168,6 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
         );
 
         // Remove existing alerts that share a fingerprint with incoming ones
-        // (the incoming version is the latest), then prepend the new alerts
         const dedupedResults = currentResults.filter(
           (existing: any) => !incomingFingerprints.has(existing.fingerprint)
         );
@@ -176,7 +183,7 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
         return {
           ...currentData,
           queryResult: {
-            ...currentData?.queryResult,
+            ...currentData.queryResult,
             results: [...data.alerts, ...dedupedResults],
             count: currentCount + newAlertCount,
           },

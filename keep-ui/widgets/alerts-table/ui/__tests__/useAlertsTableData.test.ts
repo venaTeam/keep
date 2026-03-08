@@ -105,6 +105,10 @@ describe("useAlertsTableData", () => {
       }
     });
 
+    act(() => {
+      jest.advanceTimersByTime(1000); // Advance timer for the debounce
+    });
+
     expect(mockMutate).toHaveBeenCalled();
   });
 

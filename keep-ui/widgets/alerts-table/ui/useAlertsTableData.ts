@@ -147,6 +147,8 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
     revalidateOnMount: true,
   });
 
+  const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Simple alert polling - append incoming SSE events to the local cache
   useAlertPolling(!isPaused, (data) => {
     // MUST wait for DB to load first.
@@ -160,9 +162,10 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
     if (data?.alerts && Array.isArray(data.alerts)) {
       // Check if we're on the first page by looking at the query offset
       const isFirstPage = !query?.offset || query.offset === 0;
+      const hasActiveFilters = Boolean(query?.searchCel || query?.filterCel);
 
-      if (isFirstPage) {
-        // Page 1: prepend SSE alerts locally, no DB re-fetch needed
+      if (isFirstPage && !hasActiveFilters) {
+        // Page 1 with NO filters: prepend SSE alerts locally, no DB re-fetch needed
         mutateAlerts((currentData: any) => {
           if (!currentData?.queryResult) return currentData;
 
@@ -234,10 +237,16 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
           };
         }, { revalidate: false });
       } else {
-        // Page 2+: re-fetch from DB so offsets reflect the newly inserted alerts.
-        // We have to use the DB for this because new alerts push page 1 alerts onto page 2,
-        // which the frontend can't know without a server query.
-        mutateAlerts();
+        // Page 2+ OR filtered view (Presets): 
+        // We cannot reliably inject the alert without evaluating the CEL filter.
+        // Instead, debounce a DB re-fetch. This ensures accurate pagination and filter matching
+        // without overloading the PostgreSQL database during an alert storm.
+        if (fetchTimeoutRef.current) {
+          clearTimeout(fetchTimeoutRef.current);
+        }
+        fetchTimeoutRef.current = setTimeout(() => {
+          mutateAlerts();
+        }, 800);
       }
     }
   });

@@ -37,7 +37,6 @@ from keep.common.core.db import (
     set_last_alert,
 )
 from keep.common.core.elastic import ElasticClient
-from keep.common.core.sse import notify_sse
 from keep.common.core.metrics import (
     events_error_counter,
     events_in_counter,

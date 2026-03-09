@@ -37,7 +37,6 @@ from keep.common.core.db import (
     set_last_alert,
 )
 from keep.common.core.elastic import ElasticClient
-from keep.common.core.sse import notify_sse
 from keep.common.core.metrics import (
     events_error_counter,
     events_in_counter,
@@ -1294,9 +1293,18 @@ def __handle_formatted_events(
 
         if incidents and notification_cache.should_notify(tenant_id, "incident-change"):
             try:
-                # Include incident IDs in the notification
+                api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
                 incident_ids = [str(inc.id) for inc in incidents]
-                notify_sse(tenant_id, "incident-change", {"incident_ids": incident_ids})
+                response = requests.post(
+                    f"{api_url}/sse/notify",
+                    json={
+                        "tenant_id": tenant_id,
+                        "event": "incident-change",
+                        "data": {"incident_ids": incident_ids}
+                    },
+                    timeout=5
+                )
+                response.raise_for_status()
             except Exception:
                 logger.exception("Failed to tell the client to pull incidents")
 
@@ -1318,13 +1326,19 @@ def __handle_formatted_events(
                 presets_do_update.append(preset_dto)
             if notification_cache.should_notify(tenant_id, "poll-presets"):
                 try:
-                    notify_sse(
-                        tenant_id,
-                        "poll-presets",
-                        json.dumps(
-                            [p.name.lower() for p in presets_do_update], default=str
-                        ),
+                    api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
+                    response = requests.post(
+                        f"{api_url}/sse/notify",
+                        json={
+                            "tenant_id": tenant_id,
+                            "event": "poll-presets",
+                            "data": json.dumps(
+                                [p.name.lower() for p in presets_do_update], default=str
+                            ),
+                        },
+                        timeout=5
                     )
+                    response.raise_for_status()
                 except Exception:
                     logger.exception("Failed to send presets via SSE")
         except Exception:

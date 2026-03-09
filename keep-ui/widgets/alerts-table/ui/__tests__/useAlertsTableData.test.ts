@@ -81,6 +81,15 @@ describe("useAlertsTableData", () => {
 
   it("calls mutate when SSE event is received", () => {
     let sseCallback: ((data?: any) => void) | null = null;
+    mockUseLastAlerts.mockReturnValueOnce({
+      data: defaultAlerts,
+      totalCount: 1,
+      isLoading: false,
+      mutate: mockMutate,
+      error: null,
+      queryTimeInSeconds: 1,
+    });
+
     (useAlertPolling as jest.Mock).mockImplementation(
       (isEnabled: boolean, callback: (data?: any) => void) => {
         sseCallback = callback;
@@ -92,8 +101,12 @@ describe("useAlertsTableData", () => {
     // Simulate SSE event
     act(() => {
       if (sseCallback) {
-        sseCallback();
+        sseCallback({ alerts: [{ fingerprint: "test" }] });
       }
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(1000); // Advance timer for the debounce
     });
 
     expect(mockMutate).toHaveBeenCalled();
@@ -189,7 +202,7 @@ describe("useAlertsTableData", () => {
       },
     });
 
-    expect(result.current.facetsPanelRefreshToken).toBe("mock-uuid");
+    expect(result.current.facetsPanelRefreshToken).toBe("REVALIDATE_mock-uuid");
   });
 
   // Additional tests

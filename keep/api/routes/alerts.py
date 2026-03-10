@@ -7,6 +7,9 @@ import os
 from copy import deepcopy
 from typing import List, Optional
 
+from keep.api.core.cache import build_cache_key, get_cached_raw, invalidate, set_cached
+from keep.common.consts import CACHE_TTL_ALERTS, CACHE_TTL_FACETS
+
 import celpy
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
@@ -91,6 +94,17 @@ def fetch_alert_facet_options(
 ) -> dict:
     tenant_id = authenticated_entity.tenant_id
 
+    # --- Cache read ---
+    cache_key = build_cache_key(
+        "alert_facets", tenant_id,
+        cel=facet_options_query.cel,
+        facet_ids=sorted(facet_options_query.facet_queries.keys()) if facet_options_query.facet_queries else [],
+    )
+    cached_raw = get_cached_raw(cache_key)
+    if cached_raw is not None:
+        from fastapi import Response
+        return Response(content=cached_raw, media_type="application/json")
+
     logger.info(
         "Fetching alert facets from DB",
         extra={
@@ -117,6 +131,13 @@ def fetch_alert_facet_options(
             "tenant_id": tenant_id,
         },
     )
+
+    # --- Cache write: serialize identically to how FastAPI would ---
+    from fastapi.encoders import jsonable_encoder
+    import json as _json
+    json_bytes = _json.dumps(jsonable_encoder(facet_options)).encode("utf-8")
+    from keep.api.core.cache import set_cached_raw
+    set_cached_raw(cache_key, json_bytes, CACHE_TTL_FACETS)
 
     return facet_options
 
@@ -193,8 +214,6 @@ def query_alerts(
     ),
 ):
     # Gathering alerts may take a while and we don't care if it will finish before we return the response.
-    # In the worst case, gathered alerts will be pulled in the next request.
-    # This approach is not good. We should continuesly pull alerts without relying on whether request is done or not.
     bg_tasks.add_task(
         pull_data_from_providers,
         authenticated_entity.tenant_id,
@@ -202,6 +221,47 @@ def query_alerts(
     )
 
     tenant_id = authenticated_entity.tenant_id
+
+    # --- Redis-first read for simple queries (no CEL filter, no custom sort) ---
+    is_simple_query = (
+        not query.cel
+        and not query.sort_options
+        and not query.sort_by
+    )
+
+    if is_simple_query:
+        from keep.api.core.redis_alert_store import get_alerts_from_redis
+        redis_result = get_alerts_from_redis(
+            tenant_id, limit=query.limit, offset=query.offset
+        )
+        if redis_result is not None:
+            alerts, total_count = redis_result
+            result = {
+                "limit": query.limit,
+                "offset": query.offset,
+                "count": total_count,
+                "results": alerts,
+            }
+            import json as _json
+            from fastapi import Response
+            return Response(
+                content=_json.dumps(result).encode("utf-8"),
+                media_type="application/json",
+            )
+
+    # --- Fallback: JSON blob cache for filtered/sorted queries ---
+    cache_key = build_cache_key(
+        "alerts", tenant_id,
+        cel=query.cel, limit=query.limit, offset=query.offset,
+        sort_by=query.sort_by,
+        sort_dir=query.sort_dir,
+        sort_options=[so.dict() for so in query.sort_options] if query.sort_options else None
+    )
+    cached_raw = get_cached_raw(cache_key)
+    if cached_raw is not None:
+        from fastapi import Response
+        return Response(content=cached_raw, media_type="application/json")
+
     logger.info(
         "Fetching alerts from DB",
         extra={"tenant_id": tenant_id, "cel_expression": query.cel},
@@ -228,12 +288,24 @@ def query_alerts(
         },
     )
 
-    return {
+    result = {
         "limit": query.limit,
         "offset": query.offset,
         "count": total_count,
         "results": enriched_alerts_dto,
     }
+
+    # --- Cache write for filtered queries ---
+    from fastapi.encoders import jsonable_encoder
+    import json
+    json_result = jsonable_encoder(result)
+    json_bytes = json.dumps(json_result).encode("utf-8")
+
+    from keep.api.core.cache import set_cached_raw
+    set_cached_raw(cache_key, json_bytes, CACHE_TTL_ALERTS)
+
+    # Return the original result so FastAPI serializes it normally
+    return result
 
 
 @router.get(
@@ -357,6 +429,10 @@ def delete_alert(
         action_description=f"Alert deleted by {user_email}",
         action_callee=user_email,
     )
+
+    # Invalidate alerts cache
+    invalidate("alerts", tenant_id)
+    invalidate("alert_facets", tenant_id)
 
     logger.info(
         "Deleted alert successfully",
@@ -799,6 +875,10 @@ def batch_enrich_alerts(
             logger.exception("Failed to push alerts to elasticsearch")
             pass
 
+        # Invalidate alerts cache before SSE so re-fetches get fresh data
+        invalidate("alerts", tenant_id)
+        invalidate("alert_facets", tenant_id)
+
         # use SSE to push the enriched alert to the client
         logger.info("Telling client to poll alerts")
         try:
@@ -950,6 +1030,10 @@ def _enrich_alert(
         except Exception:
             logger.exception("Failed to push alert to elasticsearch")
             pass
+        # Invalidate alerts cache before SSE so re-fetches get fresh data
+        invalidate("alerts", tenant_id)
+        invalidate("alert_facets", tenant_id)
+
         # use SSE to push the enriched alert to the client
         logger.info("Telling client to poll alerts")
         try:
@@ -1066,6 +1150,10 @@ def unenrich_alert(
         except Exception:
             logger.exception("Failed to push alert to elasticsearch")
             pass
+        # Invalidate alerts cache before SSE so re-fetches get fresh data
+        invalidate("alerts", tenant_id)
+        invalidate("alert_facets", tenant_id)
+
         # use SSE to push the un-enriched alert to the client
         logger.info("Telling client to poll alerts")
         try:

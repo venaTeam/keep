@@ -15,6 +15,17 @@ function isMobileDevice(userAgent: string): boolean {
 export const middleware = auth(async (request) => {
   const { pathname, searchParams } = request.nextUrl;
 
+  // Handle /backend/ proxy FIRST — skip expensive auth() since the backend has its own auth layer
+  if (pathname.startsWith("/backend/")) {
+    const apiUrl = getApiURL();
+    const newURL = pathname.replace("/backend/", apiUrl + "/");
+    const queryString = searchParams.toString();
+    const urlWithQuery = queryString ? `${newURL}?${queryString}` : newURL;
+
+    console.log(`Proxying ${pathname} to ${urlWithQuery}`);
+    return NextResponse.rewrite(urlWithQuery);
+  }
+
   // go to temporary placeholder for mobile devices
   const userAgent = request.headers.get("user-agent") || "";
   if (
@@ -31,16 +42,6 @@ export const middleware = auth(async (request) => {
   // Keep it on header so it can be used in server components
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-url", request.url);
-  // Handle legacy /backend/ redirects (when API_URL is not set and frontend act as a proxy)
-  if (pathname.startsWith("/backend/")) {
-    const apiUrl = getApiURL();
-    const newURL = pathname.replace("/backend/", apiUrl + "/");
-    const queryString = searchParams.toString();
-    const urlWithQuery = queryString ? `${newURL}?${queryString}` : newURL;
-
-    console.log(`Redirecting ${pathname} to ${urlWithQuery}`);
-    return NextResponse.rewrite(urlWithQuery);
-  }
 
   // Allow mobile route to pass through
   if (pathname.startsWith("/mobile")) {

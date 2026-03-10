@@ -173,3 +173,75 @@ def notify_sse(tenant_id: str, event: str, data: Any) -> None:
             "Failed to send SSE notification",
             extra={"tenant_id": tenant_id, "event": event, "error": str(e)}
         )
+
+
+async def setup_redis_listener():
+    """
+    Background task to listen for Redis Pub/Sub messages and broadcast to local SSE connections.
+    """
+    from keep.common.core.config import config
+    redis_enabled = config("REDIS", default="true") == "true"
+    if not redis_enabled:
+        logger.info("Redis disabled, SSE will only use local events")
+        return
+
+    try:
+        import redis.asyncio as redis
+        
+        host = config("REDIS_HOST", default="localhost")
+        port = config("REDIS_PORT", cast=int, default=6379)
+        password = config("REDIS_PASSWORD", default=None)
+        username = config("REDIS_USERNAME", default=None)
+
+        client = redis.Redis(
+            host=host,
+            port=port,
+            username=username,
+            password=password,
+            decode_responses=True,
+        )
+        
+        if await client.ping():
+            logger.info("Redis async client connected for SSE Pub/Sub")
+            pubsub = client.pubsub()
+            await pubsub.psubscribe("sse:messages:*")
+            logger.info("Subscribed to Redis Pub/Sub channel sse:messages:*")
+
+            async for message in pubsub.listen():
+                if message["type"] == "pmessage":
+                    channel = message["channel"]
+                    data = message["data"]
+                    
+                    try:
+                        payload = json.loads(data)
+                        tenant_id = channel.split(":")[-1]
+                        event = payload.get("event")
+                        event_data = payload.get("data", {})
+                        
+                        if event and tenant_id:
+                            # 1. Invalidate caches so REST APIs return fresh data
+                            from keep.api.core.cache import invalidate
+                            # Replicate the logic from sse_notify to determine prefixes
+                            _EVENT_CACHE_MAP = {
+                                "poll-alerts": ["alerts", "alert_facets"],
+                                "alert-update": ["alerts", "alert_facets"],
+                                "incident-change": ["incidents"],
+                                "poll-presets": ["presets"],
+                            }
+                            
+                            cache_prefixes = _EVENT_CACHE_MAP.get(event, [])
+                            if cache_prefixes:
+                                try:
+                                    logger.debug(f"Invalidating cache prefixes {cache_prefixes} for tenant {tenant_id} due to {event}")
+                                    for prefix in cache_prefixes:
+                                        invalidate(prefix, tenant_id)
+                                except Exception as inner_e:
+                                    logger.warning(f"Failed to invalidate cache for {event}: {inner_e}")
+
+                            # 2. Broadcast the SSE event to connected websockets
+                            await sse_broadcaster.notify(tenant_id, event, event_data)
+                    except Exception as e:
+                        logger.error(f"Failed to process Redis SSE message: {e}")
+
+    except Exception as e:
+        logger.error(f"Failed to setup Redis listener: {e}")

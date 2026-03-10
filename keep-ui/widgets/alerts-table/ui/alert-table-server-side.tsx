@@ -153,8 +153,8 @@ export function AlertTableServerSide({
     `column-grouping-${userPrefix}${presetName}`,
     []
   );
-  const [filterCel, setFilterCel] = useState<string | null>(null);
-  const [searchCel, setSearchCel] = useState<string | null>(null);
+  const [filterCel, setFilterCel] = useState<string | null>("");
+  const [searchCel, setSearchCel] = useState<string | null>("");
 
   const alertsQueryRef = useRef<AlertsQuery | null>(null);
   const [rowStyle] = useAlertRowStyle();
@@ -775,7 +775,7 @@ export function AlertTableServerSide({
                 state={paginationState}
                 onStateChange={setPaginationState}
                 onRefresh={() =>
-                  onReload && onReload(alertsQueryRef.current as AlertsQuery)
+                  mutateAlerts ? mutateAlerts() : onReload && onReload(alertsQueryRef.current as AlertsQuery)
                 }
               />
             </div>

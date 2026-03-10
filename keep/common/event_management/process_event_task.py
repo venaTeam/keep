@@ -1132,6 +1132,19 @@ def __handle_formatted_events(
             timestamp_forced,
         )
 
+    # Write enriched alerts to Redis (Hashes + Sorted Set) for instant API reads
+    with tracer.start_as_current_span("process_event_write_to_redis"):
+        try:
+            from keep.api.core.redis_alert_store import write_alerts_batch
+            written = write_alerts_batch(tenant_id, enriched_formatted_events)
+            if written:
+                logger.debug(
+                    "Wrote alerts to Redis store",
+                    extra={"tenant_id": tenant_id, "count": written},
+                )
+        except Exception:
+            logger.exception("Failed to write alerts to Redis store")
+
     # let's save all fields to the DB so that we can use them in the future such in deduplication fields suggestions
     # todo: also use it on correlation rules suggestions
     if KEEP_ALERT_FIELDS_ENABLED:
@@ -1265,48 +1278,42 @@ def __handle_formatted_events(
         # Get the notification cache
         notification_cache = get_notification_cache()
 
-        # Tell the client to poll alerts via API (since event handler runs in a separate process)
+        should = notification_cache.should_notify(tenant_id, "poll-alerts")
 
-        # Tell the client to poll alerts via API (since event handler runs in a separate process)
-        # We don't use throttling here to ensure real-time updates (client will append instead of full refresh)
-        try:
-            api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
-            logger.info(f"Notifying API at {api_url} to poll alerts for {tenant_id}")
-            
-            # Serialize alerts to dicts
-            alerts_payload = [alert.dict() for alert in enriched_formatted_events]
-            
-            response = requests.post(
-                f"{api_url}/sse/notify",
-                json={
-                    "tenant_id": tenant_id,
-                    "event": "poll-alerts",
-                    "data": {"alerts": alerts_payload}
-                },
-                timeout=5
-            )
-            response.raise_for_status()
-            logger.info(f"Successfully told client to poll alerts via API ({response.status_code})")
-        except Exception as e:
-            logger.warning(f"Failed to tell client to poll alerts: {e}")
-            pass
+        # Throttled publish for alerts via Redis Pub/Sub
+        if should:
+            try:
+                from keep.api.core.cache import get_redis_client
+                redis_client = get_redis_client()
+                if redis_client:
+                    # Serialize alerts to dicts
+                    alerts_payload = [alert.dict() for alert in enriched_formatted_events]
+                    message = json.dumps({
+                        "event": "poll-alerts",
+                        "data": {"alerts": alerts_payload}
+                    })
+                    channel = f"sse:messages:{tenant_id}"
+                    res = redis_client.publish(channel, message)
+                    logger.info(f"Successfully published poll-alerts to Redis channel {channel} for tenant {tenant_id}")
+            except Exception as e:
+                logger.warning(f"Failed to publish poll-alerts: {e}")
+                pass
 
         if incidents and notification_cache.should_notify(tenant_id, "incident-change"):
             try:
-                api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
-                incident_ids = [str(inc.id) for inc in incidents]
-                response = requests.post(
-                    f"{api_url}/sse/notify",
-                    json={
-                        "tenant_id": tenant_id,
+                from keep.api.core.cache import get_redis_client
+                redis_client = get_redis_client()
+                if redis_client:
+                    incident_ids = [str(inc.id) for inc in incidents]
+                    message = json.dumps({
                         "event": "incident-change",
                         "data": {"incident_ids": incident_ids}
-                    },
-                    timeout=5
-                )
-                response.raise_for_status()
+                    })
+                    channel = f"sse:messages:{tenant_id}"
+                    redis_client.publish(channel, message)
+                    logger.info(f"Successfully published incident-change to Redis channel {channel} for tenant {tenant_id}")
             except Exception:
-                logger.exception("Failed to tell the client to pull incidents")
+                logger.exception("Failed to publish incidents")
 
         # Now we need to update the presets
         # send with SSE
@@ -1326,21 +1333,20 @@ def __handle_formatted_events(
                 presets_do_update.append(preset_dto)
             if notification_cache.should_notify(tenant_id, "poll-presets"):
                 try:
-                    api_url = os.environ.get("KEEP_API_URL", "http://localhost:8080")
-                    response = requests.post(
-                        f"{api_url}/sse/notify",
-                        json={
-                            "tenant_id": tenant_id,
+                    from keep.api.core.cache import get_redis_client
+                    redis_client = get_redis_client()
+                    if redis_client:
+                        message = json.dumps({
                             "event": "poll-presets",
                             "data": json.dumps(
                                 [p.name.lower() for p in presets_do_update], default=str
-                            ),
-                        },
-                        timeout=5
-                    )
-                    response.raise_for_status()
+                            )
+                        })
+                        channel = f"sse:messages:{tenant_id}"
+                        redis_client.publish(channel, message)
+                        logger.info(f"Successfully published poll-presets to Redis channel {channel} for tenant {tenant_id}")
                 except Exception:
-                    logger.exception("Failed to send presets via SSE")
+                    logger.exception("Failed to publish presets")
         except Exception:
             logger.exception(
                 "Failed to send presets via SSE",

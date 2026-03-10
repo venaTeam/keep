@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from keep.api.core.cache import invalidate
 from keep.common.core.sse import sse_broadcaster
 from keep.identitymanager.authenticatedentity import AuthenticatedEntity
 from keep.identitymanager.identitymanagerfactory import IdentityManagerFactory
@@ -140,6 +141,14 @@ async def sse_subscribe(
     )
 
 
+# Map SSE event types to cache prefixes that need invalidation.
+_EVENT_CACHE_MAP = {
+    "poll-alerts": ["alerts", "alert_facets"],
+    "alert-update": ["alerts", "alert_facets"],
+    "incident-change": ["incidents"],
+    "poll-presets": ["presets"],
+}
+
 
 class SSENotification(BaseModel):
     tenant_id: str
@@ -162,8 +171,16 @@ async def sse_notify(
             "event": notification.event,
         }
     )
+
+    # NOTE: We intentionally do NOT invalidate Redis cache here.
+    # The SSE event tells the frontend to re-fetch, and the cached data
+    # (max 30s stale via TTL) is acceptable. Invalidating on every alert
+    # causes cache thrashing under high alert volume (~4000/min),
+    # making the cache permanently empty and every request hitting the DB.
+
     await sse_broadcaster.notify(
         notification.tenant_id,
         notification.event,
         notification.data
     )
+

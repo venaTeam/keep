@@ -57,3 +57,10 @@ OPENAI_MODEL_NAME = os.environ.get("OPENAI_MODEL_NAME", "gpt-4o-2024-08-06")
 KEEP_CORRELATION_ENABLED = os.environ.get("KEEP_CORRELATION_ENABLED", "true") == "true"
 
 MAX_PROCESSING_RETRIES = 3
+
+# Cache TTL constants (seconds)
+CACHE_TTL_ALERTS = 30        # High-churn: ~4000 alerts/min
+CACHE_TTL_FACETS = 30        # Same as alerts
+CACHE_TTL_PROVIDERS = 120    # Rarely changes
+CACHE_TTL_PRESETS = 300      # Very stable
+CACHE_TTL_INCIDENTS = 60     # Moderate churn

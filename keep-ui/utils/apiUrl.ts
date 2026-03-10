@@ -3,8 +3,13 @@ export function getApiURL(): string {
   // we need to check if we are on vercel or not
   const gitBranchName = process.env.VERCEL_GIT_COMMIT_REF || "notvercel";
 
+  let apiUrl = process.env.API_URL!;
+  if (apiUrl && apiUrl.includes("localhost")) {
+    apiUrl = apiUrl.replace("localhost", "127.0.0.1");
+  }
+
   if (gitBranchName === "main" || gitBranchName === "notvercel") {
-    return process.env.API_URL!;
+    return apiUrl;
   } else {
     console.log("preview branch on vercel");
     let branchNameSanitized = gitBranchName.replace(/\//g, "-");
@@ -16,6 +21,6 @@ export function getApiURL(): string {
       );
     }
     let serviceName = `keep-api-${branchNameSanitized}`;
-    return process.env.API_URL!.replace("keep-api", serviceName);
+    return apiUrl.replace("keep-api", serviceName);
   }
 }

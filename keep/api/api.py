@@ -167,6 +167,16 @@ async def startup():
                     "task": "task",
                 },
             )
+    # Hydrate the Redis alert store with existing DB alerts (runs in background thread)
+    try:
+        from keep.api.core.redis_alert_store import hydrate_redis_from_db
+        from keep.common.core.dependencies import SINGLE_TENANT_UUID
+        loop = asyncio.get_event_loop()
+        loop.run_in_executor(None, hydrate_redis_from_db, SINGLE_TENANT_UUID)
+        logger.info("Redis alert store hydration started in background")
+    except Exception:
+        logger.exception("Failed to start Redis alert store hydration")
+
     logger.info("Services started successfully")
 
 

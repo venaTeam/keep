@@ -51,6 +51,7 @@ from keep.api.config import (
     CONSUMER,
     HOST,
     KEEP_API_URL,
+    KEEP_CORS_TRUSTED_ORIGINS,
     KEEP_DEBUG_TASKS,
     KEEP_LIMIT_CONCURRENCY,
     KEEP_METRICS,
@@ -262,7 +263,7 @@ def get_app(
     )  # Approximately 30 MiB, https://cloud.google.com/run/quotas
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=KEEP_CORS_TRUSTED_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

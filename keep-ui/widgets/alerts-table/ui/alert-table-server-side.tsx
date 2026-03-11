@@ -761,20 +761,26 @@ export function AlertTableServerSide({
       <div className="pb-4">
         <div className="flex gap-4">
           {/* Facets sidebar */}
-          <div className="w-33 min-w-[12rem] overflow-y-auto">
-            <FacetsPanelServerSide
-              usePropertyPathsSuggestions={true}
-              entityName={"alerts"}
-              facetOptionsCel={facetsCel}
-              clearFiltersToken={clearFiltersToken}
-              initialFacetsData={{ facets: initialFacets, facetOptions: null }}
-              facetsConfig={facetsConfig}
-              persistenceKey={`facets-${userPrefix}${presetName}`}
-              onCelChange={setFilterCel}
-              revalidationToken={facetsPanelRefreshToken}
-              isSilentReloading={isAsyncLoading}
-            />
-          </div>
+          {!isFeedAwaitingQuery && (
+            <div className="w-33 min-w-[12rem] overflow-y-auto">
+              <FacetsPanelServerSide
+                usePropertyPathsSuggestions={true}
+                entityName={"alerts"}
+                facetOptionsCel={facetsCel}
+                clearFiltersToken={clearFiltersToken}
+                initialFacetsData={{ facets: initialFacets, facetOptions: null }}
+                facetsConfig={facetsConfig}
+                persistenceKey={
+                  presetName === "feed"
+                    ? undefined
+                    : `facets-${userPrefix}${presetName}`
+                }
+                onCelChange={setFilterCel}
+                revalidationToken={facetsPanelRefreshToken}
+                isSilentReloading={isAsyncLoading}
+              />
+            </div>
+          )}
 
           {/* Table section */}
           <div className="flex-1 flex flex-col min-w-0 gap-4">

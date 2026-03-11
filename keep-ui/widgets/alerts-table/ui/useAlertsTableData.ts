@@ -151,13 +151,14 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
 
   // Simple alert polling - append incoming SSE events to the local cache
   useAlertPolling(!isPaused, (data) => {
-    // MUST wait for DB to load first.
-    // `alertsLoading` from useLastAlerts is computed as:
-    //   swrValue.isLoading || !swrValue.data?.queryResult
-    // This is reliable because it stays true until the DB query actually returns.
-    if (alertsLoading) {
-      return;
-    }
+    const triggerRefetch = () => {
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+      }
+      fetchTimeoutRef.current = setTimeout(() => {
+        mutateAlerts();
+      }, 800);
+    };
 
     if (data?.alerts && Array.isArray(data.alerts)) {
       // Check if we're on the first page by looking at the query offset
@@ -165,7 +166,10 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
       const hasActiveFilters = Boolean(query?.searchCel || query?.filterCel);
 
       if (isFirstPage && !hasActiveFilters) {
-        // Page 1 with NO filters: prepend SSE alerts locally, no DB re-fetch needed
+        // Page 1 with NO filters: prepend SSE alerts locally, no DB re-fetch needed.
+        // Must wait for DB to load first — we need currentData for the merge.
+        if (alertsLoading) return;
+
         mutateAlerts((currentData: any) => {
           if (!currentData?.queryResult) return currentData;
 
@@ -241,13 +245,12 @@ export const useAlertsTableData = (query: AlertsTableDataQuery | undefined) => {
         // We cannot reliably inject the alert without evaluating the CEL filter.
         // Instead, debounce a DB re-fetch. This ensures accurate pagination and filter matching
         // without overloading the PostgreSQL database during an alert storm.
-        if (fetchTimeoutRef.current) {
-          clearTimeout(fetchTimeoutRef.current);
-        }
-        fetchTimeoutRef.current = setTimeout(() => {
-          mutateAlerts();
-        }, 800);
+        triggerRefetch();
       }
+    } else {
+      // Backend sends poll-alerts with empty payload {} (e.g. after assign/dismiss from API routes).
+      // Treat as signal to refetch — alerts have changed, we need fresh data.
+      triggerRefetch();
     }
   });
 

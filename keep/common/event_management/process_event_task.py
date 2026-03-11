@@ -12,7 +12,6 @@ from typing import List
 # third-parties
 import dateutil
 from arq import Retry
-import requests
 from fastapi.datastructures import FormData
 from opentelemetry import trace
 from sqlalchemy.orm.attributes import flag_modified
@@ -1293,7 +1292,7 @@ def __handle_formatted_events(
                         "data": {"alerts": alerts_payload}
                     })
                     channel = f"sse:messages:{tenant_id}"
-                    res = redis_client.publish(channel, message)
+                    redis_client.publish(channel, message)
                     logger.info(f"Successfully published poll-alerts to Redis channel {channel} for tenant {tenant_id}")
             except Exception as e:
                 logger.warning(f"Failed to publish poll-alerts: {e}")

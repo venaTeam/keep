@@ -1,6 +1,5 @@
 import json
-import pytest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 from keep.event_handler.core.kafka_consumer import KafkaEventConsumer
 
 

@@ -7,7 +7,7 @@ import os
 from copy import deepcopy
 from typing import List, Optional
 
-from keep.api.core.cache import build_cache_key, get_cached_raw, invalidate, set_cached
+from keep.api.core.cache import build_cache_key, get_cached_raw, invalidate
 from keep.common.consts import CACHE_TTL_ALERTS, CACHE_TTL_FACETS
 
 import celpy

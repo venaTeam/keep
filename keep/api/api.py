@@ -42,6 +42,7 @@ from keep.identitymanager.identitymanagerfactory import (
     IdentityManagerTypes,
 )
 from keep.topologies.topology_processor import TopologyProcessor
+from keep.common.core.sse import setup_redis_listener
 
 # load all providers into cache
 from keep.workflowmanager.workflowmanager import WorkflowManager
@@ -94,7 +95,7 @@ async def check_pending_tasks(background_tasks: set):
         await asyncio.sleep(1)
 
 
-async def startup():
+async def startup(background_tasks: set = None):
     """
     This runs for every worker on startup.
     Read more about lifespan here: https://fastapi.tiangolo.com/advanced/events/#lifespan
@@ -167,6 +168,18 @@ async def startup():
                     "task": "task",
                 },
             )
+    # Start the Redis SSE listener
+    if REDIS:
+        try:
+            logger.info("Starting Redis SSE listener")
+            task = asyncio.create_task(setup_redis_listener())
+            if background_tasks is not None:
+                background_tasks.add(task)
+                task.add_done_callback(background_tasks.discard)
+            logger.info("Redis SSE listener started successfully")
+        except Exception:
+            logger.exception("Failed to start Redis SSE listener")
+
     # Hydrate the Redis alert store with existing DB alerts (runs in background thread)
     try:
         from keep.api.core.redis_alert_store import hydrate_redis_from_db
@@ -224,7 +237,7 @@ async def lifespan(app: FastAPI):
         asyncio.create_task(check_pending_tasks(background_tasks))
 
     # Startup
-    await startup()
+    await startup(background_tasks)
 
     # yield the background tasks, this is available for the app to use in request context
     yield {"background_tasks": background_tasks}

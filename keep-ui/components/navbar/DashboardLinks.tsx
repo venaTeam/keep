@@ -20,10 +20,11 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { DashboardLink } from "./DashboardLink";
 
 export const DashboardLinks = () => {
-  const { dashboards = [], isLoading, error, mutate } = useDashboards();
+  const pathname = usePathname();
+  const isOnDashboardPage = pathname?.startsWith("/dashboard") ?? false;
+  const { dashboards = [], isLoading, error, mutate } = useDashboards(isOnDashboardPage);
   const api = useApi();
   const router = useRouter();
-  const pathname = usePathname();
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
 

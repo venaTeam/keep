@@ -33,6 +33,27 @@ The **biggest offender** is [AlertPresetLink](file:///Users/yarin/keep/keep-ui/f
 > [!IMPORTANT]  
 > **Fix 2 (incidents count)** means the incident badge count in the sidebar will only update via SSE events (already existing), not via a proactive `GET /incidents` on every page load. This is sound because [usePollIncidents](file:///Users/yarin/keep/keep-ui/utils/hooks/useIncidents.ts#241-269) already handles real-time updates via SSE.
 
+> [!IMPORTANT]
+> **Fix 5 (feed default behavior)** changes the alerts feed page so it no longer loads all alerts on initial visit. Instead, users must enter a CEL query or select a facet before any alerts are fetched. This is a significant UX change — the feed will show a prompt instead of a full alert list on first load.
+>
+> At 4,000 alerts/minute, loading all alerts by default is extremely expensive and rarely what the user actually wants. This tradeoff prioritizes performance and intentional querying over "show everything".
+
+---
+
+## Additional Considerations
+
+### SSE-triggered refetches
+
+The gating approach (null SWR key when not on the relevant page) is solid, but audit whether **alert-related SSE event handlers** (e.g., `alert-change`) globally call `mutate()` on alert query SWR keys. If so, gated sidebar hooks could still wake up and refetch on non-alert pages. Ensure SSE handlers only mutate keys that are actively in use.
+
+### `revalidateOnFocus` and `revalidateOnReconnect`
+
+For all hooks that remain enabled, verify that `revalidateOnFocus: false` and `revalidateOnReconnect: false` are set consistently. Otherwise, a user tabbing away and returning could trigger a wave of refetches across all enabled hooks.
+
+### Consider prefetch-on-hover for sidebar links
+
+To soften the UX impact of removing upfront badge counts, consider prefetching data when the user **hovers** over a sidebar section (e.g., hovering over "Alerts" starts loading preset counts ~200ms before the click). This keeps the sidebar snappy without the cost of fetching on every page load. This is a potential follow-up enhancement, not a blocker for this PR.
+
 ---
 
 ## Proposed Changes
@@ -100,17 +121,79 @@ The topology data is heavy and only relevant on the `/topology` page itself.
 
 ---
 
-### Fix 4: Keep [useDashboards](file:///Users/yarin/keep/keep-ui/utils/hooks/useDashboards.ts#10-28) but add `revalidateOnMount: false` when data is cached
+### Fix 4: Gate [useDashboards](file:///Users/yarin/keep/keep-ui/utils/hooks/useDashboards.ts#10-28) and add `revalidateIfStale: false`
 
 [useDashboards](file:///Users/yarin/keep/keep-ui/utils/hooks/useDashboards.ts#10-28) fetches `GET /dashboard` on every page load. Dashboards change infrequently. This is lower priority than the others but still unnecessary.
 
-**Strategy**: Add `revalidateIfStale: false` to [useDashboards](file:///Users/yarin/keep/keep-ui/utils/hooks/useDashboards.ts#10-28) so that if the data is already cached from a previous navigation, it won't refetch on every page mount.
+**Strategy**: Gate the initial fetch so it only runs when `pathname` starts with `/dashboard`, consistent with Fixes 1–3. Additionally, add `revalidateIfStale: false` so that if the data is already cached from a previous navigation, it won't refetch on every page mount.
+
+---
+
+#### [MODIFY] [DashboardLinks.tsx](file:///Users/yarin/keep/keep-ui/components/navbar/DashboardLinks.tsx)
+
+- Use `usePathname()` to get the current page.
+- Pass an `enabled` flag (or null key) to [useDashboards](file:///Users/yarin/keep/keep-ui/utils/hooks/useDashboards.ts#10-28) when not on `/dashboard*` path.
 
 ---
 
 #### [MODIFY] [useDashboards.ts](file:///Users/yarin/keep/keep-ui/utils/hooks/useDashboards.ts)
 
+- Add an optional `enabled: boolean` parameter (default `true`). When `false`, pass `null` as SWR key to skip fetching.
 - Add `revalidateIfStale: false` to the SWR config so subsequent page loads reuse cached data.
+
+---
+
+### Fix 5: Don't load all alerts on the Feed page by default — require a query first
+
+Currently, navigating to `/alerts/feed` immediately fires `POST /alerts/query` with **no CEL filter**, returning **all alerts in the system**. At 4,000 alerts/minute, this is the single most expensive page load in the app and often not what the user actually wants.
+
+**Strategy**: When the user lands on the **feed preset** (`/alerts/feed`) with no CEL search query and no facet filters applied, **skip the initial fetch entirely** and show an empty state prompting the user to enter a query. Alerts are only fetched once the user provides input (via the CEL bar or by selecting a facet).
+
+This change applies **only to the "feed" preset**. Custom presets already have a built-in CEL expression and will continue to load immediately.
+
+---
+
+#### [MODIFY] [alert-table-server-side.tsx](file:///Users/yarin/keep/keep-ui/widgets/alerts-table/ui/alert-table-server-side.tsx)
+
+- Accept a new prop: `presetName: string` (or derive from the URL `[id]` param).
+- Add a computed flag: `isFeedAwaitingQuery = presetName === "feed" && !searchCel && !filterCel`.
+- When `isFeedAwaitingQuery` is `true`:
+  - **Do not call `onQueryChange`** — this prevents `useAlertsTableData` from receiving a query and prevents `POST /alerts/query` from firing.
+  - Render a new empty state instead of the alerts table body. This empty state should:
+    - Use the existing [EmptyStateCard](file:///Users/yarin/keep/keep-ui/shared/ui/EmptyState/EmptyStateCard.tsx) component for visual consistency.
+    - Show a search/filter icon.
+    - Display a title like **"Query your alerts"**.
+    - Display a description like **"Use the CEL search bar above to filter alerts, or select facets from the panel on the left."**
+    - Optionally show example CEL queries as clickable chips (e.g., `severity == 'critical'`, `source == 'datadog'`, `status == 'firing'`).
+  - The **CEL bar**, **facet panel**, and **timeframe selector** must still be rendered and functional above/beside the empty state, so the user can immediately start building a query.
+- When the user enters a CEL query (updating `searchCel`) or selects a facet (updating `filterCel`), `isFeedAwaitingQuery` becomes `false`, `onQueryChange` fires normally, and alerts load.
+
+---
+
+#### [MODIFY] [alerts.tsx](file:///Users/yarin/keep/keep-ui/app/(keep)/alerts/[id]/ui/alerts.tsx)
+
+- Pass `presetName` (already available from props/params) down through [AlertTableTabPanelServerSide](file:///Users/yarin/keep/keep-ui/app/(keep)/alerts/[id]/ui/alert-table-tab-panel-server-side.tsx) to [AlertTableServerSide](file:///Users/yarin/keep/keep-ui/widgets/alerts-table/ui/alert-table-server-side.tsx).
+
+---
+
+#### [MODIFY] [alert-table-tab-panel-server-side.tsx](file:///Users/yarin/keep/keep-ui/app/(keep)/alerts/[id]/ui/alert-table-tab-panel-server-side.tsx)
+
+- Thread the `presetName` prop through to `AlertTableServerSide`.
+
+---
+
+#### [NO CHANGES NEEDED] [useAlertsTableData.ts](file:///Users/yarin/keep/keep-ui/widgets/alerts-table/ui/useAlertsTableData.ts)
+
+- When `AlertTableServerSide` doesn't call `onQueryChange`, `alertsTableDataQuery` in the parent `Alerts` component remains `undefined`. `useAlertsTableData(undefined)` passes `undefined` to `useLastAlerts`, which results in a `null` SWR key — no fetch occurs. This already works correctly.
+
+---
+
+#### UX Considerations
+
+- **Facet clicks should also trigger the fetch.** The gate is: skip fetch only when **both** `searchCel` is empty **and** `filterCel` is empty on the feed preset. As soon as either has a value, fetch proceeds.
+- **Timeframe selection alone should NOT trigger a fetch** on the feed (timeframe without any alert filter would still return all alerts). Timeframe only takes effect in combination with a CEL or facet filter.
+- **Custom presets are unaffected.** They have a non-empty `presetCel` by definition, so they load immediately.
+- **Example query chips** (optional enhancement): Clicking a chip like `severity == 'critical'` should populate the CEL bar and trigger the fetch. This can be a follow-up if scope needs to be limited.
 
 ---
 
@@ -121,7 +204,7 @@ The topology data is heavy and only relevant on the `/topology` page itself.
 Run the existing frontend test suite to confirm no regressions:
 
 ```bash
-cd /Users/yarin/keep/keep-ui
+cd keep-ui
 npx jest --testPathPattern="preset-navigation|alert-preset-manager|incident-alerts" --no-coverage 2>&1 | tail -30
 ```
 
@@ -138,10 +221,30 @@ This is the primary validation method since the bug is about runtime behavior.
 5. **Before fix**: Observe N×`POST /alerts/query` calls immediately firing (one per preset in sidebar) + `GET /topology` + `GET /incidents` (even though we're on the incidents page, there would be duplicates)
 6. **After fix**: 
    - On `/incidents` page: Only the alerts-related queries that the actual page needs should fire. The sidebar should NOT fire preset count queries.
-   - On `/alerts/feed`: `POST /alerts/query` calls are expected and appropriate.
+   - On `/alerts/feed`: See Feed-specific tests below.
    - The incident count badge should still update when an incident changes (via SSE).
 
-**Expected outcome after fix:**
-- Loading `/incidents` page: **No** `POST /alerts/query` calls from sidebar presets, **No** `GET /topology` from sidebar
-- Loading `/alerts/feed`: `POST /alerts/query` calls fire normally (page-specific)
-- Loading `/dashboard`: **No** `POST /alerts/query`, **No** `GET /topology`
+### Pass/Fail Criteria (Fixes 1–4: Sidebar)
+
+On a **non-alerts page** load, there should be:
+- **Zero** `POST /alerts/query` requests originating from sidebar components
+- **Zero** `GET /topology` requests from the sidebar
+- **Zero** `GET /dashboard` requests from the sidebar (unless on `/dashboard`)
+
+| Page loaded | Expected `POST /alerts/query` from sidebar | Expected `GET /topology` from sidebar | Expected `GET /dashboard` from sidebar |
+|---|---|---|---|
+| `/incidents` | 0 | 0 | 0 |
+| `/dashboard` | 0 | 0 | Allowed (page-specific) |
+| `/alerts/feed` | 0 (page handles its own, see Fix 5) | 0 | 0 |
+| `/alerts/{custom-preset}` | 0 from sidebar, page fetches own | 0 | 0 |
+
+### Pass/Fail Criteria (Fix 5: Feed Default Behavior)
+
+| Action | Expected behavior |
+|---|---|
+| Navigate to `/alerts/feed` (fresh load, no URL params) | **No** `POST /alerts/query` fires. Empty state prompt is shown: "Query your alerts". CEL bar and facet panel are visible and functional. |
+| Type a CEL query in the search bar and press Enter | `POST /alerts/query` fires with the entered CEL. Alerts matching the query are displayed. |
+| Click a facet in the left panel (without CEL query) | `POST /alerts/query` fires with the facet filter. Matching alerts are displayed. |
+| Navigate to `/alerts/{custom-preset}` | Alerts for that preset load **immediately** (no empty state). Custom presets are unaffected by this change. |
+| Clear the CEL bar (back to empty) while facets are still selected | Alerts remain visible (facet filter still active). |
+| Clear both CEL bar and all facets | Returns to empty state prompt. No `POST /alerts/query` fires. |

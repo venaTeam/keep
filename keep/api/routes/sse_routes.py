@@ -177,8 +177,11 @@ async def sse_notify(
             "event": notification.event,
         }
     )
+    # Convert pydantic model instances to dicts for JSON serialization
+    data = notification.data.dict() if isinstance(notification.data, BaseModel) else notification.data
     await sse_broadcaster.notify(
         notification.tenant_id,
         notification.event,
-        notification.data
+        data
     )
+    

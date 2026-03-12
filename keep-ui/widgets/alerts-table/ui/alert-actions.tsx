@@ -195,20 +195,17 @@ export default function AlertActions({
       >
         Associate with incident
       </Button>
-      <Button
-        icon={RocketIcon}
-        size="xs"
-        color="orange"
-        onClick={showCreateIncidentWithAI}
-        tooltip={
-          config?.OPEN_AI_API_KEY_SET
-            ? "Create incidents with AI"
-            : "AI is not configured"
-        }
-        disabled={!config?.OPEN_AI_API_KEY_SET}
-      >
-        Create incidents with AI
-      </Button>
+      {config?.AI_FEATURES_ENABLED && (
+        <Button
+          icon={RocketIcon}
+          size="xs"
+          color="orange"
+          onClick={showCreateIncidentWithAI}
+          tooltip="Create incidents with AI"
+        >
+          Create incidents with AI
+        </Button>
+      )}
       <AlertAssociateIncidentModal
         isOpen={isIncidentSelectorOpen}
         alerts={selectedAlerts}

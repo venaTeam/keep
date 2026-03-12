@@ -1335,15 +1335,22 @@ def __handle_formatted_events(
                     from keep.api.core.cache import get_redis_client
                     redis_client = get_redis_client()
                     if redis_client:
-                        message = json.dumps({
-                            "event": "poll-presets",
-                            "data": json.dumps(
-                                [p.name.lower() for p in presets_do_update], default=str
-                            )
-                        })
+                        message = json.dumps(
+                            {
+                                "event": "poll-presets",
+                                "data": {
+                                    "preset_names": [
+                                        p.name.lower() for p in presets_do_update
+                                    ]
+                                },
+                            },
+                            default=str,
+                        )
                         channel = f"sse:messages:{tenant_id}"
                         redis_client.publish(channel, message)
-                        logger.info(f"Successfully published poll-presets to Redis channel {channel} for tenant {tenant_id}")
+                        logger.info(
+                            f"Successfully published poll-presets to Redis channel {channel} for tenant {tenant_id}"
+                        )
                 except Exception:
                     logger.exception("Failed to publish presets")
         except Exception:

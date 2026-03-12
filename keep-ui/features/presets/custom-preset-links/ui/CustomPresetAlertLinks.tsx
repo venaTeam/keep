@@ -1,4 +1,4 @@
-import { CSSProperties, useCallback } from "react";
+import { CSSProperties, useCallback, useState } from "react";
 import { usePresets } from "@/entities/presets/model/usePresets";
 import { AiOutlineSwap } from "react-icons/ai";
 import { usePathname, useRouter } from "next/navigation";
@@ -41,10 +41,15 @@ export const AlertPresetLink = ({
 }: AlertPresetLinkProps) => {
   const href = `/alerts/${preset.name.toLowerCase()}`;
   const isActive = decodeURIComponent(pathname?.toLowerCase() || "") === href;
+  const [isHovered, setIsHovered] = useState(false);
 
   const { totalCount } = usePresetAlertsCount(
     preset.options.find((option) => option.label === "CEL")?.value || "",
-    preset.counter_shows_firing_only
+    preset.counter_shows_firing_only,
+    0,
+    0,
+    undefined,
+    isActive || isHovered
   );
 
   const { listeners, setNodeRef, transform, transition, isDragging } =
@@ -82,7 +87,14 @@ export const AlertPresetLink = ({
   }, [preset]);
 
   return (
-    <li key={preset.id} ref={setNodeRef} style={dragStyle} {...listeners}>
+    <li
+      key={preset.id}
+      ref={setNodeRef}
+      style={dragStyle}
+      {...listeners}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <LinkWithIcon
         href={href}
         icon={getIcon()}

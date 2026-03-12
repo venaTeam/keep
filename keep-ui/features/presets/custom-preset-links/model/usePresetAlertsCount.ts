@@ -6,7 +6,8 @@ export const usePresetAlertsCount = (
   counterShowsFiringOnly: boolean,
   limit = 0,
   offset = 0,
-  refreshInterval: number | undefined = undefined
+  refreshInterval: number | undefined = undefined,
+  enabled: boolean = true
 ) => {
   const { useLastAlerts } = useAlerts();
 
@@ -18,14 +19,18 @@ export const usePresetAlertsCount = (
 
   celList.push(presetCel);
 
-  const { data, totalCount, isLoading, mutate } = useLastAlerts({
-    cel: celList
-      .filter((cel) => !!cel)
-      .map((cel) => `(${cel})`)
-      .join(" && "),
-    limit: limit,
-    offset: offset,
-  });
+  const query = enabled
+    ? {
+        cel: celList
+          .filter((cel) => !!cel)
+          .map((cel) => `(${cel})`)
+          .join(" && "),
+        limit: limit,
+        offset: offset,
+      }
+    : undefined;
+
+  const { data, totalCount, isLoading, mutate } = useLastAlerts(query);
 
   useEffect(() => {
     if (!refreshInterval) {

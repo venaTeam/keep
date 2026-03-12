@@ -6,10 +6,10 @@ import { Session } from "next-auth";
 import { Disclosure } from "@headlessui/react";
 import { IoChevronUp } from "react-icons/io5";
 import { useIncidents, usePollIncidents } from "utils/hooks/useIncidents";
+import { usePathname } from "next/navigation";
 import { MdFlashOn } from "react-icons/md";
 import clsx from "clsx";
 import {
-  DEFAULT_INCIDENTS_PAGE_SIZE,
   DEFAULT_INCIDENTS_CEL,
   DEFAULT_INCIDENTS_SORTING,
 } from "@/entities/incidents/model/models";
@@ -18,15 +18,20 @@ type IncidentsLinksProps = { session: Session | null };
 
 export const IncidentsLinks = ({ session }: IncidentsLinksProps) => {
   const isNOCRole = session?.userRole === "noc";
+  const pathname = usePathname();
+  const isOnIncidentsPage = pathname?.startsWith("/incidents") ?? false;
+
   const { data: incidents, mutate } = useIncidents(
-    {
-      candidate: false,
-      predicted: null,
-      limit: 0,
-      offset: 0,
-      sorting: DEFAULT_INCIDENTS_SORTING,
-      cel: DEFAULT_INCIDENTS_CEL,
-    },
+    isOnIncidentsPage
+      ? {
+          candidate: false,
+          predicted: null,
+          limit: 0,
+          offset: 0,
+          sorting: DEFAULT_INCIDENTS_SORTING,
+          cel: DEFAULT_INCIDENTS_CEL,
+        }
+      : null,
     {}
   );
   usePollIncidents(mutate);

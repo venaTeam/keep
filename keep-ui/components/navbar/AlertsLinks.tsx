@@ -2,10 +2,7 @@
 import { useState } from "react";
 import { Button, Subtitle, Callout } from "@tremor/react";
 import { LinkWithIcon } from "components/LinkWithIcon";
-import {
-  CustomPresetAlertLinks,
-  usePresetAlertsCount,
-} from "@/features/presets/custom-preset-links";
+import { CustomPresetAlertLinks } from "@/features/presets/custom-preset-links";
 import { AiOutlineSwap } from "react-icons/ai";
 import { FiFilter } from "react-icons/fi";
 import { Disclosure } from "@headlessui/react";
@@ -18,6 +15,7 @@ import { ActionMeta, MultiValue } from "react-select";
 import { useTags } from "utils/hooks/useTags";
 import { usePresets } from "@/entities/presets/model/usePresets";
 import { useMounted } from "@/shared/lib/hooks/useMounted";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 type AlertsLinksProps = {
@@ -27,6 +25,7 @@ type AlertsLinksProps = {
 export const AlertsLinks = ({ session }: AlertsLinksProps) => {
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const isMounted = useMounted();
+  const pathname = usePathname();
 
   const [storedTags, setStoredTags] = useLocalStorage<string[]>(
     "selectedTags",
@@ -69,8 +68,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
     return staticPresets?.some((preset) => preset.name === "feed");
   })();
 
-  const { isLoading: isAsyncLoading, totalCount: feedAlertsTotalCount } =
-    usePresetAlertsCount("", false);
+  
 
   return (
     <>
@@ -111,7 +109,6 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
                   <LinkWithIcon
                     href="/alerts/feed"
                     icon={AiOutlineSwap}
-                    count={feedAlertsTotalCount}
                     testId="menu-alerts-feed"
                     onClick={(e) => {
                       // If we're already on the feed page, force a reload

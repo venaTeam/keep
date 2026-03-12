@@ -185,8 +185,6 @@ async def sse_notify(
             "event": notification.event,
         }
     )
-  
-
     # Convert pydantic model instances to dicts for JSON serialization
     data = (
         notification.data.dict()

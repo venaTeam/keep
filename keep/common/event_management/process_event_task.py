@@ -1351,6 +1351,7 @@ def __handle_formatted_events(
                         logger.info(
                             f"Successfully published poll-presets to Redis channel {channel} for tenant {tenant_id}"
                         )
+
                 except Exception:
                     logger.exception("Failed to publish presets")
         except Exception:

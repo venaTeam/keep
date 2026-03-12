@@ -53,6 +53,13 @@ export function getConfig(): InternalConfig {
     READ_ONLY: process.env.KEEP_READ_ONLY === "true",
     OPEN_AI_API_KEY_SET:
       !!process.env.OPEN_AI_API_KEY || !!process.env.OPENAI_API_KEY,
+    KEEP_AI_FEATURES_DISABLED:
+      process.env.KEEP_AI_FEATURES_DISABLED?.toLowerCase() === "true",
+    AI_FEATURES_ENABLED:
+      !!(
+        (!!process.env.OPEN_AI_API_KEY || !!process.env.OPENAI_API_KEY) &&
+        process.env.KEEP_AI_FEATURES_DISABLED?.toLowerCase() !== "true"
+      ),
     // NOISY ALERTS DISABLED BY DEFAULT TO SPARE SPACE ON THE TABLE
     NOISY_ALERTS_ENABLED: process.env.NOISY_ALERTS_ENABLED === "true",
     // The URL of the documentation site

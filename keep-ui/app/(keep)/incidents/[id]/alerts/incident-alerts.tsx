@@ -43,6 +43,7 @@ import { BellAlertIcon } from "@heroicons/react/24/outline";
 import { AlertsTableBody } from "@/widgets/alerts-table/ui/alerts-table-body";
 import { useAlertTableCols } from "@/widgets/alerts-table/lib/alert-table-utils";
 import { useAlertTableTheme } from "@/entities/alerts/model";
+import { useConfig } from "@/utils/hooks/useConfig";
 
 interface Props {
   incident: IncidentDto;
@@ -79,6 +80,7 @@ export default function IncidentAlerts({ incident }: Props) {
   const { unlinkAlertsFromIncident } = useIncidentActions();
 
   const { theme } = useAlertTableTheme();
+  const { data: config } = useConfig();
 
   // TODO: Load data on server side
   // Loading state is true if the data is not loaded and there is no error for smoother loading state on initial load
@@ -225,16 +227,18 @@ export default function IncidentAlerts({ incident }: Props) {
           >
             Add Alerts Manually
           </Button>
-          <Button
-            color="orange"
-            variant="primary"
-            size="md"
-            onClick={() => {
-              router.push(`/alerts/feed?createIncidentsFromLastAlerts=50`);
-            }}
-          >
-            Try AI Correlation
-          </Button>
+          {config?.AI_FEATURES_ENABLED && (
+            <Button
+              color="orange"
+              variant="primary"
+              size="md"
+              onClick={() => {
+                router.push(`/alerts/feed?createIncidentsFromLastAlerts=50`);
+              }}
+            >
+              Try AI Correlation
+            </Button>
+          )}
         </div>
       </EmptyStateCard>
     );

@@ -9,7 +9,6 @@ import { IoChevronUp } from "react-icons/io5";
 import { TbTopologyRing } from "react-icons/tb";
 import { FaVolumeMute } from "react-icons/fa";
 import { IoMdGitMerge } from "react-icons/io";
-import { useTopology } from "@/app/(keep)/topology/model/useTopology";
 import clsx from "clsx";
 import { AILink } from "./AILink";
 import { useConfig } from "@/utils/hooks/useConfig";
@@ -51,7 +50,6 @@ const TogglableLink = ({ children, disabledConfigKey }: TogglableLinkProps) => {
 
 export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
   const isNOCRole = session?.userRole === "noc";
-  const { topologyData } = useTopology();
   const { data: tenantConfig, isLoading } = useTenantConfiguration();
   const noiseReductionKeys = {
     HIDE_NAVBAR_DEDUPLICATION: "HIDE_NAVBAR_DEDUPLICATION",
@@ -139,10 +137,6 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
             <LinkWithIcon
               href="/topology"
               icon={TbTopologyRing}
-              isBeta={!topologyData || topologyData.length === 0}
-              count={
-                topologyData?.length === 0 ? undefined : topologyData?.length
-              }
               testId="service-topology"
             >
               <Subtitle className="text-xs">Service Topology</Subtitle>

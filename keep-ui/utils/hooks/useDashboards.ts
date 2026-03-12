@@ -7,14 +7,15 @@ export interface Dashboard {
   dashboard_config: any;
 }
 
-export const useDashboards = () => {
+export const useDashboards = (enabled: boolean = true) => {
   const api = useApi();
 
   const { data, error, mutate } = useSWR<Dashboard[]>(
-    api.isReady() ? "/dashboard" : null,
+    api.isReady() && enabled ? "/dashboard" : null,
     (url: string) => api.get(url),
     {
       revalidateOnFocus: false,
+      revalidateIfStale: false,
     }
   );
 

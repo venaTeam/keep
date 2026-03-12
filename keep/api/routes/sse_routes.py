@@ -8,7 +8,7 @@ no-auth modes.
 
 import logging
 import os
-from typing import Optional
+from typing import List, Optional, Union
 
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
@@ -149,10 +149,25 @@ _EVENT_CACHE_MAP = {
 }
 
 
+class AlertNotifyData(BaseModel):
+    """Data payload for poll-alerts events."""
+    alerts: list
+
+
+class PresetNotifyData(BaseModel):
+    """Data payload for poll-presets events."""
+    preset_names: List[str]
+
+
+class IncidentNotifyData(BaseModel):
+    """Data payload for incident-change events."""
+    incident_ids: List[str]
+
+
 class SSENotification(BaseModel):
     tenant_id: str
     event: str
-    data: dict = {}
+    data: Union[PresetNotifyData, IncidentNotifyData, AlertNotifyData, dict] = {}
 
 
 @router.post("/notify", status_code=204)
@@ -170,16 +185,10 @@ async def sse_notify(
             "event": notification.event,
         }
     )
-
-    # NOTE: We intentionally do NOT invalidate Redis cache here.
-    # The SSE event tells the frontend to re-fetch, and the cached data
-    # (max 30s stale via TTL) is acceptable. Invalidating on every alert
-    # causes cache thrashing under high alert volume (~4000/min),
-    # making the cache permanently empty and every request hitting the DB.
-
+    # Convert pydantic model instances to dicts for JSON serialization
+    data = notification.data.dict() if isinstance(notification.data, BaseModel) else notification.data
     await sse_broadcaster.notify(
         notification.tenant_id,
         notification.event,
-        notification.data
+        data
     )
-

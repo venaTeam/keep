@@ -1337,13 +1337,14 @@ def __handle_formatted_events(
                     if redis_client:
                         message = json.dumps({
                             "event": "poll-presets",
-                            "data": json.dumps(
-                                [p.name.lower() for p in presets_do_update], default=str
-                            )
-                        })
+                            "data": {"preset_names": json.dumps([p.name.lower() for p in presets_do_update], default=str)},
+                        },
+                        timeout=5
+                    )
                         channel = f"sse:messages:{tenant_id}"
                         redis_client.publish(channel, message)
                         logger.info(f"Successfully published poll-presets to Redis channel {channel} for tenant {tenant_id}")
+                    response.raise_for_status()
                 except Exception:
                     logger.exception("Failed to publish presets")
         except Exception:

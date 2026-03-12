@@ -345,10 +345,7 @@ class MaintenanceWindowsBl:
                             notify_sse(
                                 tenant,
                                 "poll-presets",
-                                json.dumps(
-                                    [p.name.lower() for p in presets_do_update],
-                                    default=str,
-                                ),
+                                {"preset_names": [p.name.lower() for p in presets_do_update]},
                             )
                         except Exception:
                             logger.exception("Failed to send presets via SSE")

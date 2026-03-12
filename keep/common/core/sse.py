@@ -179,8 +179,8 @@ async def setup_redis_listener():
     """
     Background task to listen for Redis Pub/Sub messages and broadcast to local SSE connections.
     """
-    from keep.common.consts import REDIS as redis_enabled
-    from keep.common.core.config import config
+    from keep.common.core.config import config    
+    redis_enabled = config("REDIS_CACHE", default="true") == "true"
     if not redis_enabled:
         logger.info("Redis disabled, SSE will only use local events")
         return

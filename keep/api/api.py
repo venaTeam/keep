@@ -49,6 +49,7 @@ from keep.workflowmanager.workflowmanager import WorkflowManager
 
 from keep.api.config import (
     AUTH_TYPE,
+    REDIS_CACHE,
     CONSUMER,
     HOST,
     KEEP_API_URL,
@@ -169,7 +170,7 @@ async def startup(background_tasks: set = None):
                 },
             )
     # Start the Redis SSE listener
-    if REDIS:
+    if REDIS_CACHE:
         try:
             logger.info("Starting Redis SSE listener")
             task = asyncio.create_task(setup_redis_listener())

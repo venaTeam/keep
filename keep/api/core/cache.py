@@ -39,9 +39,9 @@ def get_redis_client():
 
     _redis_init_attempted = True
 
-    redis_enabled = config("REDIS", default="true") == "true"
+    redis_enabled = config("REDIS_CACHE", default="true") == "true"
     if not redis_enabled:
-        logger.info("Redis cache disabled (REDIS != 'true')")
+        logger.info("Redis cache disabled (REDIS_CACHE != 'true')")
         return None
 
     try:

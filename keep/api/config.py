@@ -20,7 +20,7 @@ CONSUMER = starlette_config("CONSUMER", default="true", cast=bool)
 TOPOLOGY = starlette_config("KEEP_TOPOLOGY_PROCESSOR", default="false", cast=bool)
 WATCHER = starlette_config("WATCHER", default="false", cast=bool)
 KEEP_DEBUG_TASKS = starlette_config("KEEP_DEBUG_TASKS", default="false", cast=bool)
-
+REDIS_CACHE = starlette_config("REDIS_CACHE", default="true", cast=bool)
 KEEP_USE_LIMITER = starlette_config("KEEP_USE_LIMITER", default="false", cast=bool)
 MAINTENANCE_WINDOWS = starlette_config("MAINTENANCE_WINDOWS", default="false", cast=bool)
 

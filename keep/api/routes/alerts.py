@@ -78,8 +78,6 @@ from keep.workflowmanager.workflowmanager import WorkflowManager
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-REDIS = os.environ.get("REDIS", "false") == "true"
-
 
 
 @router.post(

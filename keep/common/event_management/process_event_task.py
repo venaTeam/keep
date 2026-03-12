@@ -1332,9 +1332,7 @@ def __handle_formatted_events(
                         json={
                             "tenant_id": tenant_id,
                             "event": "poll-presets",
-                            "data": json.dumps(
-                                [p.name.lower() for p in presets_do_update], default=str
-                            ),
+                            "data": {"preset_names": [p.name.lower() for p in presets_do_update]},
                         },
                         timeout=5
                     )

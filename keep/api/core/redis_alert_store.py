@@ -381,7 +381,8 @@ def hydrate_redis_from_db(tenant_id: str) -> int:
 
     try:
         from keep.common.models.query import QueryDto
-        from keep.common.core.db import query_last_alerts, enrich_alerts_with_incidents
+        from keep.common.core.alerts import query_last_alerts
+        from keep.common.core.db import enrich_alerts_with_incidents
         from keep.common.utils.enrichment_helpers import convert_db_alerts_to_dto_alerts
 
         # Fetch a large batch from DB (up to 10K most recent)

@@ -52,6 +52,10 @@ def get_redis_client():
         password = config("REDIS_PASSWORD", default=None)
         username = config("REDIS_USERNAME", default=None)
 
+        logger.info(
+            "Attempting to connect to Redis",
+            extra={"host": host, "port": port, "username": username},
+        )
         _redis_client = redis_lib.Redis(
             host=host,
             port=port,
@@ -65,13 +69,13 @@ def get_redis_client():
         # Quick connectivity check
         _redis_client.ping()
         logger.info(
-            "Redis cache client connected",
+            "Redis cache client connected successfully",
             extra={"host": host, "port": port},
         )
     except Exception as e:
         logger.warning(
             "Redis cache unavailable, falling back to DB",
-            extra={"error": str(e)},
+            extra={"error": str(e), "host": config("REDIS_HOST", default="localhost")},
         )
         _redis_client = None
 

@@ -1294,9 +1294,13 @@ def __handle_formatted_events(
                     channel = f"sse:messages:{tenant_id}"
                     redis_client.publish(channel, message)
                     logger.info(f"Successfully published poll-alerts to Redis channel {channel} for tenant {tenant_id}")
+                else:
+                    logger.warning(f"SSE: Redis client unavailable in Event Handler, skipping publish for tenant {tenant_id}", extra={"tenant_id": tenant_id})
             except Exception as e:
-                logger.warning(f"Failed to publish poll-alerts: {e}")
+                logger.warning(f"SSE: Failed to publish poll-alerts to Redis: {e}", extra={"tenant_id": tenant_id})
                 pass
+        else:
+            logger.debug(f"SSE: Notification throttled for tenant {tenant_id} (poll-alerts)", extra={"tenant_id": tenant_id})
 
         if incidents and notification_cache.should_notify(tenant_id, "incident-change"):
             try:
@@ -1311,8 +1315,10 @@ def __handle_formatted_events(
                     channel = f"sse:messages:{tenant_id}"
                     redis_client.publish(channel, message)
                     logger.info(f"Successfully published incident-change to Redis channel {channel} for tenant {tenant_id}")
-            except Exception:
-                logger.exception("Failed to publish incidents")
+                else:
+                    logger.warning(f"SSE: Redis client unavailable for incident-change")
+            except Exception as e:
+                logger.exception(f"SSE: Failed to publish incidents: {e}")
 
         # Now we need to update the presets
         # send with SSE
@@ -1351,9 +1357,11 @@ def __handle_formatted_events(
                         logger.info(
                             f"Successfully published poll-presets to Redis channel {channel} for tenant {tenant_id}"
                         )
+                    else:
+                        logger.warning(f"SSE: Redis client unavailable for poll-presets")
 
-                except Exception:
-                    logger.exception("Failed to publish presets")
+                except Exception as e:
+                    logger.warning(f"SSE: Failed to publish presets: {e}")
         except Exception:
             logger.exception(
                 "Failed to send presets via SSE",

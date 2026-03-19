@@ -139,7 +139,11 @@ const nextConfig = {
       : "http://localhost:8181";
     return [
       {
-        source: "/:path*",
+        // Allow Keycloak origin only on Next.js routes.
+        // Exclude /backend/* — those are proxied to FastAPI which manages its
+        // own CORS via CORSMiddleware; adding a second Access-Control-Allow-Origin
+        // here would produce duplicate headers and cause browsers to reject the response.
+        source: "/((?!backend(?:/|$)).*)",
         headers: [
           {
             key: "Access-Control-Allow-Origin",

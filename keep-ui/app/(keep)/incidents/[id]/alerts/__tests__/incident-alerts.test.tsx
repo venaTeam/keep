@@ -283,6 +283,9 @@ describe('IncidentAlerts', () => {
       error: null,
       mutate: jest.fn(),
     });
+    (useConfig as jest.Mock).mockReturnValue({
+      data: { AI_FEATURES_ENABLED: true },
+    });
 
     render(<IncidentAlerts incident={mockIncident} />);
 
@@ -293,6 +296,23 @@ describe('IncidentAlerts', () => {
     // Check for action buttons in empty state
     expect(screen.getByText('Add Alerts Manually')).toBeInTheDocument();
     expect(screen.getByText('Try AI Correlation')).toBeInTheDocument();
+  });
+
+  it('hides Try AI Correlation button when AI features are disabled', () => {
+    (useIncidentAlerts as jest.Mock).mockReturnValue({
+      data: { items: [], count: 0, limit: 20, offset: 0 },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    });
+    (useConfig as jest.Mock).mockReturnValue({
+      data: { AI_FEATURES_ENABLED: false },
+    });
+
+    render(<IncidentAlerts incident={mockIncident} />);
+
+    expect(screen.getByText('Add Alerts Manually')).toBeInTheDocument();
+    expect(screen.queryByText('Try AI Correlation')).not.toBeInTheDocument();
   });
 
   it('handles loading state', () => {

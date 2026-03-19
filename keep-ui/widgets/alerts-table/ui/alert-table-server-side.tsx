@@ -222,9 +222,16 @@ export function AlertTableServerSide({
   );
   const [lastViewedAlert, setLastViewedAlert] = useState<string | null>(null);
 
+  const isFeedAwaitingQuery =
+    presetName === "feed" && !searchCel && !filterCel;
+
   useEffect(
     function whenQueryChange() {
       if (filterCel === null || searchCel === null || timeFrame === null) {
+        return;
+      }
+
+      if (isFeedAwaitingQuery) {
         return;
       }
 
@@ -243,7 +250,7 @@ export function AlertTableServerSide({
         onQueryChange(query);
       }
     },
-    [filterCel, searchCel, paginationState, sorting, timeFrame, onQueryChange]
+    [filterCel, searchCel, paginationState, sorting, timeFrame, onQueryChange, isFeedAwaitingQuery]
   );
 
   const [selectedAlert, setSelectedAlert] = useState<AlertDto | null>(null);
@@ -554,6 +561,21 @@ export function AlertTableServerSide({
   );
 
   function renderTable() {
+    if (isFeedAwaitingQuery) {
+      return (
+        <div className="flex-1 flex items-center w-full">
+          <div className="flex flex-col justify-center items-center w-full p-4">
+            <EmptyStateCard
+              noCard
+              title="Query Your Alerts"
+              description="Use the CEL search bar above to filter alerts, or select facets from the panel on the left."
+              icon={MagnifyingGlassIcon}
+            />
+          </div>
+        </div>
+      );
+    }
+
     if (
       !showSkeleton &&
       table.getPageCount() === 0 &&
@@ -739,20 +761,26 @@ export function AlertTableServerSide({
       <div className="pb-4">
         <div className="flex gap-4">
           {/* Facets sidebar */}
-          <div className="w-33 min-w-[12rem] overflow-y-auto">
-            <FacetsPanelServerSide
-              usePropertyPathsSuggestions={true}
-              entityName={"alerts"}
-              facetOptionsCel={facetsCel}
-              clearFiltersToken={clearFiltersToken}
-              initialFacetsData={{ facets: initialFacets, facetOptions: null }}
-              facetsConfig={facetsConfig}
-              persistenceKey={`facets-${userPrefix}${presetName}`}
-              onCelChange={setFilterCel}
-              revalidationToken={facetsPanelRefreshToken}
-              isSilentReloading={isAsyncLoading}
-            />
-          </div>
+          {!isFeedAwaitingQuery && (
+            <div className="w-33 min-w-[12rem] overflow-y-auto">
+              <FacetsPanelServerSide
+                usePropertyPathsSuggestions={true}
+                entityName={"alerts"}
+                facetOptionsCel={facetsCel}
+                clearFiltersToken={clearFiltersToken}
+                initialFacetsData={{ facets: initialFacets, facetOptions: null }}
+                facetsConfig={facetsConfig}
+                persistenceKey={
+                  presetName === "feed"
+                    ? undefined
+                    : `facets-${userPrefix}${presetName}`
+                }
+                onCelChange={setFilterCel}
+                revalidationToken={facetsPanelRefreshToken}
+                isSilentReloading={isAsyncLoading}
+              />
+            </div>
+          )}
 
           {/* Table section */}
           <div className="flex-1 flex flex-col min-w-0 gap-4">

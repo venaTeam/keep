@@ -8,7 +8,7 @@ no-auth modes.
 
 import logging
 import os
-from typing import Optional
+from typing import List, Optional, Union
 
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
@@ -141,10 +141,25 @@ async def sse_subscribe(
 
 
 
+class AlertNotifyData(BaseModel):
+    """Data payload for poll-alerts events."""
+    alerts: list
+
+
+class PresetNotifyData(BaseModel):
+    """Data payload for poll-presets events."""
+    preset_names: List[str]
+
+
+class IncidentNotifyData(BaseModel):
+    """Data payload for incident-change events."""
+    incident_ids: List[str]
+
+
 class SSENotification(BaseModel):
     tenant_id: str
     event: str
-    data: dict = {}
+    data: Union[PresetNotifyData, IncidentNotifyData, AlertNotifyData, dict] = {}
 
 
 @router.post("/notify", status_code=204)
@@ -162,8 +177,11 @@ async def sse_notify(
             "event": notification.event,
         }
     )
+    # Convert pydantic model instances to dicts for JSON serialization
+    data = notification.data.dict() if isinstance(notification.data, BaseModel) else notification.data
     await sse_broadcaster.notify(
         notification.tenant_id,
         notification.event,
-        notification.data
+        data
     )
+    

@@ -155,3 +155,72 @@ optimizations that can be made to improve this ? As usually preset cels are "sou
   Practical recommendation: Add expression indexes for application and operator only if you can confirm they're present in the majority of alerts and appear in presets across most tenants. Otherwise, option 1 
   (real columns) is the right architectural move for fields that are truly universal.
                                                                                                                                                                                                                  
+ In our Keep deployment we only use one provider that actually has a strict schema, which is not apart of AlertDTO but does not change over time and the amount of custom fields of an alert is limited and     
+well known.                                                                                                                                                                                                      
+                                                                                                                                                                                                                 
+⏺ That changes things significantly — if the schema is fixed and well-known, promoting those fields to real columns is the right call, not expression indexes.                                                   
+                                                                                                                                                                                                               
+  Real columns give you:                                                                                                                                                                                         
+  - Standard B-tree indexes (far cheaper to maintain than GIN, faster for equality/range)
+  - Type safety and validation at the DB level                                                                                                                                                                   
+  - Clean query plans with no JSON extraction overhead at all for those fields                                                                                                                                 
+  - No COALESCE/fallback logic needed in queries                                                                                                                                                                 
+                                                                                                                                                                                                                 
+  To move forward properly, I need to understand the actual schema. Can you share:                                                                                                                               
+                                                                                                                                                                                                                 
+  1. The full list of custom fields your provider pushes (the fixed schema you mentioned)                                                                                                                        
+  2. Which fields are commonly used in preset CELs (i.e., which ones actually need indexes)                                                                                                                      
+  3. Where they currently land — are they in alert.event, alertenrichment.enrichments, or both?                                                                                                                  
+                                                                                                                                                                                                                 
+  With that I can plan the right migration: new columns on Alert (or a dedicated table if the field count is large), proper indexes, and the query layer changes needed to stop going through JSON for those     
+  fields.               
+
+This is the situation for now, but in the future we might add couple more providers that will have their own costum fields. So perhaps its better to keep the current jsonb column instead of actual column    
+for each custom field ? and they are held in alert.event or alertenrichment.enrichments                                                                                                                          
+                                                                                                                                                                                                                 
+⏺ Then expression indexes are exactly the right call — you get index performance for your known fields today, and the JSONB column stays flexible for future providers without any schema changes.               
+                                                                                                                                                                                                                 
+  The pattern is clean: when a new provider lands and its fields start appearing in presets, you add expression indexes for those fields in a new migration. No column additions, no model changes, no           
+  application code changes — just a migration file.
+                                                                                                                                                                                                                 
+  For your current provider, the migration would look like this alongside (or as a follow-up to) the JSONB migration:                                                                                            
+   
+  def upgrade() -> None:                                                                                                                                                                                         
+      bind = op.get_bind()                                                                                                                                                                                       
+      if bind.dialect.name != "postgresql":
+          return                                                                                                                                                                                                 
+                                                            
+      # Known high-frequency preset filter fields — current provider                                                                                                                                             
+      op.execute("CREATE INDEX ix_alert_event_status     ON alert ((event->>'status'))")
+      op.execute("CREATE INDEX ix_alert_event_severity   ON alert ((event->>'severity'))")                                                                                                                       
+      op.execute("CREATE INDEX ix_alert_event_application ON alert ((event->>'application'))")                                                                                                                   
+      op.execute("CREATE INDEX ix_alert_event_operator    ON alert ((event->>'operator'))")                                                                                                                      
+                                                                                                                                                                                                                 
+      # Enrichment-side overrides for the same fields                                                                                                                                                            
+      op.execute("CREATE INDEX ix_enrichment_status      ON alertenrichment ((enrichments->>'status'))")                                                                                                         
+      op.execute("CREATE INDEX ix_enrichment_application ON alertenrichment ((enrichments->>'application'))")                                                                                                    
+      op.execute("CREATE INDEX ix_enrichment_operator    ON alertenrichment ((enrichments->>'operator'))")
+                                                                                                                                                                                                                 
+                                                            
+  def downgrade() -> None:                                                                                                                                                                                       
+      bind = op.get_bind()                                  
+      if bind.dialect.name != "postgresql":                                                                                                                                                                      
+          return
+                                                                                                                                                                                                                 
+      op.execute("DROP INDEX IF EXISTS ix_enrichment_operator")
+      op.execute("DROP INDEX IF EXISTS ix_enrichment_application")
+      op.execute("DROP INDEX IF EXISTS ix_enrichment_status")                                                                                                                                                    
+      op.execute("DROP INDEX IF EXISTS ix_enrichment_severity")
+      op.execute("DROP INDEX IF EXISTS ix_alert_event_operator")                                                                                                                                                 
+      op.execute("DROP INDEX IF EXISTS ix_alert_event_application")
+      op.execute("DROP INDEX IF EXISTS ix_alert_event_severity")                                                                                                                                                 
+      op.execute("DROP INDEX IF EXISTS ix_alert_event_status")                                                                                                                                                   
+                                                                                                                                                                                                                 
+  Two things worth noting:                                                                                                                                                                                       
+                                                            
+  1. These indexes are only useful after the JSONB migration. On a JSON column, expression indexes on ->> still require text parsing at index-build time and don't give you the binary lookup benefit. Run this  
+  migration after json_to_jsonb completes.
+  2. Cardinality matters. status and severity have very few distinct values — PostgreSQL may ignore the index for those if selectivity is too low (e.g., 50% of rows are firing). In that case, a partial index  
+  is more effective:                                                                                                                                                                                             
+  CREATE INDEX ix_alert_event_status_firing ON alert ((event->>'status')) WHERE (event->>'status') = 'firing';
+  application and operator are likely high-cardinality (many distinct values), so standard expression indexes will work well there.            

@@ -428,3 +428,80 @@ def test_deleted_api_key_authentication(db_session, client, test_app):
     found_key = get_api_key(valid_api_key, include_deleted=True)
     assert found_key is not None
     assert found_key.is_deleted == True
+
+
+# ---------------------------------------------------------------------------
+# CORS middleware tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("test_app", ["NO_AUTH"], indirect=True)
+def test_cors_allows_trusted_origin(monkeypatch, test_app):
+    """Trusted origin should receive Access-Control-Allow-Origin echoed back."""
+    trusted = "https://platform.keephq.dev"
+    monkeypatch.setenv("KEEP_PLATFORM_URL", trusted)
+
+    # Re-evaluate the config so the new env var is picked up.
+    import importlib, keep.api.config as cfg
+    importlib.reload(cfg)
+    test_app.middleware_stack = None  # force middleware rebuild via TestClient
+
+    from fastapi.testclient import TestClient
+    with TestClient(test_app, raise_server_exceptions=False) as c:
+        response = c.get("/", headers={"Origin": trusted})
+    assert response.headers.get("access-control-allow-origin") == trusted
+
+
+@pytest.mark.parametrize("test_app", ["NO_AUTH"], indirect=True)
+def test_cors_blocks_untrusted_origin(monkeypatch, test_app):
+    """An origin not in KEEP_CORS_TRUSTED_ORIGINS must not be echoed back."""
+    monkeypatch.setenv("KEEP_PLATFORM_URL", "https://platform.keephq.dev")
+    monkeypatch.setenv("KEEP_CORS_TRUSTED_ORIGINS", "https://platform.keephq.dev")
+
+    import importlib, keep.api.config as cfg
+    importlib.reload(cfg)
+
+    from fastapi.testclient import TestClient
+    with TestClient(test_app, raise_server_exceptions=False) as c:
+        response = c.get("/", headers={"Origin": "https://evil.example.com"})
+    # CORSMiddleware must NOT echo back an untrusted origin
+    assert response.headers.get("access-control-allow-origin") != "https://evil.example.com"
+
+
+def test_cors_multi_origin():
+    """
+    All origins in a comma-separated KEEP_CORS_TRUSTED_ORIGINS must be accepted.
+    Tests the parsing logic and CORSMiddleware behaviour in isolation.
+    """
+    import os
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from starlette.middleware.cors import CORSMiddleware
+
+    raw = "https://app.keep.dev,https://staging.keep.dev"
+    # Replicate the same parsing logic from config.py
+    trusted_origins = [o.strip() for o in raw.split(",") if o.strip()]
+
+    app = FastAPI()
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=trusted_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/ping")
+    async def ping():
+        return {"ok": True}
+
+    with TestClient(app) as c:
+        for origin in trusted_origins:
+            response = c.get("/ping", headers={"Origin": origin})
+            assert response.headers.get("access-control-allow-origin") == origin, (
+                f"Expected origin '{origin}' to be allowed"
+            )
+
+        # Also verify an untrusted origin is not echoed back
+        response = c.get("/ping", headers={"Origin": "https://evil.example.com"})
+        assert response.headers.get("access-control-allow-origin") != "https://evil.example.com"

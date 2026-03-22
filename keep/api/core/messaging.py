@@ -63,6 +63,7 @@ class KafkaEventProducer(EventProducer):
         
         self.topic = config("KAFKA_TOPIC", default="keep-events")
         self.dlq_topic = config("KAFKA_DLQ_TOPIC", default="keep-events-dlq")
+        self.max_retries = int(config("KAFKA_MAX_RETRIES", default="3"))
 
         # SASL config
         self.security_protocol = config("KAFKA_SECURITY_PROTOCOL", default="PLAINTEXT")
@@ -130,26 +131,27 @@ class KafkaEventProducer(EventProducer):
                 payload, default=lambda o: o.dict() if hasattr(o, "dict") else str(o)
             ).encode("utf-8")
             
-            try:
-                # `aiokafka.AIOKafkaProducer.send_and_wait` automatically handles retriable 
-                # errors internally (using retry_backoff_ms and request_timeout_ms).
-                await self.producer.send_and_wait(self.topic, val)
-                self.logger.info(f"Successfully produced event to Kafka topic {self.topic}: {trace_id}")
-                return "kafka-async-task"
-            except Exception as e:
-                self.logger.warning(
-                    f"Failed to produce to Kafka main topic {self.topic} after internal retries: {e}. "
-                    f"Sending to DLQ {self.dlq_topic}"
-                )
+            # Simple retry loop
+            for attempt in range(self.max_retries):
                 try:
-                    await self.producer.send_and_wait(self.dlq_topic, val)
-                    self.logger.info(f"Successfully produced event to DLQ topic {self.dlq_topic}: {trace_id}")
-                    return "kafka-async-task-dlq"
-                except Exception as dlq_e:
-                    self.logger.exception(f"Failed to produce event to Kafka DLQ topic {self.dlq_topic}: {trace_id}")
-                    raise dlq_e
+                    await self.producer.send_and_wait(self.topic, val)
+                    self.logger.info(f"Successfully produced event to Kafka topic {self.topic}: {trace_id}")
+                    return "kafka-async-task"
+                except Exception as e:
+                    self.logger.warning(f"Failed to produce to Kafka main topic {self.topic} (attempt {attempt+1}/{self.max_retries}): {e}")
+            
+            # If we exit the loop, all attempts failed. Send to DLQ.
+            self.logger.warning(f"All {self.max_retries} attempts to main topic {self.topic} failed. Sending to DLQ {self.dlq_topic}")
+            try:
+                await self.producer.send_and_wait(self.dlq_topic, val)
+                self.logger.info(f"Successfully produced event to DLQ topic {self.dlq_topic}: {trace_id}")
+                return "kafka-async-task-dlq"
+            except Exception as dlq_e:
+                self.logger.exception(f"Failed to produce event to Kafka DLQ topic {self.dlq_topic}: {trace_id}")
+                raise dlq_e
+
         except Exception as e:
-            self.logger.exception("Failed to buffer event to Kafka or DLQ")
+            self.logger.exception("Failed to build or produce event to Kafka or DLQ")
             raise e
 
     async def close(self):

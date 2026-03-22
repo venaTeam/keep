@@ -10,7 +10,7 @@ import {
   SelectItem,
   Switch,
 } from "@tremor/react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, useRef } from "react";
 import { useUsers } from "@/entities/users/model/useUsers";
 import { useIncidentActions } from "@/entities/incidents/model";
 import type { IncidentDto } from "@/entities/incidents/model";
@@ -40,6 +40,8 @@ export function CreateOrUpdateIncidentForm({
   );
   const { data: session } = useSession();
   const currentUser = session?.user;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
   const [incidentName, setIncidentName] = useState<string>("");
   const [incidentUserSummary, setIncidentUserSummary] = useState<string>("");
   const [incidentAssignee, setIncidentAssignee] = useState<string>(currentUser?.email || "");
@@ -48,7 +50,7 @@ export function CreateOrUpdateIncidentForm({
   const { data: users = [] } = useUsers();
   const { addIncident, updateIncident } = useIncidentActions();
 
-    // Sort users alphabetically
+  // Sort users alphabetically
   const sortedUsers = [...users].sort((a, b) =>
     (a.name || a.email).localeCompare(b.name || b.email)
   );
@@ -83,22 +85,26 @@ export function CreateOrUpdateIncidentForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (editMode) {
-      await updateIncident(
-        incidentToEdit!.id,
-        {
-          user_generated_name: incidentName,
-          user_summary: incidentUserSummary,
-          assignee: incidentAssignee,
-          resolve_on: resolveOnAlertsResolved,
-          same_incident_in_the_past_id:
-            incidentToEdit!.same_incident_in_the_past_id,
-        },
-        false
-      );
-      exitEditMode();
-    } else {
-      try {
+    if (isSubmittingRef.current || isSubmitting) return;
+
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+    try {
+      if (editMode) {
+        await updateIncident(
+          incidentToEdit!.id,
+          {
+            user_generated_name: incidentName,
+            user_summary: incidentUserSummary,
+            assignee: incidentAssignee,
+            resolve_on: resolveOnAlertsResolved,
+            same_incident_in_the_past_id:
+              incidentToEdit!.same_incident_in_the_past_id,
+          },
+          false
+        );
+        exitEditMode();
+      } else {
         const newIncident = await addIncident({
           user_generated_name: incidentName,
           user_summary: incidentUserSummary,
@@ -108,9 +114,12 @@ export function CreateOrUpdateIncidentForm({
         });
         createCallback?.(newIncident.id);
         exitEditMode();
-      } catch (error) {
-        console.error(error);
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
   };
 
@@ -233,7 +242,8 @@ export function CreateOrUpdateIncidentForm({
           </Button>
         )}
         <Button
-          disabled={!submitEnabled()}
+          disabled={!submitEnabled() || isSubmitting}
+          loading={isSubmitting}
           color="orange"
           size="xs"
           type="submit"

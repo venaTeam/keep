@@ -3,7 +3,6 @@ import { WidgetData, WidgetType, PresetPanelType } from "../../types";
 import { usePresetAlertsCount } from "@/features/presets/custom-preset-links";
 import { useDashboardPreset } from "@/utils/hooks/useDashboardPresets";
 import { Button, Icon } from "@tremor/react";
-import { FireIcon } from "@heroicons/react/24/outline";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -49,7 +48,7 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
     isLoading,
   } = usePresetAlertsCount(
     filterCel,
-    !!preset?.counter_shows_firing_only,
+    false,
     countOfLastAlerts,
     0,
     10000 // refresh interval
@@ -126,9 +125,7 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
   }
 
   function renderAlertsCountText() {
-    const label = preset?.counter_shows_firing_only
-      ? "Firing alerts count:"
-      : "Alerts count:";
+    const label = "Alerts count:";
     let state: string = "nothingToShow";
 
     if (countOfLastAlerts > 0) {
@@ -163,14 +160,6 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
                 </span>
               )}
 
-              {preset?.counter_shows_firing_only && (
-                <Icon
-                  className="p-0"
-                  style={{ color: getColor() }}
-                  size={"md"}
-                  icon={FireIcon}
-                ></Icon>
-              )}
             </>
           )}
         </div>
@@ -185,32 +174,32 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
     <div className="flex flex-col overflow-y-auto gap-2">
       {isAlertTable && (
         <>
-      <div className="flex gap-2">
-        <div className="flex-1 min-w-0 overflow-hidden whitespace-nowrap">
-          <div className="flex gap-1 items-center">
-            <div>Preset name:</div>
-            <div className="truncate">{preset?.name}</div>
+          <div className="flex gap-2">
+            <div className="flex-1 min-w-0 overflow-hidden whitespace-nowrap">
+              <div className="flex gap-1 items-center">
+                <div>Preset name:</div>
+                <div className="truncate">{preset?.name}</div>
+              </div>
+              {/* {renderCEL()} */}
+              {renderAlertsCountText()}
+            </div>
+            <div className="flex items-center">
+              <Button
+                color="orange"
+                variant="secondary"
+                size="xs"
+                onClick={handleGoToPresetClick}
+              >
+                Go to preset
+              </Button>
+            </div>
           </div>
-          {renderCEL()}
-          {renderAlertsCountText()}
-        </div>
-        <div className="flex items-center">
-          <Button
-            color="orange"
-            variant="secondary"
-            size="xs"
-            onClick={handleGoToPresetClick}
-          >
-            Go to preset
-          </Button>
-        </div>
-      </div>
-      {countOfLastAlerts > 0 && (
-        <WidgetAlertsTable
-          presetName={preset?.name as string}
-          alerts={isLoading ? undefined : alerts}
-          columns={(item as any)?.presetColumns}
-          background={isLoading ? undefined : hexToRgb(getColor(), 0.1)}
+          {countOfLastAlerts > 0 && (
+            <WidgetAlertsTable
+              presetName={preset?.name as string}
+              alerts={isLoading ? undefined : alerts}
+              columns={(item as any)?.presetColumns}
+              background={isLoading ? undefined : hexToRgb(getColor(), 0.1)}
             />
           )}
         </>

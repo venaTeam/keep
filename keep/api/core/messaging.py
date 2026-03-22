@@ -100,11 +100,33 @@ class KafkaEventProducer(EventProducer):
             ssl_context=ssl_context,
             api_version="auto",
         )
+
+        dlq_bootstrap_servers_str = config("KAFKA_DLQ_BOOTSTRAP_SERVERS", default=bootstrap_servers)
+        try:
+            self.dlq_bootstrap_servers = json.loads(dlq_bootstrap_servers_str)
+            if not isinstance(self.dlq_bootstrap_servers, list):
+                self.dlq_bootstrap_servers = str(self.dlq_bootstrap_servers).split(",")
+        except json.JSONDecodeError:
+            self.dlq_bootstrap_servers = dlq_bootstrap_servers_str.split(",")
+
+        dlq_sasl_username = config("KAFKA_DLQ_SASL_USERNAME", default=self.sasl_plain_username)
+        dlq_sasl_password = config("KAFKA_DLQ_SASL_PASSWORD", default=self.sasl_plain_password)
+
+        self.dlq_producer = AIOKafkaProducer(
+            bootstrap_servers=self.dlq_bootstrap_servers,
+            security_protocol=self.security_protocol,
+            sasl_mechanism=self.sasl_mechanism,
+            sasl_plain_username=dlq_sasl_username,
+            sasl_plain_password=dlq_sasl_password,
+            ssl_context=ssl_context,
+            api_version="auto",
+        )
         self._started = False
 
     async def _ensure_started(self):
         if not self._started:
             await self.producer.start()
+            await self.dlq_producer.start()
             self._started = True
 
     async def produce(self, event: dict, **kwargs):
@@ -143,7 +165,7 @@ class KafkaEventProducer(EventProducer):
             # If we exit the loop, all attempts failed. Send to DLQ.
             self.logger.warning(f"All {self.max_retries} attempts to main topic {self.topic} failed. Sending to DLQ {self.dlq_topic}")
             try:
-                await self.producer.send_and_wait(self.dlq_topic, val)
+                await self.dlq_producer.send_and_wait(self.dlq_topic, val)
                 self.logger.info(f"Successfully produced event to DLQ topic {self.dlq_topic}: {trace_id}")
                 return "kafka-async-task-dlq"
             except Exception as dlq_e:
@@ -157,4 +179,5 @@ class KafkaEventProducer(EventProducer):
     async def close(self):
         if self._started:
             await self.producer.stop()
+            await self.dlq_producer.stop()
             self._started = False

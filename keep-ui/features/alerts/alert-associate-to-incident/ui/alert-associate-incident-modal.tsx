@@ -28,6 +28,7 @@ export const AlertAssociateIncidentModal = ({
   alerts,
 }: AlertAssociateIncidentModalProps) => {
   const [createIncident, setCreateIncident] = useState(false);
+  const [isAssociating, setIsAssociating] = useState(false);
 
   const {
     data: incidents,
@@ -43,6 +44,8 @@ export const AlertAssociateIncidentModal = ({
 
   const associateAlertsHandler = useCallback(
     async (incidentId: string) => {
+      if (isAssociating) return;
+      setIsAssociating(true);
       try {
         const response = await api.post(
           `/incidents/${incidentId}/alerts`,
@@ -56,9 +59,11 @@ export const AlertAssociateIncidentModal = ({
           error,
           "Failed to associated alerts with incident, please contact us if this issue persists."
         );
+      } finally {
+        setIsAssociating(false);
       }
     },
-    [alerts, api, handleSuccess, mutate]
+    [alerts, api, handleSuccess, mutate, isAssociating]
   );
 
   const handleAssociateAlerts = (e: FormEvent) => {
@@ -131,9 +136,9 @@ export const AlertAssociateIncidentModal = ({
           value={
             selectedIncidentInstance
               ? {
-                  value: selectedIncident,
-                  label: getIncidentName(selectedIncidentInstance),
-                }
+                value: selectedIncident,
+                label: getIncidentName(selectedIncidentInstance),
+              }
               : null
           }
           onChange={(selectedOption) =>
@@ -150,7 +155,8 @@ export const AlertAssociateIncidentModal = ({
             className="flex-1"
             color="orange"
             onClick={handleAssociateAlerts}
-            disabled={!selectedIncidentInstance}
+            disabled={!selectedIncidentInstance || isAssociating}
+            loading={isAssociating}
           >
             Associate {alerts.length} alert{alerts.length > 1 ? "s" : ""}
           </Button>

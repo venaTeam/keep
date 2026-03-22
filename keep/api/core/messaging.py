@@ -62,6 +62,7 @@ class KafkaEventProducer(EventProducer):
             self.bootstrap_servers = bootstrap_servers.split(",")
         
         self.topic = config("KAFKA_TOPIC", default="keep-events")
+        self.dlq_topic = config("KAFKA_DLQ_TOPIC", default="keep-events-dlq")
 
         # SASL config
         self.security_protocol = config("KAFKA_SECURITY_PROTOCOL", default="PLAINTEXT")
@@ -128,11 +129,27 @@ class KafkaEventProducer(EventProducer):
             val = json.dumps(
                 payload, default=lambda o: o.dict() if hasattr(o, "dict") else str(o)
             ).encode("utf-8")
-            await self.producer.send_and_wait(self.topic, val)
-            self.logger.info(f"Successfully produced event to Kafka: {trace_id}")
-            return "kafka-async-task"
+            
+            try:
+                # `aiokafka.AIOKafkaProducer.send_and_wait` automatically handles retriable 
+                # errors internally (using retry_backoff_ms and request_timeout_ms).
+                await self.producer.send_and_wait(self.topic, val)
+                self.logger.info(f"Successfully produced event to Kafka topic {self.topic}: {trace_id}")
+                return "kafka-async-task"
+            except Exception as e:
+                self.logger.warning(
+                    f"Failed to produce to Kafka main topic {self.topic} after internal retries: {e}. "
+                    f"Sending to DLQ {self.dlq_topic}"
+                )
+                try:
+                    await self.producer.send_and_wait(self.dlq_topic, val)
+                    self.logger.info(f"Successfully produced event to DLQ topic {self.dlq_topic}: {trace_id}")
+                    return "kafka-async-task-dlq"
+                except Exception as dlq_e:
+                    self.logger.exception(f"Failed to produce event to Kafka DLQ topic {self.dlq_topic}: {trace_id}")
+                    raise dlq_e
         except Exception as e:
-            self.logger.exception("Failed to produce event to Kafka")
+            self.logger.exception("Failed to buffer event to Kafka or DLQ")
             raise e
 
     async def close(self):

@@ -168,7 +168,7 @@ def create_db_engine():
 
 def get_json_extract_field(session, base_field, key):
     if session.bind.dialect.name == "postgresql":
-        return func.jsonb_extract_path_text(base_field, key)
+        return base_field[key].astext  # Generates: column ->> 'key'
     elif session.bind.dialect.name == "mysql":
         return func.json_unquote(func.json_extract(base_field, "$.{}".format(key)))
     else:

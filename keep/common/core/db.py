@@ -1660,7 +1660,11 @@ def get_alerts_with_filters(
                 if isinstance(filter_value, bool) and filter_value is True:
                     # If the filter value is True, we want to filter by the existence of the enrichment
                     #   e.g.: all the alerts that have ticket_id
-                    if session.bind.dialect.name in ["mysql", "postgresql"]:
+                    if session.bind.dialect.name == "postgresql":
+                        query = query.filter(
+                            AlertEnrichment.enrichments[filter_key].astext.isnot(None)
+                        )
+                    elif session.bind.dialect.name == "mysql":
                         query = query.filter(
                             func.json_extract(
                                 AlertEnrichment.enrichments, f"$.{filter_key}"
@@ -1675,27 +1679,10 @@ def get_alerts_with_filters(
                             != null()
                         )
                 elif isinstance(filter_value, (str, int)):
-                    if session.bind.dialect.name in ["mysql", "postgresql"]:
-                        query = query.filter(
-                            func.json_unquote(
-                                func.json_extract(
-                                    AlertEnrichment.enrichments, f"$.{filter_key}"
-                                )
-                            )
-                            == filter_value
-                        )
-                    elif session.bind.dialect.name == "sqlite":
-                        query = query.filter(
-                            func.json_extract(
-                                AlertEnrichment.enrichments, f"$.{filter_key}"
-                            )
-                            == filter_value
-                        )
-                    else:
-                        logger.warning(
-                            "Unsupported dialect",
-                            extra={"dialect": session.bind.dialect.name},
-                        )
+                    query = query.filter(
+                        get_json_extract_field(session, AlertEnrichment.enrichments, filter_key)
+                        == filter_value
+                    )
                 else:
                     logger.warning("Unsupported filter type", extra={"filter": f})
 
@@ -5453,21 +5440,20 @@ def get_alerts_metrics_by_provider(
     end_date: Optional[datetime] = None,
     fields: Optional[List[str]] = [],
 ) -> Dict[str, Dict[str, Any]]:
-    dynamic_field_sums = [
-        func.sum(
-            case(
-                (
-                    (func.json_extract(Alert.event, f"$.{field}").isnot(None))
-                    & (func.json_extract(Alert.event, f"$.{field}") != False),
-                    1,
-                ),
-                else_=0,
-            )
-        ).label(f"{field}_count")
-        for field in fields
-    ]
-
     with Session(engine) as session:
+        dynamic_field_sums = [
+            func.sum(
+                case(
+                    (
+                        get_json_extract_field(session, Alert.event, field).isnot(None)
+                        & (get_json_extract_field(session, Alert.event, field) != "false"),
+                        1,
+                    ),
+                    else_=0,
+                )
+            ).label(f"{field}_count")
+            for field in fields
+        ]
         query = (
             session.query(
                 Alert.provider_type,

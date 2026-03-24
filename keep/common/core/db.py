@@ -34,10 +34,12 @@ from sqlalchemy import (
     literal,
     null,
     select,
+    type_coerce,
     union,
     update,
 )
 from sqlalchemy.dialects.mysql import insert as mysql_insert
+from sqlalchemy.dialects.postgresql import JSONB as PG_JSONB
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.exc import IntegrityError, OperationalError
@@ -1662,7 +1664,7 @@ def get_alerts_with_filters(
                     #   e.g.: all the alerts that have ticket_id
                     if session.bind.dialect.name == "postgresql":
                         query = query.filter(
-                            AlertEnrichment.enrichments[filter_key].astext.isnot(None)
+                            type_coerce(AlertEnrichment.enrichments, PG_JSONB)[filter_key].astext.isnot(None)
                         )
                     elif session.bind.dialect.name == "mysql":
                         query = query.filter(

@@ -3,7 +3,7 @@ name = "keep"
 version = "0.49.8"
 description = "Alerting. for developers, by developers."
 authors = ["Keep Alerting LTD"]
-packages = [{includme = "keep"}]
+packages = [{include = "keep"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"

@@ -104,9 +104,12 @@ def test_deduplication_sanity(db_session, client, test_app):
     deduplication_rules = client.get(
         "/deduplications", headers={"x-api-key": "some-api-key"}
     ).json()
+    retries = 0
     while not any(
         [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
     ):
+        retries += 1
+        assert retries < 50, f"dedup_ratio never reached 50.0 after {retries} retries. Rules: {deduplication_rules}"
         time.sleep(0.1)
         deduplication_rules = client.get(
             "/deduplications", headers={"x-api-key": "some-api-key"}

@@ -152,6 +152,7 @@ def get_facet_options(
                         for facet_id, facet_value, matches_count in grouped_by_id_dict[
                             facet_key
                         ]
+                        if not (facet.property_path == "status" and str(facet_value).lower() in ["pending", "maintenance"])
                     ]
 
                 if property_mapping is None:
@@ -159,10 +160,15 @@ def get_facet_options(
                     continue
 
                 if property_mapping.enum_values:
+                    # Filter out pending and maintenance from enum values if this is the status facet
+                    enum_values = property_mapping.enum_values
+                    if facet.property_path == "status":
+                        enum_values = [v for v in enum_values if str(v).lower() not in ["pending", "maintenance"]]
+
                     if facet.id in result_dict:
                         values_with_zero_matches = [
                             enum_value
-                            for enum_value in property_mapping.enum_values
+                            for enum_value in enum_values
                             if enum_value
                             not in [
                                 facet_option.value
@@ -171,7 +177,7 @@ def get_facet_options(
                         ]
                     else:
                         result_dict.setdefault(facet.id, [])
-                        values_with_zero_matches = property_mapping.enum_values
+                        values_with_zero_matches = enum_values
 
                     for enum_value in values_with_zero_matches:
                         result_dict[facet.id].append(

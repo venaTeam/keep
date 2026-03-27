@@ -16,6 +16,7 @@ import ColumnSelection from "./ColumnSelection";
 import { AlertTableThemeSelection } from "@/features/alerts/change-alert-table-theme";
 import { RowStyleSelection } from "@/widgets/alerts-table/ui/RowStyleSelection";
 import { ActionTraySelection } from "@/widgets/alerts-table/ui/ActionTraySelection";
+import { FontSizeSelection } from "@/widgets/alerts-table/ui/FontSizeSelection";
 
 interface SettingsSelectionProps {
   table: Table<AlertDto>;
@@ -83,6 +84,7 @@ export default function SettingsSelection({
                   <Tab data-testid="tab-theme">Theme</Tab>
                   <Tab data-testid="tab-row-style">Row Style</Tab>
                   <Tab data-testid="tab-action-tray">Action Tray</Tab>
+                  <Tab data-testid="tab-font-size">Font Size</Tab>
                 </TabList>
                 <TabPanels className="flex-1 overflow-hidden">
                   <TabPanel className="h-full" data-testid="panel-columns">
@@ -103,6 +105,9 @@ export default function SettingsSelection({
                   </TabPanel>
                   <TabPanel className="h-full" data-testid="panel-action-tray">
                     <ActionTraySelection onClose={close} />
+                  </TabPanel>
+                  <TabPanel className="h-full" data-testid="panel-font-size">
+                    <FontSizeSelection onClose={close} />
                   </TabPanel>
                 </TabPanels>
               </TabGroup>

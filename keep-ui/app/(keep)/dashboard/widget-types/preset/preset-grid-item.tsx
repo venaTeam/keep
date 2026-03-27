@@ -6,7 +6,7 @@ import { Button, Icon } from "@tremor/react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import TimeAgo from "react-timeago";
 import { useSearchParams } from "next/navigation";
 import WidgetAlertsTable from "./widget-alerts-table";
@@ -54,9 +54,17 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
     10000 // refresh interval
   );
   const router = useRouter();
+  const params = useParams();
+  const dashboardId = params?.id as string | undefined;
 
   function handleGoToPresetClick() {
-    router.push(`/alerts/${preset?.name.toLowerCase()}`);
+    const dashboardName = dashboardId ? decodeURIComponent(dashboardId) : "";
+    const presetUrl = `/alerts/${preset?.name.toLowerCase()}`;
+    if (dashboardName) {
+      router.push(`${presetUrl}?fromDashboard=${encodeURIComponent(dashboardName)}&widgetName=${encodeURIComponent(item.name)}`);
+    } else {
+      router.push(presetUrl);
+    }
   }
 
   const getColor = () => {
@@ -178,7 +186,12 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
             <div className="flex-1 min-w-0 overflow-hidden whitespace-nowrap">
               <div className="flex gap-1 items-center">
                 <div>Preset name:</div>
-                <div className="truncate">{preset?.name}</div>
+                <div
+                  className="truncate cursor-pointer hover:text-orange-500 transition-colors"
+                  onClick={handleGoToPresetClick}
+                >
+                  {preset?.name}
+                </div>
               </div>
               {/* {renderCEL()} */}
               {renderAlertsCountText()}

@@ -221,6 +221,9 @@ export const Facet: React.FC<FacetProps> = ({
             .toLocaleLowerCase()
             .includes(filter.toLocaleLowerCase())
         )
+        .filter((facetOption) =>
+          facetConfig?.filterOut ? !facetConfig.filterOut(facetOption) : true
+        )
         .sort((fst, scd) => scd.matches_count - fst.matches_count) || [];
 
     if (facetConfig?.sortCallback) {

@@ -55,7 +55,7 @@ class DismissalExpiryBl:
         # Different databases store/extract JSON booleans differently:
         # - SQLite: json_extract can return 1/0 for true/false OR "True"/"False"/"true"/"false" strings depending on how data was stored
         # - MySQL: JSON_UNQUOTE(JSON_EXTRACT()) returns "true"/"false" strings (lowercase)
-        # - PostgreSQL: json_extract_path_text() returns "true"/"false" strings (lowercase) OR "True"/"False" (depending on input)
+        # - PostgreSQL: jsonb_extract_path_text() returns "true"/"false" strings (lowercase) OR "True"/"False" (depending on input)
         if session.bind.dialect.name == "sqlite":
             # Handle both integer and string representations in SQLite
             dismissed_condition = (

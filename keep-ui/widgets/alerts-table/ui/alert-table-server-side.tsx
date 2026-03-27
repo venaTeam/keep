@@ -741,6 +741,7 @@ export function AlertTableServerSide({
                 >
                   {fromDashboard}
                 </a>
+                <span className="capitalize">/ {widgetName || presetName}</span>
               </div>
             )}
           </div>

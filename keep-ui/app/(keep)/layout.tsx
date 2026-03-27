@@ -17,6 +17,7 @@ import ScreenWakeLock from "@/components/ui/ScreenWakeLock";
 import { SSEProvider } from "@/app/sse-provider";
 import { FontSizeInitializer } from "@/components/FontSizeInitializer";
 import GlobalMetrics from "@/components/metrics/GlobalMetrics";
+import { FontSizeInitializer } from "@/components/FontSizeInitializer";
 
 
 type RootLayoutProps = {

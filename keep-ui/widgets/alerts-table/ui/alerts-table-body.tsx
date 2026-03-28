@@ -161,6 +161,7 @@ export function AlertsTableBody({
         tolerance={0}
         globalMouse={true}
         allowClickWithoutSelected={false}
+        ignoreList={['.select-text', '.prevent-row-click', 'button', 'a', 'input', 'td']}
         onSelectionFinish={handleSelectionFinish}
       >
         {table.getExpandedRowModel().rows.map((row, rowIndex) => {

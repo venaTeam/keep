@@ -407,8 +407,9 @@ export const useAlertTableCols = (
         ? [
           columnHelper.display({
             id: "checkbox",
-            maxSize: 16,
-            minSize: 16,
+            size: 32,
+            minSize: 32,
+            maxSize: 32,
             header: (context) => (
               <TableIndeterminateCheckbox
                 checked={context.table.getIsAllRowsSelected()}
@@ -417,12 +418,18 @@ export const useAlertTableCols = (
               />
             ),
             cell: (context) => (
-              <TableIndeterminateCheckbox
-                checked={context.row.getIsSelected()}
-                indeterminate={context.row.getIsSomeSelected()}
-                onChange={context.row.getToggleSelectedHandler()}
-              />
+              <div className="flex items-center justify-center w-full h-full">
+                <TableIndeterminateCheckbox
+                  checked={context.row.getIsSelected()}
+                  indeterminate={context.row.getIsSomeSelected()}
+                  onChange={context.row.getToggleSelectedHandler()}
+                />
+              </div>
             ),
+            meta: {
+              tdClassName: "!p-0 !min-w-[32px] !max-w-[32px] !w-[32px] !box-border flex-none",
+              thClassName: "!p-0 !min-w-[32px] !max-w-[32px] !w-[32px] !box-border flex-none",
+            },
           }),
         ]
         : ([] as ColumnDef<AlertDto>[])),
@@ -475,12 +482,12 @@ export const useAlertTableCols = (
         header: () => <></>, // Empty header like source column
         enableGrouping: true,
         getGroupingValue: (row) => row.status,
-        maxSize: 16,
-        minSize: 16,
-        size: 16,
+        size: 28,
+        minSize: 28,
+        maxSize: 28,
         enableResizing: false,
         cell: (context) => (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center w-full h-full">
             <Icon
               icon={getStatusIcon(context.getValue(), context.row.original.isNoisy)}
               size="sm"
@@ -491,23 +498,23 @@ export const useAlertTableCols = (
           </div>
         ),
         meta: {
-          tdClassName: "!p-0 w-4 sm:w-8 !box-border", // Same styling as source
-          thClassName: "!p-0 w-4 sm:w-8 !box-border",
+          tdClassName: "!p-0 !min-w-[28px] !max-w-[28px] !w-[28px] !box-border flex-none", // Same styling as source
+          thClassName: "!p-0 !min-w-[28px] !max-w-[28px] !w-[28px] !box-border flex-none",
         },
       }),
       // Source column with exact 40px width ( see alert-table-headers )
       columnHelper.accessor("source", {
         id: "source",
         header: () => <></>,
-        minSize: 24,
-        maxSize: 24,
-        size: 24, // Fixed size that won't change
+        size: 32, // Fixed size that won't change
+        minSize: 32,
+        maxSize: 32,
         enableSorting: false,
         getGroupingValue: (row) => row.source,
         enableResizing: false,
         cell: (context) => {
           return (
-            <div className="flex items-center justify-center w-[24px] h-[24px]">
+            <div className="flex items-center justify-center w-full h-full">
               {context.getValue().map((source, index) => {
                 return (
                   <DynamicImageProviderIcon
@@ -532,8 +539,8 @@ export const useAlertTableCols = (
           );
         },
         meta: {
-          tdClassName: "!p-1 w-10 !box-border !flex-none", // Force fixed width with flex-none
-          thClassName: "!p-1 w-10 !box-border !flex-none",
+          tdClassName: "!p-0 !min-w-[32px] !max-w-[32px] !w-[32px] !box-border flex-none", // Force fixed width with flex-none
+          thClassName: "!p-0 !min-w-[32px] !max-w-[32px] !w-[32px] !box-border flex-none",
         },
       }),
       // Name column butted up against source

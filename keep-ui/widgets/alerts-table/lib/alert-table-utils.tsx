@@ -178,7 +178,8 @@ export const getCellClassName = (
     // Remove line clamp for expanded rows
     expanded && "!whitespace-pre-wrap !overflow-visible",
     "group-hover:bg-orange-100", // Group hover styling
-    isLastViewed && "bg-orange-50" // Override with highlight if this is the last viewed row
+    isLastViewed && "bg-orange-50", // Override with highlight if this is the last viewed row
+    "select-text" // Ensure text can be highlighted natively
   );
 };
 

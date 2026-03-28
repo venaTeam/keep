@@ -485,7 +485,7 @@ export const useAlertTableCols = (
               icon={getStatusIcon(context.getValue(), context.row.original.isNoisy)}
               size="sm"
               color={getStatusColor(context.getValue())}
-              className="!p-0 h-32px w-32px"
+              className="!p-0 h-[32px] w-[32px]"
               tooltip={context.getValue()}
             />
           </div>
@@ -513,8 +513,8 @@ export const useAlertTableCols = (
                   <DynamicImageProviderIcon
                     className={clsx(
                       "inline-block",
-                      // Use fixed pixel sizes instead of responsive sizing
-                      "size-6",
+                      // Use fixed pixel sizes instead of responsive rem sizing to prevent zooming
+                      "w-[24px] h-[24px]",
                       index == 0 ? "" : "-ml-2"
                     )}
                     key={source}

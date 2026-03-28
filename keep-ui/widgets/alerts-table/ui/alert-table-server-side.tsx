@@ -734,13 +734,13 @@ export function AlertTableServerSide({
             <PageTitle className="capitalize inline">{presetName}</PageTitle>
             {fromDashboard && (
               <div className="flex items-center gap-1 text-sm mt-1 text-gray-500">
+                <span className="text-gray-400">from</span>
                 <a
                   href={`/dashboard/${encodeURIComponent(fromDashboard)}`}
-                  className="hover:text-orange-500 transition-colors cursor-pointer hover:underline hover:underline-offset-2"
+                  className="text-gray-500 hover:text-orange-500 transition-colors cursor-pointer underline underline-offset-2"
                 >
                   {fromDashboard}
                 </a>
-                <span className="capitalize">/ {widgetName || presetName}</span>
               </div>
             )}
           </div>

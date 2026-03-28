@@ -99,6 +99,12 @@ export function AlertsTableBody({
       return;
     }
 
+    // Prevent row click (which opens the sidebar) if the user is selecting text
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+
     onRowClick(alert);
   };
 

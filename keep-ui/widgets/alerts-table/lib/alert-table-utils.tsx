@@ -178,8 +178,7 @@ export const getCellClassName = (
     // Remove line clamp for expanded rows
     expanded && "!whitespace-pre-wrap !overflow-visible",
     "group-hover:bg-orange-100", // Group hover styling
-    isLastViewed && "bg-orange-50", // Override with highlight if this is the last viewed row
-    "select-text" // Ensure text can be highlighted natively
+    isLastViewed && "bg-orange-50" // Override with highlight if this is the last viewed row
   );
 };
 
@@ -371,7 +370,7 @@ export const useAlertTableCols = (
             return (
               <div
                 className={clsx(
-                  "whitespace-pre-wrap",
+                  "whitespace-pre-wrap select-text",
                   // Only apply line clamp if not expanded
                   !isExpanded &&
                   (rowStyle === "default" ? "line-clamp-1" : "line-clamp-3")
@@ -555,7 +554,7 @@ export const useAlertTableCols = (
 
           return (
             // Remove w-full class which can cause expansion
-            <div className={expanded ? "max-w-[180px] overflow-hidden" : ""}>
+            <div className={clsx(expanded ? "max-w-[180px] overflow-hidden" : "", "select-text")}>
               <AlertName
                 alert={context.row.original}
                 expanded={expanded}
@@ -595,7 +594,8 @@ export const useAlertTableCols = (
                 // Give description more space and control overflow
                 expanded ? "w-full break-words" : "",
                 // Set fixed width when expanded to prevent layout issues
-                expanded ? "max-w-[100%]" : ""
+                expanded ? "max-w-[100%]" : "",
+                "select-text"
               )}
             >
               <div
@@ -639,7 +639,7 @@ export const useAlertTableCols = (
             "timeago";
 
           return (
-            <span title={isoString}>{formatDateTime(date, formatOption)}</span>
+            <span title={isoString} className="select-text">{formatDateTime(date, formatOption)}</span>
           );
         },
       }),

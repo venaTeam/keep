@@ -163,11 +163,11 @@ export const Search = ({ session }: SearchProps) => {
 
   const queriedOptions = query.length
     ? OPTIONS.filter((option) =>
-        option.label
-          .toLowerCase()
-          .replace(/\s+/g, "")
-          .includes(query.toLowerCase().replace(/\s+/g, ""))
-      )
+      option.label
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .includes(query.toLowerCase().replace(/\s+/g, ""))
+    )
     : OPTIONS;
 
   // Tenant switcher function
@@ -221,9 +221,8 @@ export const Search = ({ session }: SearchProps) => {
               {({ active }) => (
                 <ListItem className="flex items-center justify-start space-x-3 cursor-default select-none p-2 ui-active:bg-orange-400 ui-active:text-white ui-not-active:text-gray-900">
                   <Icon
-                    className={`py-2 px-0 ${
-                      active ? "bg-orange-400 text-white" : "text-gray-900"
-                    }`}
+                    className={`py-2 px-0 ${active ? "bg-orange-400 text-white" : "text-gray-900"
+                      }`}
                     icon={option.icon}
                     color="orange"
                   />
@@ -259,9 +258,8 @@ export const Search = ({ session }: SearchProps) => {
               {({ active }) => (
                 <ListItem className="flex items-center justify-start space-x-3 cursor-default select-none p-2 ui-active:bg-orange-400 ui-active:text-white ui-not-active:text-gray-900">
                   <Icon
-                    className={`py-2 px-0 ${
-                      active ? "bg-orange-400 text-white" : "text-gray-900"
-                    }`}
+                    className={`py-2 px-0 ${active ? "bg-orange-400 text-white" : "text-gray-900"
+                      }`}
                     icon={option.icon}
                     color="orange"
                   />
@@ -284,9 +282,8 @@ export const Search = ({ session }: SearchProps) => {
               {({ active }) => (
                 <ListItem className="flex items-center justify-start space-x-3 cursor-default select-none p-2 ui-active:bg-orange-400 ui-active:text-white ui-not-active:text-gray-900">
                   <Icon
-                    className={`py-2 px-0 ${
-                      active ? "bg-orange-400 text-white" : "text-gray-900"
-                    }`}
+                    className={`py-2 px-0 ${active ? "bg-orange-400 text-white" : "text-gray-900"
+                      }`}
                     icon={option.icon}
                     color="orange"
                   />
@@ -341,17 +338,17 @@ export const Search = ({ session }: SearchProps) => {
             {({ open }) => (
               <>
                 <Popover.Button
-                  className="focus:outline-none flex items-center"
+                  className="focus:outline-none flex items-center gap-4"
                   disabled={isLoading}
                 >
-                  <Image className="w-8" src={KeepPng} alt="Keep Logo" />
+                  <Image className="w-[32px] h-[32px] flex-none" src={KeepPng} alt="Keep Logo" />
                   {tenantLogoUrl && (
                     <Image
                       src={tenantLogoUrl || ""}
                       alt={`${currentTenant?.tenant_name || "Tenant"} Logo`}
                       width={60}
                       height={60}
-                      className="ml-4 object-cover"
+                      className="object-cover"
                     />
                   )}
                 </Popover.Button>
@@ -364,11 +361,10 @@ export const Search = ({ session }: SearchProps) => {
                     {session.user.tenantIds?.map((tenant) => (
                       <button
                         key={tenant.tenant_id}
-                        className={`block w-full text-left px-4 py-2 text-sm ${
-                          tenant.tenant_id === session.tenantId
-                            ? "bg-orange-50 text-orange-700 font-medium"
-                            : "text-gray-700 hover:bg-gray-50"
-                        }`}
+                        className={`block w-full text-left px-4 py-2 text-sm ${tenant.tenant_id === session.tenantId
+                          ? "bg-orange-50 text-orange-700 font-medium"
+                          : "text-gray-700 hover:bg-gray-50"
+                          }`}
                         onClick={() => switchTenant(tenant.tenant_id)}
                         disabled={
                           tenant.tenant_id === session.tenantId || isLoading
@@ -383,8 +379,8 @@ export const Search = ({ session }: SearchProps) => {
             )}
           </Popover>
         ) : (
-          <Link href="/" className="flex items-center">
-            <Image className="w-8" src={KeepPng} alt="Keep Logo" />
+          <Link href="/" className="flex items-center gap-4">
+            <Image className="w-[32px] h-[32px] flex-none" src={KeepPng} alt="Keep Logo" />
             {hasTenantLogo && (
               <Image
                 src={tenantLogoUrl || ""}
@@ -398,7 +394,7 @@ export const Search = ({ session }: SearchProps) => {
         )}
       </div>
 
-      <div className="flex-grow ml-4">
+      <div className="flex-grow ml-6">
         <Combobox
           value={query}
           onChange={onOptionSelection}

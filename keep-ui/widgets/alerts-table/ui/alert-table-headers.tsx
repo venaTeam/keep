@@ -158,11 +158,11 @@ const DraggableHeaderCell = ({
   const dragStyle: CSSProperties = {
     width:
       column.id === "checkbox"
-        ? "32px !important"
+        ? "44px !important"
         : column.id === "source"
-          ? "32px !important"
+          ? "44px !important"
           : column.id === "status"
-            ? "28px !important"
+            ? "36px !important"
             : column.getSize(),
     opacity: isDragging ? 0.5 : 1,
     transform: CSS.Translate.toString(transform),

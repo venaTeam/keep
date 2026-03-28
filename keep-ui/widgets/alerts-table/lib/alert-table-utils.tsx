@@ -485,7 +485,7 @@ export const useAlertTableCols = (
               icon={getStatusIcon(context.getValue(), context.row.original.isNoisy)}
               size="sm"
               color={getStatusColor(context.getValue())}
-              className="!p-0 h-[32px] w-[32px]"
+              className="!p-0 !h-[20px] !w-[20px]"
               tooltip={context.getValue()}
             />
           </div>

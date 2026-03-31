@@ -68,7 +68,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
     return staticPresets?.some((preset) => preset.name === "feed");
   })();
 
-  
+
 
   return (
     <>

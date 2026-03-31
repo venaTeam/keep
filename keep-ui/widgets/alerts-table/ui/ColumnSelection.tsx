@@ -292,6 +292,7 @@ export default function ColumnSelection({
             {useBackend && isLoading ? "Saving..." : "Save changes"}
           </Button>
         </div>
+      </div>
     </form>
   );
 }

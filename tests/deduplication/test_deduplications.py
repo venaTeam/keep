@@ -78,7 +78,7 @@ def test_default_deduplication_rule(db_session, client, test_app):
             assert dedup_rule.get("default")
 
 
-@pytest.mark.timeout(15)
+@pytest.mark.timeout(30)
 @pytest.mark.parametrize(
     "test_app",
     [

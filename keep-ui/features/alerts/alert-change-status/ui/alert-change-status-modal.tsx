@@ -8,6 +8,7 @@ import {
   ExclamationCircleIcon,
   PauseIcon,
   CircleStackIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { useApi } from "@/shared/lib/hooks/useApi";
@@ -20,6 +21,7 @@ const statusIcons: any = {
   [Status.Resolved]: <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />,
   [Status.Acknowledged]: <PauseIcon className="w-5 h-5 text-gray-500 mr-2" />,
   [Status.Suppressed]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
+  [Status.Pending]: <ClockIcon className="w-5 h-5 text-gray-500 mr-2" />,
 };
 
 interface Props {

@@ -78,7 +78,7 @@ def test_default_deduplication_rule(db_session, client, test_app):
             assert dedup_rule.get("default")
 
 
-@pytest.mark.timeout(30)
+@pytest.mark.timeout(60)
 @pytest.mark.parametrize(
     "test_app",
     [
@@ -101,17 +101,20 @@ def test_deduplication_sanity(db_session, client, test_app):
 
     wait_for_alerts(client, 1)
 
-    deduplication_rules = client.get(
-        "/deduplications", headers={"x-api-key": "some-api-key"}
-    ).json()
-    while not any(
-        [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
-    ):
-        time.sleep(0.1)
+    # loop for up to 30 seconds until the deduplication ratio is 50.0
+    for _ in range(30):
         deduplication_rules = client.get(
             "/deduplications", headers={"x-api-key": "some-api-key"}
         ).json()
+        if any(
+            [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
+        ):
+            break
+        time.sleep(1)
 
+    assert any(
+        [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
+    )
     assert len(deduplication_rules) == 2  # default + datadog
 
     for dedup_rule in deduplication_rules:

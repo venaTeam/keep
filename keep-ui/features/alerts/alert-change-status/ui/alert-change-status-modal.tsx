@@ -15,7 +15,7 @@ import { Select, showErrorToast, Tooltip } from "@/shared/ui";
 
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 
-const statusIcons = {
+const statusIcons: any = {
   [Status.Firing]: <ExclamationCircleIcon className="w-5 h-5 text-red-500 mr-2" />,
   [Status.Resolved]: <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />,
   [Status.Acknowledged]: <PauseIcon className="w-5 h-5 text-gray-500 mr-2" />,

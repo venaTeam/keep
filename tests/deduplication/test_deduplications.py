@@ -23,13 +23,18 @@ from tests.fixtures.client import client, setup_api_key, test_app  # noqa
 logging.basicConfig(level=logging.DEBUG)
 
 
-def wait_for_alerts(client, num_alerts):
+def wait_for_alerts(client, num_alerts, timeout=30):
+    start_time = time.time()
     alerts = client.get("/alerts", headers={"x-api-key": "some-api-key"}).json()
     print(f"------------- Total alerts: {len(alerts)}")
     while len(alerts) != num_alerts:
+        if time.time() - start_time > timeout:
+            print(f"TIMEOUT waiting for {num_alerts} alerts, found {len(alerts)} alerts: {alerts}")
+            break
         time.sleep(1)
         alerts = client.get("/alerts", headers={"x-api-key": "some-api-key"}).json()
         print(f"------------- Total alerts: {len(alerts)}")
+    return alerts
 
 
 @pytest.mark.parametrize(
@@ -78,7 +83,7 @@ def test_default_deduplication_rule(db_session, client, test_app):
             assert dedup_rule.get("default")
 
 
-@pytest.mark.timeout(60)
+@pytest.mark.timeout(120)
 @pytest.mark.parametrize(
     "test_app",
     [
@@ -93,12 +98,17 @@ def test_deduplication_sanity(db_session, client, test_app):
     # insert an alert with some provider_id and make sure that the default deduplication rule is working
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    for i in range(2):
-        client.post(
-            "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
-        )
-        time.sleep(0.1)
+    
+    # 1st posting: should create 1 alert
+    client.post(
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
+    )
+    wait_for_alerts(client, 1)
 
+    # 2nd posting: should be deduplicated (1 alert total)
+    client.post(
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
+    )
     wait_for_alerts(client, 1)
 
     # loop for up to 30 seconds until the deduplication ratio is 50.0

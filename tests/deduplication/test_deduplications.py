@@ -29,11 +29,11 @@ def wait_for_alerts(client, num_alerts, timeout=30):
     print(f"------------- Total alerts: {len(alerts)}")
     while len(alerts) != num_alerts:
         if time.time() - start_time > timeout:
-            print(f"TIMEOUT waiting for {num_alerts} alerts, found {len(alerts)} alerts: {alerts}")
-            break
+            raise AssertionError(f"TIMEOUT waiting for {num_alerts} alerts, found {len(alerts)} alerts: {alerts}")
         time.sleep(1)
         alerts = client.get("/alerts", headers={"x-api-key": "some-api-key"}).json()
         print(f"------------- Total alerts: {len(alerts)}")
+    return alerts
     return alerts
 
 
@@ -100,22 +100,27 @@ def test_deduplication_sanity(db_session, client, test_app):
     alert = provider.simulate_alert()
     
     # 1st posting: should create 1 alert
-    client.post(
+    response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
+    assert response.status_code == 202
     wait_for_alerts(client, 1)
 
     # 2nd posting: should be deduplicated (1 alert total)
-    client.post(
+    response = client.post(
         "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
     )
+    assert response.status_code == 202
     wait_for_alerts(client, 1)
 
     # loop for up to 30 seconds until the deduplication ratio is 50.0
+    deduplication_rules = []
     for _ in range(30):
-        deduplication_rules = client.get(
+        response = client.get(
             "/deduplications", headers={"x-api-key": "some-api-key"}
-        ).json()
+        )
+        assert response.status_code == 200
+        deduplication_rules = response.json()
         if any(
             [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
         ):
@@ -124,7 +129,7 @@ def test_deduplication_sanity(db_session, client, test_app):
 
     assert any(
         [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
-    )
+    ), f"Deduplication ratio 50.0 not found in rules: {deduplication_rules}"
     assert len(deduplication_rules) == 2  # default + datadog
 
     for dedup_rule in deduplication_rules:

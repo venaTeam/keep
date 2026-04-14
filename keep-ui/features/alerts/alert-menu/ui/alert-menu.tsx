@@ -47,6 +47,8 @@ import {
 } from "@/components/ui/ImagePreviewTooltip";
 import { useExpandedRows } from "@/utils/hooks/useExpandedRows";
 import { useConfig } from "@/utils/hooks/useConfig";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 interface Props {
   alert: AlertDto;
@@ -99,6 +101,7 @@ export function AlertMenu({
   const [showActionsOnHover] = useLocalStorage("alert-action-tray-hover", true);
   const { isRowExpanded, toggleRowExpanded } = useExpandedRows(presetName);
   const expanded = isRowExpanded(alert.fingerprint);
+  const pathname = usePathname();
 
   const {
     data: { installed_providers: installedProviders } = {
@@ -390,10 +393,10 @@ export function AlertMenu({
                     : ClockIcon
               }
               className={`w-4 h-4 ${relevantWorkflowExecution.workflow_status === "success"
-                  ? "text-green-500"
-                  : relevantWorkflowExecution.workflow_status === "error"
-                    ? "text-red-500"
-                    : "text-gray-500"
+                ? "text-green-500"
+                : relevantWorkflowExecution.workflow_status === "error"
+                  ? "text-red-500"
+                  : "text-gray-500"
                 }`}
             />
           )}
@@ -424,7 +427,9 @@ export function AlertMenu({
             typeof alert.lastReceived === "string"
               ? alert.lastReceived
               : alert.lastReceived.toISOString();
+          const startTime = performance.now();
           await api.post(`/alerts/${fingerprint}/assign/${lastReceived}`);
+          reportActionLatency("self-assign-alert-direct", performance.now() - startTime, pathname);
           await mutate();
         }
       }

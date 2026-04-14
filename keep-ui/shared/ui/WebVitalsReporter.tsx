@@ -3,21 +3,15 @@
 
 import { useReportWebVitals } from "next/web-vitals";
 import { usePathname } from "next/navigation";
+import { recordWebVital } from "@/utils/otel-rum";
 
 export function WebVitalsReporter() {
     const pathname = usePathname();
 
     useReportWebVitals((metric) => {
-        // Basic sanitation to avoid high cardinality labels
-        // We group dynamic routes if possible, but usePathname usually returns the resolved path.
-        // Ideally, we should use the route pattern (e.g. /incidents/[id]), but that's harder to get in app router client components reliably without more plumbing.
-        // For now, let's take the first segment as a crude grouping if it's an ID-like string, or just trust the path.
-        // Actually, to be safe for Prometheus, let's just use the top-level path segment for now.
-
+        // Sanitize path to avoid high cardinality labels
         // Example: /incidents/123 -> /incidents
-        // Example: /settings -> /settings
-        // Example: / -> /
-
+        // Example: /settings/users -> /settings/users
         const parts = pathname?.split('/').filter(p => p);
         let safePath = "/";
         if (parts && parts.length > 0) {
@@ -28,19 +22,8 @@ export function WebVitalsReporter() {
             }
         }
 
-        const body = JSON.stringify({
-            ...metric,
-            path: safePath,
-        });
-
-        const url = "/api/rum";
-
-        // Use `navigator.sendBeacon()` if available, falling back to `fetch()`.
-        if (navigator.sendBeacon) {
-            navigator.sendBeacon(url, body);
-        } else {
-            fetch(url, { body, method: "POST", keepalive: true });
-        }
+        // Record via OTEL SDK — exported directly to the OTEL Collector
+        recordWebVital(metric.name, metric.value, safePath);
     });
 
     return null;

@@ -16,6 +16,8 @@ import { MultiValue } from "react-select";
 import { useTags } from "@/utils/hooks/useTags";
 import { Preset } from "@/entities/presets/model/types";
 import { usePresetActions } from "@/entities/presets/model/usePresetActions";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 interface TagOption {
   id?: string;
@@ -58,6 +60,7 @@ export function CreateOrUpdatePresetForm({
   const [selectedTags, setSelectedTags] = useState<TagOption[]>(
     presetData.tags ?? []
   );
+  const pathname = usePathname();
 
   const clearForm = () => {
     setPresetName("");
@@ -123,6 +126,7 @@ export function CreateOrUpdatePresetForm({
   const { createPreset, updatePreset } = usePresetActions();
   const addOrUpdatePreset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const startTime = performance.now();
     if (presetId) {
       const updatedPreset = await updatePreset(presetId, {
         ...presetData,
@@ -135,6 +139,7 @@ export function CreateOrUpdatePresetForm({
           name: tag.name,
         })),
       });
+      reportActionLatency("update-preset", performance.now() - startTime, pathname);
       onCreateOrUpdate?.(updatedPreset);
     } else {
       const newPreset = await createPreset({
@@ -148,6 +153,7 @@ export function CreateOrUpdatePresetForm({
           name: tag.name,
         })),
       });
+      reportActionLatency("create-preset", performance.now() - startTime, pathname);
       onCreateOrUpdate?.(newPreset);
     }
   };

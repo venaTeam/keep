@@ -16,7 +16,7 @@ import { WorkflowModalProvider } from "@/features/workflows/manual-run-workflow"
 import ScreenWakeLock from "@/components/ui/ScreenWakeLock";
 import { SSEProvider } from "@/app/sse-provider";
 import { FontSizeInitializer } from "@/components/FontSizeInitializer";
-
+import GlobalMetrics from "@/components/metrics/GlobalMetrics";
 
 
 type RootLayoutProps = {
@@ -35,6 +35,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <FontSizeInitializer />
         <ConfigProvider config={config}>
           <ScreenWakeLock />
+          <GlobalMetrics />
           <NextAuthProvider session={session}>
             <SSEProvider>
               <TopologyPollingContextProvider>

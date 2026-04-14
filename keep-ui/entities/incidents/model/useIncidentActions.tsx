@@ -4,6 +4,8 @@ import { useSWRConfig } from "swr";
 import { IncidentDto, Severity, Status } from "./models";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 type UseIncidentActionsValue = {
   addIncident: (incident: IncidentCreateDto) => Promise<IncidentDto>;
@@ -76,6 +78,7 @@ type IncidentUpdateDto = Partial<IncidentCreateDto> &
 export function useIncidentActions(): UseIncidentActionsValue {
   const api = useApi();
   const { mutate } = useSWRConfig();
+  const pathname = usePathname();
 
   const mutateIncidentsList = useCallback(
     () =>
@@ -94,12 +97,14 @@ export function useIncidentActions(): UseIncidentActionsValue {
 
   const assignIncident = useCallback(
     async (incidentId: string) => {
+      const startTime = performance.now();
       const result = await api.post(`/incidents/${incidentId}/assign`);
+      reportActionLatency("self-assign-incident", performance.now() - startTime, pathname);
       mutateIncidentsList();
       mutateIncident(incidentId);
       return result;
     },
-    [api, mutateIncident, mutateIncidentsList]
+    [api, mutateIncident, mutateIncidentsList, pathname]
   );
 
   const invokeProviderMethod = useCallback(
@@ -130,7 +135,9 @@ export function useIncidentActions(): UseIncidentActionsValue {
   const addIncident = useCallback(
     async (incident: IncidentCreateDto) => {
       try {
+        const startTime = performance.now();
         const result = await api.post("/incidents", incident);
+        reportActionLatency("create-incident", performance.now() - startTime, pathname);
         mutateIncidentsList();
         toast.success("Incident created successfully");
         return result as IncidentDto;
@@ -142,7 +149,7 @@ export function useIncidentActions(): UseIncidentActionsValue {
         throw error;
       }
     },
-    [api, mutateIncidentsList]
+    [api, mutateIncidentsList, pathname]
   );
 
   const updateIncident = useCallback(
@@ -251,11 +258,13 @@ export function useIncidentActions(): UseIncidentActionsValue {
       }
 
       try {
+        const startTime = performance.now();
         const result = await api.post(`/incidents/${incidentId}/status`, {
           status,
           comment,
           dispose_on_new_alert: disposeOnNewAlert,
         });
+        reportActionLatency("change-status-incident", performance.now() - startTime, pathname);
 
         toast.success("Incident status changed successfully!");
         mutateIncidentsList();
@@ -265,7 +274,7 @@ export function useIncidentActions(): UseIncidentActionsValue {
         showErrorToast(error, "Failed to change incident status");
       }
     },
-    [api, mutateIncident, mutateIncidentsList]
+    [api, mutateIncident, mutateIncidentsList, pathname]
   );
 
   const changeSeverity = useCallback(

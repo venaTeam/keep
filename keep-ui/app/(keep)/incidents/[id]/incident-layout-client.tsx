@@ -7,6 +7,9 @@ import { useIncident } from "@/utils/hooks/useIncidents";
 import { IncidentHeader } from "./incident-header";
 import { IncidentTabsNavigation } from "./incident-tabs-navigation";
 import ResizableColumns from "@/components/ui/ResizableColumns";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { reportPageLoadLatency } from "@/utils/rum-utils";
 
 export function IncidentLayoutClient({
   children,
@@ -20,6 +23,20 @@ export function IncidentLayoutClient({
   const { data: incident, mutate } = useIncident(initialIncident.id, {
     fallbackData: initialIncident,
   });
+
+  const pathname = usePathname();
+  const [loadStartTime] = useState(performance.now());
+  const [metricReported, setMetricReported] = useState(false);
+
+  useEffect(() => {
+    // Incident page is considered loaded when we have the incident data
+    if (!metricReported && incident) {
+      reportPageLoadLatency("incident", performance.now() - loadStartTime, pathname, {
+        incident_id: initialIncident.id
+      });
+      setMetricReported(true);
+    }
+  }, [incident, metricReported, loadStartTime, pathname, initialIncident.id]);
 
   if (!incident) {
     return null;

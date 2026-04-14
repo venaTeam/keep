@@ -18,6 +18,8 @@ import { DynamicImageProviderIcon } from "@/components/ui";
 import { CiViewTimeline } from "react-icons/ci";
 import { KeepLoader, EmptyStateCard } from "@/shared/ui";
 import { FormattedContent } from "@/shared/ui/FormattedContent/FormattedContent";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 const severityColors = {
   critical: "bg-red-300",
@@ -127,16 +129,14 @@ const EventDot: React.FC<EventDotProps> = ({
 
   return (
     <div
-      className={`absolute top-0 transform ${
-        isSelected ? "h-full" : "h-3 top-1/2 -translate-y-1/2"
-      } cursor-pointer transition-all duration-200`}
+      className={`absolute top-0 transform ${isSelected ? "h-full" : "h-3 top-1/2 -translate-y-1/2"
+        } cursor-pointer transition-all duration-200`}
       style={{ left: `${position}%` }}
       onClick={() => onClick(event)}
     >
       <div
-        className={`w-3 ${
-          isSelected ? "h-full border-2 border-white" : "h-3 animate-pulse"
-        } ${dotColors[color as keyof typeof dotColors]} rounded-full`}
+        className={`w-3 ${isSelected ? "h-full border-2 border-white" : "h-3 animate-pulse"
+          } ${dotColors[color as keyof typeof dotColors]} rounded-full`}
       ></div>
     </div>
   );
@@ -197,12 +197,10 @@ const AlertBar: React.FC<AlertBarProps> = ({
         {Array.from({ length: 24 }).map((_, index) => (
           <div
             key={index}
-            className={`border-gray-100 border-b ${
-              isFirstRow ? "border-t-0" : "border-t"
-            }
-            ${index === 0 ? "border-l-0" : "border-l"} ${
-              index === 23 ? "border-r-0" : "border-r"
-            }`}
+            className={`border-gray-100 border-b ${isFirstRow ? "border-t-0" : "border-t"
+              }
+            ${index === 0 ? "border-l-0" : "border-l"} ${index === 23 ? "border-r-0" : "border-r"
+              }`}
           />
         ))}
       </div>
@@ -215,19 +213,17 @@ const AlertBar: React.FC<AlertBarProps> = ({
         }}
       >
         <div
-          className={`h-full w-full rounded-full ${
-            severityColors[alert.severity as keyof typeof severityColors] ||
+          className={`h-full w-full rounded-full ${severityColors[alert.severity as keyof typeof severityColors] ||
             severityColors.info
-          } relative overflow-hidden`}
+            } relative overflow-hidden`}
         >
           <div className="absolute inset-y-0 left-2 flex items-center font-semibold truncate w-full pr-4">
             <AlertSeverity severity={alert.severity} />
             <span
-              className={`ml-2 ${
-                severityTextColors[
-                  alert.severity as keyof typeof severityTextColors
-                ] || severityTextColors.info
-              }`}
+              className={`ml-2 ${severityTextColors[
+                alert.severity as keyof typeof severityTextColors
+              ] || severityTextColors.info
+                }`}
             >
               {alert.name}
             </span>
@@ -285,6 +281,7 @@ export default function IncidentTimeline({
     error: alertsError,
   } = useIncidentAlerts(incident.id, 256);
   const { useMultipleFingerprintsAlertAudit } = useAlerts();
+  const pathname = usePathname();
   const {
     data: auditEvents,
     isLoading: _auditEventsLoading,
@@ -479,11 +476,10 @@ export default function IncidentTimeline({
                       key={index}
                       className="absolute flex flex-col items-center text-xs text-gray-400 h-[50px]"
                       style={{
-                        left: `${
-                          ((time.getTime() - startTime.getTime()) *
-                            pixelsPerMillisecond || 30) -
+                        left: `${((time.getTime() - startTime.getTime()) *
+                          pixelsPerMillisecond || 30) -
                           (index === intervals.length - 1 ? 50 : 0)
-                        }px`,
+                          }px`,
                         transform: "translateX(-50%)",
                       }}
                     >

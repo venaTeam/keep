@@ -53,6 +53,8 @@ import EnhancedDateRangePickerV2, {
 import { useTimeframeState } from "@/components/ui/useTimeframeState";
 import { PaginationState } from "@/features/filter/pagination";
 import { useConfig } from "@/utils/hooks/useConfig";
+import { usePathname } from "next/navigation";
+import { reportPageLoadLatency } from "@/utils/rum-utils";
 
 const AssigneeLabel = ({ email }: { email: string }) => {
   const user = useUser(email);
@@ -113,6 +115,17 @@ export function IncidentList({
   const [filterRevalidationToken, setFilterRevalidationToken] = useState<
     string | undefined
   >(undefined);
+
+  const pathname = usePathname();
+  const [loadStartTime] = useState(performance.now());
+  const [metricReported, setMetricReported] = useState(false);
+
+  React.useEffect(() => {
+    if (!metricReported && !incidentsLoading && incidents) {
+      reportPageLoadLatency("incidents", performance.now() - loadStartTime, pathname);
+      setMetricReported(true);
+    }
+  }, [incidentsLoading, incidents, metricReported, loadStartTime, pathname]);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const { data: config } = useConfig();
 
@@ -208,12 +221,12 @@ export function IncidentList({
       ["Linked incident"]: {
         sortCallback: (facetOption) =>
           facetOption.display_name == "1" ||
-          facetOption.display_name.toLocaleLowerCase() == "true"
+            facetOption.display_name.toLocaleLowerCase() == "true"
             ? 1
             : 0,
         renderOptionLabel: (facetOption) =>
           facetOption.display_name == "1" ||
-          facetOption.display_name.toLocaleLowerCase() == "true"
+            facetOption.display_name.toLocaleLowerCase() == "true"
             ? "Yes"
             : "No",
       },
@@ -295,9 +308,9 @@ export function IncidentList({
     <div className="flex h-full w-full">
       <div className="flex-grow min-w-0">
         {config?.AI_FEATURES_ENABLED &&
-        !isPredictedLoading &&
-        predictedIncidents &&
-        predictedIncidents.items.length > 0 ? (
+          !isPredictedLoading &&
+          predictedIncidents &&
+          predictedIncidents.items.length > 0 ? (
           <Card className="mt-10 mb-10 flex-grow">
             <Title>Incident Predictions</Title>
             <Subtitle>

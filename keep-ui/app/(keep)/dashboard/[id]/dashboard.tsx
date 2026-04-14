@@ -22,6 +22,8 @@ import {
 } from "@/utils/hooks/useDashboardMetricWidgets";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
+import { usePathname } from "next/navigation";
+import { reportActionLatency, reportPageLoadLatency } from "@/utils/rum-utils";
 import "../styles.css";
 import { Preset } from "@/entities/presets/model/types";
 
@@ -46,6 +48,23 @@ const DashboardPage = () => {
   const [editingItem, setEditingItem] = useState<WidgetData | null>(null);
   const [dashboardName, setDashboardName] = useState(decodeURIComponent(id));
   const [isEditingName, setIsEditingName] = useState(false);
+  const pathname = usePathname();
+
+  const [loadStartTime] = useState(performance.now());
+  const [metricReported, setMetricReported] = useState(false);
+
+  useEffect(() => {
+    // We consider dashboard "loaded" when:
+    // 1. isLoading (dashboard config) is false
+    // 2. allMetricWidgets (panel data) is loaded (length > 0)
+    // 3. metric has not been reported yet
+    if (!metricReported && !isLoading && allMetricWidgets.length > 0) {
+      reportPageLoadLatency("dashboard", performance.now() - loadStartTime, pathname, {
+        dashboard_id: id
+      });
+      setMetricReported(true);
+    }
+  }, [isLoading, allMetricWidgets, metricReported, loadStartTime, pathname, id]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -124,10 +143,10 @@ const DashboardPage = () => {
         (d) => d.dashboard_name === decodeURIComponent(id)
       );
       const method = dashboard ? "PUT" : "POST";
-      const endpoint = `/dashboard${
-        dashboard ? `/${encodeURIComponent(dashboard.id)}` : ""
-      }`;
+      const endpoint = `/dashboard${dashboard ? `/${encodeURIComponent(dashboard.id)}` : ""
+        }`;
 
+      const startTime = performance.now();
       const result = await api.post(
         endpoint,
         {
@@ -141,6 +160,7 @@ const DashboardPage = () => {
           method,
         }
       );
+      reportActionLatency(method === "POST" ? "create-dashboard" : "update-dashboard", performance.now() - startTime, pathname);
 
       console.log("Dashboard saved successfully", result);
       mutateDashboard();

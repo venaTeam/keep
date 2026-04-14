@@ -7,6 +7,8 @@ import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 interface Props {
     alert: AlertDto | null | undefined;
@@ -25,6 +27,7 @@ export function AlertAssignModal({
     const { alertsMutator } = useAlerts();
     const presetsMutator = () => revalidateMultiple(["/preset"]);
     const [noteContent, setNoteContent] = useState<string>("");
+    const pathname = usePathname();
 
     if (!alert) return null;
 
@@ -41,6 +44,7 @@ export function AlertAssignModal({
                     ? alert.lastReceived
                     : alert.lastReceived.toISOString();
 
+            const startTime = performance.now();
             await api.post(
                 `/alerts/${alert.fingerprint}/assign/${lastReceived}`,
                 {
@@ -48,6 +52,7 @@ export function AlertAssignModal({
                     note: noteContent && noteContent.trim() !== "" ? noteContent.trim() : null,
                 }
             );
+            reportActionLatency("self-assign-alert", performance.now() - startTime, pathname);
 
             toast.success("Alert assigned successfully!");
             clearAndClose();

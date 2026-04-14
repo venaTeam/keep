@@ -6,6 +6,8 @@ import { AlertDto } from "@/entities/alerts/model";
 import Modal from "@/components/ui/Modal";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 interface AlertNoteModalProps {
   handleClose: () => void;
@@ -22,6 +24,7 @@ export const AlertNoteModal = ({
 }: AlertNoteModalProps) => {
   const api = useApi();
   const [noteContent, setNoteContent] = useState<string>("");
+  const pathname = usePathname();
 
   useEffect(() => {
     if (alert) {
@@ -42,15 +45,19 @@ export const AlertNoteModal = ({
           note: trimmedNote,
           fingerprint: alert.fingerprint,
         };
+        const startTime = performance.now();
         await api.post(`/alerts/enrich/note`, requestData);
+        reportActionLatency("save-note", performance.now() - startTime, pathname);
         // Update local alert object with the trimmed note
         alert.note = trimmedNote;
       } else {
         // Empty note — remove it via unenrich so the note column disappears
+        const startTime = performance.now();
         await api.post(`/alerts/unenrich`, {
           fingerprint: alert.fingerprint,
           enrichments: ["note"],
         });
+        reportActionLatency("delete-note", performance.now() - startTime, pathname);
         // Clear the local alert note
         alert.note = undefined;
       }

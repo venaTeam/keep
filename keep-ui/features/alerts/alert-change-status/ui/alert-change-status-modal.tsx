@@ -15,6 +15,8 @@ import { useApi } from "@/shared/lib/hooks/useApi";
 import { Select, showErrorToast, Tooltip } from "@/shared/ui";
 
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 const statusIcons: any = {
   [Status.Firing]: <ExclamationCircleIcon className="w-5 h-5 text-red-500 mr-2" />,
@@ -44,6 +46,7 @@ export function AlertChangeStatusModal({
   const { alertsMutator } = useAlerts();
   const presetsMutator = () => revalidateMultiple(["/preset"]);
   const [noteContent, setNoteContent] = useState<string>("");
+  const pathname = usePathname();
 
   if (!alert) return null;
 
@@ -83,6 +86,7 @@ export function AlertChangeStatusModal({
       return;
     }
     try {
+      const startTime = performance.now();
       await api.post(
         `/alerts/enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
         {
@@ -99,6 +103,7 @@ export function AlertChangeStatusModal({
           fingerprint: alert.fingerprint,
         }
       );
+      reportActionLatency("change-status-alert", performance.now() - startTime, pathname);
 
       toast.success("Alert status changed successfully!");
       clearAndClose();
@@ -116,6 +121,7 @@ export function AlertChangeStatusModal({
       alert.forEach((a) => fingerprints.add(a.fingerprint));
     }
     try {
+      const startTime = performance.now();
       await api.post(
         `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
         {
@@ -132,6 +138,7 @@ export function AlertChangeStatusModal({
           fingerprints: Array.from(fingerprints),
         }
       );
+      reportActionLatency("change-status-alert-batch", performance.now() - startTime, pathname);
 
       toast.success("Alert(s) status changed successfully!");
       clearAndClose();

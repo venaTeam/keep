@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useSSE } from "@/utils/hooks/useSSE";
 import { AlertDto } from "@/entities/alerts/model";
@@ -23,6 +23,8 @@ import { useProviders } from "@/utils/hooks/useProviders";
 // feature not supposed to import other features, TODO: move alert-menu to entities or shared
 import { AlertMenu } from "@/features/alerts/alert-menu";
 import { useConfig } from "@/utils/hooks/useConfig";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 import { FormattedContent } from "@/shared/ui/FormattedContent/FormattedContent";
 import { IncidentDto } from "@/entities/incidents/model";
 import { DOCS_CLIPBOARD_COPY_ERROR_PATH } from "@/shared/constants";
@@ -55,6 +57,23 @@ export const AlertSidebar = ({
     isLoading,
     mutate,
   } = useAlertAudit(alert?.fingerprint ?? "");
+  const [loadStartTime, setLoadStartTime] = useState(performance.now());
+  const [metricReported, setMetricReported] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (isOpen) {
+      setLoadStartTime(performance.now());
+      setMetricReported(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && !metricReported && !isLoading && auditData) {
+      reportActionLatency("alert-timeline-load", performance.now() - loadStartTime, pathname);
+      setMetricReported(true);
+    }
+  }, [isOpen, isLoading, auditData, metricReported, loadStartTime, pathname]);
 
   const { data: providers } = useProviders();
   const providerName =

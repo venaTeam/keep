@@ -24,6 +24,7 @@ import {
   useAlertsTableData,
   AlertsTableDataQuery,
 } from "@/widgets/alerts-table/ui/useAlertsTableData";
+import { reportPageLoadLatency } from "@/utils/rum-utils";
 
 const defaultPresets: Preset[] = [
   {
@@ -99,6 +100,21 @@ export default function Alerts({ presetName, initialFacets }: AlertsProps) {
     facetsCel,
     facetsPanelRefreshToken,
   } = useAlertsTableData(alertsTableDataQuery);
+
+  const [loadStartTime] = useState(performance.now());
+  const [metricReported, setMetricReported] = useState(false);
+
+  useEffect(() => {
+    if (!metricReported && !alertsLoading && alerts) {
+      reportPageLoadLatency(
+        presetName === "feed" ? "feed" : "preset",
+        performance.now() - loadStartTime,
+        window.location.pathname,
+        { preset: presetName }
+      );
+      setMetricReported(true);
+    }
+  }, [alertsLoading, alerts, metricReported, loadStartTime, presetName]);
 
   useEffect(() => {
     const fingerprint = searchParams?.get("alertPayloadFingerprint");

@@ -22,6 +22,8 @@ import { toast } from "react-toastify";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { Select, showErrorToast } from "@/shared/ui";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
@@ -63,6 +65,7 @@ export function AlertDismissModal({
 
   const isRestore = alerts?.every((a) => a.dismissed);
   const revalidateMultiple = useRevalidateMultiple();
+  const pathname = usePathname();
   const presetsMutator = () => revalidateMultiple(["/preset"]);
   const { alertsMutator } = useAlerts();
 
@@ -136,7 +139,9 @@ export function AlertDismissModal({
         ? "/alerts/batch_enrich?dispose_on_new_alert=false"
         : `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`;
 
+      const startTime = performance.now();
       await api.post(endpoint, requestData);
+      reportActionLatency(isRestore ? "restore-alert" : "dismiss-alert", performance.now() - startTime, pathname);
       toast.success(
         `${alerts.length} alerts ${isRestore ? "restored" : "dismissed"
         } successfully!`,

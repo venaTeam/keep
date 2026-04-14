@@ -9,6 +9,8 @@ import {
   DEFAULT_COLS,
   DEFAULT_COLS_VISIBILITY,
 } from "@/widgets/alerts-table/lib/alert-table-utils";
+import { usePathname } from "next/navigation";
+import { reportActionLatency } from "@/utils/rum-utils";
 
 interface AlertColumnsSelectProps {
   table: Table<AlertDto>;
@@ -27,6 +29,7 @@ export default function ColumnSelection({
   onResetGrouping,
   onResetFacets,
 }: AlertColumnsSelectProps) {
+  const pathname = usePathname();
   const tableColumns = table.getAllColumns();
 
   // Use the unified column state hook - it will automatically determine
@@ -138,6 +141,7 @@ export default function ColumnSelection({
 
   const handleResetToDefault = async () => {
     try {
+      const startTime = performance.now();
       await updateMultipleColumnConfigs({
         columnVisibility: DEFAULT_COLS_VISIBILITY,
         columnOrder: DEFAULT_COLS,
@@ -145,6 +149,7 @@ export default function ColumnSelection({
         columnTimeFormats: {},
         columnListFormats: {},
       });
+      reportActionLatency("reset-column-config", performance.now() - startTime, pathname);
       setLocalColumnVisibility(DEFAULT_COLS_VISIBILITY);
       // Also reset grouping and facets if callbacks provided
       onResetGrouping?.();
@@ -185,10 +190,12 @@ export default function ColumnSelection({
 
     try {
       // Use batched update to avoid multiple API calls and toasts
+      const startTime = performance.now();
       await updateMultipleColumnConfigs({
         columnVisibility: localColumnVisibility,
         columnOrder: finalOrder,
       });
+      reportActionLatency("update-column-config", performance.now() - startTime, pathname);
       onClose?.();
     } catch (error) {
       console.error("Failed to save column configuration:", error);

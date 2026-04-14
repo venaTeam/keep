@@ -68,18 +68,15 @@ services:
     ports:
       - "3001:3000"
 
-  # OpenTelemetry collector. Make sure you set USERID and GOOGLE_APPLICATION_CREDENTIALS
-  # environment variables for your container to authenticate correctly
+  # OpenTelemetry collector - required for RUM metrics from browser
+  # Also used by backend when METRIC_OTEL_ENABLED=true
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.81.0
-    profiles:
-      - otel
 
     ports:
       - "9100:9100"
-    depends_on:
-      - tempo
-      - loki
+      - "4317:4317"   # OTLP gRPC (for backend)
+      - "4318:4318"   # OTLP HTTP (for browser RUM via NGINX)
     volumes:
       - ./otel-shared/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
 
@@ -89,6 +86,7 @@ services:
       service: keep-frontend-common
     environment:
       - API_URL=http://keep-backend-dev:8080
+      - NEXT_PUBLIC_OTEL_COLLECTOR_URL=/otlp
     build:
       dockerfile: docker/Dockerfile.dev.ui
     volumes:
@@ -98,16 +96,39 @@ services:
     depends_on:
       - keep-backend-dev
 
+  # NGINX reverse proxy - bridges HTTPS to HTTP for OTLP and frontend
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+      # Mount SSL certs - generate self-signed for dev:
+      # openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+      #   -keyout ./proxy/ssl/key.pem -out ./proxy/ssl/cert.pem -subj '/CN=localhost'
+      - ./proxy/ssl:/etc/nginx/ssl
+    depends_on:
+      - keep-frontend-dev
+      - otel-collector
+
   keep-backend-dev:
     extends:
       file: docker-compose.common.yml
       service: keep-backend-common
     build:
       dockerfile: docker/Dockerfile.dev.api
+    ports:
+      - "8080:8080"
     environment:
+      - PORT=8080
       - OTEL_SERVICE_NAME=keephq
       - OTLP_ENDPOINT=http://otel-collector:4317
       - METRIC_OTEL_ENABLED=true
+      - MESSAGING_TYPE=KAFKA
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_SECURITY_PROTOCOL=PLAINTEXT
+      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@postgres:5432/keep
     volumes:
       - .:/app
       - ./state:/state

@@ -2,6 +2,10 @@ receivers:
   otlp:
     protocols:
       http:
+        cors:
+          allowed_origins: ["*"]  # Restrict in production to your frontend domain
+          allowed_headers: ["*"]
+          max_age: 7200
       grpc:
 
 processors:

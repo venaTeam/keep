@@ -5,8 +5,8 @@ global:
 scrape_configs:
   - job_name: "keep"
     static_configs:
-      - targets: ["keep-backend:8080"]
-    metrics_path: "/metrics/processing"
+      - targets: ["host.docker.internal:8080"]
+    metrics_path: "/metrics"
     http_headers:
       x-api-key:
         values:

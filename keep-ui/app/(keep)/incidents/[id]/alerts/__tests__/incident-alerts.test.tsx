@@ -2,19 +2,19 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import IncidentAlerts from '../incident-alerts';
-import type { 
-  IncidentDto, 
+import type {
+  IncidentDto,
 } from '@/entities/incidents/model';
-import { 
+import {
   Status as IncidentStatus,
-  Severity as IncidentSeverity 
+  Severity as IncidentSeverity
 } from '@/entities/incidents/model/models';
-import type { 
-  AlertDto, 
+import type {
+  AlertDto,
 } from '@/entities/alerts/model/types';
-import { 
-  Status as AlertStatus, 
-  Severity as AlertSeverity 
+import {
+  Status as AlertStatus,
+  Severity as AlertSeverity
 } from '@/entities/alerts/model/types';
 import { useIncidentAlerts, usePollIncidentAlerts } from '@/utils/hooks/useIncidents';
 import { useIncidentActions } from '@/entities/incidents/model';
@@ -24,6 +24,8 @@ import { useConfig } from '@/utils/hooks/useConfig';
 // Mock the dependencies
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  usePathname: jest.fn(() => '/incidents/incident-123/alerts'),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
 }));
 
 jest.mock('@/utils/hooks/useIncidents', () => ({
@@ -220,6 +222,10 @@ describe('IncidentAlerts', () => {
       push: jest.fn(),
     });
 
+    const { usePathname, useSearchParams } = require('next/navigation');
+    (usePathname as jest.Mock).mockReturnValue('/incidents/incident-123/alerts');
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
+
     (useIncidentAlerts as jest.Mock).mockReturnValue({
       data: mockAlertsResponse,
       isLoading: false,
@@ -292,7 +298,7 @@ describe('IncidentAlerts', () => {
     // Check for empty state
     expect(screen.getByText('No alerts yet')).toBeInTheDocument();
     expect(screen.getByText('Alerts will show up here as they are correlated into this incident.')).toBeInTheDocument();
-    
+
     // Check for action buttons in empty state
     expect(screen.getByText('Add Alerts Manually')).toBeInTheDocument();
     expect(screen.getByText('Try AI Correlation')).toBeInTheDocument();
@@ -331,7 +337,7 @@ describe('IncidentAlerts', () => {
 
   // TODO: Fix these tests to work with the new table structure
   // For now, commenting them out to avoid CI failures
-  
+
   /*
   it('opens AlertSidebar when clicking view alert button', async () => {
     // This test needs to be updated to test ViewAlertModal instead

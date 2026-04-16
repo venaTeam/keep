@@ -1,219 +1,127 @@
 /**
- * OpenTelemetry RUM (Real User Monitoring) - Client-side metrics export
+ * RUM (Real User Monitoring) - Client-side metrics export via plain fetch.
  *
- * Sends Web Vitals and custom action latency metrics directly from the browser
- * to the OTEL Collector via OTLP/HTTP, bypassing the backend.
+ * Sends metrics directly to a custom backend route defined by
+ * NEXT_PUBLIC_RUM_ENDPOINT. No OTLP protocol required on the receiving end.
+ *
+ * Payload shape (array of events):
+ * [{ type, name, value, path, timestamp, attributes }]
  */
 
-import { metrics, Histogram } from "@opentelemetry/api";
-import {
-    MeterProvider,
-    PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
-import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
-import { Resource } from "@opentelemetry/resources";
-import {
-    ATTR_SERVICE_NAME,
-    ATTR_SERVICE_VERSION,
-} from "@opentelemetry/semantic-conventions";
-
-// Collector URL defaults to /otlp which is proxied by NGINX to the OTEL Collector
-const OTEL_COLLECTOR_URL =
-    process.env.NEXT_PUBLIC_OTEL_COLLECTOR_URL || "/otlp";
+const RUM_ENDPOINT = process.env.NEXT_PUBLIC_RUM_ENDPOINT || "";
 
 const SESSION_ID = Math.random().toString(36).substring(2, 11);
+const SERVICE_VERSION = process.env.NEXT_PUBLIC_KEEP_VERSION || "local";
 
-let initialized = false;
+// --- Batching ---
 
-// Histogram instruments (lazy-initialized)
-let clsHistogram: Histogram;
-let fcpHistogram: Histogram;
-let lcpHistogram: Histogram;
-let ttfbHistogram: Histogram;
-let fidHistogram: Histogram;
-let inpHistogram: Histogram;
-let actionLatencyHistogram: Histogram;
-let pageLoadLatencyHistogram: Histogram;
-let errorCounter: any;
-let activeUserHeartbeatCounter: any;
-
-/**
- * Initialize the OTEL MeterProvider and create histogram instruments.
- * Safe to call multiple times — only initializes once.
- */
-function ensureInitialized() {
-    if (initialized) return;
-    initialized = true;
-
-    const resource = new Resource({
-        [ATTR_SERVICE_NAME]: "keep-frontend",
-        [ATTR_SERVICE_VERSION]: process.env.NEXT_PUBLIC_KEEP_VERSION || "local",
-    });
-
-    const exporter = new OTLPMetricExporter({
-        url: `${OTEL_COLLECTOR_URL}/v1/metrics`,
-        headers: {},
-    });
-
-    const reader = new PeriodicExportingMetricReader({
-        exporter,
-        exportIntervalMillis: 1_000, // Export every 1 second (faster testing)
-        exportTimeoutMillis: 1_000,
-    });
-
-    const meterProvider = new MeterProvider({
-        resource,
-        readers: [reader],
-    });
-
-    // Set as global so other parts of the app can use it
-    metrics.setGlobalMeterProvider(meterProvider);
-
-    const meter = meterProvider.getMeter("keep-frontend-rum", "1.0.0");
-
-    // Web Vitals histograms
-    clsHistogram = meter.createHistogram("keep.frontend.web_vital.cls", {
-        description: "Cumulative Layout Shift",
-        unit: "",
-        advice: {
-            explicitBucketBoundaries: [0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0],
-        },
-    });
-
-    fcpHistogram = meter.createHistogram("keep.frontend.web_vital.fcp", {
-        description: "First Contentful Paint (seconds)",
-        unit: "s",
-        advice: {
-            explicitBucketBoundaries: [
-                0.5, 1.0, 1.5, 1.8, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0,
-            ],
-        },
-    });
-
-    lcpHistogram = meter.createHistogram("keep.frontend.web_vital.lcp", {
-        description: "Largest Contentful Paint (seconds)",
-        unit: "s",
-        advice: {
-            explicitBucketBoundaries: [0.5, 1.0, 1.5, 2.5, 3.0, 4.0, 5.0, 10.0],
-        },
-    });
-
-    ttfbHistogram = meter.createHistogram("keep.frontend.web_vital.ttfb", {
-        description: "Time to First Byte (seconds)",
-        unit: "s",
-        advice: {
-            explicitBucketBoundaries: [0.1, 0.2, 0.5, 0.8, 1.0, 1.8, 3.0, 5.0],
-        },
-    });
-
-    fidHistogram = meter.createHistogram("keep.frontend.web_vital.fid", {
-        description: "First Input Delay (seconds)",
-        unit: "s",
-        advice: {
-            explicitBucketBoundaries: [0.1, 0.2, 0.3, 0.4, 0.5, 1.0],
-        },
-    });
-
-    inpHistogram = meter.createHistogram("keep.frontend.web_vital.inp", {
-        description: "Interaction to Next Paint (seconds)",
-        unit: "s",
-        advice: {
-            explicitBucketBoundaries: [0.1, 0.2, 0.5, 1.0, 2.0, 5.0],
-        },
-    });
-
-    actionLatencyHistogram = meter.createHistogram(
-        "keep.frontend.action_latency",
-        {
-            description: "Frontend action latency (seconds)",
-            unit: "s",
-            advice: {
-                explicitBucketBoundaries: [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0],
-            },
-        }
-    );
-
-    pageLoadLatencyHistogram = meter.createHistogram(
-        "keep.frontend.page_load_latency",
-        {
-            description: "Frontend page load latency (seconds)",
-            unit: "s",
-            advice: {
-                explicitBucketBoundaries: [0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 60.0],
-            },
-        }
-    );
-
-    errorCounter = meter.createCounter("keep.frontend.error_count", {
-        description: "Total count of frontend errors",
-    });
-
-    activeUserHeartbeatCounter = meter.createCounter(
-        "keep.frontend.active_user_heartbeat",
-        {
-            description: "Active user heartbeat count",
-        }
-    );
+interface RumEvent {
+    type: "histogram" | "counter";
+    name: string;
+    value: number;
+    path: string;
+    timestamp: number;
+    attributes: Record<string, string | number>;
 }
 
-const METRICS_MAP: Record<string, () => Histogram> = {
-    CLS: () => clsHistogram,
-    FCP: () => fcpHistogram,
-    LCP: () => lcpHistogram,
-    TTFB: () => ttfbHistogram,
-    FID: () => fidHistogram,
-    INP: () => inpHistogram,
-};
+const queue: RumEvent[] = [];
+let flushTimer: ReturnType<typeof setInterval> | null = null;
+
+function enqueue(event: RumEvent) {
+    if (!RUM_ENDPOINT) return; // silently no-op if not configured
+    queue.push(event);
+    scheduleFlush();
+}
+
+function scheduleFlush() {
+    if (flushTimer !== null) return;
+    flushTimer = setInterval(flush, 5_000); // flush every 5 s
+}
+
+async function flush() {
+    if (queue.length === 0 || !RUM_ENDPOINT) return;
+
+    const batch = queue.splice(0, queue.length);
+
+    try {
+        await fetch(RUM_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                service: "keep-frontend",
+                version: SERVICE_VERSION,
+                session_id: SESSION_ID,
+                events: batch,
+            }),
+            // keepalive ensures the request completes even if the page is unloading
+            keepalive: true,
+        });
+    } catch {
+        // Best-effort: re-queue on network failure (up to a limit)
+        if (queue.length < 200) {
+            queue.unshift(...batch);
+        }
+    }
+}
+
+// Flush on page unload so we don't lose the last batch
+if (typeof window !== "undefined") {
+    window.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+            flush();
+        }
+    });
+}
+
+// --- Public API ---
 
 /**
- * Record a Web Vital metric via OTEL.
+ * Record a Web Vital metric.
  * Called from WebVitalsReporter.
  */
-export function recordWebVital(
-    name: string,
-    value: number,
-    path: string
-): void {
-    ensureInitialized();
-
-    const getHistogram = METRICS_MAP[name];
-    if (!getHistogram) return;
-
-    const histogram = getHistogram();
-
-    // Convert ms to seconds for time-based metrics (CLS is unitless)
+export function recordWebVital(name: string, value: number, path: string): void {
+    // Convert ms to seconds for time-based metrics; CLS is unitless
     const recordValue = name === "CLS" ? value : value / 1000.0;
 
-    histogram.record(recordValue, { path });
+    enqueue({
+        type: "histogram",
+        name: `keep.frontend.web_vital.${name.toLowerCase()}`,
+        value: recordValue,
+        path,
+        timestamp: Date.now(),
+        attributes: { metric: name },
+    });
 }
 
 /**
- * Record a custom action latency via OTEL.
- * Drop-in replacement for the old reportActionLatency that POSTed to /api/rum.
+ * Record a custom action latency.
  *
- * @param action Name of the action (e.g., "change-status")
- * @param durationMs Duration of the action in milliseconds
- * @param path The current page path
+ * @param action  Name of the action (e.g. "change-status")
+ * @param durationMs  Duration in milliseconds
+ * @param path  Current page path
  */
 export function reportActionLatency(
     action: string,
     durationMs: number,
     path: string
 ): void {
-    ensureInitialized();
-
-    // Convert ms to seconds
-    const durationSec = durationMs / 1000.0;
-    actionLatencyHistogram.record(durationSec, { path, action });
+    enqueue({
+        type: "histogram",
+        name: "keep.frontend.action_latency",
+        value: durationMs / 1000.0,
+        path,
+        timestamp: Date.now(),
+        attributes: { action },
+    });
 }
 
 /**
- * Record a page load latency via OTEL.
+ * Record a page load latency.
  *
- * @param page Name of the page (e.g., "dashboard")
- * @param durationMs Duration of the page load in milliseconds
- * @param path The current page path
- * @param attributes Additional labels for the metric
+ * @param page  Name of the page (e.g. "dashboard")
+ * @param durationMs  Duration in milliseconds
+ * @param path  Current page path
+ * @param attributes  Additional labels
  */
 export function reportPageLoadLatency(
     page: string,
@@ -221,37 +129,46 @@ export function reportPageLoadLatency(
     path: string,
     attributes: Record<string, string> = {}
 ): void {
-    ensureInitialized();
-
-    const durationSec = durationMs / 1000.0;
-    pageLoadLatencyHistogram.record(durationSec, {
-        ...attributes,
+    enqueue({
+        type: "histogram",
+        name: "keep.frontend.page_load_latency",
+        value: durationMs / 1000.0,
         path,
-        page,
+        timestamp: Date.now(),
+        attributes: { page, ...attributes },
     });
 }
 
 /**
  * Record a frontend error.
  *
- * @param type Type of error (e.g., "window-error")
- * @param message Error message
- * @param path The current page path
+ * @param type  Error category (e.g. "window-error")
+ * @param message  Error message
+ * @param path  Current page path
  */
 export function reportError(type: string, message: string, path: string): void {
-    ensureInitialized();
-
-    errorCounter.add(1, { type, message, path });
+    enqueue({
+        type: "counter",
+        name: "keep.frontend.error_count",
+        value: 1,
+        path,
+        timestamp: Date.now(),
+        attributes: { type, message },
+    });
 }
 
 /**
- * Record an active user heartbeat.
+ * Record an active-user heartbeat.
  *
- * @param path The current page path
+ * @param path  Current page path
  */
 export function reportHeartbeat(path: string): void {
-    ensureInitialized();
-
-    // Include SESSION_ID to allow counting unique users/sessions in Prometheus
-    activeUserHeartbeatCounter.add(1, { session_id: SESSION_ID });
+    enqueue({
+        type: "counter",
+        name: "keep.frontend.active_user_heartbeat",
+        value: 1,
+        path,
+        timestamp: Date.now(),
+        attributes: { session_id: SESSION_ID },
+    });
 }

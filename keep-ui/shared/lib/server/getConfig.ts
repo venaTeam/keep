@@ -48,6 +48,7 @@ export function getConfig(): InternalConfig {
     API_URL: process.env.API_URL,
     // could be relative (e.g. for ingress) or absolute (e.g. for cloud run)
     API_URL_CLIENT: API_URL_CLIENT,
+    WORKFLOWS_API_URL: process.env.WORKFLOWS_API_URL || "http://localhost:8082",
 
     SENTRY_DISABLED: process.env.SENTRY_DISABLED,
     READ_ONLY: process.env.KEEP_READ_ONLY === "true",

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DefinitionV2 } from "@/entities/workflows";
 import { wrapDefinitionV2 } from "@/entities/workflows/lib/parser";
 import { parseWorkflow } from "@/entities/workflows/lib/parser";
-import { useProviders } from "@/utils/hooks/useProviders";
+import { useWorkflowProviders } from "@/utils/hooks/useProviders";
 import { useWorkflowActions } from "@/entities/workflows/model/useWorkflowActions";
 import { WorkflowYamlEditorHeader } from "./WorkflowYamlEditorHeader";
 import { getOrderedWorkflowYamlString } from "@/entities/workflows/lib/yaml-utils";
@@ -46,7 +46,7 @@ export function WorkflowYAMLEditorStandalone({
     validationErrors?.filter((e) => e.severity === "error").length === 0;
 
   const { updateWorkflow } = useWorkflowActions();
-  const { data: { providers } = {} } = useProviders();
+  const { data: { providers } = {} } = useWorkflowProviders();
 
   const parseYamlToDefinition = useCallback(
     (yamlString: string) => {

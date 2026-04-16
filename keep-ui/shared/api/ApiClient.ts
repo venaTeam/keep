@@ -151,9 +151,15 @@ export class ApiClient {
       );
     }
 
-    const apiUrl = this.isServer
+    let apiUrl = this.isServer
       ? getApiURL()
       : getApiUrlFromConfig(this.config);
+
+    // On the server side, route /workflows/* directly to the workflow service
+    if (this.isServer && url.startsWith("/workflows/")) {
+      apiUrl = this.config?.WORKFLOWS_API_URL || process.env.WORKFLOWS_API_URL || "http://localhost:8082";
+    }
+
     const fullUrl = apiUrl + url;
 
     const response = await fetch(fullUrl, {

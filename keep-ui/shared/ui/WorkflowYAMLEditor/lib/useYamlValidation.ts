@@ -11,7 +11,7 @@ import {
   getCurrentPath,
   parseWorkflowYamlStringToJSON,
 } from "@/entities/workflows/lib/yaml-utils";
-import { useProviders } from "@/utils/hooks/useProviders";
+import { useWorkflowProviders } from "@/utils/hooks/useProviders";
 
 interface UseYamlValidationProps {
   onValidationErrors?: React.Dispatch<
@@ -48,7 +48,7 @@ export function useYamlValidation({
   >(null);
 
   const { data: { providers, installed_providers: installedProviders } = {} } =
-    useProviders();
+    useWorkflowProviders();
 
   // Function to find the current step in the workflow based on the path
   const findStepFromPath = useCallback((path: (string | number)[]) => {

@@ -6,8 +6,7 @@ import { Button, Title, Badge, Divider } from "@tremor/react";
 import { IoMdClose } from "react-icons/io";
 import { AlertTimeline } from "./alert-timeline";
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
-import { TopologyMap } from "@/app/(keep)/topology/ui/map";
-import { TopologySearchProvider } from "@/app/(keep)/topology/TopologySearchContext";
+
 import {
   FieldHeader,
   SeverityLabel,
@@ -295,13 +294,7 @@ export const AlertSidebar = ({
                   isLoading={isLoading}
                   onRefresh={handleRefresh}
                 />
-                <Title>Related Services</Title>
-                <TopologySearchProvider>
-                  <TopologyMap
-                    providerIds={alert.providerId ? [alert.providerId] : []}
-                    services={alert.service ? [alert.service] : []}
-                  />
-                </TopologySearchProvider>
+
               </div>
             )}
           </Dialog.Panel>

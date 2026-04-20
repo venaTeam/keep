@@ -44,6 +44,7 @@ html.workaround-dark {
   pointer-events: auto;
   z-index: 55;
 }
+
 .Toastify {
   pointer-events: auto;
 }
@@ -54,20 +55,26 @@ html.workaround-dark {
 .Toastify__toast-container {
   @apply pointer-events-none;
 }
+
 .Toastify__toast * {
   @apply pointer-events-auto;
 }
+
 /* --- End of Radix UI / Tremor Hotfixes */
 
 .rules-tooltip [role="tooltip"] {
-  @apply w-72; /* This sets the width to 16rem. Adjust the number as needed. */
-  @apply break-words; /* This will wrap long words if needed. */
+  @apply w-72;
+  /* This sets the width to 16rem. Adjust the number as needed. */
+  @apply break-words;
+  /* This will wrap long words if needed. */
 }
 
 /* styles/globals.css */
 .loader {
-  border: 4px solid #f3f3f3; /* Light grey */
-  border-top: 4px solid #838885; /* Green */
+  border: 4px solid #f3f3f3;
+  /* Light grey */
+  border-top: 4px solid #838885;
+  /* Green */
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -76,6 +83,7 @@ html.workaround-dark {
 
 .page-container {
   @apply p-4 pl-1 mx-auto w-full;
+
   @screen xl {
     @apply p-6 pl-1;
   }
@@ -83,6 +91,7 @@ html.workaround-dark {
 
 .card-container {
   @apply p-4 mx-auto;
+
   @screen xl {
     @apply p-10;
   }
@@ -92,6 +101,7 @@ html.workaround-dark {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -101,6 +111,7 @@ html.workaround-dark {
   0% {
     filter: none;
   }
+
   25%,
   100% {
     filter: drop-shadow(rgba(0, 0, 0, 0.07) -2px 9px 5px);
@@ -108,10 +119,12 @@ html.workaround-dark {
 }
 
 @keyframes scroll-shadow-right {
+
   0%,
   75% {
     filter: drop-shadow(rgba(0, 0, 0, 0.07) 2px 9px 5px);
   }
+
   99% {
     filter: none;
   }
@@ -141,6 +154,6 @@ html.workaround-dark {
   }
 }
 
-.tremor-TableRow-row > td.bg-tremor-background {
+.tremor-TableRow-row>td.bg-tremor-background {
   background-color: inherit !important;
 }

@@ -24,13 +24,13 @@ export const IncidentsLinks = ({ session }: IncidentsLinksProps) => {
   const { data: incidents, mutate } = useIncidents(
     isOnIncidentsPage
       ? {
-          candidate: false,
-          predicted: null,
-          limit: 0,
-          offset: 0,
-          sorting: DEFAULT_INCIDENTS_SORTING,
-          cel: DEFAULT_INCIDENTS_CEL,
-        }
+        candidate: false,
+        predicted: null,
+        limit: 0,
+        offset: 0,
+        sorting: DEFAULT_INCIDENTS_SORTING,
+        cel: DEFAULT_INCIDENTS_CEL,
+      }
       : null,
     {}
   );

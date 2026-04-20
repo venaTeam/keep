@@ -27,15 +27,16 @@ import {
   ExclamationCircleIcon,
   PauseIcon,
   CircleStackIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
 import "./alert-dismiss-modal.css";
 
-const statusIcons = {
+const statusIcons: any = {
   [Status.Firing]: <ExclamationCircleIcon className="w-5 h-5 text-red-500 mr-2" />,
   [Status.Resolved]: <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />,
   [Status.Acknowledged]: <PauseIcon className="w-5 h-5 text-gray-500 mr-2" />,
   [Status.Suppressed]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
-  [Status.Pending]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
+  [Status.Pending]: <ClockIcon className="w-5 h-5 text-gray-500 mr-2" />,
 };
 
 interface Props {
@@ -194,15 +195,17 @@ export function AlertDismissModal({
               New status:
             </Subtitle>
             <Select
-              options={Object.values(Status).map((status) => ({
-                value: status,
-                label: (
-                  <div className="flex items-center">
-                    {statusIcons[status]}
-                    <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
-                  </div>
-                ),
-              }))}
+              options={Object.values(Status)
+                .filter((status) => status !== Status.Pending)
+                .map((status) => ({
+                  value: status,
+                  label: (
+                    <div className="flex items-center">
+                      {statusIcons[status]}
+                      <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                    </div>
+                  ),
+                }))}
               value={
                 selectedStatus
                   ? {

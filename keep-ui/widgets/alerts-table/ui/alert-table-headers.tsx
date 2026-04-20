@@ -158,11 +158,11 @@ const DraggableHeaderCell = ({
   const dragStyle: CSSProperties = {
     width:
       column.id === "checkbox"
-        ? "32px !important"
+        ? "44px !important"
         : column.id === "source"
-          ? "40px !important"
+          ? "44px !important"
           : column.id === "status"
-            ? "24px !important"
+            ? "36px !important"
             : column.getSize(),
     opacity: isDragging ? 0.5 : 1,
     transform: CSS.Translate.toString(transform),
@@ -235,7 +235,7 @@ const DraggableHeaderCell = ({
         "relative group",
         column.columnDef.meta?.thClassName,
         (column.getIsPinned() === false || column.id == "name") &&
-          "hover:bg-orange-100",
+        "hover:bg-orange-100",
         className
       )}
       style={{ ...dragStyle, ...style }}
@@ -343,7 +343,7 @@ const DraggableHeaderCell = ({
                     }
                     title={
                       !column.getIsGrouped() &&
-                      table.getState().grouping.length > 0
+                        table.getState().grouping.length > 0
                         ? `Only one column can be grouped by at any single time. You should ungroup "${getGroupedColumnName()}"`
                         : undefined
                     }

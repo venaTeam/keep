@@ -99,6 +99,12 @@ export function AlertsTableBody({
       return;
     }
 
+    // Prevent row click (which opens the sidebar) if the user is selecting text
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+
     onRowClick(alert);
   };
 
@@ -155,6 +161,7 @@ export function AlertsTableBody({
         tolerance={0}
         globalMouse={true}
         allowClickWithoutSelected={false}
+        ignoreList={['.select-text', '.prevent-row-click', 'button', 'a', 'input']}
         onSelectionFinish={handleSelectionFinish}
       >
         {table.getExpandedRowModel().rows.map((row, rowIndex) => {

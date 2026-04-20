@@ -74,11 +74,11 @@ const UserDropdown = ({ session }: UserDropdownProps) => {
                       await fetch(`${configData?.KEYCLOAK_ISSUER}/protocol/openid-connect/logout`,
                         {
                           mode: 'no-cors', method: 'POST',
-                          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                          headers: { "Content-Type": "application/x-www-form-urlencoded" },
                           body: new URLSearchParams({
                             client_id: `${configData?.KEYCLOAK_ID}`,
                             client_secret: `${configData?.KEYCLOAK_SECRET}`,
-                            refresh_token:  session.refreshToken
+                            refresh_token: session.refreshToken
                           })
                         }
                       );

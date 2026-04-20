@@ -16,6 +16,7 @@ import ColumnSelection from "./ColumnSelection";
 import { AlertTableThemeSelection } from "@/features/alerts/change-alert-table-theme";
 import { RowStyleSelection } from "@/widgets/alerts-table/ui/RowStyleSelection";
 import { ActionTraySelection } from "@/widgets/alerts-table/ui/ActionTraySelection";
+import { FontSizeSelection } from "@/widgets/alerts-table/ui/FontSizeSelection";
 
 interface SettingsSelectionProps {
   table: Table<AlertDto>;
@@ -59,12 +60,12 @@ export default function SettingsSelection({
           />
           <Popover.Overlay className="fixed inset-0 bg-black opacity-30 z-20" />
           <Popover.Panel
-            className="bg-white z-30 p-4 rounded-sm w-[400px]"
+            className="bg-white dark:bg-[#111827] z-[60] p-4 rounded-sm shadow-xl border border-gray-100 dark:border-gray-800 min-w-[300px] w-auto max-w-[600px] overflow-hidden"
             ref={refs.setFloating}
             data-testid="settings-panel"
             style={{
               ...floatingStyles,
-              maxHeight: "80vh", // Limit height to 80% of viewport height
+              maxHeight: "85vh", // Limit height to 85% of viewport height
               overflowY: "auto", // Add scroll when content exceeds max height
             }}
           >
@@ -77,12 +78,13 @@ export default function SettingsSelection({
               className="flex flex-col"
               style={{ maxHeight: "calc(80vh - 40px)" }}
             >
-              <TabGroup className="flex flex-col flex-1">
-                <TabList className="mb-4">
+              <TabGroup className="flex flex-col flex-1 w-full max-w-full">
+                <TabList className="mb-4 overflow-x-auto whitespace-nowrap overflow-y-hidden pb-1" variant="line">
                   <Tab data-testid="tab-columns">Columns</Tab>
                   <Tab data-testid="tab-theme">Theme</Tab>
                   <Tab data-testid="tab-row-style">Row Style</Tab>
                   <Tab data-testid="tab-action-tray">Action Tray</Tab>
+                  <Tab data-testid="tab-font-size">Font Size</Tab>
                 </TabList>
                 <TabPanels className="flex-1 overflow-hidden">
                   <TabPanel className="h-full" data-testid="panel-columns">
@@ -103,6 +105,9 @@ export default function SettingsSelection({
                   </TabPanel>
                   <TabPanel className="h-full" data-testid="panel-action-tray">
                     <ActionTraySelection onClose={close} />
+                  </TabPanel>
+                  <TabPanel className="h-full" data-testid="panel-font-size">
+                    <FontSizeSelection onClose={close} />
                   </TabPanel>
                 </TabPanels>
               </TabGroup>

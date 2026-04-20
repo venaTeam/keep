@@ -391,6 +391,29 @@ export function AlertTableServerSide({
             className="!p-0"
           />
         ),
+        filterOut: (facetOption) => {
+          const hiddenStatuses = ["pending", "maintenance"];
+          return hiddenStatuses.includes(
+            facetOption.display_name.trim().toLowerCase()
+          );
+        },
+      },
+      ["status"]: {
+        canHitEmptyState: true,
+        renderOptionIcon: (facetOption) => (
+          <Icon
+            icon={getStatusIcon(facetOption.display_name)}
+            size="sm"
+            color={getStatusColor(facetOption.display_name)}
+            className="!p-0"
+          />
+        ),
+        filterOut: (facetOption) => {
+          const hiddenStatuses = ["pending", "maintenance"];
+          return hiddenStatuses.includes(
+            facetOption.display_name.trim().toLowerCase()
+          );
+        },
       },
       ["Source"]: {
         renderOptionIcon: (facetOption) => {
@@ -700,13 +723,27 @@ export function AlertTableServerSide({
     );
   }
 
+  const fromDashboard = searchParams?.get("fromDashboard");
+  const widgetName = searchParams?.get("widgetName");
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex-none">
         <div className="flex justify-between">
-          <span data-testid="preset-page-title">
+          <div className="flex flex-col" data-testid="preset-page-title">
             <PageTitle className="capitalize inline">{presetName}</PageTitle>
-          </span>
+            {fromDashboard && (
+              <div className="flex items-center gap-1 text-sm mt-1 text-gray-500">
+                <span className="text-gray-400">from</span>
+                <a
+                  href={`/dashboard/${encodeURIComponent(fromDashboard)}`}
+                  className="text-gray-500 hover:text-orange-500 transition-colors cursor-pointer underline underline-offset-2"
+                >
+                  {fromDashboard}
+                </a>
+              </div>
+            )}
+          </div>
           <div className="grid grid-cols-[auto_auto] grid-rows-[auto_auto] gap-4">
             {timeFrame && (
               <EnhancedDateRangePickerV2

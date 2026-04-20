@@ -3,7 +3,7 @@ import { Card, Callout } from "@tremor/react";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import { EmptyBuilderState } from "./empty-builder-state";
-import { useProviders } from "@/utils/hooks/useProviders";
+import { useWorkflowProviders } from "@/utils/hooks/useProviders";
 import { KeepLoader } from "@/shared/ui";
 import clsx from "clsx";
 
@@ -31,7 +31,7 @@ export function WorkflowBuilderCard({
     data: { providers, installed_providers: installedProviders } = {},
     error,
     isLoading,
-  } = useProviders();
+  } = useWorkflowProviders();
 
   const cardClassName = clsx(
     "p-0 overflow-hidden",

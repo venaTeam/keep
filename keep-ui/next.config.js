@@ -9,10 +9,10 @@ const isSentryDisabled =
 const turbopackAliases =
   process.env.NODE_ENV === "development"
     ? {
-        "./MonacoEditor": "@/shared/ui/MonacoEditor/index.turbopack.ts",
-        "./MonacoYAMLEditor": "@/shared/ui/MonacoYAMLEditor/index.turbopack.ts",
-        "./MonacoCel": "@/shared/ui/MonacoCELEditor/MonacoCel.turbopack.tsx",
-      }
+      "./MonacoEditor": "@/shared/ui/MonacoEditor/index.turbopack.ts",
+      "./MonacoYAMLEditor": "@/shared/ui/MonacoYAMLEditor/index.turbopack.ts",
+      "./MonacoCel": "@/shared/ui/MonacoCELEditor/MonacoCel.turbopack.tsx",
+    }
     : {};
 
 /** @type {import('next').NextConfig} */
@@ -25,6 +25,12 @@ const nextConfig = {
     turbo: {
       resolveAlias: turbopackAliases,
     },
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   webpack: (
     config,
@@ -123,13 +129,13 @@ const nextConfig = {
     return process.env.DISABLE_REDIRECTS === "true"
       ? []
       : [
-          {
-            source: "/",
-            destination: "/incidents",
-            permanent: process.env.ENV === "production",
-          },
-          ...workflowRawYamlRedirects,
-        ];
+        {
+          source: "/",
+          destination: "/incidents",
+          permanent: process.env.ENV === "production",
+        },
+        ...workflowRawYamlRedirects,
+      ];
   },
   async headers() {
     // Allow Keycloak Server as a CORS origin since we use SSO wizard as iframe

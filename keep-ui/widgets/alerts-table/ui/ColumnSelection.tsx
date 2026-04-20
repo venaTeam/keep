@@ -281,16 +281,18 @@ export default function ColumnSelection({
             </ul>
           )}
         </div>
+        <div className="sticky bottom-0 pt-4 pb-2 z-10 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1f2937]">
+          <Button
+            className="w-full"
+            color="orange"
+            type="submit"
+            loading={useBackend && isLoading}
+            disabled={useBackend && isLoading}
+          >
+            {useBackend && isLoading ? "Saving..." : "Save changes"}
+          </Button>
+        </div>
       </div>
-      <Button
-        className="mt-4"
-        color="orange"
-        type="submit"
-        loading={useBackend && isLoading}
-        disabled={useBackend && isLoading}
-      >
-        {useBackend && isLoading ? "Saving..." : "Save changes"}
-      </Button>
     </form>
   );
 }

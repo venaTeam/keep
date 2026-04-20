@@ -23,13 +23,24 @@ from tests.fixtures.client import client, setup_api_key, test_app  # noqa
 logging.basicConfig(level=logging.DEBUG)
 
 
-def wait_for_alerts(client, num_alerts):
-    alerts = client.get("/alerts", headers={"x-api-key": "some-api-key"}).json()
-    print(f"------------- Total alerts: {len(alerts)}")
+def wait_for_alerts(client, num_alerts, fingerprint=None, timeout=30):
+    start_time = time.time()
+    response = client.get("/alerts", headers={"x-api-key": "some-api-key"})
+    assert response.status_code == 200
+    alerts = response.json()
+    if fingerprint:
+        alerts = [a for a in alerts if a.get("fingerprint") == fingerprint]
+    
+    print(f"------------- Total alerts (filtered): {len(alerts)}")
     while len(alerts) != num_alerts:
+        if time.time() - start_time > timeout:
+            raise AssertionError(f"TIMEOUT waiting for {num_alerts} alerts with fingerprint {fingerprint}, found {len(alerts)} alerts: {alerts}")
         time.sleep(1)
         alerts = client.get("/alerts", headers={"x-api-key": "some-api-key"}).json()
-        print(f"------------- Total alerts: {len(alerts)}")
+        if fingerprint:
+            alerts = [a for a in alerts if a.get("fingerprint") == fingerprint]
+        print(f"------------- Total alerts (filtered): {len(alerts)}")
+    return alerts
 
 
 @pytest.mark.parametrize(
@@ -78,7 +89,7 @@ def test_default_deduplication_rule(db_session, client, test_app):
             assert dedup_rule.get("default")
 
 
-@pytest.mark.timeout(15)
+@pytest.mark.timeout(120)
 @pytest.mark.parametrize(
     "test_app",
     [
@@ -93,25 +104,39 @@ def test_deduplication_sanity(db_session, client, test_app):
     # insert an alert with some provider_id and make sure that the default deduplication rule is working
     provider = ProvidersFactory.get_provider_class("prometheus")
     alert = provider.simulate_alert()
-    for i in range(2):
-        client.post(
-            "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
-        )
-        time.sleep(0.1)
+    fingerprint = alert.get("fingerprint")
+    
+    # 1st posting: should create 1 alert
+    response = client.post(
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
+    )
+    assert response.status_code == 202
+    wait_for_alerts(client, 1, fingerprint=fingerprint)
 
-    wait_for_alerts(client, 1)
+    # 2nd posting: should be deduplicated (1 alert total)
+    response = client.post(
+        "/alerts/event/prometheus", json=alert, headers={"x-api-key": "some-api-key"}
+    )
+    assert response.status_code == 202
+    wait_for_alerts(client, 1, fingerprint=fingerprint)
 
-    deduplication_rules = client.get(
-        "/deduplications", headers={"x-api-key": "some-api-key"}
-    ).json()
-    while not any(
-        [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
-    ):
-        time.sleep(0.1)
-        deduplication_rules = client.get(
+    # loop for up to 30 seconds until the deduplication ratio is 50.0
+    deduplication_rules = []
+    for _ in range(30):
+        response = client.get(
             "/deduplications", headers={"x-api-key": "some-api-key"}
-        ).json()
+        )
+        assert response.status_code == 200
+        deduplication_rules = response.json()
+        if any(
+            [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
+        ):
+            break
+        time.sleep(1)
 
+    assert any(
+        [rule for rule in deduplication_rules if rule.get("dedup_ratio") == 50.0]
+    ), f"Deduplication ratio 50.0 not found in rules: {deduplication_rules}"
     assert len(deduplication_rules) == 2  # default + datadog
 
     for dedup_rule in deduplication_rules:

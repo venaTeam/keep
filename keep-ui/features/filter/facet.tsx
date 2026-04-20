@@ -221,6 +221,19 @@ export const Facet: React.FC<FacetProps> = ({
             .toLocaleLowerCase()
             .includes(filter.toLocaleLowerCase())
         )
+        .filter((facetOption) =>
+          facetConfig?.filterOut ? !facetConfig.filterOut(facetOption) : true
+        )
+        .filter((facetOption) => {
+          const isStatusFacet =
+            facet.name?.toLowerCase() === "status" ||
+            facet.id?.toLowerCase() === "status";
+          if (isStatusFacet) {
+            const val = facetOption.display_name?.trim().toLowerCase();
+            if (val === "pending" || val === "maintenance") return false;
+          }
+          return true;
+        })
         .sort((fst, scd) => scd.matches_count - fst.matches_count) || [];
 
     if (facetConfig?.sortCallback) {

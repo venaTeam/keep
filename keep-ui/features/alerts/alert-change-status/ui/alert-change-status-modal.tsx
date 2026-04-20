@@ -8,6 +8,7 @@ import {
   ExclamationCircleIcon,
   PauseIcon,
   CircleStackIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { useApi } from "@/shared/lib/hooks/useApi";
@@ -15,12 +16,12 @@ import { Select, showErrorToast, Tooltip } from "@/shared/ui";
 
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 
-const statusIcons = {
+const statusIcons: any = {
   [Status.Firing]: <ExclamationCircleIcon className="w-5 h-5 text-red-500 mr-2" />,
   [Status.Resolved]: <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />,
   [Status.Acknowledged]: <PauseIcon className="w-5 h-5 text-gray-500 mr-2" />,
   [Status.Suppressed]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
-  [Status.Pending]: <CircleStackIcon className="w-5 h-5 text-gray-500 mr-2" />,
+  [Status.Pending]: <ClockIcon className="w-5 h-5 text-gray-500 mr-2" />,
 };
 
 interface Props {
@@ -48,6 +49,8 @@ export function AlertChangeStatusModal({
 
   const statusOptions = Object.values(Status)
     .filter((status) => {
+      // Hide Pending status from the UI
+      if (status === Status.Pending) return false;
       if (!Array.isArray(alert)) {
         return status !== alert.status; // Exclude current status for single alert
       }

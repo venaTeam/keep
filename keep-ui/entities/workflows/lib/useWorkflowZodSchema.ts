@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { useProviders } from "@/utils/hooks/useProviders";
+import { useWorkflowProviders } from "@/utils/hooks/useProviders";
 import {
   getYamlWorkflowDefinitionSchema,
   YamlWorkflowDefinitionSchema,
 } from "../model/yaml.schema";
 
 export function useWorkflowZodSchema() {
-  const { data: { providers } = {} } = useProviders();
+  const { data: { providers } = {} } = useWorkflowProviders();
   return useMemo(() => {
     if (!providers) {
       return YamlWorkflowDefinitionSchema;

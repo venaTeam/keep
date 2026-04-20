@@ -130,6 +130,11 @@ export const AlertFacets: React.FC<AlertFacetsProps> = ({
           facetFilters[key]?.includes(label) || !facetFilters[key]?.length,
       }));
 
+      if (key === "status") {
+        const hiddenStatuses = ["pending", "maintenance"];
+        values = values.filter((v) => !hiddenStatuses.includes(v.label.toLowerCase().trim()));
+      }
+
       if (["assignee", "incident"].includes(key as string) && nullCount > 0) {
         values.push({
           label: "n/a",

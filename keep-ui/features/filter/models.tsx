@@ -10,6 +10,7 @@ export interface FacetConfig {
     facetOption: FacetOptionDto
   ) => JSX.Element | string | undefined;
   sortCallback?: (facetOption: FacetOptionDto) => number;
+  filterOut?: (facetOption: FacetOptionDto) => boolean;
 }
 
 export interface FacetsConfig {

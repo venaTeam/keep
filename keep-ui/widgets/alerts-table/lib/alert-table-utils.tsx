@@ -370,7 +370,7 @@ export const useAlertTableCols = (
             return (
               <div
                 className={clsx(
-                  "whitespace-pre-wrap",
+                  "whitespace-pre-wrap select-text",
                   // Only apply line clamp if not expanded
                   !isExpanded &&
                   (rowStyle === "default" ? "line-clamp-1" : "line-clamp-3")
@@ -407,8 +407,9 @@ export const useAlertTableCols = (
         ? [
           columnHelper.display({
             id: "checkbox",
-            maxSize: 16,
-            minSize: 16,
+            size: 44,
+            minSize: 44,
+            maxSize: 44,
             header: (context) => (
               <TableIndeterminateCheckbox
                 checked={context.table.getIsAllRowsSelected()}
@@ -417,12 +418,18 @@ export const useAlertTableCols = (
               />
             ),
             cell: (context) => (
-              <TableIndeterminateCheckbox
-                checked={context.row.getIsSelected()}
-                indeterminate={context.row.getIsSomeSelected()}
-                onChange={context.row.getToggleSelectedHandler()}
-              />
+              <div className="flex items-center justify-center w-full h-full">
+                <TableIndeterminateCheckbox
+                  checked={context.row.getIsSelected()}
+                  indeterminate={context.row.getIsSomeSelected()}
+                  onChange={context.row.getToggleSelectedHandler()}
+                />
+              </div>
             ),
+            meta: {
+              tdClassName: "!p-0 !min-w-[44px] !max-w-[44px] !w-[44px] !box-border flex-none",
+              thClassName: "!p-0 !min-w-[44px] !max-w-[44px] !w-[44px] !box-border flex-none",
+            },
           }),
         ]
         : ([] as ColumnDef<AlertDto>[])),
@@ -475,46 +482,46 @@ export const useAlertTableCols = (
         header: () => <></>, // Empty header like source column
         enableGrouping: true,
         getGroupingValue: (row) => row.status,
-        maxSize: 16,
-        minSize: 16,
-        size: 16,
+        size: 36,
+        minSize: 36,
+        maxSize: 36,
         enableResizing: false,
         cell: (context) => (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center w-full h-full">
             <Icon
               icon={getStatusIcon(context.getValue(), context.row.original.isNoisy)}
               size="sm"
               color={getStatusColor(context.getValue())}
-              className="!p-0 h-32px w-32px"
+              className="!p-0 !h-[20px] !w-[20px]"
               tooltip={context.getValue()}
             />
           </div>
         ),
         meta: {
-          tdClassName: "!p-0 w-4 sm:w-8 !box-border", // Same styling as source
-          thClassName: "!p-0 w-4 sm:w-8 !box-border",
+          tdClassName: "!p-0 !min-w-[36px] !max-w-[36px] !w-[36px] !box-border flex-none", // Same styling as source
+          thClassName: "!p-0 !min-w-[36px] !max-w-[36px] !w-[36px] !box-border flex-none",
         },
       }),
       // Source column with exact 40px width ( see alert-table-headers )
       columnHelper.accessor("source", {
         id: "source",
         header: () => <></>,
-        minSize: 24,
-        maxSize: 24,
-        size: 24, // Fixed size that won't change
+        size: 44, // Fixed size that won't change
+        minSize: 44,
+        maxSize: 44,
         enableSorting: false,
         getGroupingValue: (row) => row.source,
         enableResizing: false,
         cell: (context) => {
           return (
-            <div className="flex items-center justify-center w-[24px] h-[24px]">
+            <div className="flex items-center justify-center w-full h-full">
               {context.getValue().map((source, index) => {
                 return (
                   <DynamicImageProviderIcon
                     className={clsx(
                       "inline-block",
-                      // Use fixed pixel sizes instead of responsive sizing
-                      "size-6",
+                      // Use fixed pixel sizes instead of responsive rem sizing to prevent zooming
+                      "w-[24px] h-[24px]",
                       index == 0 ? "" : "-ml-2"
                     )}
                     key={source}
@@ -532,8 +539,8 @@ export const useAlertTableCols = (
           );
         },
         meta: {
-          tdClassName: "!p-1 w-10 !box-border !flex-none", // Force fixed width with flex-none
-          thClassName: "!p-1 w-10 !box-border !flex-none",
+          tdClassName: "!p-0 !min-w-[44px] !max-w-[44px] !w-[44px] !box-border flex-none", // Force fixed width with flex-none
+          thClassName: "!p-0 !min-w-[44px] !max-w-[44px] !w-[44px] !box-border flex-none",
         },
       }),
       // Name column butted up against source
@@ -554,7 +561,7 @@ export const useAlertTableCols = (
 
           return (
             // Remove w-full class which can cause expansion
-            <div className={expanded ? "max-w-[180px] overflow-hidden" : ""}>
+            <div className={clsx(expanded ? "max-w-[180px] overflow-hidden" : "", "select-text")}>
               <AlertName
                 alert={context.row.original}
                 expanded={expanded}
@@ -594,7 +601,8 @@ export const useAlertTableCols = (
                 // Give description more space and control overflow
                 expanded ? "w-full break-words" : "",
                 // Set fixed width when expanded to prevent layout issues
-                expanded ? "max-w-[100%]" : ""
+                expanded ? "max-w-[100%]" : "",
+                "select-text"
               )}
             >
               <div
@@ -638,7 +646,7 @@ export const useAlertTableCols = (
             "timeago";
 
           return (
-            <span title={isoString}>{formatDateTime(date, formatOption)}</span>
+            <span title={isoString} className="select-text">{formatDateTime(date, formatOption)}</span>
           );
         },
       }),

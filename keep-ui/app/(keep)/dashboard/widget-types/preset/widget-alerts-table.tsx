@@ -92,7 +92,7 @@ const WidgetAlertsTable: React.FC<WidgetAlertsTableProps> = ({
       name: {
         gridColumnTemplate: "minmax(100px, 1fr)",
         renderValue: (alert: any) => (
-          <div title={alert.name} className="truncate overflow-hidden text-ellipsis">
+          <div title={alert.name} className="truncate overflow-hidden text-ellipsis select-text">
             {alert.name}
           </div>
         ),
@@ -100,7 +100,7 @@ const WidgetAlertsTable: React.FC<WidgetAlertsTableProps> = ({
       description: {
         gridColumnTemplate: "minmax(100px, 1fr)",
         renderValue: (alert: any) => (
-          <div title={alert.description} className="truncate overflow-hidden text-ellipsis">
+          <div title={alert.description} className="truncate overflow-hidden text-ellipsis select-text">
             {alert.description}
           </div>
         ),
@@ -165,7 +165,7 @@ const WidgetAlertsTable: React.FC<WidgetAlertsTableProps> = ({
             columnValue = columnMeta.renderValue(alert);
           } else {
             columnValue = (
-              <div className="truncate overflow-hidden text-ellipsis">{getNestedValue(alert, column)}</div>
+              <div className="truncate overflow-hidden text-ellipsis select-text">{getNestedValue(alert, column)}</div>
             );
           }
           const _columnsGapClass =
@@ -177,7 +177,7 @@ const WidgetAlertsTable: React.FC<WidgetAlertsTableProps> = ({
             <div
               key={`${column}-${alertIndex}`}
               title={alert?.[column]}
-              className={`min-h-7 text-xs flex min-w-0 items-center overflow-hidden whitespace-nowrap ${_borderClass} ${_columnsGapClass}`}
+              className={`min-h-7 text-xs flex min-w-0 items-center overflow-hidden whitespace-nowrap select-text ${_borderClass} ${_columnsGapClass}`}
             >
               {columnValue}
             </div>

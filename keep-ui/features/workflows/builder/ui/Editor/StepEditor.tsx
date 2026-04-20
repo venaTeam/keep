@@ -38,7 +38,7 @@ import {
   ValidationError,
 } from "@/entities/workflows/lib/validate-definition";
 import { EditorField } from "./EditorField";
-import { useProviders } from "@/utils/hooks/useProviders";
+import { useWorkflowProviders } from "@/utils/hooks/useProviders";
 import ProviderForm from "@/app/(keep)/providers/provider-form";
 import { Drawer } from "@/shared/ui/Drawer";
 
@@ -137,7 +137,7 @@ function InstallProviderButton({
   providerType: string;
   onConnect: (result: any) => void;
 }) {
-  const { data: { providers } = {}, mutate: mutateProviders } = useProviders();
+  const { data: { providers } = {}, mutate: mutateProviders } = useWorkflowProviders();
   const providerObject = providers?.find((p) => p.type === providerType);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -220,7 +220,7 @@ function KeepSetupProviderEditor({
   providerNameError?: string | null;
 }) {
   const { data: { providers, installed_providers: installedProviders } = {} } =
-    useProviders();
+    useWorkflowProviders();
   const providerObject =
     providers?.find((p) => p.type === providerType) ?? null;
 
@@ -236,7 +236,7 @@ function KeepSetupProviderEditor({
 
   const isCustomConfig =
     installedProviderByType?.find((p) => p.details?.name === providerConfig) ===
-      undefined && providerConfig;
+    undefined && providerConfig;
 
   const [selectValue, setSelectValue] = useState(
     isCustomConfig ? "enter-manually" : (providerConfig ?? "")
@@ -716,20 +716,20 @@ export function StepEditorV2() {
 
 type ConditionsAndMiscFormDataType =
   | {
-      type: "condition-threshold";
-      name: string;
-      properties: V2StepConditionThreshold["properties"];
-    }
+    type: "condition-threshold";
+    name: string;
+    properties: V2StepConditionThreshold["properties"];
+  }
   | {
-      type: "condition-assert";
-      name: string;
-      properties: V2StepConditionAssert["properties"];
-    }
+    type: "condition-assert";
+    name: string;
+    properties: V2StepConditionAssert["properties"];
+  }
   | {
-      type: "foreach";
-      name: string;
-      properties: V2StepForeach["properties"];
-    };
+    type: "foreach";
+    name: string;
+    properties: V2StepForeach["properties"];
+  };
 
 function ConditionsAndMiscEditor({
   initialFormData,
@@ -863,10 +863,10 @@ function ActionOrStepEditor({
   }
 
   const { data: { installed_providers: installedProviders } = {} } =
-    useProviders();
+    useWorkflowProviders();
 
   const providerObject = installedProviders?.find(
-    (p) => p.type === providerType
+    (p: any) => p.type === providerType
   );
 
   const method = formData.type?.includes("step-") ? "_query" : "_notify";
@@ -877,7 +877,7 @@ function ActionOrStepEditor({
       : (formData.properties?.config ?? "")?.trim();
 
   const installedProvider = installedProviders?.find(
-    (p) => p.type === providerType && p.details?.name === providerConfig
+    (p: any) => p.type === providerType && p.details?.name === providerConfig
   );
   const providerId = installedProvider?.id;
 

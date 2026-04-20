@@ -36,6 +36,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <ConfigProvider config={config}>
           <ScreenWakeLock />
           <GlobalMetrics />
+
           <NextAuthProvider session={session}>
             <SSEProvider>
               <TopologyPollingContextProvider>

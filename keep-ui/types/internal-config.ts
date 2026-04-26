@@ -14,6 +14,8 @@ export interface InternalConfig {
   // the API URL for the client (browser)
   // optional, defaults to /backend (relative)
   API_URL_CLIENT: string | undefined;
+  // the Workflows API URL
+  WORKFLOWS_API_URL: string | undefined;
   // Sentry
   SENTRY_DISABLED: string | undefined;
   // READ ONLY

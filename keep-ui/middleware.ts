@@ -33,7 +33,9 @@ export const middleware = auth(async (request) => {
   requestHeaders.set("x-url", request.url);
   // Handle legacy /backend/ redirects (when API_URL is not set and frontend act as a proxy)
   if (pathname.startsWith("/backend/")) {
-    const apiUrl = getApiURL();
+    const workflowsApiUrl = process.env.WORKFLOWS_API_URL || "http://localhost:8082";
+    const isWorkflowServicePath = pathname === "/backend/workflows" || pathname.startsWith("/backend/workflows/");
+    const apiUrl = isWorkflowServicePath ? workflowsApiUrl : getApiURL();
     const newURL = pathname.replace("/backend/", apiUrl + "/");
     const queryString = searchParams.toString();
     const urlWithQuery = queryString ? `${newURL}?${queryString}` : newURL;

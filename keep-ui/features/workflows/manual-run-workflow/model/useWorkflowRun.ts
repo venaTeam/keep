@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useProviders } from "../../../../utils/hooks/useProviders";
+import { useWorkflowProviders } from "../../../../utils/hooks/useProviders";
 import { Workflow } from "@/shared/api/workflows";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
@@ -22,7 +22,7 @@ import {
   WorkflowRunPayload,
 } from "./types";
 
-const noop = () => {};
+const noop = () => { };
 
 // TODO: refactor this whole thing to be more intuitive and easier to test
 export const useWorkflowRun = (workflow: Workflow) => {
@@ -40,7 +40,7 @@ export const useWorkflowRun = (workflow: Workflow) => {
     closeIncidentDependenciesModal,
   } = useWorkflowModals();
   const { revalidateForWorkflow } = useWorkflowExecutionsRevalidation();
-  const { data: providersData } = useProviders();
+  const { data: providersData } = useWorkflowProviders();
   const providers = providersData?.providers ?? [];
   const isUIBuilderUnsaved = useUIBuilderUnsavedChanges();
   const { hasUnsavedChanges: isYamlEditorUnsaved } =

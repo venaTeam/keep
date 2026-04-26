@@ -15,10 +15,9 @@ import {
   parseWorkflow,
   wrapDefinitionV2,
 } from "@/entities/workflows/lib/parser";
-import { CodeBracketIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { CodeBracketIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { ResizableColumns } from "@/shared/ui";
-import { WorkflowBuilderChatSafe } from "@/features/workflows/ai-assistant";
 import debounce from "lodash.debounce";
 import { getOrderedWorkflowYamlStringFromJSON } from "@/entities/workflows/lib/yaml-utils";
 import { useWorkflowSecrets } from "@/utils/hooks/useWorkflowSecrets";
@@ -63,8 +62,8 @@ export function WorkflowBuilder({
   } = useWorkflowStore();
   const router = useRouter();
 
-  const [leftColumnMode, setLeftColumnMode] = useState<"yaml" | "chat" | null>(
-    "chat"
+  const [leftColumnMode, setLeftColumnMode] = useState<"yaml" | null>(
+    "yaml"
   );
 
   const searchParams = useSearchParams();
@@ -270,16 +269,7 @@ export function WorkflowBuilder({
             onChange={handleYamlChange}
           />
         </div>
-        <div
-          className={clsx(
-            leftColumnMode === "chat" ? "visible h-full" : "hidden"
-          )}
-        >
-          <WorkflowBuilderChatSafe
-            definition={definition}
-            installedProviders={installedProviders ?? []}
-          />
-        </div>
+
       </>
       <>
         <div className="relative h-full">
@@ -304,27 +294,7 @@ export function WorkflowBuilder({
               </button>
             )}
           </div>
-          <div className={clsx("absolute top-10 left-0 w-10 h-10 z-50")}>
-            {leftColumnMode !== "chat" ? (
-              <button
-                className="flex justify-center items-center bg-white w-full h-full border-b border-r rounded-br-lg shadow-md cursor-pointer"
-                onClick={() => setLeftColumnMode("chat")}
-                data-testid="wf-open-chat-button"
-                title="Show AI Assistant"
-              >
-                <SparklesIcon className="size-5" />
-              </button>
-            ) : (
-              <button
-                className="flex justify-center bg-white items-center w-full h-full border-b border-r rounded-br-lg shadow-md text-orange-500"
-                onClick={() => setLeftColumnMode(null)}
-                data-testid="wf-close-chat-button"
-                title="Hide AI Assistant"
-              >
-                <SparklesIcon className="size-5" />
-              </button>
-            )}
-          </div>
+
           <ReactFlowProvider>
             <ReactFlowBuilder />
           </ReactFlowProvider>

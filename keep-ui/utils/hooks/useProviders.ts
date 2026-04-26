@@ -26,3 +26,14 @@ export const useProvidersWithHealthCheck = (
     options
   );
 };
+export const useWorkflowProviders = (
+  options: SWRConfiguration = { revalidateOnFocus: false }
+) => {
+  const api = useApi();
+
+  return useSWRImmutable<ProvidersResponse>(
+    api.isReady() ? "/workflows/providers" : null,
+    (url) => api.get(url),
+    options
+  );
+};

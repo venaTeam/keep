@@ -3,7 +3,8 @@ import { WidgetData, WidgetType, Threshold } from "../../types";
 import { usePresetAlertsCount } from "@/features/presets/custom-preset-links";
 import { useDashboardPreset } from "@/utils/hooks/useDashboardPresets";
 import { Button, Icon } from "@tremor/react";
-import { FireIcon } from "@heroicons/react/24/outline";
+import { FireIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { AiOutlineSwap } from "react-icons/ai";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,8 @@ interface WidgetAlertCountPanelProps {
   background?: string;
   thresholds?: Threshold[];
   customLink?: string;
+  dashboardName?: string;
+  widgetName?: string;
 }
 
 const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
@@ -23,6 +26,8 @@ const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
   background,
   thresholds = [],
   customLink,
+  dashboardName,
+  widgetName,
 }) => {
   const searchParams = useSearchParams();
   const timeRangeCel = useMemo(() => {
@@ -79,7 +84,12 @@ const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
   const router = useRouter();
 
   function handleGoToPresetClick() {
-    router.push(`/alerts/${preset?.name.toLowerCase()}`);
+    const presetUrl = `/alerts/${preset?.name.toLowerCase()}`;
+    if (dashboardName && widgetName) {
+      router.push(`${presetUrl}?fromDashboard=${encodeURIComponent(dashboardName)}&widgetName=${encodeURIComponent(widgetName)}`);
+    } else {
+      router.push(presetUrl);
+    }
   }
 
   function handleCustomLinkClick() {
@@ -121,7 +131,6 @@ const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
     return `rgb(${r}, ${g}, ${b}, ${alpha})`;
   }
 
-  const label = showFiringOnly ? "Firing Alerts" : "Total Alerts";
   const displayCount = showFiringOnly ? firingAlertsCount : totalAlertsCount;
   const count = isLoading ? "..." : displayCount;
 
@@ -131,37 +140,26 @@ const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header with label and button */}
-      <div className="flex items-center justify-between mb-2 flex-shrink-0">
-        <div className="flex items-center justify-center text-sm font-medium text-gray-700 h-4">
-          <span>{label}</span>
-          {showFiringOnly && (
-            <Icon
-              className="ml-1"
-              style={{ color }}
-              size="sm"
-              icon={FireIcon}
-            />
-          )}
-        </div>
+      {/* Header with icon buttons */}
+      <div className="flex items-center justify-end mb-2 flex-shrink-0">
         <div className="flex items-center space-x-1">
           <Button
             color="orange"
             variant="secondary"
             size="xs"
+            icon={AiOutlineSwap}
             onClick={handleGoToPresetClick}
-          >
-            Go to Preset
-          </Button>
+            tooltip="Go to Preset"
+          />
           {customLink && (
             <Button
               color="blue"
               variant="secondary"
               size="xs"
+              icon={ArrowTopRightOnSquareIcon}
               onClick={handleCustomLinkClick}
-            >
-              Go to Link
-            </Button>
+              tooltip="Go to Link"
+            />
           )}
         </div>
       </div>
@@ -174,13 +172,19 @@ const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
         className="max-w-full border rounded-lg p-2 h-full shadow-sm"
       >
 
-
-        {/* Main content area with diagonal alignment */}
+        {/* Main content area */}
         <div className="flex-1 flex flex-col justify-center min-h-0">
-          {/* Preset name and count in diagonal layout */}
           <div className="flex flex-col space-y-2 items-center">
-            <div className="text-2xl font-bold text-gray-700">
+            <div className="text-2xl font-bold text-gray-700 flex items-center gap-1">
               {preset?.name}
+              {showFiringOnly && (
+                <Icon
+                  className="p-0"
+                  style={{ color }}
+                  size="sm"
+                  icon={FireIcon}
+                />
+              )}
             </div>
             <div
               className="text-4xl font-black tracking-tight"

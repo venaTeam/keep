@@ -30,7 +30,7 @@ const GridItem: React.FC<GridItemProps> = ({
     <Card className="relative w-full h-full p-3">
       <div className="flex flex-col h-full px-2">
         <div className={`flex-none flex items-center justify-between`}>
-          <span className="text-lg font-bold truncate grid-item__widget">
+          <span className="text-lg font-bold grid-item__widget" title={item.name}>
             {item.name}
           </span>
           <MenuButton

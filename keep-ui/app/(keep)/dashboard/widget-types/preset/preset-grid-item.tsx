@@ -224,6 +224,8 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
           background={isLoading ? undefined : hexToRgb(getColor(), 0.1)}
           thresholds={item.thresholds}
           customLink={item.customLink}
+          dashboardName={dashboardId ? decodeURIComponent(dashboardId) : undefined}
+          widgetName={item.name}
         />
       )}
     </div>

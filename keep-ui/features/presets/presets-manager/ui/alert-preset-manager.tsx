@@ -69,29 +69,9 @@ export function AlertPresetManager({
     const encodedPresetName = encodeURIComponent(preset.name.toLowerCase());
     const newUrl = `/alerts/${encodedPresetName}`;
 
-    // Check if we're updating an existing preset and the name has changed
-    const oldPresetName = selectedPreset?.name?.toLowerCase();
-    const newPresetName = preset.name.toLowerCase();
-    const isNameChanged = selectedPreset && oldPresetName !== newPresetName;
-
-    if (isNameChanged) {
-      // For name changes, we need to ensure the preset data is fresh before navigating
-      try {
-        // Wait for the preset list to be revalidated
-        await mutatePresets();
-
-        // Use window.location to force a full page reload which ensures
-        // the new preset is properly loaded
-        window.location.href = newUrl;
-      } catch (error) {
-        console.error("Failed to revalidate presets after name change:", error);
-        // Fallback to normal navigation
-        router.push(newUrl);
-      }
-    } else {
-      // For new presets or updates without name changes, use normal navigation
-      router.push(newUrl);
-    }
+    // Wait for fresh preset data before navigating to avoid 404
+    await mutatePresets();
+    router.push(newUrl);
   };
 
   const handlePresetModalClose = () => {

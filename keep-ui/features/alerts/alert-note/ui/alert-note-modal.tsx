@@ -6,6 +6,7 @@ import { AlertDto } from "@/entities/alerts/model";
 import Modal from "@/components/ui/Modal";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
+import { recordAction, recordError } from "@/utils/metrics";
 
 interface AlertNoteModalProps {
   handleClose: () => void;
@@ -32,36 +33,39 @@ export const AlertNoteModal = ({
   // if this modal should not be open, do nothing
   if (!alert) return null;
 
-  const saveNote = async () => {
-    try {
-      const trimmedNote = noteContent.trim();
+ const saveNote = async () => {
+  const start = performance.now();
+  try {
+    const trimmedNote = noteContent.trim();
 
-      if (trimmedNote) {
-        // Save the note via enrich
-        const requestData = {
-          note: trimmedNote,
-          fingerprint: alert.fingerprint,
-        };
-        await api.post(`/alerts/enrich/note`, requestData);
-        // Update local alert object with the trimmed note
-        alert.note = trimmedNote;
-      } else {
-        // Empty note — remove it via unenrich so the note column disappears
-        await api.post(`/alerts/unenrich`, {
-          fingerprint: alert.fingerprint,
-          enrichments: ["note"],
-        });
-        // Clear the local alert note
-        alert.note = undefined;
-      }
-
-      setNoteContent("");
-      mutate?.();
-      handleClose();
-    } catch (error) {
-      showErrorToast(error, "Failed to save note");
+    if (trimmedNote) {
+      // Save the note via enrich
+      const requestData = {
+        note: trimmedNote,
+        fingerprint: alert.fingerprint,
+      };
+      await api.post('/alerts/enrich/note', requestData);
+      // Update local alert object with the trimmed note
+      alert.note = trimmedNote;
+    } else {
+      // Empty note - remove it via unenrich so the note column disappears
+      await api.post('/alerts/unenrich', {
+        fingerprint: alert.fingerprint,
+        enrichments: ["note"],
+      });
+      // Clear the local alert note
+      alert.note = undefined;
     }
-  };
+
+    recordAction("add_note", (performance.now() - start) / 1000);
+    setNoteContent("");
+    mutate?.();
+    handleClose();
+  } catch (error) {
+    recordError("add_note");
+    showErrorToast(error, "Failed to save note");
+  }
+};
 
   const isOpen = alert !== null;
 

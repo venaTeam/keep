@@ -53,6 +53,7 @@ import EnhancedDateRangePickerV2, {
 import { useTimeframeState } from "@/components/ui/useTimeframeState";
 import { PaginationState } from "@/features/filter/pagination";
 import { useConfig } from "@/utils/hooks/useConfig";
+import { recordPageLoad } from "@/utils/metrics";
 
 const AssigneeLabel = ({ email }: { email: string }) => {
   const user = useUser(email);
@@ -65,6 +66,12 @@ export function IncidentList({
   initialData?: PaginatedIncidentsDto;
   initialFacetsData?: InitialFacetsData;
 }) {
+
+  // Record page load time - call directly since useEffect may not fire reliably in Next.js
+  if (typeof window !== "undefined") {
+    recordPageLoad("incidents", 0);
+  }
+
   const [incidentsPagination, setIncidentsPagination] =
     useState<PaginationState>({
       limit: DEFAULT_INCIDENTS_PAGE_SIZE,

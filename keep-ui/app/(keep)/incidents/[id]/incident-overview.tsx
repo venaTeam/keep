@@ -37,6 +37,7 @@ import { useConfig } from "@/utils/hooks/useConfig";
 import { EnrichmentEditableField } from "@/app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField";
 import { EnrichmentEditableForm } from "@/app/(keep)/incidents/[id]/enrichments/EnrichmentEditableForm";
 import { FormattedContent } from "@/shared/ui/FormattedContent/FormattedContent";
+import { recordAction, recordPageLoad } from "@/utils/metrics";
 
 const PROVISIONED_ENRICHMENTS = [
   "services",
@@ -193,6 +194,10 @@ function MergedCallout({
 }
 
 export function IncidentOverview({ incident: initialIncidentData }: Props) {
+  // Record page load time - call directly since useEffect may not fire reliably in Next.js React 19
+  if (typeof window !== "undefined") {
+    recordPageLoad("incidents_detail", 0);
+  }
   const router = useRouter();
   const { data: fetchedIncident, mutate } = useIncident(
     initialIncidentData.id,
@@ -461,19 +466,21 @@ export function IncidentOverview({ incident: initialIncidentData }: Props) {
                   )}
                   <div>
                     <span
-                      className="text-sm text-gray-500 cursor-pointer hover:text-orange-500 underline"
-                      onClick={() => {
-                        if (
-                          confirm(
-                            "Are you sure you want to assign this incident to yourself?"
-                          )
-                        ) {
-                          assignIncident(incident.id);
-                        }
-                      }}
-                    >
-                      Assign to me
-                    </span>
+  className="text-sm text-gray-500 cursor-pointer hover:text-orange-500 underline"
+  onClick={async () => {
+    if (
+      confirm(
+        "Are you sure you want to assign this incident to yourself?"
+      )
+    ) {
+      const start = performance.now();
+      await assignIncident(incident.id);
+      recordAction("self_assign", (performance.now() - start) / 1000);
+    }
+  }}
+>
+  Assign to me
+</span>
                   </div>
                 </div>
               </div>

@@ -75,21 +75,27 @@ const customComponents: CustomSelectProps['components'] = {
 
 type CreatableMultiSelectProps = SelectProps<OptionType, true, GroupBase<OptionType>> & {
   onCreateOption?: (inputValue: string) => void;
+  "data-cy"?: string;
 };
 
-const CreatableMultiSelect: React.FC<CreatableMultiSelectProps> = ({ value, onChange, onCreateOption, options, placeholder }) => (
-  <CreatableSelect
-    isMulti
-    value={value}
-    onChange={onChange}
-    onCreateOption={onCreateOption}
-    options={options}
-    placeholder={placeholder}
-    styles={customStyles}
-    components={customComponents}
-    menuPortalTarget={document.body} // Render the menu in a portal
-    menuPosition="fixed"
-  />
+// react-select renders deeply nested DOM and does not reliably forward
+// unknown props to a single element, so we wrap the control in a <div> with
+// the data-cy attribute for stable Cypress targeting.
+const CreatableMultiSelect: React.FC<CreatableMultiSelectProps> = ({ value, onChange, onCreateOption, options, placeholder, "data-cy": dataCy }) => (
+  <div data-cy={dataCy}>
+    <CreatableSelect
+      isMulti
+      value={value}
+      onChange={onChange}
+      onCreateOption={onCreateOption}
+      options={options}
+      placeholder={placeholder}
+      styles={customStyles}
+      components={customComponents}
+      menuPortalTarget={document.body} // Render the menu in a portal
+      menuPosition="fixed"
+    />
+  </div>
 );
 
 export default CreatableMultiSelect;

@@ -103,7 +103,8 @@ export default function EnhancedDateRangePickerV2({
   hasZoomOut = false,
   pausedByDefault = true,
   enableYearNavigation = false,
-}: EnhancedDateRangePickerV2Props) {
+  "data-cy": dataCy,
+}: EnhancedDateRangePickerV2Props & { "data-cy"?: string }) {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -435,6 +436,7 @@ export default function EnhancedDateRangePickerV2({
         <Popover.Trigger asChild>
           <Button
             data-testid="timeframe-picker-trigger"
+            data-cy={dataCy}
             size="xs"
             variant="secondary"
             className={clsx(

@@ -1,0 +1,82 @@
+{
+  "version": "0a03269fef5e8d94298ebb3f6b835b38bb13bc0a",
+  "generatedAt": "2026-05-06T23:49:59.150Z",
+  "totalSelectors": 7,
+  "byArea": {
+    "(dynamic)": 5,
+    "drawer": 1,
+    "modal": 1
+  },
+  "selectors": [
+    {
+      "selector": "${cyPrefix}-page-size",
+      "area": "(dynamic)",
+      "role": "page",
+      "dynamic": true,
+      "file": "shared/ui/TablePagination/TablePagination.tsx",
+      "line": 62,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "${cyPrefix}-first",
+      "area": "(dynamic)",
+      "role": "first",
+      "dynamic": true,
+      "file": "shared/ui/TablePagination/TablePagination.tsx",
+      "line": 85,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "${cyPrefix}-prev",
+      "area": "(dynamic)",
+      "role": "prev",
+      "dynamic": true,
+      "file": "shared/ui/TablePagination/TablePagination.tsx",
+      "line": 95,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "${cyPrefix}-next",
+      "area": "(dynamic)",
+      "role": "next",
+      "dynamic": true,
+      "file": "shared/ui/TablePagination/TablePagination.tsx",
+      "line": 105,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "${cyPrefix}-last",
+      "area": "(dynamic)",
+      "role": "last",
+      "dynamic": true,
+      "file": "shared/ui/TablePagination/TablePagination.tsx",
+      "line": 115,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "drawer-close-btn",
+      "area": "drawer",
+      "role": "close",
+      "dynamic": false,
+      "file": "shared/ui/Drawer/TremorDrawer.tsx",
+      "line": 115,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "modal-close-btn",
+      "area": "modal",
+      "role": "close",
+      "dynamic": false,
+      "file": "components/ui/Modal.tsx",
+      "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    }
+  ]
+}

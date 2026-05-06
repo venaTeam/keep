@@ -53,8 +53,9 @@ function Calendar({
   mode = "single",
   onSelect,
   selected,
+  "data-cy": dataCy,
   ...props
-}: CalendarProps) {
+}: CalendarProps & { "data-cy"?: string }) {
   const [hoveredDay, setHoveredDay] = React.useState<Date | undefined>();
   const [internalSelected, setInternalSelected] = React.useState<
     Date | DateRange | undefined
@@ -235,7 +236,12 @@ function Calendar({
     },
   };
 
-  return <DayPicker {...(dayPickerProps as any)} />;
+  // Wrap in a <div> so data-cy is reachable on a stable DOM node.
+  return (
+    <div data-cy={dataCy}>
+      <DayPicker {...(dayPickerProps as any)} />
+    </div>
+  );
 }
 
 Calendar.displayName = "Calendar";

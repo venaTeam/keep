@@ -38,10 +38,11 @@ describe("WorkflowNode data-cy propagation", () => {
       properties: {},
       isLayouted: true,
     };
+    const NodeAsAny = WorkflowNode as unknown as React.FC<{ id: string; data: typeof data }>;
     const { container } = render(
       <ReactFlowProvider>
-        <WorkflowNode id="step-http-1" data={data} />
-      </ReactFlowProvider> as any
+        <NodeAsAny id="step-http-1" data={data} />
+      </ReactFlowProvider>
     );
     expect(
       container.querySelector('[data-cy="wf-node-task-step-http-1"]')

@@ -57,7 +57,7 @@ const IncidentWorkflowSidebar: React.FC<IncidentWorkflowSidebarProps> = ({
           leaveFrom="translate-x-0"
           leaveTo="translate-x-full"
         >
-          <Dialog.Panel className="fixed right-0 inset-y-0 w-2/4 bg-white z-30 p-6 overflow-auto flex flex-col">
+          <Dialog.Panel className="fixed right-0 inset-y-0 w-2/4 bg-white z-30 p-6 overflow-auto flex flex-col" data-cy="incidents-workflow-sidebar">
             <div className="flex justify-between mb-4">
               <div>
                 <Dialog.Title className="text-3xl font-bold" as={Title}>
@@ -77,7 +77,7 @@ const IncidentWorkflowSidebar: React.FC<IncidentWorkflowSidebarProps> = ({
                 </Dialog.Title>
               </div>
               <div>
-                <Button onClick={toggle} variant="light">
+                <Button onClick={toggle} variant="light" data-cy="incidents-workflow-sidebar-close-btn">
                   <IoMdClose className="h-6 w-6 text-gray-500" />
                 </Button>
               </div>

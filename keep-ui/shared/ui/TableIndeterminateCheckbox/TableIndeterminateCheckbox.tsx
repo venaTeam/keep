@@ -9,8 +9,9 @@ export function TableIndeterminateCheckbox({
   indeterminate,
   className = "",
   disabled = false,
+  "data-cy": dataCy,
   ...rest
-}: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) {
+}: { indeterminate?: boolean; "data-cy"?: string } & HTMLProps<HTMLInputElement>) {
   const ref = useRef<HTMLInputElement>(null!);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export function TableIndeterminateCheckbox({
           className,
           disabled ? "cursor-not-allowed" : "cursor-pointer"
         )}
+        data-cy={dataCy}
         {...rest}
       />
     </div>

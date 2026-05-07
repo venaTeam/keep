@@ -142,7 +142,7 @@ export const IncidentsReport: React.FC<IncidentsReportProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-4 mt-4 px-6">
+    <div className="flex flex-col gap-4 mt-4 px-6" data-cy="incidents-report">
       {renderTimeMetrics()}
       {incidentsReportData?.severity_metrics && (
         <IncidentSeverityMetric

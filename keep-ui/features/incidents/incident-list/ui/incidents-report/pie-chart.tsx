@@ -31,7 +31,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   );
 
   return (
-    <div className="flex items-center gap-10">
+    <div className="flex items-center gap-10" data-cy="incidents-report-pie-chart">
       <DonutChart
         className="min-w-48 min-h-48 w-48 h-48"
         data={sortedByValue}

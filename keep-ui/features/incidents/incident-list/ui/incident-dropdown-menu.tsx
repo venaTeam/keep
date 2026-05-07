@@ -19,10 +19,16 @@ export function IncidentDropdownMenu({
 
   return (
     <>
-      <DropdownMenu.Menu icon={EllipsisHorizontalIcon} label="">
+      <DropdownMenu.Menu
+        icon={EllipsisHorizontalIcon}
+        label=""
+        data-cy="incidents-row-menu-btn"
+        listDataCy="incidents-row-menu-list"
+      >
         <DropdownMenu.Item
           icon={PencilIcon}
           label="Edit"
+          data-cy="incidents-row-menu-edit"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -32,6 +38,7 @@ export function IncidentDropdownMenu({
         <DropdownMenu.Item
           icon={PlayIcon}
           label="Run workflow"
+          data-cy="incidents-row-menu-run-workflow"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -42,6 +49,7 @@ export function IncidentDropdownMenu({
           icon={TrashIcon}
           label="Delete"
           variant="destructive"
+          data-cy="incidents-row-menu-delete"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

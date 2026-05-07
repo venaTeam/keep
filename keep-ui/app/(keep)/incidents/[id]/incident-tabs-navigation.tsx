@@ -37,6 +37,7 @@ export function IncidentTabsNavigation() {
           href={`/incidents/${id}/${tab.path}`}
           prefetch={!!tab.prefetch}
           count={tab.path === "alerts" ? alerts?.count : undefined}
+          data-cy={`incidents-tab-${tab.path}`}
         >
           {tab.label}
         </TabNavigationLink>

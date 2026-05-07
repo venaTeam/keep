@@ -33,13 +33,14 @@ export const GenerateReportModal: React.FC<GenerateReportModalProps> = ({
       className="min-w-[80vw] h-[80vh]"
       isOpen={true}
       onClose={onClose}
+      data-cy="incidents-report-modal"
     >
       <div className="w-full h-full">
         {isLoading && <KeepLoader />}
         {!isLoading && (
           <div className="flex flex-col w-full h-full">
             <div className="flex-1 overflow-auto">
-              <div ref={contentRef}>
+              <div ref={contentRef} data-cy="incidents-report-content">
                 <IncidentsReport incidentsReportData={data as IncidentData} />
               </div>
             </div>
@@ -50,6 +51,7 @@ export const GenerateReportModal: React.FC<GenerateReportModalProps> = ({
                 size="md"
                 icon={PrinterIcon}
                 onClick={handlePrint}
+                data-cy="incidents-report-print-btn"
               >
                 Print
               </Button>

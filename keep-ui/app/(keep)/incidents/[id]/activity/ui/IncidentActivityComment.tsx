@@ -42,7 +42,7 @@ export function IncidentActivityComment({
   }, [api, incident.id, incident.status, comment, mutator]);
 
   return (
-    <div className="border border-tremor-border rounded-tremor-default shadow-tremor-input flex flex-col">
+    <div className="border border-tremor-border rounded-tremor-default shadow-tremor-input flex flex-col" data-cy="incidents-comment-form">
       <IncidentCommentInput
         value={comment}
         onValueChange={setComment}
@@ -57,6 +57,7 @@ export function IncidentActivityComment({
           variant="primary"
           disabled={!comment}
           onClick={onSubmit}
+          data-cy="incidents-comment-submit-btn"
         >
           Comment
         </Button>

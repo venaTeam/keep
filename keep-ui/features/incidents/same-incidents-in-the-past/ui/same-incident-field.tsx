@@ -48,6 +48,7 @@ export function SameIncidentField({ incident }: { incident: IncidentDto }) {
             size="xs"
             className="!px-1 !py-0.5"
             onClick={(e) => handleChangeSameIncidentInThePast(e, incident)}
+            data-cy="incidents-past-change-btn"
           >
             Change
           </Button>
@@ -62,6 +63,7 @@ export function SameIncidentField({ incident }: { incident: IncidentDto }) {
               size="xs"
               className="!px-1 !py-0.5"
               onClick={(e) => handleChangeSameIncidentInThePast(e, incident)}
+              data-cy="incidents-past-link-modal-btn"
             >
               Link incident
             </Button>
@@ -77,6 +79,7 @@ export function SameIncidentField({ incident }: { incident: IncidentDto }) {
           onClose={() => setChangeSameIncidentInThePast(null)}
           title="Link to the same incident in the past"
           className="w-[600px]"
+          data-cy="incidents-past-modal"
         >
           <ChangeSameIncidentInThePastForm
             key={incident.id}

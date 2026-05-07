@@ -15,6 +15,7 @@ interface TooltipProps
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   side?: "bottom" | "left" | "top" | "right";
   showArrow?: boolean;
+  "data-cy"?: string;
 }
 
 const Tooltip = React.forwardRef<
@@ -35,6 +36,7 @@ const Tooltip = React.forwardRef<
       side,
       sideOffset = 10,
       asChild,
+      "data-cy": dataCy,
       ...props
     }: TooltipProps,
     forwardedRef
@@ -57,6 +59,7 @@ const Tooltip = React.forwardRef<
               side={side}
               sideOffset={sideOffset}
               align="center"
+              data-cy={dataCy}
               className={clsx(
                 // base
                 "max-w-60 select-none rounded-md px-2.5 py-1.5 text-sm leading-5 shadow-md",

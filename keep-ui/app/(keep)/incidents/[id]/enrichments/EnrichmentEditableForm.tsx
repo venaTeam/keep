@@ -62,6 +62,7 @@ export const EnrichmentEditableForm = ({fields, title, onUpdate, onDelete, child
             className={`w-4 h-4 text-orange-500`}
           />
         )}
+        data-cy="incidents-enrichment-form-edit-btn"
       />
 
       {(onDelete && some(Object.values(fields))) && <Button
@@ -75,6 +76,7 @@ export const EnrichmentEditableForm = ({fields, title, onUpdate, onDelete, child
             className={`w-4 h-4 text-red-500`}
           />
         )}
+        data-cy="incidents-enrichment-form-delete-btn"
       />}
     </div>
 
@@ -83,6 +85,7 @@ export const EnrichmentEditableForm = ({fields, title, onUpdate, onDelete, child
       onClose={handleCloseForm}
       className="w-[600px]"
       title={title}
+      data-cy="incidents-enrichment-form-modal"
     >
       {map(fields, (value: string, key: string) => {
         return <div key={key}>
@@ -91,6 +94,7 @@ export const EnrichmentEditableForm = ({fields, title, onUpdate, onDelete, child
             value={value}
             onChange={(e) => handleValueChange(key, e.target.value)}
             placeholder={`Add ${key}`}
+            data-cy={`incidents-enrichment-form-${key}-input`}
           />
         </div>
       })}
@@ -106,6 +110,7 @@ export const EnrichmentEditableForm = ({fields, title, onUpdate, onDelete, child
             className={`w-4 h-4 text-orange-500`}
           />}
           onClick={handleSave}
+          data-cy="incidents-enrichment-form-save-btn"
         />
         <Button
           className="leading-none p-2 rounded-md"
@@ -113,6 +118,7 @@ export const EnrichmentEditableForm = ({fields, title, onUpdate, onDelete, child
           tooltip="Cancel"
           icon={FiX}
           onClick={handleCancel}
+          data-cy="incidents-enrichment-form-cancel-btn"
         />
       </div>
 

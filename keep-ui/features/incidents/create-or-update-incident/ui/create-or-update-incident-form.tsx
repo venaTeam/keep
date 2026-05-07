@@ -154,7 +154,7 @@ export function CreateOrUpdateIncidentForm({
   };
 
   return (
-    <form className="py-2" onSubmit={handleSubmit}>
+    <form className="py-2" onSubmit={handleSubmit} data-cy="incidents-form">
       <Subtitle>Incident Metadata</Subtitle>
       <div className="mt-2.5">
         <Text className="mb-2">Severity</Text>
@@ -172,6 +172,7 @@ export function CreateOrUpdateIncidentForm({
           required={true}
           value={incidentName}
           onValueChange={setIncidentName}
+          data-cy="incidents-form-name-input"
         />
       </div>
       <div className="mt-2.5">
@@ -184,6 +185,7 @@ export function CreateOrUpdateIncidentForm({
           formats={formats} // Add formats
           placeholder="What happened?"
           className="border border-tremor-border rounded-tremor-default shadow-tremor-input"
+          data-cy="incidents-form-summary-input"
         />
       </div>
 
@@ -193,6 +195,7 @@ export function CreateOrUpdateIncidentForm({
           <Select
             value={incidentAssignee}
             onValueChange={setIncidentAssignee}
+            data-cy="incidents-form-assignee-select"
           >
             {sortedUsers.map((user) => (
               <SelectItem key={user.email} value={user.email}>
@@ -205,6 +208,7 @@ export function CreateOrUpdateIncidentForm({
             placeholder="Who is responsible"
             value={incidentAssignee}
             onValueChange={setIncidentAssignee}
+            data-cy="incidents-form-assignee-input"
           />
         )}
       </div>
@@ -223,6 +227,7 @@ export function CreateOrUpdateIncidentForm({
                   : "all_resolved"
               )
             }
+            data-cy="incidents-form-resolve-on-alerts-switch"
           />
           <Text>Resolve when all alerts are resolved</Text>
         </div>
@@ -237,6 +242,7 @@ export function CreateOrUpdateIncidentForm({
             size="xs"
             variant="secondary"
             onClick={exitEditMode}
+            data-cy="incidents-form-cancel-btn"
           >
             Cancel
           </Button>
@@ -247,6 +253,7 @@ export function CreateOrUpdateIncidentForm({
           color="orange"
           size="xs"
           type="submit"
+          data-cy="incidents-form-submit-btn"
         >
           {editMode ? "Update" : "Create"}
         </Button>

@@ -20,11 +20,12 @@ export function IncidentAlertsActions({
 
   return (
     <>
-      <div className="flex gap-2 justify-end mb-2.5">
+      <div className="flex gap-2 justify-end mb-2.5" data-cy="incidents-alerts-actions">
         <Button
           variant="primary"
           onClick={() => setIsSplitModalOpen(true)}
           disabled={selectedFingerprints.length === 0}
+          data-cy="incidents-action-split-btn"
         >
           Split
         </Button>
@@ -36,6 +37,7 @@ export function IncidentAlertsActions({
             resetAlertsSelection();
           }}
           disabled={selectedFingerprints.length === 0}
+          data-cy="incidents-action-unlink-btn"
         >
           Unlink
         </Button>
@@ -46,6 +48,7 @@ export function IncidentAlertsActions({
             const cel = encodeURIComponent(`incident.id=="${incidentId}"`)
             router.push(`/alerts/feed?cel=${cel}`);
           }}
+          data-cy="incidents-action-view-feed-btn"
         >
           View in feed
         </Button>

@@ -85,13 +85,18 @@ export const EnrichmentEditableField = ({
 
   if (editMode) {
     return (
-      <div className="flex items-center flex-wrap gap-2.5 z-50">
+      <div
+        className="flex items-center flex-wrap gap-2.5 z-50"
+        data-cy="incidents-enrichment-edit"
+        data-cy-id={fieldName || "new"}
+      >
         {!name && (
           <TextInput
             value={fieldName}
             error={fieldNameError}
             onChange={handleNameChange}
             placeholder="Add name"
+            data-cy="incidents-enrichment-name-input"
           />
         )}
         <TextInput
@@ -99,6 +104,7 @@ export const EnrichmentEditableField = ({
           error={valueError}
           onChange={handleValueChange}
           placeholder="Add value"
+          data-cy="incidents-enrichment-value-input"
         />
         <Button
           className="leading-none p-2 rounded-md"
@@ -109,6 +115,7 @@ export const EnrichmentEditableField = ({
             <Icon icon={FiSave} className={`w-4 h-4 text-orange-500`} />
           )}
           onClick={handleSave}
+          data-cy="incidents-enrichment-save-btn"
         />
         <Button
           className="leading-none p-2 rounded-md"
@@ -116,13 +123,18 @@ export const EnrichmentEditableField = ({
           tooltip="Cancel"
           icon={FiX}
           onClick={handleCancel}
+          data-cy="incidents-enrichment-cancel-btn"
         />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-1 relative">
+    <div
+      className="flex flex-col gap-1 relative"
+      data-cy="incidents-enrichment-field"
+      data-cy-id={name || "new"}
+    >
       {name ? (
         <div className="flex flex-wrap gap-1 group items-center">
           {children
@@ -151,6 +163,7 @@ export const EnrichmentEditableField = ({
             icon={() => (
               <Icon icon={MdModeEdit} className={`w-4 h-4 text-orange-500`} />
             )}
+            data-cy="incidents-enrichment-edit-btn"
           />
 
           {onDelete && (
@@ -162,6 +175,7 @@ export const EnrichmentEditableField = ({
               icon={() => (
                 <Icon icon={FiTrash2} className={`w-4 h-4 text-red-500`} />
               )}
+              data-cy="incidents-enrichment-delete-btn"
             />
           )}
         </div>
@@ -169,6 +183,7 @@ export const EnrichmentEditableField = ({
         <div
           className="flex gap-2 items-center cursor-pointer"
           onClick={() => setEditMode(true)}
+          data-cy="incidents-enrichment-add"
         >
           <Badge>+</Badge> Add new field
         </div>

@@ -78,6 +78,7 @@ export function ChangeSameIncidentInThePastForm({
               className="flex-1"
               color="orange"
               onClick={() => router.push("/incidents")}
+              data-cy="incidents-past-go-to-incidents-btn"
             >
               Incidents page
             </Button>
@@ -91,11 +92,12 @@ export function ChangeSameIncidentInThePastForm({
     );
 
     return (
-      <form className="h-full">
+      <form className="h-full" data-cy="incidents-past-form">
         <Select
           instanceId="change-same-incident-in-the-past-select"
           className="my-2.5"
           placeholder="Select incident"
+          data-cy="incidents-past-select"
           value={
             selectedIncidentInstance
               ? {
@@ -124,6 +126,7 @@ export function ChangeSameIncidentInThePastForm({
               color="red"
               onClick={handleUnlinkIncident}
               disabled={selectedIncident === null}
+              data-cy="incidents-past-unlink-btn"
             >
               Unlink
             </Button>
@@ -132,6 +135,7 @@ export function ChangeSameIncidentInThePastForm({
             color="orange"
             onClick={handleLinkIncident}
             disabled={selectedIncident === null}
+            data-cy="incidents-past-link-btn"
           >
             Link and help AI
           </Button>

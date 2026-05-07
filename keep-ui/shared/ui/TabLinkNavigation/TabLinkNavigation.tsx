@@ -4,12 +4,14 @@ import { twMerge } from "tailwind-merge";
 interface TabLinkNavigationProps {
   children: ReactNode;
   className?: string;
+  "data-cy"?: string;
 }
 
 // Purpose of this component is to mimic the tab navigation from Tremor, but with links instead of buttons.
 export function TabLinkNavigation({
   children,
   className,
+  "data-cy": dataCy,
 }: TabLinkNavigationProps) {
   return (
     // using overflow-x-auto to allow horizontal scrolling on small screens
@@ -23,6 +25,7 @@ export function TabLinkNavigation({
         )}
         role="tablist"
         aria-orientation="horizontal"
+        data-cy={dataCy}
       >
         {children}
       </nav>

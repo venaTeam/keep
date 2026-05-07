@@ -130,6 +130,7 @@ export function IncidentCommentInput({
       placeholder={placeholder}
       theme="snow"
       className={clsx("incident-comment-input", className)}
+      data-cy="incidents-comment-input"
     />
   );
 }

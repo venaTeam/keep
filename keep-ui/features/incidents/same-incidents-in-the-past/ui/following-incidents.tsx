@@ -18,7 +18,7 @@ function FollowingIncident({ incidentId }: { incidentId: string }) {
   }
 
   return (
-    <div>
+    <div data-cy={`incidents-past-item-${incidentId}`} data-cy-id={incidentId}>
       <Link
         icon={() => <StatusIcon className="!p-0" status={incident.status} />}
         href={"/incidents/" + incidentId}
@@ -44,9 +44,9 @@ export function FollowingIncidents({ incident }: { incident: IncidentDto }) {
   return (
     <>
       <FieldHeader>Following incidents</FieldHeader>
-      <ul>
+      <ul data-cy="incidents-following-list">
         {same_incidents_in_the_future.items.map((item) => (
-          <li key={item.id}>
+          <li key={item.id} data-cy="incidents-following-item" data-cy-id={item.id}>
             <FollowingIncident incidentId={item.id} />
           </li>
         ))}

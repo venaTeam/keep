@@ -57,7 +57,11 @@ export function Select<
   Option = OptionType,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>,
->(props: SelectProps<Option, IsMulti, Group>) {
+>(props: SelectProps<Option, IsMulti, Group> & { "data-cy"?: string }) {
+  // Pull the data-cy prop off so we can wrap react-select's deeply nested
+  // DOM in a <div> carrying the value, rather than relying on react-select
+  // to forward unknown attributes to a single element.
+  const { "data-cy": dataCy, ...rest } = props;
   const customSelectStyles: StylesConfig<Option, IsMulti, Group> = {
     control: (provided, state) => ({
       ...provided,
@@ -122,10 +126,12 @@ export function Select<
   };
 
   return (
-    <ReactSelect
-      components={customComponents}
-      styles={customSelectStyles}
-      {...props}
-    />
+    <div data-cy={dataCy}>
+      <ReactSelect
+        components={customComponents}
+        styles={customSelectStyles}
+        {...rest}
+      />
+    </div>
   );
 }

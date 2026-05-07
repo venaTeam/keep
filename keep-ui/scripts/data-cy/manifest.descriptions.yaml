@@ -1,0 +1,18 @@
+# data-cy manifest descriptions sidecar
+#
+# This file enriches the auto-generated manifest (manifest.json) with prose
+# descriptions and dynamic-id provenance. Keys are the literal data-cy
+# selector string as it appears in source. Templated selectors are keyed by
+# their template form, e.g. "wf-tile-${id}".
+#
+# Schema per entry:
+#   description:     short prose describing what the selector targets
+#   idSource:        only for dynamic selectors; describes where ${id} comes from
+#   resolvedExample: only for dynamic selectors; a concrete realised example
+#
+# Example (commented out — uncomment and replace when adding real entries):
+#
+# "wf-tile-${id}":
+#   description: "Workflow tile in the workflows grid; one per workflow."
+#   idSource: "workflow.id (server uuid)"
+#   resolvedExample: "wf-tile-9f2c8b21"

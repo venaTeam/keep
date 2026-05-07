@@ -1,11 +1,12 @@
 {
-  "version": "0a03269fef5e8d94298ebb3f6b835b38bb13bc0a",
-  "generatedAt": "2026-05-06T23:49:59.150Z",
-  "totalSelectors": 7,
+  "version": "a2eb0cc11bc0979ef853dbaf5ad26854a16378e2",
+  "generatedAt": "2026-05-07T00:01:54.793Z",
+  "totalSelectors": 49,
   "byArea": {
     "(dynamic)": 5,
     "drawer": 1,
-    "modal": 1
+    "modal": 1,
+    "nav": 42
   },
   "selectors": [
     {
@@ -75,6 +76,430 @@
       "dynamic": false,
       "file": "components/ui/Modal.tsx",
       "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-page-main",
+      "area": "nav",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/layout.tsx",
+      "line": 47,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-ai",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/AILink.tsx",
+      "line": 42,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-group-alerts",
+      "area": "nav",
+      "role": "group",
+      "dynamic": false,
+      "file": "components/navbar/AlertsLinks.tsx",
+      "line": 80,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-btn-alerts-tag-filter",
+      "area": "nav",
+      "role": "btn",
+      "dynamic": false,
+      "file": "components/navbar/AlertsLinks.tsx",
+      "line": 100,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-alerts-feed",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/AlertsLinks.tsx",
+      "line": 117,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-modal-alerts-tag-filter",
+      "area": "nav",
+      "role": "modal",
+      "dynamic": false,
+      "file": "components/navbar/AlertsLinks.tsx",
+      "line": 143,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-select-alerts-tags",
+      "area": "nav",
+      "role": "select",
+      "dynamic": false,
+      "file": "components/navbar/AlertsLinks.tsx",
+      "line": 162,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-btn-alerts-tag-cancel",
+      "area": "nav",
+      "role": "btn",
+      "dynamic": false,
+      "file": "components/navbar/AlertsLinks.tsx",
+      "line": 171,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-btn-alerts-tag-apply",
+      "area": "nav",
+      "role": "btn",
+      "dynamic": false,
+      "file": "components/navbar/AlertsLinks.tsx",
+      "line": 180,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-dashboard-${dashboard.id}",
+      "area": "nav",
+      "role": "link",
+      "dynamic": true,
+      "file": "components/navbar/DashboardLink.tsx",
+      "line": 39,
+      "description": "Sidebar dashboard link in the Dashboards section; one per saved dashboard.",
+      "mirrorsDataTestId": false,
+      "idSource": "dashboard.id (server uuid stored in the dashboards table)",
+      "resolvedExample": "nav-link-dashboard-9f2c8b21-1c3d-4a51-9c2a-7c8e2bd2d100"
+    },
+    {
+      "selector": "nav-group-dashboards",
+      "area": "nav",
+      "role": "group",
+      "dynamic": false,
+      "file": "components/navbar/DashboardLinks.tsx",
+      "line": 88,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-btn-add-dashboard",
+      "area": "nav",
+      "role": "btn",
+      "dynamic": false,
+      "file": "components/navbar/DashboardLinks.tsx",
+      "line": 147,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-group-incidents",
+      "area": "nav",
+      "role": "group",
+      "dynamic": false,
+      "file": "components/navbar/IncidentLinks.tsx",
+      "line": 47,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-incidents",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/IncidentLinks.tsx",
+      "line": 68,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-mobile-menu-open-btn",
+      "area": "nav",
+      "role": "mobile",
+      "dynamic": false,
+      "file": "components/navbar/Menu.tsx",
+      "line": 55,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-sidebar",
+      "area": "nav",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "components/navbar/Menu.tsx",
+      "line": 64,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-mobile-menu-close-btn",
+      "area": "nav",
+      "role": "mobile",
+      "dynamic": false,
+      "file": "components/navbar/Menu.tsx",
+      "line": 80,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-minimize-btn",
+      "area": "nav",
+      "role": "minimize",
+      "dynamic": false,
+      "file": "components/navbar/MinimizeMenuButton.tsx",
+      "line": 18,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-sections",
+      "area": "nav",
+      "role": "sections",
+      "dynamic": false,
+      "file": "components/navbar/Navbar.tsx",
+      "line": 22,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-group-noise-reduction",
+      "area": "nav",
+      "role": "group",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 77,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-deduplication",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 112,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-rules",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 126,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-workflows",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 140,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-topology",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 155,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-mapping",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 169,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-extraction",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 183,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-maintenance",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/NoiseReductionLinks.tsx",
+      "line": 197,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-header",
+      "area": "nav",
+      "role": "header",
+      "dynamic": false,
+      "file": "components/navbar/Search.tsx",
+      "line": 336,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-tenant-switcher-trigger",
+      "area": "nav",
+      "role": "tenant",
+      "dynamic": false,
+      "file": "components/navbar/Search.tsx",
+      "line": 346,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-tenant-option-${tenant.tenant_id}",
+      "area": "nav",
+      "role": "tenant",
+      "dynamic": true,
+      "file": "components/navbar/Search.tsx",
+      "line": 376,
+      "description": "Tenant option button in the logo/tenant-switcher popover; one per tenant the current user belongs to.",
+      "mirrorsDataTestId": false,
+      "idSource": "tenant.tenant_id (server-issued tenant uuid from session.user.tenantIds)",
+      "resolvedExample": "nav-tenant-option-2f8a3a5e-3a47-4b27-9d2f-7d2af6e3aa12"
+    },
+    {
+      "selector": "nav-logo-link",
+      "area": "nav",
+      "role": "logo",
+      "dynamic": false,
+      "file": "components/navbar/Search.tsx",
+      "line": 387,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-search-input",
+      "area": "nav",
+      "role": "search",
+      "dynamic": false,
+      "file": "components/navbar/Search.tsx",
+      "line": 426,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-user-avatar",
+      "area": "nav",
+      "role": "user",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 43,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-user-avatar-image",
+      "area": "nav",
+      "role": "user",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 49,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-user-menu",
+      "area": "nav",
+      "role": "user",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-user-menu-item-settings",
+      "area": "nav",
+      "role": "user",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 69,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-user-menu-item-signout",
+      "area": "nav",
+      "role": "user",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 80,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-footer",
+      "area": "nav",
+      "role": "footer",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 126,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-providers",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 131,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-slack",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 142,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-link-docs",
+      "area": "nav",
+      "role": "link",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 152,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "nav-theme-control",
+      "area": "nav",
+      "role": "theme",
+      "dynamic": false,
+      "file": "components/navbar/UserInfo.tsx",
+      "line": 159,
       "description": "",
       "mirrorsDataTestId": false
     }

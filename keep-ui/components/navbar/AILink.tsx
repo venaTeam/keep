@@ -35,7 +35,12 @@ export const AILink = () => {
   }, [newText]);
 
   return (
-    <LinkWithIcon href="/ai" icon={RiSparkling2Line} className="w-full">
+    <LinkWithIcon
+      href="/ai"
+      icon={RiSparkling2Line}
+      className="w-full"
+      data-cy="nav-link-ai"
+    >
       <div className="flex justify-between items-center w-full">
         <Subtitle className="text-xs break-all">{text}</Subtitle>
       </div>

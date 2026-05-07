@@ -42,7 +42,10 @@ export const IncidentsLinks = ({ session }: IncidentsLinksProps) => {
 
   return (
     <Disclosure as="div" className="space-y-0.5" defaultOpen>
-      <Disclosure.Button className="w-full flex justify-between items-center px-2">
+      <Disclosure.Button
+        className="w-full flex justify-between items-center px-2"
+        data-cy="nav-group-incidents"
+      >
         {({ open }) => (
           <>
             <Subtitle className="text-xs ml-2 text-gray-900 font-medium uppercase">
@@ -62,6 +65,7 @@ export const IncidentsLinks = ({ session }: IncidentsLinksProps) => {
             icon={MdFlashOn}
             count={incidents?.count}
             testId="incidents"
+            data-cy="nav-link-incidents"
           >
             <Subtitle className="text-xs">Incidents</Subtitle>
           </LinkWithIcon>

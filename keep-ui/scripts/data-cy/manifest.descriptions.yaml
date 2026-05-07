@@ -16,3 +16,13 @@
 #   description: "Workflow tile in the workflows grid; one per workflow."
 #   idSource: "workflow.id (server uuid)"
 #   resolvedExample: "wf-tile-9f2c8b21"
+
+"nav-link-dashboard-${dashboard.id}":
+  description: "Sidebar dashboard link in the Dashboards section; one per saved dashboard."
+  idSource: "dashboard.id (server uuid stored in the dashboards table)"
+  resolvedExample: "nav-link-dashboard-9f2c8b21-1c3d-4a51-9c2a-7c8e2bd2d100"
+
+"nav-tenant-option-${tenant.tenant_id}":
+  description: "Tenant option button in the logo/tenant-switcher popover; one per tenant the current user belongs to."
+  idSource: "tenant.tenant_id (server-issued tenant uuid from session.user.tenantIds)"
+  resolvedExample: "nav-tenant-option-2f8a3a5e-3a47-4b27-9d2f-7d2af6e3aa12"

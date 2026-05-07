@@ -50,7 +50,10 @@ export const Menu = ({ children, session }: MenuButtonProps) => {
       {({ close: closeMenu }) => (
         <>
           <div className="p-3 w-full block lg:hidden">
-            <Popover.Button className="p-1 hover:bg-stone-200/50 font-medium rounded-lg hover:text-orange-400 focus:ring focus:ring-orange-300">
+            <Popover.Button
+              className="p-1 hover:bg-stone-200/50 font-medium rounded-lg hover:text-orange-400 focus:ring focus:ring-orange-300"
+              data-cy="nav-mobile-menu-open-btn"
+            >
               <Icon icon={AiOutlineMenu} color="orange" />
             </Popover.Button>
           </div>
@@ -58,6 +61,7 @@ export const Menu = ({ children, session }: MenuButtonProps) => {
           <aside
             className='relative bg-gray-50 col-span-1 border-r border-gray-300 h-full hidden lg:block [&[data-minimized="true"]>nav]:invisible'
             data-minimized={isMenuMinimized}
+            data-cy="nav-sidebar"
           >
             <nav className="flex flex-col h-full">
               {/* No more TenantSwitcher - the logo and tenant switching is now in Search component */}
@@ -71,7 +75,10 @@ export const Menu = ({ children, session }: MenuButtonProps) => {
             as="nav"
           >
             <div className="p-3 fixed top-0 right-0 ">
-              <Popover.Button className="p-1 hover:bg-stone-200/50 font-medium rounded-lg hover:text-orange-400 focus:ring focus:ring-orange-300">
+              <Popover.Button
+                className="p-1 hover:bg-stone-200/50 font-medium rounded-lg hover:text-orange-400 focus:ring focus:ring-orange-300"
+                data-cy="nav-mobile-menu-close-btn"
+              >
                 <Icon icon={AiOutlineClose} color="orange" />
               </Popover.Button>
             </div>

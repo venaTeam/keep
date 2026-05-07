@@ -75,7 +75,10 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
       <Disclosure as="div" className="space-y-1" defaultOpen>
         {({ open }) => (
           <>
-            <Disclosure.Button className="w-full flex justify-between items-center px-2">
+            <Disclosure.Button
+              className="w-full flex justify-between items-center px-2"
+              data-cy="nav-group-alerts"
+            >
               <div className="flex items-center relative group">
                 <Subtitle className="text-xs ml-2 text-gray-900 font-medium uppercase">
                   Alerts
@@ -94,6 +97,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
                     e.stopPropagation();
                     handleOpenModal();
                   }}
+                  data-cy="nav-btn-alerts-tag-filter"
                 />
               </div>
               <IoChevronUp
@@ -110,6 +114,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
                     href="/alerts/feed"
                     icon={AiOutlineSwap}
                     testId="menu-alerts-feed"
+                    data-cy="nav-link-alerts-feed"
                     onClick={(e) => {
                       // If we're already on the feed page, force a reload
                       if (
@@ -135,6 +140,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
         isOpen={isTagModalOpen}
         onClose={() => setIsTagModalOpen(false)}
         className="w-[30%] max-w-screen-2xl max-h-[710px] transform overflow-auto ring-tremor bg-white p-6 text-left align-middle shadow-tremor transition-all rounded-xl"
+        data-cy="nav-modal-alerts-tag-filter"
       >
         <div className="space-y-2">
           <Subtitle>Select tags to watch</Subtitle>
@@ -153,6 +159,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
             }))}
             placeholder="Select or create tags"
             className="mt-4"
+            data-cy="nav-select-alerts-tags"
           />
           <div className="flex justify-end space-x-2.5">
             <Button
@@ -161,6 +168,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
               color="orange"
               onClick={() => setIsTagModalOpen(false)}
               tooltip="Close Modal"
+              data-cy="nav-btn-alerts-tag-cancel"
             >
               Close
             </Button>
@@ -169,6 +177,7 @@ export const AlertsLinks = ({ session }: AlertsLinksProps) => {
               color="orange"
               onClick={handleApplyTags}
               tooltip="Apply Tags"
+              data-cy="nav-btn-alerts-tag-apply"
             >
               Apply
             </Button>

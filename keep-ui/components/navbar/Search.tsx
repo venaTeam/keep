@@ -331,7 +331,10 @@ export const Search = ({ session }: SearchProps) => {
   const hasTenantLogo = Boolean(tenantLogoUrl);
 
   return (
-    <div className="flex items-center w-full py-3 px-2 border-b border-gray-300">
+    <div
+      className="flex items-center w-full py-3 px-2 border-b border-gray-300"
+      data-cy="nav-header"
+    >
       <div className="flex-shrink-0 flex items-center">
         {hasTenantSwitcher ? (
           <Popover className="relative">
@@ -340,6 +343,7 @@ export const Search = ({ session }: SearchProps) => {
                 <Popover.Button
                   className="focus:outline-none flex items-center gap-4"
                   disabled={isLoading}
+                  data-cy="nav-tenant-switcher-trigger"
                 >
                   <Image className="w-[32px] h-[32px] flex-none" src={KeepPng} alt="Keep Logo" />
                   {tenantLogoUrl && (
@@ -369,6 +373,7 @@ export const Search = ({ session }: SearchProps) => {
                         disabled={
                           tenant.tenant_id === session.tenantId || isLoading
                         }
+                        data-cy={`nav-tenant-option-${tenant.tenant_id}`}
                       >
                         {tenant.tenant_name}
                       </button>
@@ -379,7 +384,7 @@ export const Search = ({ session }: SearchProps) => {
             )}
           </Popover>
         ) : (
-          <Link href="/" className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-4" data-cy="nav-logo-link">
             <Image className="w-[32px] h-[32px] flex-none" src={KeepPng} alt="Keep Logo" />
             {hasTenantLogo && (
               <Image
@@ -418,6 +423,7 @@ export const Search = ({ session }: SearchProps) => {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 ref={comboboxInputRef}
+                data-cy="nav-search-input"
               />
 
               <Transition

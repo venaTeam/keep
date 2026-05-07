@@ -72,7 +72,10 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
 
   return (
     <Disclosure as="div" className="space-y-0.5" defaultOpen>
-      <Disclosure.Button className="w-full flex justify-between items-center px-2">
+      <Disclosure.Button
+        className="w-full flex justify-between items-center px-2"
+        data-cy="nav-group-noise-reduction"
+      >
         {({ open }) => (
           <>
             {tenantConfig && (
@@ -106,6 +109,7 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
               href="/deduplication"
               icon={IoMdGitMerge}
               testId="deduplication"
+              data-cy="nav-link-deduplication"
             >
               <Subtitle className="text-xs">Deduplication</Subtitle>
             </LinkWithIcon>
@@ -115,7 +119,12 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
           disabledConfigKey={noiseReductionKeys.HIDE_NAVBAR_CORRELATION}
         >
           <li>
-            <LinkWithIcon href="/rules" icon={Rules} testId="rules">
+            <LinkWithIcon
+              href="/rules"
+              icon={Rules}
+              testId="rules"
+              data-cy="nav-link-rules"
+            >
               <Subtitle className="text-xs">Correlations</Subtitle>
             </LinkWithIcon>
           </li>
@@ -124,7 +133,12 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
           disabledConfigKey={noiseReductionKeys.HIDE_NAVBAR_WORKFLOWS}
         >
           <li>
-            <LinkWithIcon href="/workflows" icon={Workflows} testId="workflows">
+            <LinkWithIcon
+              href="/workflows"
+              icon={Workflows}
+              testId="workflows"
+              data-cy="nav-link-workflows"
+            >
               <Subtitle className="text-xs">Workflows</Subtitle>
             </LinkWithIcon>
           </li>
@@ -138,6 +152,7 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
               href="/topology"
               icon={TbTopologyRing}
               testId="service-topology"
+              data-cy="nav-link-topology"
             >
               <Subtitle className="text-xs">Service Topology</Subtitle>
             </LinkWithIcon>
@@ -147,7 +162,12 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
           disabledConfigKey={noiseReductionKeys.HIDE_NAVBAR_MAPPING}
         >
           <li>
-            <LinkWithIcon href="/mapping" icon={Mapping} testId="mapping">
+            <LinkWithIcon
+              href="/mapping"
+              icon={Mapping}
+              testId="mapping"
+              data-cy="nav-link-mapping"
+            >
               <Subtitle className="text-xs">Mapping</Subtitle>
             </LinkWithIcon>
           </li>
@@ -160,6 +180,7 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
               href="/extraction"
               icon={ExportIcon}
               testId="extraction"
+              data-cy="nav-link-extraction"
             >
               <Subtitle className="text-xs">Extraction</Subtitle>
             </LinkWithIcon>
@@ -173,6 +194,7 @@ export const NoiseReductionLinks = ({ session }: NoiseReductionLinksProps) => {
               href="/maintenance"
               icon={FaVolumeMute}
               testId="maintenance"
+              data-cy="nav-link-maintenance"
             >
               <Subtitle className="text-xs">Maintenance Windows</Subtitle>
             </LinkWithIcon>

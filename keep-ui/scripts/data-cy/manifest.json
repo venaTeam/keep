@@ -1,11 +1,14 @@
 {
-  "version": "0a03269fef5e8d94298ebb3f6b835b38bb13bc0a",
-  "generatedAt": "2026-05-06T23:49:59.150Z",
-  "totalSelectors": 7,
+  "version": "a2eb0cc11bc0979ef853dbaf5ad26854a16378e2",
+  "generatedAt": "2026-05-07T00:08:39.251Z",
+  "totalSelectors": 102,
   "byArea": {
     "(dynamic)": 5,
+    "auth": 49,
     "drawer": 1,
-    "modal": 1
+    "modal": 1,
+    "providers": 17,
+    "settings": 29
   },
   "selectors": [
     {
@@ -59,6 +62,496 @@
       "mirrorsDataTestId": false
     },
     {
+      "selector": "auth-api-key-row",
+      "area": "auth",
+      "role": "api",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/api-key-settings.tsx",
+      "line": 154,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-api-key-regenerate-btn",
+      "area": "auth",
+      "role": "api",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/api-key-settings.tsx",
+      "line": 181,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-api-key-delete-btn",
+      "area": "auth",
+      "role": "api",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/api-key-settings.tsx",
+      "line": 189,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-api-key-row",
+      "area": "auth",
+      "role": "api",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/api-key-table.tsx",
+      "line": 65,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-group-sidebar",
+      "area": "auth",
+      "role": "group",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-sidebar.tsx",
+      "line": 142,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-group-name-input",
+      "area": "auth",
+      "role": "group",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-sidebar.tsx",
+      "line": 168,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-group-cancel-btn",
+      "area": "auth",
+      "role": "group",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-sidebar.tsx",
+      "line": 242,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-group-submit-btn",
+      "area": "auth",
+      "role": "group",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-sidebar.tsx",
+      "line": 250,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-add-group-btn",
+      "area": "auth",
+      "role": "add",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-tab.tsx",
+      "line": 116,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-groups-search-input",
+      "area": "auth",
+      "role": "groups",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-tab.tsx",
+      "line": 127,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-group-row",
+      "area": "auth",
+      "role": "group",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-tab.tsx",
+      "line": 146,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-group-delete-btn",
+      "area": "auth",
+      "role": "group",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-tab.tsx",
+      "line": 185,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-group-row",
+      "area": "auth",
+      "role": "group",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/groups-table.tsx",
+      "line": 53,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-permission-sidebar",
+      "area": "auth",
+      "role": "permission",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/permissions-sidebar.tsx",
+      "line": 141,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-permission-cancel-btn",
+      "area": "auth",
+      "role": "permission",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/permissions-sidebar.tsx",
+      "line": 214,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-permission-submit-btn",
+      "area": "auth",
+      "role": "permission",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/permissions-sidebar.tsx",
+      "line": 223,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-permissions-search-input",
+      "area": "auth",
+      "role": "permissions",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/permissions-tab.tsx",
+      "line": 145,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-permission-row",
+      "area": "auth",
+      "role": "permission",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/permissions-table.tsx",
+      "line": 42,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-sidebar",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-sidebar.tsx",
+      "line": 210,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-name-input",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-sidebar.tsx",
+      "line": 244,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-description-input",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-sidebar.tsx",
+      "line": 268,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-cancel-btn",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-sidebar.tsx",
+      "line": 313,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-submit-btn",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-sidebar.tsx",
+      "line": 332,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-add-role-btn",
+      "area": "auth",
+      "role": "add",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-tab.tsx",
+      "line": 104,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-roles-search-input",
+      "area": "auth",
+      "role": "roles",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-tab.tsx",
+      "line": 115,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-row",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-tab.tsx",
+      "line": 137,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-delete-btn",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-tab.tsx",
+      "line": 187,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-role-row",
+      "area": "auth",
+      "role": "role",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/roles-table.tsx",
+      "line": 52,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-sso-row",
+      "area": "auth",
+      "role": "sso",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/sso-settings.tsx",
+      "line": 54,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-sso-connect-btn",
+      "area": "auth",
+      "role": "sso",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/sso-settings.tsx",
+      "line": 67,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-sso-disconnect-btn",
+      "area": "auth",
+      "role": "sso",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/sso-settings.tsx",
+      "line": 76,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-add-user-btn",
+      "area": "auth",
+      "role": "add",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-settings.tsx",
+      "line": 137,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-users-search-input",
+      "area": "auth",
+      "role": "users",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-settings.tsx",
+      "line": 148,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-sidebar",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-sidebar.tsx",
+      "line": 177,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-email-input",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-sidebar.tsx",
+      "line": 221,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-name-input",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-sidebar.tsx",
+      "line": 241,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-username-input",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-sidebar.tsx",
+      "line": 263,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-password-input",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-sidebar.tsx",
+      "line": 287,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-cancel-btn",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-sidebar.tsx",
+      "line": 369,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-submit-btn",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-sidebar.tsx",
+      "line": 378,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-row",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-table.tsx",
+      "line": 68,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-user-delete-btn",
+      "area": "auth",
+      "role": "user",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/users-table.tsx",
+      "line": 136,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-tabs",
+      "area": "auth",
+      "role": "tabs",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 407,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-tab-users",
+      "area": "auth",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 411,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-tab-groups",
+      "area": "auth",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 418,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-tab-roles",
+      "area": "auth",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 425,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-tab-permissions",
+      "area": "auth",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 432,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-tab-api-keys",
+      "area": "auth",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 439,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "auth-tab-sso",
+      "area": "auth",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 446,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
       "selector": "drawer-close-btn",
       "area": "drawer",
       "role": "close",
@@ -75,6 +568,466 @@
       "dynamic": false,
       "file": "components/ui/Modal.tsx",
       "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-category-chips",
+      "area": "providers",
+      "role": "category",
+      "dynamic": false,
+      "file": "app/(keep)/providers/components/providers-categories/providers-categories.tsx",
+      "line": 37,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-category-chip-${category\n            .toLowerCase()\n            .replace(/\\s+/g, \"-\")}",
+      "area": "providers",
+      "role": "category",
+      "dynamic": true,
+      "file": "app/(keep)/providers/components/providers-categories/providers-categories.tsx",
+      "line": 51,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-filter-by-label-select",
+      "area": "providers",
+      "role": "filter",
+      "dynamic": false,
+      "file": "app/(keep)/providers/components/providers-filter-by-label/providers-filter-by-label.tsx",
+      "line": 24,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-search-input",
+      "area": "providers",
+      "role": "search",
+      "dynamic": false,
+      "file": "app/(keep)/providers/components/providers-search/providers-search.tsx",
+      "line": 17,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-${id}-input",
+      "area": "providers",
+      "role": "form",
+      "dynamic": true,
+      "file": "app/(keep)/providers/form-fields.tsx",
+      "line": 269,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-${id}-select",
+      "area": "providers",
+      "role": "form",
+      "dynamic": true,
+      "file": "app/(keep)/providers/form-fields.tsx",
+      "line": 311,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-${id}-file-input",
+      "area": "providers",
+      "role": "form",
+      "dynamic": true,
+      "file": "app/(keep)/providers/form-fields.tsx",
+      "line": 375,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-validate-scopes-btn",
+      "area": "providers",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-form-scopes.tsx",
+      "line": 49,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-oauth2-btn",
+      "area": "providers",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-form.tsx",
+      "line": 477,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-install-webhook-input",
+      "area": "providers",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-form.tsx",
+      "line": 568,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-disconnect-btn",
+      "area": "providers",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-form.tsx",
+      "line": 883,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-cancel-btn",
+      "area": "providers",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-form.tsx",
+      "line": 897,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-update-btn",
+      "area": "providers",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-form.tsx",
+      "line": 909,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-form-connect-btn",
+      "area": "providers",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-form.tsx",
+      "line": 920,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-logs-refresh-btn",
+      "area": "providers",
+      "role": "logs",
+      "dynamic": false,
+      "file": "app/(keep)/providers/provider-logs.tsx",
+      "line": 68,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-tile-${provider.type}",
+      "area": "providers",
+      "role": "tile",
+      "dynamic": true,
+      "file": "app/(keep)/providers/provider-tile.tsx",
+      "line": 165,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "providers-connect-drawer",
+      "area": "providers",
+      "role": "connect",
+      "dynamic": false,
+      "file": "app/(keep)/providers/providers-tiles.tsx",
+      "line": 135,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-create-api-key-btn",
+      "area": "settings",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/settings/auth/api-key-settings.tsx",
+      "line": 121,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-create-api-key-modal",
+      "area": "settings",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/settings/create-api-key-modal.tsx",
+      "line": 72,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-create-api-key-name-input",
+      "area": "settings",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/settings/create-api-key-modal.tsx",
+      "line": 91,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-create-api-key-submit-btn",
+      "area": "settings",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/settings/create-api-key-modal.tsx",
+      "line": 157,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-create-api-key-cancel-btn",
+      "area": "settings",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/settings/create-api-key-modal.tsx",
+      "line": 165,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-provider-images-row",
+      "area": "settings",
+      "role": "provider",
+      "dynamic": false,
+      "file": "app/(keep)/settings/provider-images/provider-image-list.tsx",
+      "line": 92,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-provider-image-uploader-modal",
+      "area": "settings",
+      "role": "provider",
+      "dynamic": false,
+      "file": "app/(keep)/settings/provider-images/provider-image-uploader.tsx",
+      "line": 80,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-provider-image-uploader-input",
+      "area": "settings",
+      "role": "provider",
+      "dynamic": false,
+      "file": "app/(keep)/settings/provider-images/provider-image-uploader.tsx",
+      "line": 101,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-provider-image-uploader-cancel-btn",
+      "area": "settings",
+      "role": "provider",
+      "dynamic": false,
+      "file": "app/(keep)/settings/provider-images/provider-image-uploader.tsx",
+      "line": 119,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-provider-image-uploader-submit-btn",
+      "area": "settings",
+      "role": "provider",
+      "dynamic": false,
+      "file": "app/(keep)/settings/provider-images/provider-image-uploader.tsx",
+      "line": 127,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-provider-images-upload-btn",
+      "area": "settings",
+      "role": "provider",
+      "dynamic": false,
+      "file": "app/(keep)/settings/provider-images/provider-images-settings.tsx",
+      "line": 46,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-tabs",
+      "area": "settings",
+      "role": "tabs",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 371,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-tab-auth",
+      "area": "settings",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 375,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-tab-webhook",
+      "area": "settings",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 382,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-tab-smtp",
+      "area": "settings",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 389,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-tab-provider-images",
+      "area": "settings",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/settings/settings.client.tsx",
+      "line": 396,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-form",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 234,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-host-input",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 243,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-port-input",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 266,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-from-email-input",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 291,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-username-input",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 314,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-password-input",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 333,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-secure-input",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 350,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-save-btn",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 365,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-delete-btn",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 374,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-to-email-input",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 404,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-smtp-test-btn",
+      "area": "settings",
+      "role": "smtp",
+      "dynamic": false,
+      "file": "app/(keep)/settings/smtp-settings.tsx",
+      "line": 423,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-webhook-try-btn",
+      "area": "settings",
+      "role": "webhook",
+      "dynamic": false,
+      "file": "app/(keep)/settings/webhook-settings.tsx",
+      "line": 206,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "settings-webhook-copy-code-btn",
+      "area": "settings",
+      "role": "webhook",
+      "dynamic": false,
+      "file": "app/(keep)/settings/webhook-settings.tsx",
+      "line": 229,
       "description": "",
       "mirrorsDataTestId": false
     }

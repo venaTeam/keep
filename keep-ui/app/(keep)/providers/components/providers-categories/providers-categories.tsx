@@ -33,7 +33,10 @@ export const ProvidersCategories = () => {
   };
 
   return (
-    <div className="w-full flex flex-wrap justify-start gap-2 mt-2.5">
+    <div
+      data-cy="providers-category-chips"
+      className="w-full flex flex-wrap justify-start gap-2 mt-2.5"
+    >
       {categories.map((category) => (
         <Badge
           color={
@@ -45,6 +48,9 @@ export const ProvidersCategories = () => {
               : "hover:shadow-inner"
           } cursor-pointer`}
           key={category}
+          data-cy={`providers-category-chip-${category
+            .toLowerCase()
+            .replace(/\s+/g, "-")}`}
           onClick={() => toggleCategory(category)}
         >
           {category}

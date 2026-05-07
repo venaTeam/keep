@@ -46,6 +46,7 @@ const ProviderFormScopes = ({
             onClick={onRevalidate}
             variant="secondary"
             loading={refreshLoading}
+            data-cy="providers-form-validate-scopes-btn"
           >
             Validate Scopes
           </Button>

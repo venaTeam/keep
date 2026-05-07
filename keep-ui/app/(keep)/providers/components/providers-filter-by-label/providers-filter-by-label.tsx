@@ -21,6 +21,7 @@ export const ProvidersFilterByLabel: FC = (props) => {
       placeholder="All Labels"
       className="w-64 ml-2.5"
       icon={TagIcon}
+      data-cy="providers-filter-by-label-select"
     >
       {options.map(([value, label]) => (
         <MultiSelectItem key={value} value={value}>

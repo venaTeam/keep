@@ -203,6 +203,7 @@ req.end();
                 color="orange"
                 onClick={tryNow}
                 id="tooltip-select-0"
+                data-cy="settings-webhook-try-btn"
               >
                 Click to create an example Alert
               </Button>
@@ -225,6 +226,7 @@ req.end();
                 size="xs"
                 color="orange"
                 onClick={onCopyCode}
+                data-cy="settings-webhook-copy-code-btn"
               >
                 Copy code
               </Button>

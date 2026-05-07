@@ -50,6 +50,8 @@ export function GroupsTable({
               transition-colors duration-200 group
             `}
             onClick={() => !isDisabled && onRowClick(group)}
+            data-cy="auth-group-row"
+            data-cy-id={group.id}
           >
             <TableCell className="w-2/12">{group.name}</TableCell>
             <TableCell className="w-4/12">

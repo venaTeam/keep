@@ -65,7 +65,12 @@ export default function CreateApiKeyModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Create API Key">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Create API Key"
+      data-cy="settings-create-api-key-modal"
+    >
       <form
         onSubmit={(e) => {
           clearErrors();
@@ -83,6 +88,7 @@ export default function CreateApiKeyModal({
               render={({ field }) => (
                 <TextInput
                   {...field}
+                  data-cy="settings-create-api-key-name-input"
                   error={!!errors.username}
                   errorMessage={
                     errors.username &&
@@ -145,13 +151,18 @@ export default function CreateApiKeyModal({
 
         {/* Submit and Cancel Buttons */}
         <div className="mt-6 flex gap-2">
-          <Button color="orange" type="submit">
+          <Button
+            color="orange"
+            type="submit"
+            data-cy="settings-create-api-key-submit-btn"
+          >
             Create API Key{" "}
           </Button>
           <Button
             onClick={handleClose}
             variant="secondary"
             className="border border-orange-500 text-orange-500"
+            data-cy="settings-create-api-key-cancel-btn"
           >
             Cancel
           </Button>

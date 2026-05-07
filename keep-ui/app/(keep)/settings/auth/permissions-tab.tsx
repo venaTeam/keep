@@ -142,6 +142,7 @@ export default function PermissionsTab({ isDisabled = false }: Props) {
         onChange={(e) => setFilter(e.target.value)}
         className="mb-4"
         disabled={isDisabled}
+        data-cy="auth-permissions-search-input"
       />
 
       <Card className="flex-grow overflow-hidden flex flex-col">

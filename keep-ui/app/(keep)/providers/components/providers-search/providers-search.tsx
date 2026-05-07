@@ -14,6 +14,7 @@ export const ProvidersSearch: FC = () => {
   return (
     <TextInput
       id="search-providers"
+      data-cy="providers-search-input"
       icon={MagnifyingGlassIcon}
       placeholder="Filter providers..."
       className="w-full"

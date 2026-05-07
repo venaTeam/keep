@@ -65,6 +65,8 @@ export function UsersTable({
               transition-colors duration-200 group
             `}
             onClick={() => !isDisabled && onRowClick && onRowClick(user)}
+            data-cy="auth-user-row"
+            data-cy-id={user.email}
           >
             <TableCell className="w-3/12">
               <div className="flex items-center justify-between">
@@ -131,6 +133,7 @@ export function UsersTable({
                       onClick={(e) =>
                         onDeleteUser && onDeleteUser(user.email, e)
                       }
+                      data-cy="auth-user-delete-btn"
                     />
                   </div>
                 )}

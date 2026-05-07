@@ -49,7 +49,11 @@ const SSOSettings = () => {
             </TableHead>
             <TableBody>
               {providers.map((provider) => (
-                <TableRow key={provider.id}>
+                <TableRow
+                  key={provider.id}
+                  data-cy="auth-sso-row"
+                  data-cy-id={provider.id}
+                >
                   <TableCell>{provider.name}</TableCell>
                   <TableCell>
                     {provider.connected ? "Connected" : "Not connected"}
@@ -60,6 +64,7 @@ const SSOSettings = () => {
                       onClick={() => {
                         /* Connect logic here */
                       }}
+                      data-cy="auth-sso-connect-btn"
                     >
                       Connect
                     </Button>
@@ -68,6 +73,7 @@ const SSOSettings = () => {
                       onClick={() => {
                         /* Disconnect logic here */
                       }}
+                      data-cy="auth-sso-disconnect-btn"
                     >
                       Disconnect
                     </Button>

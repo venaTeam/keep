@@ -40,7 +40,11 @@ export default function ProviderImagesSettings() {
           <PageTitle>Provider Icons</PageTitle>
           <PageSubtitle>Customize provider icons</PageSubtitle>
         </div>
-        <Button icon={PhotoIcon} onClick={() => setIsUploadModalOpen(true)}>
+        <Button
+          icon={PhotoIcon}
+          onClick={() => setIsUploadModalOpen(true)}
+          data-cy="settings-provider-images-upload-btn"
+        >
           Upload New Image
         </Button>
       </div>

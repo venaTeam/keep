@@ -101,6 +101,7 @@ export default function RolesTab({ customRolesAllowed }: RolesTabProps) {
                 ? undefined
                 : "This feature is not available in your authentication mode."
             }
+            data-cy="auth-add-role-btn"
           >
             Create Custom Role
           </Button>
@@ -111,6 +112,7 @@ export default function RolesTab({ customRolesAllowed }: RolesTabProps) {
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         className="mb-4"
+        data-cy="auth-roles-search-input"
       />
       <Card className="overflow-auto p-0">
         <Table className="h-full">
@@ -132,6 +134,8 @@ export default function RolesTab({ customRolesAllowed }: RolesTabProps) {
                   key={role.name}
                   className="hover:bg-gray-50 transition-colors duration-200 cursor-pointer group"
                   onClick={() => handleRowClick(role)}
+                  data-cy="auth-role-row"
+                  data-cy-id={role.id}
                 >
                   <TableCell className="w-4/24">
                     <div className="flex items-center justify-between">
@@ -180,6 +184,7 @@ export default function RolesTab({ customRolesAllowed }: RolesTabProps) {
                         color="orange"
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={(e) => handleDeleteRole(role.id, e)}
+                        data-cy="auth-role-delete-btn"
                       />
                     )}
                   </TableCell>

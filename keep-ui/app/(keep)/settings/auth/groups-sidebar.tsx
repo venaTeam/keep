@@ -137,7 +137,10 @@ const GroupsSidebar = ({
           leaveFrom="translate-x-0"
           leaveTo="translate-x-full"
         >
-          <Dialog.Panel className="fixed right-0 inset-y-0 w-3/4 bg-white z-30 p-6 overflow-auto flex flex-col">
+          <Dialog.Panel
+            className="fixed right-0 inset-y-0 w-3/4 bg-white z-30 p-6 overflow-auto flex flex-col"
+            data-cy="auth-group-sidebar"
+          >
             <div className="flex justify-between mb-4">
               <Dialog.Title className="text-3xl font-bold" as={Text}>
                 {isNewGroup ? "Create Group" : "Group Details"}
@@ -162,6 +165,7 @@ const GroupsSidebar = ({
                     render={({ field }) => (
                       <TextInput
                         {...field}
+                        data-cy="auth-group-name-input"
                         error={!!errors.name}
                         errorMessage={errors.name?.message}
                         disabled={!isNewGroup}
@@ -235,6 +239,7 @@ const GroupsSidebar = ({
                     handleClose();
                   }}
                   className="border border-orange-500 text-orange-500"
+                  data-cy="auth-group-cancel-btn"
                 >
                   Cancel
                 </Button>
@@ -242,6 +247,7 @@ const GroupsSidebar = ({
                   color="orange"
                   type="submit"
                   disabled={isSubmitting || (isNewGroup ? false : !isDirty)}
+                  data-cy="auth-group-submit-btn"
                 >
                   {isSubmitting
                     ? "Saving..."

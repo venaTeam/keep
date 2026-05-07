@@ -205,7 +205,10 @@ const RoleSidebar = ({
           leaveFrom="translate-x-0"
           leaveTo="translate-x-full"
         >
-          <Dialog.Panel className="fixed right-0 inset-y-0 w-3/4 bg-white z-30 p-6 overflow-auto flex flex-col">
+          <Dialog.Panel
+            className="fixed right-0 inset-y-0 w-3/4 bg-white z-30 p-6 overflow-auto flex flex-col"
+            data-cy="auth-role-sidebar"
+          >
             <div className="flex justify-between mb-4">
               <Dialog.Title className="text-3xl font-bold" as={Text}>
                 {selectedRole ? "Edit Role" : "Add Role"}
@@ -238,6 +241,7 @@ const RoleSidebar = ({
                     render={({ field }) => (
                       <TextInput
                         {...field}
+                        data-cy="auth-role-name-input"
                         error={!!errors.name}
                         errorMessage={errors.name?.message}
                         disabled={!!(selectedRole && selectedRole.predefined)}
@@ -261,6 +265,7 @@ const RoleSidebar = ({
                     render={({ field }) => (
                       <TextInput
                         {...field}
+                        data-cy="auth-role-description-input"
                         error={!!errors.description}
                         errorMessage={errors.description?.message}
                         disabled={!!(selectedRole && selectedRole.predefined)}
@@ -305,6 +310,7 @@ const RoleSidebar = ({
                     handleToggle();
                   }}
                   className="border border-orange-500 text-orange-500"
+                  data-cy="auth-role-cancel-btn"
                 >
                   Cancel
                 </Button>
@@ -323,6 +329,7 @@ const RoleSidebar = ({
                         ? "At least one scope must be selected"
                         : ""
                     }
+                    data-cy="auth-role-submit-btn"
                   >
                     {isSubmitting ? "Saving..." : "Save Role"}
                   </Button>

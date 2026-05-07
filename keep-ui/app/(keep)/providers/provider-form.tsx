@@ -474,6 +474,7 @@ const ProviderForm = ({
               variant="secondary"
               icon={ArrowTopRightOnSquareIcon}
               onClick={handleOauth}
+              data-cy="providers-form-oauth2-btn"
             >
               Install with OAuth2
             </Button>
@@ -564,6 +565,7 @@ const ProviderForm = ({
                   type="checkbox"
                   id="install_webhook"
                   name="install_webhook"
+                  data-cy="providers-form-install-webhook-input"
                   className="mr-2.5"
                   onChange={handleWebhookChange}
                   checked={
@@ -878,6 +880,7 @@ const ProviderForm = ({
             disabled={provider.provisioned}
             variant="secondary"
             icon={TrashIcon}
+            data-cy="providers-form-disconnect-btn"
           >
             Disconnect
           </Button>
@@ -891,6 +894,7 @@ const ProviderForm = ({
             onClick={closeModal}
             className="mr-2.5"
             disabled={isLoading}
+            data-cy="providers-form-cancel-btn"
           >
             Cancel
           </Button>
@@ -902,6 +906,7 @@ const ProviderForm = ({
               color="orange"
               disabled={provider.provisioned}
               variant="primary"
+              data-cy="providers-form-update-btn"
             >
               Update
             </Button>
@@ -912,6 +917,7 @@ const ProviderForm = ({
               onClick={handleConnectClick}
               color="orange"
               icon={LightningBoltIcon}
+              data-cy="providers-form-connect-btn"
             >
               {isHealthCheck ? `Check health` : `Connect`}
             </Button>

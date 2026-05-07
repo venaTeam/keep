@@ -73,7 +73,12 @@ export function ProviderImageUploader({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Upload Provider Image">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Upload Provider Image"
+      data-cy="settings-provider-image-uploader-modal"
+    >
       <div className="space-y-6">
         <div>
           <Text className="mb-2">Select Provider</Text>
@@ -93,6 +98,7 @@ export function ProviderImageUploader({
             type="file"
             accept="image/png"
             onChange={handleFileSelect}
+            data-cy="settings-provider-image-uploader-input"
             className="block w-full text-sm text-gray-500
               file:mr-4 file:py-2 file:px-4
               file:rounded-full file:border-0
@@ -106,13 +112,19 @@ export function ProviderImageUploader({
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button variant="secondary" color="orange" onClick={handleClose}>
+          <Button
+            variant="secondary"
+            color="orange"
+            onClick={handleClose}
+            data-cy="settings-provider-image-uploader-cancel-btn"
+          >
             Cancel
           </Button>
           <Button
             color="orange"
             onClick={handleUpload}
             disabled={!selectedFile || !selectedProvider || isUploading}
+            data-cy="settings-provider-image-uploader-submit-btn"
           >
             {isUploading ? "Uploading..." : "Upload"}
           </Button>

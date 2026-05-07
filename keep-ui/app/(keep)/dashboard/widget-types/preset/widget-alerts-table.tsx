@@ -211,6 +211,7 @@ const WidgetAlertsTable: React.FC<WidgetAlertsTableProps> = ({
     <div
       style={{ background }}
       className="bg-opacity-25 max-w-full overflow-x-auto border rounded-md"
+      data-cy="dashboard-widget-alerts-table"
     >
       <div
         style={{ gridTemplateColumns }}

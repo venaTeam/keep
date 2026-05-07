@@ -106,7 +106,7 @@ export function ServiceNowWidgetForm({
 
   return (
     <>
-      <div className="mb-4 mt-2">
+      <div className="mb-4 mt-2" data-cy="dashboard-widget-form-service-now">
         <Subtitle>Team</Subtitle>
         <Controller
           name="team"
@@ -120,6 +120,7 @@ export function ServiceNowWidgetForm({
               placeholder="Enter team"
               error={!!get(errors, "team.message")}
               errorMessage={get(errors, "team.message")}
+              data-cy="dashboard-widget-form-service-now-team-input"
             />
           )}
         />
@@ -132,7 +133,7 @@ export function ServiceNowWidgetForm({
           control={control}
           rules={{ required: true }}
           render={({ field }) => (
-            <Select {...field} placeholder="Select incident status">
+            <Select {...field} placeholder="Select incident status" data-cy="dashboard-widget-form-service-now-status-select">
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="both">Both</SelectItem>
@@ -148,7 +149,7 @@ export function ServiceNowWidgetForm({
           control={control}
           rules={{ required: true }}
         render={({ field }) => (
-            <Select {...field} placeholder="Select detection method">
+            <Select {...field} placeholder="Select detection method" data-cy="dashboard-widget-form-service-now-detection-select">
               <SelectItem value="direct">Direct</SelectItem>
               <SelectItem value="hamal">Hamal</SelectItem>
               <SelectItem value="all">All</SelectItem>
@@ -167,6 +168,7 @@ export function ServiceNowWidgetForm({
               {...field}
               placeholder="https://example.com"
               type="url"
+              data-cy="dashboard-widget-form-service-now-custom-link-input"
             />
           )}
         />

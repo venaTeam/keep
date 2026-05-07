@@ -65,7 +65,7 @@ export const GenericMetricsWidgetForm: React.FC<
   }, [formValues]);
 
   return (
-    <div className="mb-4 mt-2">
+    <div className="mb-4 mt-2" data-cy="dashboard-widget-form-generic-metrics">
       <Subtitle>Generic Metrics</Subtitle>
       <Controller
         name="selectedGenericMetrics"
@@ -82,6 +82,7 @@ export const GenericMetricsWidgetForm: React.FC<
             placeholder="Select a Generic Metrics"
             error={!!get(errors, "selectedGenericMetrics.message")}
             errorMessage={get(errors, "selectedGenericMetrics.message")}
+            data-cy="dashboard-widget-form-generic-metrics-select"
           >
             {GENERIC_METRICS.map((metrics) => (
               <SelectItem key={metrics.key} value={metrics.key}>

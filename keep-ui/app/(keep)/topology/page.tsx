@@ -38,7 +38,7 @@ export default async function Page(props: PageProps) {
 
   return (
     <>
-      <div className="flex w-full justify-between items-center mb-2">
+      <div className="flex w-full justify-between items-center mb-2" data-cy="topology-page-header">
         <div>
           <PageTitle>Service Topology</PageTitle>
           <PageSubtitle>

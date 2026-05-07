@@ -101,8 +101,9 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={editingItem ? "Edit Widget" : "Add Widget"}
+      data-cy="dashboard-widget-modal"
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} data-cy="dashboard-widget-form">
         <div className="mb-4 mt-2">
           <Subtitle>Widget Name</Subtitle>
           <Controller
@@ -117,6 +118,7 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
                 placeholder="Enter widget name"
                 error={!!get(errors, "widgetName.message")}
                 errorMessage={get(errors, "widgetName.message")}
+                data-cy="dashboard-widget-form-name-input"
               />
             )}
           />
@@ -139,6 +141,7 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
                   placeholder="Select a Widget Type"
                   error={!!get(errors, "selectedWidgetType.message")}
                   errorMessage={get(errors, "selectedWidgetType.message")}
+                  data-cy="dashboard-widget-form-type-select"
                 >
                   {[
                     { key: WidgetType.PRESET, value: "Preset" },
@@ -200,6 +203,7 @@ const WidgetModal: React.FC<WidgetModalProps> = ({
           color="orange"
           type="submit"
           disabled={!isValid || !innerFormState.isValid}
+          data-cy="dashboard-widget-form-submit-btn"
         >
           {editingItem ? "Update Widget" : "Add Widget"}
         </Button>

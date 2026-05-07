@@ -1,11 +1,15 @@
 {
-  "version": "0a03269fef5e8d94298ebb3f6b835b38bb13bc0a",
-  "generatedAt": "2026-05-06T23:49:59.150Z",
-  "totalSelectors": 7,
+  "version": "a2eb0cc11bc0979ef853dbaf5ad26854a16378e2",
+  "generatedAt": "2026-05-07T00:08:03.719Z",
+  "totalSelectors": 86,
   "byArea": {
     "(dynamic)": 5,
+    "ai": 4,
+    "dashboard": 43,
     "drawer": 1,
-    "modal": 1
+    "modal": 1,
+    "notif": 1,
+    "topology": 31
   },
   "selectors": [
     {
@@ -59,6 +63,476 @@
       "mirrorsDataTestId": false
     },
     {
+      "selector": "ai-page",
+      "area": "ai",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/ai/ai-plugins.tsx",
+      "line": 86,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "ai-plugins-list",
+      "area": "ai",
+      "role": "plugins",
+      "dynamic": false,
+      "file": "app/(keep)/ai/ai-plugins.tsx",
+      "line": 98,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "ai-plugin-card-${algorithm_config.algorithm_id}",
+      "area": "ai",
+      "role": "plugin",
+      "dynamic": true,
+      "file": "app/(keep)/ai/ai-plugins.tsx",
+      "line": 141,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "ai-plugin-apply-proposed-btn-${algorithm_config.algorithm_id}",
+      "area": "ai",
+      "role": "plugin",
+      "dynamic": true,
+      "file": "app/(keep)/ai/ai-plugins.tsx",
+      "line": 250,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-page",
+      "area": "dashboard",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 162,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-name-input",
+      "area": "dashboard",
+      "role": "name",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 172,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-name",
+      "area": "dashboard",
+      "role": "name",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 175,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-edit-btn",
+      "area": "dashboard",
+      "role": "edit",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 185,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-save-layout-btn",
+      "area": "dashboard",
+      "role": "save",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 197,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-add-widget-btn",
+      "area": "dashboard",
+      "role": "add",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 199,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-empty-state",
+      "area": "dashboard",
+      "role": "empty",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 209,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-grid-container",
+      "area": "dashboard",
+      "role": "grid",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/[id]/dashboard.tsx",
+      "line": 217,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-alert-quality-table",
+      "area": "dashboard",
+      "role": "alert",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/alert-quality-table.tsx",
+      "line": 291,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-${item.i}",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": true,
+      "file": "app/(keep)/dashboard/GridItem.tsx",
+      "line": 30,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-title",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/GridItem.tsx",
+      "line": 33,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-cell-${item.i}",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": true,
+      "file": "app/(keep)/dashboard/GridLayout.tsx",
+      "line": 73,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-menu-btn",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/MenuButton.tsx",
+      "line": 30,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-menu-edit",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/MenuButton.tsx",
+      "line": 61,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-menu-delete",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/MenuButton.tsx",
+      "line": 78,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-menu-save",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/MenuButton.tsx",
+      "line": 96,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-generic-metrics",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/generic-metrics/generic-metrics-grid-item.tsx",
+      "line": 53,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-generic-metrics",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/generic-metrics/generic-metrics-widget-form.tsx",
+      "line": 68,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-generic-metrics-select",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/generic-metrics/generic-metrics-widget-form.tsx",
+      "line": 85,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-metric",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/metric/metric-grid-item.tsx",
+      "line": 15,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-metric",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/metric/metric-widget-form.tsx",
+      "line": 54,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-metric-select",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/metric/metric-widget-form.tsx",
+      "line": 65,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-columns-multiselect",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/columns-selection.tsx",
+      "line": 42,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-preset",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/preset-grid-item.tsx",
+      "line": 182,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-preset-go-to-btn",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/preset-grid-item.tsx",
+      "line": 205,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-preset",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/preset-widget-form.tsx",
+      "line": 161,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-preset-select",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/preset-widget-form.tsx",
+      "line": 178,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-panel-type-select",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/preset-widget-form.tsx",
+      "line": 206,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-custom-link-input",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/preset-widget-form.tsx",
+      "line": 245,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-count-of-last-alerts-input",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/preset-widget-form.tsx",
+      "line": 274,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-alert-count-panel",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/widget-alert-count-panel.tsx",
+      "line": 142,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-alerts-table",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/preset/widget-alerts-table.tsx",
+      "line": 214,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-service-now",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/service-now/widget-service-now-form.tsx",
+      "line": 109,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-service-now-team-input",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/service-now/widget-service-now-form.tsx",
+      "line": 123,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-service-now-status-select",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/service-now/widget-service-now-form.tsx",
+      "line": 136,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-service-now-detection-select",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/service-now/widget-service-now-form.tsx",
+      "line": 152,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-service-now-custom-link-input",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/service-now/widget-service-now-form.tsx",
+      "line": 171,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-service-now",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/widget-types/service-now/widget-service-now.tsx",
+      "line": 103,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-modal",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/WidgetModal.tsx",
+      "line": 104,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/WidgetModal.tsx",
+      "line": 106,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-name-input",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/WidgetModal.tsx",
+      "line": 121,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-type-select",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/WidgetModal.tsx",
+      "line": 144,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dashboard-widget-form-submit-btn",
+      "area": "dashboard",
+      "role": "widget",
+      "dynamic": false,
+      "file": "app/(keep)/dashboard/WidgetModal.tsx",
+      "line": 206,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
       "selector": "drawer-close-btn",
       "area": "drawer",
       "role": "close",
@@ -75,6 +549,326 @@
       "dynamic": false,
       "file": "components/ui/Modal.tsx",
       "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "notif-hub-page",
+      "area": "notif",
+      "role": "hub",
+      "dynamic": false,
+      "file": "app/(keep)/notifications-hub/page.tsx",
+      "line": 5,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-page-header",
+      "area": "topology",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/topology/page.tsx",
+      "line": 41,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-tabs",
+      "area": "topology",
+      "role": "tabs",
+      "dynamic": false,
+      "file": "app/(keep)/topology/topology-client.tsx",
+      "line": 57,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-tab-map",
+      "area": "topology",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/topology/topology-client.tsx",
+      "line": 62,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-tab-applications",
+      "area": "topology",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/topology/topology-client.tsx",
+      "line": 66,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-tab-pull",
+      "area": "topology",
+      "role": "tab",
+      "dynamic": false,
+      "file": "app/(keep)/topology/topology-client.tsx",
+      "line": 71,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-card-${application.id}",
+      "area": "topology",
+      "role": "app",
+      "dynamic": true,
+      "file": "app/(keep)/topology/ui/applications/application-card.tsx",
+      "line": 12,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-modal",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/application-modal.tsx",
+      "line": 36,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-create-empty-btn",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/applications-list.tsx",
+      "line": 107,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-add-btn",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/applications-list.tsx",
+      "line": 138,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-list",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/applications-list.tsx",
+      "line": 144,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-show-on-map-btn-${application.id}",
+      "area": "topology",
+      "role": "app",
+      "dynamic": true,
+      "file": "app/(keep)/topology/ui/applications/applications-list.tsx",
+      "line": 158,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-edit-btn-${application.id}",
+      "area": "topology",
+      "role": "app",
+      "dynamic": true,
+      "file": "app/(keep)/topology/ui/applications/applications-list.tsx",
+      "line": 166,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-form",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/create-or-update-application-form.tsx",
+      "line": 137,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-form-name-input",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/create-or-update-application-form.tsx",
+      "line": 152,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-form-description-input",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/create-or-update-application-form.tsx",
+      "line": 163,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-form-repository-input",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/create-or-update-application-form.tsx",
+      "line": 177,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-form-delete-btn",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/create-or-update-application-form.tsx",
+      "line": 238,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-form-cancel-btn",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/create-or-update-application-form.tsx",
+      "line": 249,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-form-submit-btn",
+      "area": "topology",
+      "role": "app",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/applications/create-or-update-application-form.tsx",
+      "line": 259,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-edit-node-sidebar",
+      "area": "topology",
+      "role": "edit",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/AddEditNodeSidePanel.tsx",
+      "line": 120,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-edit-node-update-btn",
+      "area": "topology",
+      "role": "edit",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/AddEditNodeSidePanel.tsx",
+      "line": 262,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-edit-node-save-btn",
+      "area": "topology",
+      "role": "edit",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/AddEditNodeSidePanel.tsx",
+      "line": 271,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-edit-node-close-btn",
+      "area": "topology",
+      "role": "edit",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/AddEditNodeSidePanel.tsx",
+      "line": 276,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-app-node-${id}",
+      "area": "topology",
+      "role": "app",
+      "dynamic": true,
+      "file": "app/(keep)/topology/ui/map/application-node.tsx",
+      "line": 46,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-selection-toolbar",
+      "area": "topology",
+      "role": "selection",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/manage-selection.tsx",
+      "line": 326,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-service-node-${data.service}",
+      "area": "topology",
+      "role": "service",
+      "dynamic": true,
+      "file": "app/(keep)/topology/ui/map/service-node.tsx",
+      "line": 125,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-map-container",
+      "area": "topology",
+      "role": "map",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/topology-map.tsx",
+      "line": 575,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-add-node-btn",
+      "area": "topology",
+      "role": "add",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/topology-map.tsx",
+      "line": 608,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-map-canvas",
+      "area": "topology",
+      "role": "map",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/map/topology-map.tsx",
+      "line": 645,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-search-autocomplete",
+      "area": "topology",
+      "role": "search",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/TopologySearchAutocomplete.tsx",
+      "line": 92,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "topology-search-input",
+      "area": "topology",
+      "role": "search",
+      "dynamic": false,
+      "file": "app/(keep)/topology/ui/TopologySearchAutocomplete.tsx",
+      "line": 108,
       "description": "",
       "mirrorsDataTestId": false
     }

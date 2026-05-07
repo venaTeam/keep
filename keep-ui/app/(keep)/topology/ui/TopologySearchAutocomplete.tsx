@@ -89,6 +89,7 @@ export function TopologySearchAutocomplete({
             onSelect(option as Option<TopologyApplicationMinimal>);
           }
         }}
+        data-cy="topology-search-autocomplete"
         {...props}
       />
     );
@@ -104,6 +105,7 @@ export function TopologySearchAutocomplete({
       onSelect={(option) => {
         onSelect(option as Option<TopologyServiceMinimal>);
       }}
+      data-cy="topology-search-input"
       {...props}
     />
   );

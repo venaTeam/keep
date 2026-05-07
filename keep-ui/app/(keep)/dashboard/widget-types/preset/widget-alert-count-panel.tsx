@@ -139,7 +139,7 @@ const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
   const color = getColor(thresholdCount);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" data-cy="dashboard-widget-alert-count-panel">
       {/* Header with icon buttons */}
       <div className="flex items-center justify-end mb-2 flex-shrink-0">
         <div className="flex items-center space-x-1">

@@ -158,7 +158,7 @@ export const PresetWidgetForm: React.FC<PresetWidgetFormProps> = ({
 
   return (
     <>
-      <div className="mb-4 mt-2">
+      <div className="mb-4 mt-2" data-cy="dashboard-widget-form-preset">
         <Subtitle>Preset</Subtitle>
         <Controller
           name="selectedPreset"
@@ -175,6 +175,7 @@ export const PresetWidgetForm: React.FC<PresetWidgetFormProps> = ({
               placeholder="Select a preset"
               error={!!get(errors, "selectedPreset.message")}
               errorMessage={get(errors, "selectedPreset.message")}
+              data-cy="dashboard-widget-form-preset-select"
             >
               {presets.map((preset) => (
                 <SelectItem key={preset.id} value={preset.id}>
@@ -202,6 +203,7 @@ export const PresetWidgetForm: React.FC<PresetWidgetFormProps> = ({
               placeholder="Select a panel type"
               error={!!get(errors, "presetPanelType.message")}
               errorMessage={get(errors, "presetPanelType.message")}
+              data-cy="dashboard-widget-form-panel-type-select"
             >
               <SelectItem value={PresetPanelType.ALERT_TABLE}>
                 Alert Table
@@ -240,6 +242,7 @@ export const PresetWidgetForm: React.FC<PresetWidgetFormProps> = ({
                   {...field}
                   placeholder="https://example.com or leave empty for preset link"
                   type="url"
+                  data-cy="dashboard-widget-form-custom-link-input"
                 />
               )}
             />
@@ -268,6 +271,7 @@ export const PresetWidgetForm: React.FC<PresetWidgetFormProps> = ({
               type="number"
               placeholder="Value indicating how many alerts to display in widget"
               required
+              data-cy="dashboard-widget-form-count-of-last-alerts-input"
             />
           )}
         />

@@ -572,7 +572,7 @@ export function TopologyMap({
 
   return (
     <>
-      <div className="flex flex-col gap-4 h-full">
+      <div className="flex flex-col gap-4 h-full" data-cy="topology-map-container">
         <div className="flex justify-between gap-4 items-center">
           <TopologySearchAutocomplete
             wrapperClassName="w-full flex-1"
@@ -605,6 +605,7 @@ export function TopologyMap({
               variant="primary"
               size="md"
               icon={PlusIcon}
+              data-cy="topology-add-node-btn"
             >
               Add Node
             </Button>
@@ -641,7 +642,7 @@ export function TopologyMap({
             </div>
           ) : null}
         </div>
-        <Card className="p-0 h-full mx-auto relative overflow-hidden flex flex-col">
+        <Card className="p-0 h-full mx-auto relative overflow-hidden flex flex-col" data-cy="topology-map-canvas">
           <ReactFlowProvider>
             <ManageSelection
               topologyMutator={mutateTopologyData}

@@ -122,6 +122,7 @@ export function ServiceNode({ data, selected }: NodeProps<ServiceNodeType>) {
         )}
         onMouseEnter={() => setShowDetails(true)}
         onMouseLeave={() => setShowDetails(false)}
+        data-cy={`topology-service-node-${data.service}`}
       >
         {data.category && (
           <div className="absolute top-2 right-2 text-gray-400">

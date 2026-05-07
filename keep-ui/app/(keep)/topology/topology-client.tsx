@@ -54,18 +54,21 @@ export function TopologyPageClient({
       className="flex flex-col"
       index={tabIndex}
       onIndexChange={setTabIndex}
+      data-cy="topology-tabs"
     >
       <TabList className="mb-2">
         <Tab
           className="items-center"
+          data-cy="topology-tab-map"
         >
           Topology Map
         </Tab>
-        <Tab className="items-center">Applications</Tab>
+        <Tab className="items-center" data-cy="topology-tab-applications">Applications</Tab>
         <Tab
           className="items-center"
           icon={ArrowPathIcon}
           onClick={handlePullTopology}
+          data-cy="topology-tab-pull"
         >
           Pull from providers</Tab>
       </TabList>

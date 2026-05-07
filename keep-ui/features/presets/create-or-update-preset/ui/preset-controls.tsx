@@ -43,6 +43,7 @@ export const PresetControls: React.FC<PresetControlsProps> = ({
         <div className="flex items-center gap-2">
           <Switch
             data-testid="is-noisy-switch"
+            data-cy="is-noisy-switch"
             id="noisy"
             checked={isNoisy}
             onChange={() => setIsNoisy(!isNoisy)}
@@ -63,6 +64,7 @@ export const PresetControls: React.FC<PresetControlsProps> = ({
         <div className="flex items-center gap-2">
           <Switch
             data-testid="counter-shows-firing-only-switch"
+            data-cy="counter-shows-firing-only-switch"
             id="counterShowsFiringOnly"
             checked={counterShowsFiringOnly}
             onChange={() => setCounterShowsFiringOnly(!counterShowsFiringOnly)}

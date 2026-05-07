@@ -70,7 +70,7 @@ export const AlertTableThemeSelection = ({
         <span className="text-gray-400 text-sm mb-2">Set theme colors</span>
         <div className="flex-1 overflow-y-auto">
           <TabGroup onIndexChange={handleTabChange}>
-            <TabList data-testid="theme-tab-list">
+            <TabList data-testid="theme-tab-list" data-cy="theme-tab-list">
               <Tab>Transparent</Tab>
               <Tab>Keep</Tab>
               <Tab>Basic</Tab>
@@ -102,6 +102,7 @@ export const AlertTableThemeSelection = ({
       </div>
       <Button
         data-testid="apply-theme-button"
+        data-cy="apply-theme-button"
         className="mt-4"
         color="orange"
         onClick={onApplyTheme}

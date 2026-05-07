@@ -23,22 +23,24 @@ export function CreatePresetModal({ isOpen, handleClose, handleCreate }: Props) 
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={clearAndClose} className="w-[400px]">
+        <Modal isOpen={isOpen} onClose={clearAndClose} className="w-[400px]" data-cy="alerts-create-preset-modal">
             <div className="flex flex-col gap-4">
                 <Title>Create Preset</Title>
                 <TextInput
                     placeholder="Enter preset name"
                     value={presetName}
                     onChange={(e) => setPresetName(e.target.value)}
+                    data-cy="alerts-create-preset-name-input"
                 />
                 <div className="flex justify-end gap-2">
-                    <Button variant="secondary" color="gray" onClick={clearAndClose}>
+                    <Button variant="secondary" color="gray" onClick={clearAndClose} data-cy="alerts-create-preset-cancel-btn">
                         Cancel
                     </Button>
                     <Button
                         disabled={!presetName}
                         onClick={onSubmit}
                         color="orange"
+                        data-cy="alerts-create-preset-submit-btn"
                     >
                         Create
                     </Button>

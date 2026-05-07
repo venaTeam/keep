@@ -313,6 +313,7 @@ export const CreateIncidentWithAIModal = ({
       beta={true}
       title="Create Incidents with AI"
       className="max-w-[600px] w-full lg:max-w-[1200px]"
+      data-cy="alerts-create-incident-ai-modal"
     >
       <div className="relative bg-white p-6 rounded-lg">
         {isLoading ? (
@@ -363,6 +364,7 @@ export const CreateIncidentWithAIModal = ({
                 className="w-full"
                 color="orange"
                 onClick={handleCreateIncidents}
+                data-cy="alerts-create-incident-ai-submit-btn"
               >
                 Create Incidents
               </Button>
@@ -430,6 +432,7 @@ export const CreateIncidentWithAIModal = ({
               className="w-full"
               color="orange"
               onClick={createIncidentWithAI}
+              data-cy="alerts-create-incident-ai-generate-btn"
             >
               Generate incident suggestions with AI
             </Button>

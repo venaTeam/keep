@@ -50,6 +50,7 @@ export const FacetValue: React.FC<FacetValueProps> = ({
       className={`flex items-center px-2 py-1 h-7 hover:bg-gray-100 rounded-sm cursor-pointer group ${isSelectable || isSelected ? "" : "opacity-50 pointer-events-none"}`}
       onClick={handleCheckboxClick}
       data-testid="facet-value"
+      data-cy="facet-value"
     >
       <div className="flex items-center min-w-[24px]">
         <input
@@ -81,11 +82,12 @@ export const FacetValue: React.FC<FacetValueProps> = ({
         <button
           onClick={handleActionClick}
           className="h-full text-xs text-orange-600 hidden hover:text-orange-800 group-hover:block"
+          data-cy="facet-value-action"
         >
           {isExclusivelySelected ? "All" : "Only"}
         </button>
         {
-          <span data-testid="facet-value-count">
+          <span data-testid="facet-value-count" data-cy="facet-value-count">
             <Text className="text-xs text-gray-500 group-hover:hidden">
               <ShortNumber value={count}></ShortNumber>
             </Text>

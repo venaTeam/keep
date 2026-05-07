@@ -59,7 +59,7 @@ export function AlertAssignModal({
     };
 
     return (
-        <Modal onClose={handleClose} isOpen={!!alert} className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible">
+        <Modal onClose={handleClose} isOpen={!!alert} className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible" data-cy="alerts-assign-modal">
             <Title className="text-lg font-semibold">Assign Alert</Title>
             <div className="border-t border-gray-200 my-4" />
             <div className="flex mt-2.5 inline-flex items-center">
@@ -87,10 +87,10 @@ export function AlertAssignModal({
                 </div>
             </div>
             <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={handleClose} color="orange" variant="secondary">
+                <Button onClick={handleClose} color="orange" variant="secondary" data-cy="alerts-assign-cancel-btn">
                     Cancel
                 </Button>
-                <Button onClick={handleAssign} color="orange">
+                <Button onClick={handleAssign} color="orange" data-cy="alerts-assign-submit-btn">
                     Assign
                 </Button>
             </div>

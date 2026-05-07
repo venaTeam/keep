@@ -112,6 +112,7 @@ export const PushAlertToServerModal = ({
       onClose={handleClose}
       title="Simulate Alert"
       className="w-[600px]"
+      data-cy="alerts-simulate-modal"
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -209,10 +210,10 @@ export const PushAlertToServerModal = ({
         )}
 
         <div className="mt-6 flex gap-2 justify-end">
-          <Button color="orange" onClick={handleClose} variant="secondary">
+          <Button color="orange" onClick={handleClose} variant="secondary" data-cy="alerts-simulate-cancel-btn">
             Cancel
           </Button>
-          <Button color="orange" variant="primary" type="submit">
+          <Button color="orange" variant="primary" type="submit" data-cy="alerts-simulate-submit-btn">
             Submit
           </Button>
         </div>

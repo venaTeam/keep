@@ -39,7 +39,7 @@ export const Facet: React.FC<FacetProps> = ({
   const Icon = isOpen ? ChevronDownIcon : ChevronRightIcon;
 
   return (
-    <div className="pb-2 border-b border-gray-200">
+    <div className="pb-2 border-b border-gray-200" data-cy={`facet-${facetKey}`}>
       <div
         className="flex items-center justify-between px-2 py-2 cursor-pointer hover:bg-gray-50"
         onClick={() => setIsOpen(!isOpen)}
@@ -60,6 +60,7 @@ export const Facet: React.FC<FacetProps> = ({
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                data-cy={`facet-${facetKey}-filter-input`}
               />
             </div>
           )}

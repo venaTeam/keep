@@ -56,6 +56,7 @@ export default function SettingsSelection({
             icon={FiSettings}
             ref={refs.setReference}
             data-testid="settings-button"
+            data-cy="settings-button"
             aria-label="Settings"
           />
           <Popover.Overlay className="fixed inset-0 bg-black opacity-30 z-20" />
@@ -63,6 +64,7 @@ export default function SettingsSelection({
             className="bg-white dark:bg-[#111827] z-[60] p-4 rounded-sm shadow-xl border border-gray-100 dark:border-gray-800 min-w-[300px] w-auto max-w-[600px] overflow-hidden"
             ref={refs.setFloating}
             data-testid="settings-panel"
+            data-cy="settings-panel"
             style={{
               ...floatingStyles,
               maxHeight: "85vh", // Limit height to 85% of viewport height
@@ -80,14 +82,14 @@ export default function SettingsSelection({
             >
               <TabGroup className="flex flex-col flex-1 w-full max-w-full">
                 <TabList className="mb-4 overflow-x-auto whitespace-nowrap overflow-y-hidden pb-1" variant="line">
-                  <Tab data-testid="tab-columns">Columns</Tab>
-                  <Tab data-testid="tab-theme">Theme</Tab>
-                  <Tab data-testid="tab-row-style">Row Style</Tab>
-                  <Tab data-testid="tab-action-tray">Action Tray</Tab>
-                  <Tab data-testid="tab-font-size">Font Size</Tab>
+                  <Tab data-testid="tab-columns" data-cy="tab-columns">Columns</Tab>
+                  <Tab data-testid="tab-theme" data-cy="tab-theme">Theme</Tab>
+                  <Tab data-testid="tab-row-style" data-cy="tab-row-style">Row Style</Tab>
+                  <Tab data-testid="tab-action-tray" data-cy="tab-action-tray">Action Tray</Tab>
+                  <Tab data-testid="tab-font-size" data-cy="tab-font-size">Font Size</Tab>
                 </TabList>
                 <TabPanels className="flex-1 overflow-hidden">
-                  <TabPanel className="h-full" data-testid="panel-columns">
+                  <TabPanel className="h-full" data-testid="panel-columns" data-cy="panel-columns">
                     <ColumnSelection
                       table={table}
                       presetName={presetName}
@@ -97,16 +99,16 @@ export default function SettingsSelection({
                       onResetFacets={onResetFacets}
                     />
                   </TabPanel>
-                  <TabPanel className="h-full" data-testid="panel-theme">
+                  <TabPanel className="h-full" data-testid="panel-theme" data-cy="panel-theme">
                     <AlertTableThemeSelection onClose={close} />
                   </TabPanel>
-                  <TabPanel className="h-full" data-testid="panel-row-style">
+                  <TabPanel className="h-full" data-testid="panel-row-style" data-cy="panel-row-style">
                     <RowStyleSelection onClose={close} />
                   </TabPanel>
-                  <TabPanel className="h-full" data-testid="panel-action-tray">
+                  <TabPanel className="h-full" data-testid="panel-action-tray" data-cy="panel-action-tray">
                     <ActionTraySelection onClose={close} />
                   </TabPanel>
-                  <TabPanel className="h-full" data-testid="panel-font-size">
+                  <TabPanel className="h-full" data-testid="panel-font-size" data-cy="panel-font-size">
                     <FontSizeSelection onClose={close} />
                   </TabPanel>
                 </TabPanels>

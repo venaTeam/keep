@@ -117,6 +117,7 @@ export const AlertAssociateIncidentModal = ({
             className="flex-1"
             color="orange"
             onClick={showCreateIncidentForm}
+            data-cy="alerts-associate-incident-create-new-btn"
           >
             Create a new incident
           </Button>
@@ -157,6 +158,7 @@ export const AlertAssociateIncidentModal = ({
             onClick={handleAssociateAlerts}
             disabled={!selectedIncidentInstance || isAssociating}
             loading={isAssociating}
+            data-cy="alerts-associate-incident-submit-btn"
           >
             Associate {alerts.length} alert{alerts.length > 1 ? "s" : ""}
           </Button>
@@ -166,6 +168,7 @@ export const AlertAssociateIncidentModal = ({
             color="orange"
             variant="secondary"
             onClick={showCreateIncidentForm}
+            data-cy="alerts-associate-incident-create-new-alt-btn"
           >
             Create a new incident
           </Button>
@@ -180,6 +183,7 @@ export const AlertAssociateIncidentModal = ({
       onClose={handleClose}
       title="Associate alerts to incident"
       className="w-[600px]"
+      data-cy="alerts-associate-incident-modal"
     >
       <div className="relative">
         {isLoading ? (

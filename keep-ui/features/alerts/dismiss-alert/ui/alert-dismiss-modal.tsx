@@ -184,6 +184,7 @@ export function AlertDismissModal({
       className="overflow-visible"
       beforeTitle={alerts?.[0]?.name}
       title={isRestore ? "Restore Alert(s)" : "Dismiss Alert(s)"}
+      data-cy="alerts-dismiss-modal"
     >
       {isRestore ? (
         <>
@@ -237,13 +238,14 @@ export function AlertDismissModal({
             />
           </div>
           <div className="flex justify-end mt-4 space-x-2">
-            <Button variant="secondary" color="orange" onClick={clearAndClose}>
+            <Button variant="secondary" color="orange" onClick={clearAndClose} data-cy="alerts-restore-cancel-btn">
               Cancel
             </Button>
             <Button
               onClick={handleDismissChange}
               color="orange"
               loading={isLoading}
+              data-cy="alerts-restore-submit-btn"
             >
               Restore
             </Button>
@@ -331,13 +333,14 @@ export function AlertDismissModal({
             />
           </div>
           <div className="mt-4 flex justify-end gap-2">
-            <Button variant="secondary" color="orange" onClick={clearAndClose}>
+            <Button variant="secondary" color="orange" onClick={clearAndClose} data-cy="alerts-dismiss-cancel-btn">
               Cancel
             </Button>
             <Button
               onClick={handleDismissChange}
               color="orange"
               loading={isLoading}
+              data-cy="alerts-dismiss-submit-btn"
             >
               Dismiss
             </Button>

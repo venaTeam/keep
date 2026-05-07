@@ -666,6 +666,7 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
       onClose={handleClose}
       isOpen={isOpen}
       className="overflow-visible max-w-[800px]"
+      data-cy="alerts-view-raw-modal"
     >
       <div className="flex justify-between items-center mb-4 min-w-full">
         <div className="flex flex-col flex-1">
@@ -679,6 +680,7 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
               size="xs"
               icon={isEditable ? Unlock : Lock}
               className="p-1"
+              data-cy="alerts-view-raw-edit-toggle-btn"
             ></Button>
           </div>
         </div>
@@ -705,18 +707,21 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
             icon={Save}
             disabled={!hasChanges || validationErrors.length > 0}
             title={!hasChanges ? "No changes in the alert payload" : ""}
+            data-cy="alerts-view-raw-save-btn"
           ></Button>
           <Button
             onClick={handleCopy}
             color="orange"
             variant="secondary"
             icon={Copy}
+            data-cy="alerts-view-raw-copy-btn"
           ></Button>
           <Button
             onClick={handleClose}
             color="orange"
             variant="secondary"
             icon={X}
+            data-cy="alerts-view-raw-close-btn"
           ></Button>
         </div>
       </div>

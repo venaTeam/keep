@@ -47,6 +47,7 @@ export const AddFacetModalWithSuggestions: React.FC<
       onClose={onClose}
       title="Add New Facet"
       className="w-[400px]"
+      data-cy="facet-add-modal-suggestions"
     >
       <div className="flex flex-col max-w-full overflow-hidden">
         <div className="flex-1 flex flex-col mt-3 max-h-96 space-y-1">
@@ -116,6 +117,7 @@ export const AddFacetModalWithSuggestions: React.FC<
         <div className="flex flex-1 justify-end gap-2">
           <Button
             data-testid="cancel-facet-creation-btn"
+            data-cy="cancel-facet-creation-btn"
             color="orange"
             size="xs"
             variant="secondary"
@@ -125,6 +127,7 @@ export const AddFacetModalWithSuggestions: React.FC<
           </Button>
           <Button
             data-testid="create-facet-btn"
+            data-cy="create-facet-btn"
             color="orange"
             size="xs"
             variant="primary"

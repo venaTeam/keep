@@ -47,7 +47,7 @@ export default function AlertPagination({
   const pageCount = table.getPageCount();
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between items-center" data-cy="alerts-pagination">
       <Text>
         {pageCount ? (
           <>
@@ -57,6 +57,7 @@ export default function AlertPagination({
       </Text>
       <div className="flex gap-1">
         <Select
+          data-cy="alerts-pagination-page-size"
           components={{ SingleValue }}
           value={{
             value: table.getState().pagination.pageSize.toString(),
@@ -76,6 +77,7 @@ export default function AlertPagination({
         <div className="flex">
           <Button
             className="pagination-button"
+            data-cy="alerts-pagination-first"
             icon={ChevronDoubleLeftIcon}
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
@@ -85,6 +87,7 @@ export default function AlertPagination({
           />
           <Button
             className="pagination-button"
+            data-cy="alerts-pagination-prev"
             icon={ChevronLeftIcon}
             onClick={table.previousPage}
             disabled={!table.getCanPreviousPage()}
@@ -94,6 +97,7 @@ export default function AlertPagination({
           />
           <Button
             className="pagination-button"
+            data-cy="alerts-pagination-next"
             icon={ChevronRightIcon}
             onClick={table.nextPage}
             disabled={!table.getCanNextPage()}
@@ -103,6 +107,7 @@ export default function AlertPagination({
           />
           <Button
             className="pagination-button"
+            data-cy="alerts-pagination-last"
             icon={ChevronDoubleRightIcon}
             onClick={() => table.setPageIndex(pageCount - 1)}
             disabled={!table.getCanNextPage()}
@@ -120,6 +125,7 @@ export default function AlertPagination({
             loading={isValidating}
             onClick={async () => await mutate()}
             title="Refresh"
+            data-cy="alerts-btn-refresh"
           />
         )}
       </div>

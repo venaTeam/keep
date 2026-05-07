@@ -110,6 +110,7 @@ export const FacetsPanel: React.FC<FacetsPanelProps> = ({
       id={`${panelId}-facets`}
       className={clsx("w-48 lg:w-56", className)}
       data-testid="facets-panel"
+      data-cy="facets-panel"
     >
       <div className="space-y-2">
         <div className="flex justify-between">
@@ -117,6 +118,7 @@ export const FacetsPanel: React.FC<FacetsPanelProps> = ({
           <button
             onClick={() => onAddFacet && onAddFacet()}
             className="p-1 pr-2 text-sm text-gray-600 hover:bg-gray-100 rounded flex items-center gap-1"
+            data-cy="facet-add-btn"
           >
             <PlusIcon className="h-4 w-4" />
             Add Facet
@@ -124,6 +126,7 @@ export const FacetsPanel: React.FC<FacetsPanelProps> = ({
           <button
             onClick={() => clearFilters()}
             className="p-1 pr-2 text-sm text-gray-600 hover:bg-gray-100 rounded flex items-center gap-1"
+            data-cy="facet-reset-btn"
           >
             <XMarkIcon className="h-4 w-4" />
             Reset

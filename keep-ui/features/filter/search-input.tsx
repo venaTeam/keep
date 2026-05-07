@@ -29,6 +29,7 @@ export const SearchInput = ({
       placeholder={placeholder}
       value={inputValue}
       onValueChange={setInputValue}
+      data-cy="alerts-search-input"
     />
   );
 };

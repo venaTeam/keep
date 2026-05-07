@@ -36,6 +36,7 @@ const CelInput: FC<CelInputProps> = ({
 }) => {
   return (
     <div
+      data-cy="cel-input"
       className={clsx(
         { "pl-2": readOnly, "pl-9": !readOnly },
         "flex-1 h-9 border rounded-md relative bg-white"
@@ -67,6 +68,7 @@ const CelInput: FC<CelInputProps> = ({
         <button
           onClick={onClearValue}
           className="absolute top-0 right-0 w-9 h-full flex items-center justify-center text-gray-400 hover:text-gray-600" // Position to the left of the Enter to apply badge
+          data-cy="cel-clear-btn"
         >
           <XMarkIcon className="h-4 w-4" />
         </button>

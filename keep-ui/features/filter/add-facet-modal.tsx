@@ -42,6 +42,7 @@ export const AddFacetModal: React.FC<AddFacetModalProps> = ({
       onClose={onClose}
       title="Add New Facet"
       className="w-[400px]"
+      data-cy="facet-add-modal"
     >
       <div className="mt-3 max-h-96 overflow-auto space-y-1">
         <div>
@@ -55,6 +56,7 @@ export const AddFacetModal: React.FC<AddFacetModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="mb-4"
+            data-cy="facet-add-name-input"
           />
         </div>
         <div>
@@ -68,12 +70,14 @@ export const AddFacetModal: React.FC<AddFacetModalProps> = ({
             value={propertyPath}
             onChange={(e) => setPropertyPath(e.target.value)}
             className="mb-4"
+            data-cy="facet-add-property-input"
           />
         </div>
       </div>
       <div className="flex flex-1 justify-end gap-2">
         <Button
           data-testid="cancel-facet-creation-btn"
+          data-cy="cancel-facet-creation-btn"
           color="orange"
           size="xs"
           variant="secondary"
@@ -83,6 +87,7 @@ export const AddFacetModal: React.FC<AddFacetModalProps> = ({
         </Button>
         <Button
           data-testid="create-facet-btn"
+          data-cy="create-facet-btn"
           color="orange"
           size="xs"
           variant="primary"

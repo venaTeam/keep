@@ -233,7 +233,7 @@ export const AlertTimeline: React.FC<AlertTimelineProps> = ({
   const auditContent = auditData?.length ? auditData : defaultAuditEvent;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3" data-cy="alerts-timeline">
       <div className="flex justify-between items-center">
         <Title>Timeline</Title>
         <Button
@@ -245,6 +245,7 @@ export const AlertTimeline: React.FC<AlertTimelineProps> = ({
           loading={isLoading}
           onClick={onRefresh}
           title="Refresh"
+          data-cy="alerts-timeline-refresh-btn"
         />
       </div>
       <Card className="p-4">

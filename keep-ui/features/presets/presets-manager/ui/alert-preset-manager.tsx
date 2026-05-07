@@ -150,6 +150,7 @@ export function AlertPresetManager({
           onClick={handleAddAlertModalOpen}
           className="ml-2"
           color="orange"
+          data-cy="preset-test-alerts-btn"
         ></Button>
 
         {/* Group expansion toggle button */}
@@ -166,6 +167,7 @@ export function AlertPresetManager({
             }
             className="ml-2"
             color="orange"
+            data-cy="preset-toggle-groups-btn"
           >
             {areAllGroupsExpanded() ? "Collapse All" : "Expand All"}
           </Button>
@@ -179,6 +181,7 @@ export function AlertPresetManager({
               size="sm"
               onClick={() => setIsErrorAlertModalOpen(true)}
               icon={MdErrorOutline}
+              data-cy="preset-error-alerts-btn"
             />
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
               {errorAlerts.length}
@@ -192,6 +195,7 @@ export function AlertPresetManager({
         isOpen={isPresetModalOpen}
         onClose={handlePresetModalClose}
         className="w-[40%] max-w-screen-2xl max-h-[710px] transform overflow-auto ring-tremor bg-white p-6 text-left align-middle shadow-tremor transition-all rounded-xl"
+        data-cy="preset-form-modal"
       >
         <CopilotKit runtimeUrl="/api/copilotkit">
           <CreateOrUpdatePresetForm

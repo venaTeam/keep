@@ -72,6 +72,7 @@ export const PresetsNoise = ({ presets }: PresetsNoiseProps) => {
   return (
     <div
       data-testid="noisy-presets-audio-player"
+      data-cy="noisy-presets-audio-player"
       className={clsx("absolute -z-10", {
         playing: shouldDoNoise,
       })}

@@ -203,7 +203,7 @@ export default function ColumnSelection({
           <div className="flex items-center gap-2">
             <span className="text-gray-400 text-sm">Set table fields</span>
             {isCustomized && (
-              <span className="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full" data-testid="custom-view-indicator">
+              <span className="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full" data-testid="custom-view-indicator" data-cy="custom-view-indicator">
                 Customized
               </span>
             )}
@@ -220,6 +220,7 @@ export default function ColumnSelection({
                 onClick={handleResetToDefault}
                 className="text-xs text-gray-500 hover:text-orange-600 flex items-center gap-1 transition-colors"
                 data-testid="reset-to-default-button"
+                data-cy="reset-to-default-button"
                 title="Reset columns to default view"
               >
                 <FiRotateCcw size={12} />
@@ -238,18 +239,19 @@ export default function ColumnSelection({
         <div className="flex-1 overflow-y-auto max-h-[350px]">
           {isLoading && useBackend ? (
             <div className="flex items-center justify-center py-8 text-gray-400">
-              <span data-testid="columns-loading">
+              <span data-testid="columns-loading" data-cy="columns-loading">
                 Loading column configuration...
               </span>
             </div>
           ) : isSearching ? (
             <div className="flex items-center justify-center py-8 text-gray-400">
-              <span data-testid="columns-searching">Searching...</span>
+              <span data-testid="columns-searching" data-cy="columns-searching">Searching...</span>
             </div>
           ) : (
             <ul
               className="space-y-1"
               data-testid="column-list"
+              data-cy="column-list"
               data-column-count={filteredColumns.length}
             >
               {filteredColumns.map((column) => (
@@ -264,6 +266,7 @@ export default function ColumnSelection({
                         handleCheckboxChange(column, e.target.checked)
                       }
                       data-testid={`column-checkbox-${column}`}
+                      data-cy={`column-checkbox-${column}`}
                       data-checked={localColumnVisibility[column] || false}
                     />
                     {column}
@@ -274,6 +277,7 @@ export default function ColumnSelection({
                 <li
                   className="text-gray-400 p-2"
                   data-testid="no-columns-found"
+                  data-cy="no-columns-found"
                 >
                   No columns found matching &ldquo;{searchTerm}&rdquo;
                 </li>
@@ -288,6 +292,7 @@ export default function ColumnSelection({
             type="submit"
             loading={useBackend && isLoading}
             disabled={useBackend && isLoading}
+            data-cy="alerts-columns-save-btn"
           >
             {useBackend && isLoading ? "Saving..." : "Save changes"}
           </Button>

@@ -208,7 +208,7 @@ export function AlertMethodModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose} data-cy="alerts-method-modal">
       {isLoading ? (
         <Loading includeMinHeight={false} />
       ) : methodResult ? (
@@ -223,6 +223,7 @@ export function AlertMethodModal({
             color="orange"
             onClick={() => invokeMethod(provider, method, inputParameters)}
             disabled={!isInvokeEnabled()}
+            data-cy="alerts-method-invoke-btn"
           >
             Invoke {`"${method.name}"`}
           </Button>

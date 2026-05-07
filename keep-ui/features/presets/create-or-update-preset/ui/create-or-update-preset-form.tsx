@@ -155,6 +155,7 @@ export function CreateOrUpdatePresetForm({
   return (
     <form
       data-testid="preset-form"
+      data-cy="preset-form"
       className="space-y-2"
       onSubmit={addOrUpdatePreset}
     >
@@ -168,6 +169,7 @@ export function CreateOrUpdatePresetForm({
           <div className="flex items-center gap-2">
             <TextInput
               data-testid="preset-name-input"
+              data-cy="preset-name-input"
               // TODO: don't show error until user tries to save
               error={!presetName}
               errorMessage="Preset name is required"
@@ -188,6 +190,7 @@ export function CreateOrUpdatePresetForm({
                 loading={generatingName}
                 icon={TbSparkles}
                 size="xs"
+                data-cy="preset-generate-ai-name-btn"
               >
                 AI
               </Button>
@@ -254,11 +257,13 @@ export function CreateOrUpdatePresetForm({
           color="orange"
           onClick={handleCancel}
           tooltip="Close"
+          data-cy="preset-form-cancel-btn"
         >
           Close
         </Button>
         <Button
           data-testid="save-preset-button"
+          data-cy="save-preset-button"
           disabled={!presetName}
           type="submit"
           size="lg"

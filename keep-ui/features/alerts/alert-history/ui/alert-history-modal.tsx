@@ -89,6 +89,7 @@ const AlertHistoryPanel = ({
         <Button
           className="mt-2 bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300"
           onClick={() => router.replace(`/alerts/${presetName.toLowerCase()}`)}
+          data-cy="alerts-history-close-btn"
         >
           Close
         </Button>
@@ -148,6 +149,7 @@ export function AlertHistoryModal({ alerts, presetName, onClose }: Props) {
       onClose={onClose}
       className="w-full max-w-screen-2xl max-h-[710px] transform overflow-scroll ring-tremor bg-white
                     p-6 text-left align-middle shadow-tremor transition-all rounded-xl"
+      data-cy="alerts-history-modal"
     >
       <AlertHistoryPanel
         alertsHistoryWithDate={alertsHistoryWithDate}

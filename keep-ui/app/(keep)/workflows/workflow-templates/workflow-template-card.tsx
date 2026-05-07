@@ -27,6 +27,7 @@ export const WorkflowTemplateCard: React.FC<{ template: WorkflowTemplate }> = ({
         e.stopPropagation();
         handlePreview(template);
       }}
+      data-cy={`wf-template-card-${template?.workflow_raw_id ?? "loading"}`}
     >
       <div className="min-h-36">
         {template && <WorkflowSteps workflow={template.workflow} />}
@@ -40,7 +41,7 @@ export const WorkflowTemplateCard: React.FC<{ template: WorkflowTemplate }> = ({
           {!template && <Skeleton className="h-16 w-full mb-2" />}
         </p>
       </div>
-      <div>{template && <Button variant="secondary">Preview</Button>}</div>
+      <div>{template && <Button variant="secondary" data-cy="wf-template-preview-btn">Preview</Button>}</div>
     </Card>
   );
 };

@@ -16,3 +16,122 @@
 #   description: "Workflow tile in the workflows grid; one per workflow."
 #   idSource: "workflow.id (server uuid)"
 #   resolvedExample: "wf-tile-9f2c8b21"
+
+# ---------------------------------------------------------------------------
+# PR 3 — workflows list, builder, React Flow, YAML editor
+# ---------------------------------------------------------------------------
+
+"wf-tile-${workflow.id}":
+  description: "Workflow tile card in the workflows grid; one per workflow."
+  idSource: "workflow.id (server uuid)"
+  resolvedExample: "wf-tile-9f2c8b21"
+
+"wf-tile-triggers-modal-${workflow.id}":
+  description: "Triggers modal opened from a workflow tile."
+  idSource: "workflow.id"
+  resolvedExample: "wf-tile-triggers-modal-9f2c8b21"
+
+"wf-template-card-${template?.workflow_raw_id ?? \"loading\"}":
+  description: "Workflow template card on the create / no-workflows screens."
+  idSource: "template.workflow_raw_id (slug); falls back to \"loading\" while skeletons render"
+  resolvedExample: "wf-template-card-bq-sql-query"
+
+"wf-execution-row-${row.original.id}":
+  description: "Workflow execution row link in the executions table."
+  idSource: "execution.id"
+  resolvedExample: "wf-execution-row-c1f2..."
+
+"wf-execution-row-menu-${row.original.id}":
+  description: "Per-row dropdown trigger in the workflow executions table."
+  idSource: "execution.id"
+  resolvedExample: "wf-execution-row-menu-c1f2..."
+
+"wf-provider-${provider.type}":
+  description: "Provider chip in the workflow detail providers carousel."
+  idSource: "provider.type"
+  resolvedExample: "wf-provider-slack"
+
+"wf-provider-connect-btn-${provider.type}":
+  description: "Connect button inside a provider chip in the workflow providers carousel."
+  idSource: "provider.type"
+  resolvedExample: "wf-provider-connect-btn-slack"
+
+"wf-secrets-toggle-${row.original.name}":
+  description: "Show/hide value toggle button for a workflow secret row."
+  idSource: "secret name"
+  resolvedExample: "wf-secrets-toggle-SLACK_TOKEN"
+
+"wf-secrets-delete-${row.original.name}":
+  description: "Delete button for a workflow secret row."
+  idSource: "secret name"
+  resolvedExample: "wf-secrets-delete-SLACK_TOKEN"
+
+"wf-version-row-${revision.revision}":
+  description: "Revision selector row in the workflow versions panel."
+  idSource: "revision (integer)"
+  resolvedExample: "wf-version-row-3"
+
+"wf-node-${data?.componentType ?? \"step\"}-${id}":
+  description: "Custom React Flow node rendered by WorkflowNode for a single step/action/trigger."
+  idSource: "componentType from node data + node id from React Flow"
+  resolvedExample: "wf-node-task-step-1"
+
+"wf-node-menu-${id}":
+  description: "Inline dropdown root attached to a workflow builder node."
+  idSource: "node id from React Flow"
+  resolvedExample: "wf-node-menu-step-1"
+
+"wf-node-menu-trigger-${id}":
+  description: "Dropdown trigger button attached to a workflow builder node."
+  idSource: "node id from React Flow"
+  resolvedExample: "wf-node-menu-trigger-step-1"
+
+"wf-node-menu-delete-${id}":
+  description: "Delete-node menu item attached to a workflow builder node."
+  idSource: "node id from React Flow"
+  resolvedExample: "wf-node-menu-delete-step-1"
+
+"wf-node-menu-properties-${id}":
+  description: "Properties menu item attached to a workflow builder node."
+  idSource: "node id from React Flow"
+  resolvedExample: "wf-node-menu-properties-step-1"
+
+"wf-edge-label-${id}":
+  description: "Edge label rendered by WorkflowEdge (e.g. True / False / orange) for a single edge."
+  idSource: "edge id from React Flow"
+  resolvedExample: "wf-edge-label-e1-2"
+
+"wf-toolbox-${step.componentType}-${step.type}":
+  description: "Toolbox item used to add a step / trigger / action / condition to the workflow builder."
+  idSource: "step.componentType + step.type"
+  resolvedExample: "wf-toolbox-step-http"
+
+"wf-toolbox-group-${name.toLowerCase()}-toggle":
+  description: "Toolbox group disclosure toggle (Triggers / Steps / Actions / Conditions / Misc)."
+  idSource: "group name (kebab-cased to lowercase)"
+  resolvedExample: "wf-toolbox-group-triggers-toggle"
+
+"wf-editor-field-${name}":
+  description: "EditorField wrapper around a builder property input."
+  idSource: "property name (e.g. message, url, body, code)"
+  resolvedExample: "wf-editor-field-message"
+
+"wf-editor-${name}-input":
+  description: "Input/Textarea inside an EditorField for a builder property."
+  idSource: "property name (e.g. message, url, body, code)"
+  resolvedExample: "wf-editor-message-input"
+
+"wf-editor-${key}-input":
+  description: "TextInput rendered by WorkflowEditorV2 for a workflow-level property."
+  idSource: "workflow property key (e.g. name, description, owners)"
+  resolvedExample: "wf-editor-name-input"
+
+"wf-trigger-editor-${selectedTriggerKey}":
+  description: "Heading of the trigger editor for the currently selected trigger type."
+  idSource: "trigger key (alert | incident | interval | manual)"
+  resolvedExample: "wf-trigger-editor-alert"
+
+"wf-trigger-editor-${selectedTriggerKey}-content":
+  description: "Body of the trigger editor for the currently selected trigger type."
+  idSource: "trigger key (alert | incident | interval | manual)"
+  resolvedExample: "wf-trigger-editor-alert-content"

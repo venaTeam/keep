@@ -18,16 +18,18 @@ export const ProvidersCarousel = ({
   onConnectClick: (provider: FullProvider) => void;
 }) => {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2" data-cy="wf-providers-carousel">
       {providers.map((provider, index) => (
         <div
           key={index}
           className="relative border border-gray-200 rounded-md p-2"
+          data-cy={`wf-provider-${provider.type}`}
         >
           <button
             onClick={() => onConnectClick(provider)}
             disabled={provider.installed}
             className="flex items-center gap-2"
+            data-cy={`wf-provider-connect-btn-${provider.type}`}
           >
             <DynamicImageProviderIcon
               src={`/icons/${provider.type}-icon.png`}
@@ -128,6 +130,7 @@ export function WorkflowProviders({ workflow }: { workflow: Workflow }) {
         title={`Connect to ${selectedProvider?.display_name}`}
         isOpen={openPanel}
         onClose={handleCloseModal}
+        data-cy="wf-providers-connect-drawer"
       >
         {selectedProvider && (
           <ProviderForm

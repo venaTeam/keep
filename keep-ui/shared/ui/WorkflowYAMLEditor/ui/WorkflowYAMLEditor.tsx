@@ -223,6 +223,7 @@ export const WorkflowYAMLEditor = ({
     <div
       className="w-full h-full flex flex-col relative min-h-0"
       data-testid={dataTestId + "-container"}
+      data-cy="wf-yaml-editor"
     >
       <div className="flex-1 min-h-0" style={{ height: "calc(100vh - 300px)" }}>
         <WorkflowYAMLEditorToolbar
@@ -264,10 +265,10 @@ export const WorkflowYAMLEditor = ({
           );
         }}
       />
-      <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200">
-        <span className="text-sm text-gray-500">{filename}.yaml</span>
+      <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200" data-cy="wf-yaml-editor-footer">
+        <span className="text-sm text-gray-500" data-cy="wf-yaml-editor-filename">{filename}.yaml</span>
         {workflowId && (
-          <span className="text-sm text-gray-500">{workflowId}</span>
+          <span className="text-sm text-gray-500" data-cy="wf-yaml-editor-workflow-id">{workflowId}</span>
         )}
       </div>
     </div>

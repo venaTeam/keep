@@ -51,7 +51,7 @@ const ReactFlowEditor = () => {
   const showDivider = Boolean(selectedNode || selectedEdge);
 
   return (
-    <div className="transition-transform relative z-50" ref={containerRef}>
+    <div className="transition-transform relative z-50" ref={containerRef} data-cy="wf-editor-panel">
       <div
         className={clsx(
           "absolute top-0 w-10 h-10",
@@ -63,6 +63,7 @@ const ReactFlowEditor = () => {
             className="flex justify-center items-center bg-white w-full h-full border-b border-l rounded-bl-lg shadow-md"
             onClick={() => setEditorOpen(true)}
             data-testid="wf-open-editor-button"
+            data-cy="wf-open-editor-button"
             title="Show step editor"
           >
             <Cog8ToothIcon className="size-5" />
@@ -73,6 +74,7 @@ const ReactFlowEditor = () => {
               className="flex justify-center bg-white items-center w-full h-full border-b border-l rounded-bl-lg shadow-md"
               onClick={() => setEditorOpen(false)}
               data-testid="wf-close-editor-button"
+              data-cy="wf-close-editor-button"
               title="Hide step editor"
             >
               <ChevronRightIcon className="size-5" />
@@ -81,7 +83,7 @@ const ReactFlowEditor = () => {
         )}
       </div>
       {editorOpen && (
-        <div className="relative flex-1 flex flex-col bg-white border-l overflow-y-auto h-full w-80 2xl:w-96">
+        <div className="relative flex-1 flex flex-col bg-white border-l overflow-y-auto h-full w-80 2xl:w-96" data-cy="wf-editor-content">
           <WorkflowStatus className="m-2 shrink-0" />
           <WorkflowEditorV2 />
           {showDivider && <Divider ref={dividerRef} className="my-2" />}

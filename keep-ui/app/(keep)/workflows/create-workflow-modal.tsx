@@ -20,6 +20,7 @@ export const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       onClose={onClose}
       className="min-w-[80vw] min-h-[90vh] max-h-[90vh]"
       title="Create workflow"
+      data-cy="wf-create-modal"
     >
       <div className="flex flex-col min-h-0 max-w-full max-h-full overflow-hidden">
         <PageSubtitle>
@@ -36,6 +37,7 @@ export const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
                 size="xs"
                 variant="primary"
                 onClick={() => router.push("/workflows/builder")}
+                data-cy="wf-create-modal-start-from-scratch-btn"
               >
                 Start from scratch
               </Button>

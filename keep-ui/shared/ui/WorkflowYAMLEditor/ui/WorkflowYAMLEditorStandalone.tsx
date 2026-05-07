@@ -124,7 +124,7 @@ export function WorkflowYAMLEditorStandalone({
   };
 
   return (
-    <div className="w-full h-full flex flex-col relative">
+    <div className="w-full h-full flex flex-col relative" data-cy="wf-yaml-standalone">
       <WorkflowYamlEditorHeader
         workflowId={workflowId}
         isInitialized={isEditorMounted}
@@ -144,6 +144,7 @@ export function WorkflowYAMLEditorStandalone({
           disabled={!hasUnsavedChanges || isSaving}
           onClick={handleSaveWorkflow}
           data-testid="wf-yaml-editor-save-button"
+          data-cy="wf-yaml-editor-save-button"
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>

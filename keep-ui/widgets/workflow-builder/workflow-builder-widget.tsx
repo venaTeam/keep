@@ -87,10 +87,10 @@ export function WorkflowBuilderWidget({
 
   return (
     <>
-      <main className="mx-auto max-w-full flex flex-col h-full">
+      <main className="mx-auto max-w-full flex flex-col h-full" data-cy="wf-builder-widget">
         <div className="flex items-baseline justify-between p-2">
           <div className="flex items-center gap-2">
-            <Title className={clsx(workflowId ? "mx-2" : "mx-0")}>
+            <Title className={clsx(workflowId ? "mx-2" : "mx-0")} data-cy="wf-builder-title">
               {workflowId ? "Edit" : "New"} Workflow
             </Title>
             <WorkflowSyncStatus
@@ -111,6 +111,7 @@ export function WorkflowBuilderWidget({
                   variant="secondary"
                   icon={ArrowUpOnSquareIcon}
                   disabled={!isInitialized}
+                  data-cy="wf-builder-import-yaml-btn"
                 >
                   Import from YAML
                 </Button>
@@ -120,6 +121,7 @@ export function WorkflowBuilderWidget({
                   style={{ display: "none" }}
                   ref={fileInputRef}
                   onChange={handleFileChange}
+                  data-cy="wf-builder-import-yaml-input"
                 />
               </>
             )}
@@ -133,6 +135,7 @@ export function WorkflowBuilderWidget({
                 className="min-w-28"
                 variant="secondary"
                 disabled={!isInitialized}
+                data-cy="wf-builder-edit-metadata-btn"
               >
                 Edit Metadata
               </Button>
@@ -150,6 +153,7 @@ export function WorkflowBuilderWidget({
               disabled={!canDeploy || isSaving || !isEditorSyncedWithNodes}
               onClick={() => triggerSave()}
               data-testid="wf-builder-main-save-deploy-button"
+              data-cy="wf-builder-main-save-deploy-button"
             >
               {isSaving ? "Saving..." : "Save"}
             </Button>

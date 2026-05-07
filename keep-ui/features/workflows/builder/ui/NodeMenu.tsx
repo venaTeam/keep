@@ -25,11 +25,12 @@ export default function NodeMenu({
   return (
     <>
       {data && !hideMenu && (
-        <Menu as="div" className="relative inline-block text-left">
+        <Menu as="div" className="relative inline-block text-left" data-cy={`wf-node-menu-${id}`}>
           <div>
             <Menu.Button
               className="inline-flex w-full justify-center rounded-md text-sm"
               onClick={stopPropagation}
+              data-cy={`wf-node-menu-trigger-${id}`}
             >
               <CiSquareChevDown className="size-6 text-gray-500 hover:text-gray-700" />
             </Menu.Button>
@@ -55,6 +56,7 @@ export default function NodeMenu({
                       className={`${
                         active ? "bg-slate-200" : "text-gray-900"
                       } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
+                      data-cy={`wf-node-menu-delete-${id}`}
                     >
                       <TrashIcon className="mr-2 h-4 w-4" aria-hidden="true" />
                       Delete
@@ -71,6 +73,7 @@ export default function NodeMenu({
                       className={`${
                         active ? "bg-slate-200" : "text-gray-900"
                       } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
+                      data-cy={`wf-node-menu-properties-${id}`}
                     >
                       <IoMdSettings
                         className="mr-2 h-4 w-4"

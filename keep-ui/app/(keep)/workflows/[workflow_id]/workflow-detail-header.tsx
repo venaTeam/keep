@@ -47,12 +47,13 @@ export default function WorkflowDetailHeader({
           <h1
             className="text-2xl line-clamp-2 font-bold flex items-baseline gap-2"
             data-testid="wf-name"
+            data-cy="wf-name"
           >
             {workflow.name}
           </h1>
           {workflow.description && (
             <Text className="line-clamp-5">
-              <span data-testid="wf-description">{workflow.description}</span>
+              <span data-testid="wf-description" data-cy="wf-description">{workflow.description}</span>
             </Text>
           )}
         </div>
@@ -71,6 +72,7 @@ export default function WorkflowDetailHeader({
               }}
               tooltip={message}
               data-testid="wf-run-now-button"
+              data-cy="wf-run-now-button"
             >
               {isRunning ? "Running..." : "Run now"}
             </Button>

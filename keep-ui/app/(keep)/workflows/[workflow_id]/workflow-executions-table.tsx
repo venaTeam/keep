@@ -58,6 +58,7 @@ function WorkflowExecutionRowMenu({
       icon={EllipsisHorizontalIcon}
       label=""
       onClick={(e) => e.stopPropagation()}
+      data-cy={`wf-execution-row-menu-${row.original.id}`}
     >
       <DropdownMenu.Item
         icon={ArrowUpRightIcon}
@@ -67,10 +68,12 @@ function WorkflowExecutionRowMenu({
             `/workflows/${row.original.workflow_id}/runs/${row.original.id}`
           );
         }}
+        data-cy="wf-execution-view-logs-btn"
       />
       <DropdownMenu.Item
         icon={ClipboardDocumentIcon}
         label="Copy Execution ID"
+        data-cy="wf-execution-copy-id-btn"
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(row.original.id);
@@ -122,6 +125,7 @@ export function WorkflowExecutionsTable({
           <>
             <Link
               href={`/workflows/${row.original.workflow_id}/runs/${row.original.id}`}
+              data-cy={`wf-execution-row-${row.original.id}`}
             >
               {workflowName} · Rev. {row.original.workflow_revision}
             </Link>

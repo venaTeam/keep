@@ -161,6 +161,7 @@ export function TriggerEditor() {
                   variant="light"
                   color="gray"
                   icon={FunnelIcon}
+                  data-cy="wf-trigger-editor-add-filter-btn"
                 >
                   Add Filter
                 </Button>
@@ -244,6 +245,7 @@ export function TriggerEditor() {
               value={value || ("" as string)}
               error={!!error}
               errorMessage={error?.[0]}
+              data-cy="wf-trigger-editor-interval-input"
             />
             {value && (
               <Text className="text-sm text-gray-500">
@@ -261,10 +263,10 @@ export function TriggerEditor() {
 
   return (
     <EditorLayout>
-      <Subtitle className="font-medium flex items-baseline justify-between">
+      <Subtitle className="font-medium flex items-baseline justify-between" data-cy={`wf-trigger-editor-${selectedTriggerKey}`}>
         {capitalize(selectedTriggerKey)} Trigger
       </Subtitle>
-      <div className="flex flex-col gap-2">{renderTriggerContent()}</div>
+      <div className="flex flex-col gap-2" data-cy={`wf-trigger-editor-${selectedTriggerKey}-content`}>{renderTriggerContent()}</div>
     </EditorLayout>
   );
 }

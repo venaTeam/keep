@@ -42,14 +42,14 @@ export function WorkflowBuilderCard({
 
   if (!providers || isLoading)
     return (
-      <Card className={cardClassName}>
+      <Card className={cardClassName} data-cy="wf-builder-card-loading">
         <KeepLoader loadingText="Loading providers..." />
       </Card>
     );
 
   if (error) {
     return (
-      <Card className={cardClassName}>
+      <Card className={cardClassName} data-cy="wf-builder-card-error">
         <Callout
           className="mt-4"
           title="Error"
@@ -64,7 +64,7 @@ export function WorkflowBuilderCard({
 
   if (loadedYamlFileContents == "" && !workflowRaw) {
     return (
-      <Card className={cardClassName}>
+      <Card className={cardClassName} data-cy="wf-builder-card-empty">
         <EmptyBuilderState />
       </Card>
     );
@@ -74,7 +74,7 @@ export function WorkflowBuilderCard({
     <Suspense
       fallback={<KeepLoader loadingText="Loading workflow builder..." />}
     >
-      <Card className={cardClassName}>
+      <Card className={cardClassName} data-cy="wf-builder-card">
         <Builder
           providers={providers}
           installedProviders={installedProviders}

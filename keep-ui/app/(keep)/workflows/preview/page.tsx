@@ -43,10 +43,11 @@ export default function Page(props: PageProps) {
           <Link
             className="p-2 bg-orange-500 text-white hover:bg-orange-600 rounded"
             href="/workflows"
+            data-cy="wf-preview-go-back-link"
           >
             Go Back
           </Link>
-          <div className="flex items-center justify-center min-h-screen">
+          <div className="flex items-center justify-center min-h-screen" data-cy="wf-preview-not-found">
             <div className="text-center text-red-500">Workflow not found!</div>
           </div>
         </>

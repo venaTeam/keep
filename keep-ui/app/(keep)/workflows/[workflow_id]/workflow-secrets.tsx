@@ -63,6 +63,7 @@ const WorkflowSecrets = ({ workflowId }: { workflowId: string }) => {
             icon={showValues[row.original.name] ? EyeOff : Eye}
             color="orange"
             variant="secondary"
+            data-cy={`wf-secrets-toggle-${row.original.name}`}
           />
         </div>
       ),
@@ -78,6 +79,7 @@ const WorkflowSecrets = ({ workflowId }: { workflowId: string }) => {
             className="p-1 hover:bg-gray-100"
             icon={TrashIcon}
             color="red"
+            data-cy={`wf-secrets-delete-${row.original.name}`}
           />
         </div>
       ),
@@ -92,7 +94,7 @@ const WorkflowSecrets = ({ workflowId }: { workflowId: string }) => {
         </div>
       )}
 
-      <Card className="p-4">
+      <Card className="p-4" data-cy="wf-secrets">
         <div className="flex gap-4 my-4">
           <Input
             type="text"
@@ -101,6 +103,7 @@ const WorkflowSecrets = ({ workflowId }: { workflowId: string }) => {
             onChange={(e) =>
               setNewSecret((prev) => ({ ...prev, name: e.target.value }))
             }
+            data-cy="wf-secrets-name-input"
           />
           <Input
             placeholder="Secret value"
@@ -108,12 +111,14 @@ const WorkflowSecrets = ({ workflowId }: { workflowId: string }) => {
             onChange={(e) =>
               setNewSecret((prev) => ({ ...prev, value: e.target.value }))
             }
+            data-cy="wf-secrets-value-input"
           />
           <Button
             onClick={handleAddSecret}
             variant="primary"
             color="orange"
             icon={PlusIcon}
+            data-cy="wf-secrets-add-btn"
           >
             Add Secret
           </Button>

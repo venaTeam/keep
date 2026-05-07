@@ -100,7 +100,7 @@ export function WorkflowVersions({
       };
 
   return (
-    <Card className="h-[calc(100vh-12rem)] flex p-0 overflow-hidden relative">
+    <Card className="h-[calc(100vh-12rem)] flex p-0 overflow-hidden relative" data-cy="wf-versions">
       <div className="flex-1 p-[2px] h-full min-w-0 border-r border-gray-200">
         <WorkflowYAMLEditor
           filename={
@@ -130,6 +130,7 @@ export function WorkflowVersions({
                     : "hover:bg-slate-50"
                 )}
                 onClick={() => setSelectedRevision(revision.revision)}
+                data-cy={`wf-version-row-${revision.revision}`}
               >
                 <span className="font-bold flex items-center gap-1 leading-none">
                   Revision {revision.revision}
@@ -155,6 +156,7 @@ export function WorkflowVersions({
             id="show-diff"
             checked={showDiff}
             onChange={() => setShowDiff(!showDiff)}
+            data-cy="wf-versions-show-diff-switch"
           />
           <label htmlFor="show-diff">Show diff from previous revision</label>
         </div>

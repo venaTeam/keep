@@ -181,6 +181,7 @@ function WorkflowTile({ workflow }: { workflow: Workflow }) {
       <Card
         className="relative flex flex-col justify-between p-4 h-full border-2 border-transparent hover:border-orange-400 overflow-hidden cursor-pointer"
         data-testid={`workflow-tile-${workflow.id}`}
+        data-cy={`wf-tile-${workflow.id}`}
       >
         <Link
           href={`/workflows/${workflow.id}`}
@@ -270,6 +271,7 @@ function WorkflowTile({ workflow }: { workflow: Workflow }) {
         onClose={() => {
           setOpenTriggerModal(false);
         }}
+        data-cy={`wf-tile-triggers-modal-${workflow.id}`}
       >
         <Title>Triggers</Title>
         <div>

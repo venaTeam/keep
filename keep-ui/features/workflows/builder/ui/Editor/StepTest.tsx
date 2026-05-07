@@ -50,6 +50,7 @@ const WFDebugWithAI = ({
           })
         );
       }}
+      data-cy="wf-editor-step-debug-with-ai-btn"
     >
       Debug with AI
     </Button>
@@ -295,6 +296,7 @@ export function TestRunStepForm({
           color="orange"
           disabled={isLoading || isDisabled}
           data-testid="wf-editor-step-test-run-button"
+          data-cy="wf-editor-step-test-run-button"
         >
           {isLoading ? "Running..." : "Test Run"}
         </Button>

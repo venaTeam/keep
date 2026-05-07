@@ -28,9 +28,9 @@ export default function PageWithId(
   }, [key]);
 
   return (
-    <div className="flex flex-col h-full gap-4">
-      <Subtitle className="text-sm">
-        <Link href="/workflows">All Workflows</Link>{" "}
+    <div className="flex flex-col h-full gap-4" data-cy="wf-preview-page">
+      <Subtitle className="text-sm" data-cy="wf-preview-breadcrumbs">
+        <Link href="/workflows" data-cy="wf-preview-all-link">All Workflows</Link>{" "}
         <Icon icon={ArrowRightIcon} color="gray" size="xs" /> Preview workflow
         template
       </Subtitle>
@@ -50,10 +50,11 @@ export default function PageWithId(
             <Link
               className="p-2 bg-orange-500 text-white hover:bg-orange-600 rounded"
               href="/workflows"
+              data-cy="wf-preview-go-back-link"
             >
               Go Back
             </Link>
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex items-center justify-center min-h-screen" data-cy="wf-preview-not-found">
               <div className="text-center text-red-500">
                 Workflow not found!
               </div>

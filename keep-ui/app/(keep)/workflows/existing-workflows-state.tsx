@@ -240,6 +240,7 @@ export function ExistingWorkflowsState({
       <div
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full gap-4"
         data-testid="workflow-list"
+        data-cy="wf-list-grid"
       >
         {filteredWorkflows?.map((workflow) => (
           <WorkflowTile key={workflow.id} workflow={workflow} />
@@ -256,6 +257,7 @@ export function ExistingWorkflowsState({
     <>
       <main
         data-testid="workflows-exist-state"
+        data-cy="wf-list-page"
         className="flex flex-col gap-12"
       >
         <div className="flex flex-col gap-6">
@@ -276,6 +278,7 @@ export function ExistingWorkflowsState({
                 }}
                 icon={ArrowUpOnSquareStackIcon}
                 id="uploadWorkflowButton"
+                data-cy="wf-upload-btn"
               >
                 Upload Workflows
               </Button>
@@ -285,6 +288,7 @@ export function ExistingWorkflowsState({
                 variant="primary"
                 onClick={() => setIsCreateWorkflowModalOpen(true)}
                 icon={PlusIcon}
+                data-cy="wf-create-btn"
               >
                 Create Workflow
               </Button>

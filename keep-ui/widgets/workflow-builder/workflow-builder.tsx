@@ -260,6 +260,7 @@ export function WorkflowBuilder({
           className={clsx(
             leftColumnMode === "yaml" ? "visible h-full" : "hidden"
           )}
+          data-cy="wf-builder-yaml-pane"
         >
           <WorkflowYAMLEditor
             value={workflowYaml ?? ""}
@@ -272,13 +273,14 @@ export function WorkflowBuilder({
 
       </>
       <>
-        <div className="relative h-full">
+        <div className="relative h-full" data-cy="wf-builder-canvas-pane">
           <div className={clsx("absolute top-0 left-0 w-10 h-10 z-50")}>
             {leftColumnMode !== "yaml" ? (
               <button
                 className="flex justify-center items-center bg-white w-full h-full border-b border-r rounded-br-lg shadow-md cursor-pointer"
                 onClick={() => setLeftColumnMode("yaml")}
                 data-testid="wf-open-editor-button"
+                data-cy="wf-builder-open-yaml-btn"
                 title="Show YAML editor"
               >
                 <CodeBracketIcon className="size-5" />
@@ -288,6 +290,7 @@ export function WorkflowBuilder({
                 className="flex justify-center bg-white items-center w-full h-full border-b border-r rounded-br-lg shadow-md text-orange-500"
                 onClick={() => setLeftColumnMode(null)}
                 data-testid="wf-close-yaml-editor-button"
+                data-cy="wf-close-yaml-editor-button"
                 title="Hide YAML editor"
               >
                 <CodeBracketIcon className="size-5" />

@@ -80,6 +80,7 @@ export const WorkflowStatus = ({ className }: { className?: string }) => {
         title="Workflow is valid"
         icon={CheckCircleIcon}
         color="teal"
+        data-cy="wf-status-valid"
       >
         It can be deployed and run
       </Callout>
@@ -92,6 +93,7 @@ export const WorkflowStatus = ({ className }: { className?: string }) => {
         title="Workflow has errors"
         icon={ExclamationTriangleIcon}
         color="yellow"
+        data-cy="wf-status-warning"
       >
         It can be saved, but to run it, fix errors
         {/* TODO: fix In HTML, <summary> cannot be a descendant of <p>. */}
@@ -108,6 +110,7 @@ export const WorkflowStatus = ({ className }: { className?: string }) => {
       title="Fix the errors before saving"
       icon={ExclamationCircleIcon}
       color="rose"
+      data-cy="wf-status-error"
     >
       <ErrorList
         validationErrors={validationErrors}

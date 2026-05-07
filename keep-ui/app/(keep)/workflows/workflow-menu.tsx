@@ -37,8 +37,8 @@ export default function WorkflowMenu({
   isDisabled,
 }: WorkflowMenuProps) {
   return (
-    <div className="js-dont-propagate" data-testid="workflow-menu">
-      <DropdownMenu.Menu icon={EllipsisHorizontalIcon} label="">
+    <div className="js-dont-propagate" data-testid="workflow-menu" data-cy="workflow-menu">
+      <DropdownMenu.Menu icon={EllipsisHorizontalIcon} label="" data-cy="wf-menu-trigger" listDataCy="wf-menu-list">
         <DropdownMenu.Item
           icon={PlayIcon}
           label="Run workflow"
@@ -49,6 +49,7 @@ export default function WorkflowMenu({
           }}
           title={runButtonToolTip}
           disabled={isRunButtonDisabled}
+          data-cy="wf-menu-run-btn"
         />
         <DropdownMenu.Item
           icon={DownloadIcon}
@@ -58,6 +59,7 @@ export default function WorkflowMenu({
             e.stopPropagation();
             onDownload?.();
           }}
+          data-cy="wf-menu-download-btn"
         />
         <DropdownMenu.Item
           icon={EyeIcon}
@@ -67,6 +69,7 @@ export default function WorkflowMenu({
             e.stopPropagation();
             onView?.();
           }}
+          data-cy="wf-menu-view-btn"
         />
         <DropdownMenu.Item
           icon={WrenchIcon}
@@ -76,6 +79,7 @@ export default function WorkflowMenu({
             e.stopPropagation();
             onBuilder?.();
           }}
+          data-cy="wf-menu-builder-btn"
         />
         <DropdownMenu.Item
           icon={isDisabled ? PlayCircleIcon : PauseIcon}
@@ -87,6 +91,7 @@ export default function WorkflowMenu({
           }}
           disabled={provisioned}
           title={provisioned ? "Cannot modify a provisioned workflow" : ""}
+          data-cy="wf-menu-toggle-btn"
         />
         <DropdownMenu.Item
           icon={TrashIcon}
@@ -100,6 +105,7 @@ export default function WorkflowMenu({
           disabled={provisioned}
           title={provisioned ? "Cannot delete a provisioned workflow" : ""}
           data-testid="wf-menu-delete-button"
+          data-cy="wf-menu-delete-btn"
         />
       </DropdownMenu.Menu>
     </div>

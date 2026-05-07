@@ -93,7 +93,7 @@ const GroupedMenu = ({
       {({ open }) => {
         return (
           <>
-            <Disclosure.Button className="w-full flex justify-between items-center p-2">
+            <Disclosure.Button className="w-full flex justify-between items-center p-2" data-cy={`wf-toolbox-group-${name.toLowerCase()}-toggle`}>
               <Subtitle className="text-xs ml-2 text-gray-900 font-medium uppercase">
                 {name}
               </Subtitle>
@@ -120,6 +120,7 @@ const GroupedMenu = ({
                       draggable={isDraggable}
                       title={step.name}
                       onClick={(e) => handleAddNode(e, step)}
+                      data-cy={`wf-toolbox-${step.componentType}-${step.type}`}
                     >
                       {step.componentType === "trigger" ? (
                         <NodeTriggerIcon nodeData={step} />
@@ -224,6 +225,7 @@ export const WorkflowToolbox = ({ isDraggable }: { isDraggable?: boolean }) => {
         "bg-white transition-transform z-40 shrink-0",
         isVisible ? "h-full" : "shadow-lg"
       )}
+      data-cy="wf-toolbox"
     >
       <div className="relative h-full flex flex-col px-2">
         {/* Sticky header */}
@@ -238,6 +240,7 @@ export const WorkflowToolbox = ({ isDraggable }: { isDraggable?: boolean }) => {
               className="w-full"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              data-cy="wf-toolbox-search-input"
             />
           </div>
         </div>

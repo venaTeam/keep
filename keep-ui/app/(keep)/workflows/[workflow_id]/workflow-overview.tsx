@@ -82,15 +82,15 @@ export default function WorkflowOverview({
   } as Pick<Workflow, "last_executions">;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" data-cy="wf-overview">
       {/* TODO: Add a working time filter */}
       {(!data || isLoading || !workflow) && <WorkflowOverviewSkeleton />}
       {data?.items && (
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" data-cy="wf-overview-stats">
             <StatsCard>
               <Title>Total Executions</Title>
-              <div>
+              <div data-cy="wf-overview-stat-total">
                 <h1 className="text-2xl font-bold">
                   {formatNumber(data.count ?? 0)}
                 </h1>
@@ -98,7 +98,7 @@ export default function WorkflowOverview({
             </StatsCard>
             <StatsCard>
               <Title>Pass / Fail Ratio</Title>
-              <div>
+              <div data-cy="wf-overview-stat-pass-fail">
                 <h1 className="text-2xl font-bold">
                   {formatNumber(data.passCount)}
                   {"/"}
@@ -108,7 +108,7 @@ export default function WorkflowOverview({
             </StatsCard>
             <StatsCard>
               <Title>Success %</Title>
-              <div>
+              <div data-cy="wf-overview-stat-success-pct">
                 <h1 className="text-2xl font-bold">
                   {(data.count
                     ? (data.passCount / data.count) * 100
@@ -120,7 +120,7 @@ export default function WorkflowOverview({
             </StatsCard>
             <StatsCard>
               <Title>Avg. Duration</Title>
-              <div>
+              <div data-cy="wf-overview-stat-avg-duration">
                 <h1 className="text-2xl font-bold">
                   {(data.avgDuration ?? 0).toFixed(2)}
                 </h1>

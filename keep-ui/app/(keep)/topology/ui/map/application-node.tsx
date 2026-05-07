@@ -43,6 +43,7 @@ export function ApplicationNode({ id, data, selected }: NodeProps) {
         backgroundColor: color,
         borderColor: borderColor,
       }}
+      data-cy={`topology-app-node-${id}`}
     >
       <p className="text-lg font-bold text-gray-800">{data?.label as string}</p>
       <Handle type="source" position={Position.Right} id="right" />

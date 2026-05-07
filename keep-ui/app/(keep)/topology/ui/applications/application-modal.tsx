@@ -33,7 +33,7 @@ export function ApplicationModal({
     actionType === "create" ? "Create application" : "Edit application";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title}>
+    <Modal isOpen={isOpen} onClose={onClose} title={title} data-cy="topology-app-modal">
       {actionType === "create" ? (
         <CreateOrUpdateApplicationForm
           action="create"

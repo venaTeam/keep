@@ -15,6 +15,7 @@ export type AutocompleteInputProps<T> = {
   getId: (option: Option<T>) => string;
   placeholder: string;
   wrapperClassName?: string;
+  "data-cy"?: string;
 } & Omit<React.ComponentProps<typeof TextInput>, "onSelect">;
 
 export function AutocompleteInput<T>({
@@ -23,6 +24,7 @@ export function AutocompleteInput<T>({
   getId,
   placeholder,
   wrapperClassName,
+  "data-cy": dataCy,
   ...props
 }: AutocompleteInputProps<T>) {
   const [inputValue, setInputValue] = useState("");
@@ -120,6 +122,7 @@ export function AutocompleteInput<T>({
         aria-activedescendant={
           focusedIndex >= 0 ? `option-${focusedIndex}` : undefined
         }
+        data-cy={dataCy}
         {...props}
       />
       {isOpen && filteredOptions.length > 0 && (

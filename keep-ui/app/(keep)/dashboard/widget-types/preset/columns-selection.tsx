@@ -39,6 +39,7 @@ const ColumnsSelection: React.FC<ColumnsSelectionProps> = ({
       placeholder="Select alert columns"
       value={Array.from(selectedColumnsState)}
       onValueChange={(selected) => setSelectedColumnsState(new Set(selected))}
+      data-cy="dashboard-widget-form-columns-multiselect"
     >
       {sortedOptions?.map((field) => (
         <MultiSelectItem key={field} value={field}>

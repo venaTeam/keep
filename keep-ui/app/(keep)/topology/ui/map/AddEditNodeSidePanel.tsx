@@ -117,7 +117,7 @@ export function AddEditNodeSidePanel({
 
   return (
     <SidePanel isOpen={isOpen} onClose={handleClose} panelWidth={"w-1/3"}>
-      <div className="h-full overflow-y-auto gap-y-3 pr-3">
+      <div className="h-full overflow-y-auto gap-y-3 pr-3" data-cy="topology-edit-node-sidebar">
         <div className="flex flex-col gap-y-3">
           <div>
             <label htmlFor="service">
@@ -259,7 +259,7 @@ export function AddEditNodeSidePanel({
       </div>
       <div className="sticky bottom-0 p-4 border-t border-gray-200 bg-white flex justify-end gap-2">
         {editData ? (
-          <Button onClick={handleUpdate} color="orange" variant="primary">
+          <Button onClick={handleUpdate} color="orange" variant="primary" data-cy="topology-edit-node-update-btn">
             Update
           </Button>
         ) : (
@@ -268,11 +268,12 @@ export function AddEditNodeSidePanel({
             color="orange"
             variant="primary"
             disabled={!handleSaveValidation()}
+            data-cy="topology-edit-node-save-btn"
           >
             Save
           </Button>
         )}
-        <Button onClick={handleClosePanel} color="orange" variant="secondary">
+        <Button onClick={handleClosePanel} color="orange" variant="secondary" data-cy="topology-edit-node-close-btn">
           Close
         </Button>
       </div>

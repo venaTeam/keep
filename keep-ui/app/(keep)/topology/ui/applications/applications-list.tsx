@@ -104,6 +104,7 @@ export function ApplicationsList({
                 application: undefined,
               });
             }}
+            data-cy="topology-app-create-empty-btn"
           >
             Create Application
           </Button>
@@ -134,12 +135,13 @@ export function ApplicationsList({
                   setModalState({ ...initialModalState, isOpen: true });
                 }}
                 icon={PlusIcon}
+                data-cy="topology-app-add-btn"
               >
                 Add Application
               </Button>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2" data-cy="topology-app-list">
             {applications.map((application) => (
               <ApplicationCard
                 key={application.id}
@@ -153,6 +155,7 @@ export function ApplicationsList({
                         setSelectedApplicationIds([application.id]);
                         setSelectedObjectId(application.id);
                       }}
+                      data-cy={`topology-app-show-on-map-btn-${application.id}`}
                     >
                       Show on map
                     </Button>
@@ -160,6 +163,7 @@ export function ApplicationsList({
                       variant="secondary"
                       color="orange"
                       onClick={() => handleEditApplication(application)}
+                      data-cy={`topology-app-edit-btn-${application.id}`}
                     >
                       Edit
                     </Button>

@@ -51,7 +51,7 @@ export const MetricWidgetForm: React.FC<MetricWidgetFormProps> = ({
   }
 
   return (
-    <div className="mb-4 mt-2">
+    <div className="mb-4 mt-2" data-cy="dashboard-widget-form-metric">
       <Subtitle>Widget</Subtitle>
       <Controller
         name="selectedMetricWidget"
@@ -62,6 +62,7 @@ export const MetricWidgetForm: React.FC<MetricWidgetFormProps> = ({
             placeholder="Select a metric widget"
             error={!!get(errors, "selectedMetricWidget.message")}
             errorMessage={get(errors, "selectedMetricWidget.message")}
+            data-cy="dashboard-widget-form-metric-select"
           >
             {metricWidgets.map((widget) => (
               <SelectItem key={widget.id} value={widget.id}>

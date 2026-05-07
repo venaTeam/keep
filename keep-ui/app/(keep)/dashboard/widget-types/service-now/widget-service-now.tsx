@@ -100,7 +100,7 @@ const WidgetServiceNow: React.FC<WidgetServiceNowProps> = ({
   const color = count !== null ? getColor(count) : "#1f2937";
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" data-cy="dashboard-widget-service-now">
       <div className="flex items-center justify-between mb-2 flex-shrink-0">
         <div className="text-sm font-medium text-gray-700 h-4">Service Now</div>
         <div className="flex items-center space-x-1">

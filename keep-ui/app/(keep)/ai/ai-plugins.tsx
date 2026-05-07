@@ -83,7 +83,7 @@ export function AIPlugins() {
   };
 
   return (
-    <main className="flex flex-col gap-6">
+    <main className="flex flex-col gap-6" data-cy="ai-page">
       <header className="flex justify-between items-center">
         <div>
           <PageTitle>AI Plugins</PageTitle>
@@ -95,7 +95,7 @@ export function AIPlugins() {
       <Card className="p-0 overflow-hidden">
         <div>
           <div>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4" data-cy="ai-plugins-list">
               {isLoading ? (
                 <KeepLoader loadingText="Loading algorithms and their settings..." />
               ) : null}
@@ -138,6 +138,7 @@ export function AIPlugins() {
                 <Card
                   key={index}
                   className="p-4 flex flex-col justify-between w-full border-white border-2"
+                  data-cy={`ai-plugin-card-${algorithm_config.algorithm_id}`}
                 >
                   <h3 className="text-md font-semibold line-clamp-2">
                     {algorithm_config.algorithm.name}
@@ -246,6 +247,7 @@ export function AIPlugins() {
                                 algorithm_config
                               );
                             }}
+                            data-cy={`ai-plugin-apply-proposed-btn-${algorithm_config.algorithm_id}`}
                           >
                             Apply proposed settings
                           </button>

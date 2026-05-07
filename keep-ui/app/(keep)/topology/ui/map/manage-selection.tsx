@@ -323,6 +323,7 @@ export function ManageSelection({
         "flex justify-between items-center gap-2 bg-white border-b border-gray-200 px-4 py-2 text-sm absolute top-0 left-0 w-full z-[25]",
         className
       )}
+      data-cy="topology-selection-toolbar"
     >
       {selectedApplication !== null ? renderManageApplicationForm() : null}
       {selectedApplication === null && selectedServices.length > 0

@@ -12,6 +12,7 @@ const GridItem: React.FC<GridItemProps> = ({ item }) => {
       className={
         'h-56 w-full "flex-1 flex items-center justify-center grid-item__widget'
       }
+      data-cy="dashboard-widget-metric"
     >
       <div className={"w-[100%]"}>
         <AreaChart

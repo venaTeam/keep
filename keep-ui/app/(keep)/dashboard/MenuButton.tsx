@@ -27,6 +27,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
           <Menu.Button
             className="inline-flex w-full justify-center rounded-md text-sm mt-2"
             onClick={stopPropagation}
+            data-cy="dashboard-widget-menu-btn"
           >
             <Icon
               size="sm"
@@ -57,6 +58,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
                     className={`${
                       active ? "bg-slate-200" : "text-gray-900"
                     } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
+                    data-cy="dashboard-widget-menu-edit"
                   >
                     <PencilIcon className="mr-2 h-4 w-4" aria-hidden="true" />
                     Edit
@@ -73,6 +75,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
                     className={`${
                       active ? "bg-slate-200" : "text-gray-900"
                     } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
+                    data-cy="dashboard-widget-menu-delete"
                   >
                     <TrashIcon className="mr-2 h-4 w-4" aria-hidden="true" />
                     Delete
@@ -90,6 +93,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
                       className={`${
                         active ? "bg-slate-200" : "text-gray-900"
                       } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
+                      data-cy="dashboard-widget-menu-save"
                     >
                       <FiSave className="mr-2 h-4 w-4" aria-hidden="true" />
                       Save

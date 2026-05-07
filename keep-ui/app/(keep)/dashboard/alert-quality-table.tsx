@@ -288,6 +288,7 @@ const QualityTable = ({
   return (
     <div
       className={`flex flex-col gap-2 p-2 px-4 ${isDashBoard ? "h-[90%]" : ""}`}
+      data-cy="dashboard-alert-quality-table"
     >
       <div>
         {!isDashBoard && (

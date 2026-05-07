@@ -70,7 +70,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
             }
           }
           return (
-            <div key={item.i} data-grid={item}>
+            <div key={item.i} data-grid={item} data-cy={`dashboard-widget-cell-${item.i}`}>
               <GridItemContainer
                 key={item.i}
                 item={item}

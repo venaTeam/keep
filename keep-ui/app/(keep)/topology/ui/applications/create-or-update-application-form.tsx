@@ -134,6 +134,7 @@ export function CreateOrUpdateApplicationForm({
     <form
       className="flex flex-col gap-4 text-tremor-content-emphasis"
       onSubmit={handleSubmit}
+      data-cy="topology-app-form"
     >
       <p className="">Group services into an application</p>
       <div>
@@ -148,6 +149,7 @@ export function CreateOrUpdateApplicationForm({
           value={applicationName}
           onChange={(e) => setApplicationName(e.target.value)}
           required={true}
+          data-cy="topology-app-form-name-input"
         />
       </div>
       <div>
@@ -158,6 +160,7 @@ export function CreateOrUpdateApplicationForm({
           placeholder="Description (optional)"
           value={applicationDescription}
           onChange={(e) => setApplicationDescription(e.target.value)}
+          data-cy="topology-app-form-description-input"
         />
       </div>
       <div>
@@ -171,6 +174,7 @@ export function CreateOrUpdateApplicationForm({
           placeholder="Repository URL"
           value={applicationRepo}
           onChange={(e) => setApplicationRepo(e.target.value)}
+          data-cy="topology-app-form-repository-input"
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -231,6 +235,7 @@ export function CreateOrUpdateApplicationForm({
             size="xs"
             variant="destructive"
             onClick={onDelete}
+            data-cy="topology-app-form-delete-btn"
           >
             Delete
           </Button>
@@ -241,6 +246,7 @@ export function CreateOrUpdateApplicationForm({
             size="xs"
             variant="secondary"
             onClick={onCancel}
+            data-cy="topology-app-form-cancel-btn"
           >
             Cancel
           </Button>
@@ -250,6 +256,7 @@ export function CreateOrUpdateApplicationForm({
             variant="primary"
             type="submit"
             loading={isLoading}
+            data-cy="topology-app-form-submit-btn"
           >
             {action === "create" ? "Create" : "Update"}
           </Button>

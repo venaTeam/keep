@@ -9,7 +9,7 @@ export function ApplicationCard({
   application: TopologyApplication;
 }) {
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col" data-cy={`topology-app-card-${application.id}`}>
       <div className="flex justify-between">
         <div>
           <Title>{application.name}</Title>

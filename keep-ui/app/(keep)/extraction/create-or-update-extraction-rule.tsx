@@ -136,6 +136,7 @@ export default function CreateOrUpdateExtractionRule({
     <form
       className="py-2 h-full overflow-y-auto"
       onSubmit={editMode ? updateExtraction : addExtraction}
+      data-cy="extraction-sidebar"
     >
       <Subtitle>Extraction Metadata</Subtitle>
       <div className="mt-2.5">
@@ -147,6 +148,7 @@ export default function CreateOrUpdateExtractionRule({
           required={true}
           value={extractionName}
           onValueChange={setExtractionName}
+          data-cy="extraction-form-name-input"
         />
       </div>
       <div className="mt-2.5">
@@ -155,6 +157,7 @@ export default function CreateOrUpdateExtractionRule({
           placeholder="Extraction Description"
           value={mapDescription}
           onValueChange={setMapDescription}
+          data-cy="extraction-form-description-input"
         />
       </div>
       <div className="mt-2.5">
@@ -174,6 +177,7 @@ export default function CreateOrUpdateExtractionRule({
           onValueChange={setPriority}
           min={0}
           max={100}
+          data-cy="extraction-form-priority-input"
         />
       </div>
       <div className="mt-2.5">
@@ -215,6 +219,7 @@ export default function CreateOrUpdateExtractionRule({
           required={true}
           value={attribute}
           onValueChange={setAttribute}
+          data-cy="extraction-form-attribute-input"
         />
       </div>
       <div className="mt-2.5">
@@ -239,6 +244,7 @@ export default function CreateOrUpdateExtractionRule({
           error={extractedAttributes.length === 0 && regex !== ""}
           errorMessage="Invalid regex pattern. Must contain named groups."
           onValueChange={setRegex}
+          data-cy="extraction-form-regex-input"
         />
       </div>
       <div className="mt-2.5">
@@ -293,6 +299,7 @@ export default function CreateOrUpdateExtractionRule({
           size="xs"
           variant="secondary"
           onClick={exitEditOrCreateMode}
+          data-cy="extraction-form-cancel-btn"
         >
           Cancel
         </Button>
@@ -301,6 +308,7 @@ export default function CreateOrUpdateExtractionRule({
           color="orange"
           size="xs"
           type="submit"
+          data-cy="extraction-form-submit-btn"
         >
           {editMode ? "Update" : "Create"}
         </Button>

@@ -294,6 +294,7 @@ export const DeduplicationTable: React.FC<DeduplicationTableProps> = ({
                 info.row.original.default || info.row.original.is_provisioned
               }
               onClick={(e) => handleDeleteRule(info.row.original, e)}
+              data-cy="dedup-action-delete-btn"
             />
           </div>
         ),
@@ -324,7 +325,7 @@ export const DeduplicationTable: React.FC<DeduplicationTableProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full gap-6">
+    <div className="flex-1 flex flex-col h-full gap-6" data-cy="dedup-page">
       <div className="flex items-center justify-between">
         <div>
           <PageTitle>
@@ -346,11 +347,12 @@ export const DeduplicationTable: React.FC<DeduplicationTableProps> = ({
           icon={PlusIcon}
           variant="primary"
           size="md"
+          data-cy="dedup-create-btn"
         >
           Create Deduplication Rule
         </Button>
       </div>
-      <Card className="p-0">
+      <Card className="p-0" data-cy="dedup-table">
         <Table>
           <TableHead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -410,6 +412,8 @@ export const DeduplicationTable: React.FC<DeduplicationTableProps> = ({
                 key={row.id}
                 className="cursor-pointer hover:bg-slate-50 group"
                 onClick={() => onDeduplicationClick(row.original)}
+                data-cy="dedup-row"
+                data-cy-id={row.original.id}
               >
                 {row.getVisibleCells().map((cell) => {
                   const { style, className } =
@@ -427,6 +431,7 @@ export const DeduplicationTable: React.FC<DeduplicationTableProps> = ({
                         "px-3 py-2"
                       )}
                       style={style}
+                      data-cy={`dedup-cell-${cell.column.id}`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

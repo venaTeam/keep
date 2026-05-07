@@ -60,6 +60,7 @@ interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement>,
     VariantProps<typeof inputStyles> {
   inputClassName?: string;
+  "data-cy"?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -70,6 +71,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       hasError,
       enableStepper = true,
       type,
+      "data-cy": dataCy,
       ...props
     }: InputProps,
     forwardedRef
@@ -92,6 +94,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             },
             inputClassName
           )}
+          data-cy={dataCy}
           {...props}
         />
         {isSearch && (

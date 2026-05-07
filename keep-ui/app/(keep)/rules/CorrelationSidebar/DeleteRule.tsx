@@ -35,6 +35,7 @@ export const DeleteRuleCell = ({ ruleId }: DeleteRuleCellProps) => {
       color="red"
       size="xs"
       icon={TrashIcon}
+      data-cy="rules-delete-btn"
     />
   );
 };

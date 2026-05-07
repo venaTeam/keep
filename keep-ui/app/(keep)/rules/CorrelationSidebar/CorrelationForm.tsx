@@ -75,6 +75,7 @@ export const CorrelationForm = ({
             })}
             error={isSubmitted && !!get(errors, "name.message")}
             errorMessage={isSubmitted && get(errors, "name.message")}
+            data-cy="rules-form-name-input"
           />
         </label>
 
@@ -100,6 +101,7 @@ export const CorrelationForm = ({
             min={1}
             className="mt-2"
             {...register("timeAmount", { validate: (value) => value > 0 })}
+            data-cy="rules-form-time-amount-input"
           />
           <Controller
             control={control}
@@ -143,6 +145,7 @@ export const CorrelationForm = ({
             errorMessage={
               isSubmitted && get(errors, "incidentNameTemplate.message")
             }
+            data-cy="rules-form-incident-name-template-input"
           />
         </div>
         <div>
@@ -162,6 +165,7 @@ export const CorrelationForm = ({
             type="text"
             placeholder="INC"
             className="mt-2"
+            data-cy="rules-form-incident-prefix-input"
             {...register("incidentPrefix", {
               required: {
                 message: "Incident prefix is required",
@@ -288,6 +292,7 @@ export const CorrelationForm = ({
                 type="number"
                 placeholder="1"
                 className="mt-2"
+                data-cy="rules-form-threshold-input"
                 {...register("threshold", {
                   required: {
                     message: "Threshold is required",

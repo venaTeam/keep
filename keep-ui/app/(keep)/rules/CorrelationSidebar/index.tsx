@@ -94,6 +94,7 @@ export const CorrelationSidebar = ({
       isOpen={isOpen}
       onClose={toggle}
       className="fixed right-0 inset-y-0 min-w-12 bg-white p-6 overflow-auto flex flex-col"
+      data-cy="rules-sidebar"
     >
       <div className="flex flex-col h-full max-h-full overflow-hidden">
         <CorrelationSidebarHeader toggle={toggle} />

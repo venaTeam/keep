@@ -34,7 +34,7 @@ export default function ExtractionExecutionDetailsPage(props: {
   )}`;
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4" data-cy="extraction-execution-detail-page">
       <div>
         <Subtitle className="text-sm">
           <Link href="/extraction">All Rules</Link>{" "}

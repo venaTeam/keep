@@ -56,7 +56,7 @@ export default function RunMappingModal({ ruleId, isOpen, onClose }: Props) {
 
   return (
     <Dialog open={isOpen} onClose={clearAndClose} static={true}>
-      <DialogPanel>
+      <DialogPanel data-cy="mapping-run-modal">
         <Title className="mb-1">Select alert to run mapping rule against</Title>
 
         {alerts.length > 0 ? (
@@ -64,6 +64,7 @@ export default function RunMappingModal({ ruleId, isOpen, onClose }: Props) {
             value={selectedAlertId}
             onValueChange={setSelectedAlertId}
             placeholder="Select an alert..."
+            data-cy="mapping-run-alert-select"
           >
             {alerts.map((alert) => (
               <SelectItem key={alert.event_id} value={alert.event_id}>
@@ -81,7 +82,7 @@ export default function RunMappingModal({ ruleId, isOpen, onClose }: Props) {
         )}
 
         <div className="flex justify-end gap-2 mt-4">
-          <Button onClick={clearAndClose} color="orange" variant="secondary">
+          <Button onClick={clearAndClose} color="orange" variant="secondary" data-cy="mapping-run-cancel-btn">
             Cancel
           </Button>
           <Button
@@ -89,6 +90,7 @@ export default function RunMappingModal({ ruleId, isOpen, onClose }: Props) {
             color="orange"
             loading={isLoading}
             disabled={!selectedAlertId}
+            data-cy="mapping-run-confirm-btn"
           >
             Run
           </Button>

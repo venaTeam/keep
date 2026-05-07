@@ -149,6 +149,7 @@ export default function ExtractionsTable({ extractions, editCallback }: Props) {
               event.stopPropagation();
               setRunModalRule(context.row.original.id!);
             }}
+            data-cy="extraction-action-run-btn"
           />
           <Button
             color="orange"
@@ -160,6 +161,7 @@ export default function ExtractionsTable({ extractions, editCallback }: Props) {
               event.stopPropagation();
               editCallback(context.row.original!);
             }}
+            data-cy="extraction-action-edit-btn"
           />
           <Button
             color="red"
@@ -171,6 +173,7 @@ export default function ExtractionsTable({ extractions, editCallback }: Props) {
               event.stopPropagation();
               deleteExtraction(context.row.original.id!);
             }}
+            data-cy="extraction-action-delete-btn"
           />
         </div>
       ),
@@ -205,12 +208,12 @@ export default function ExtractionsTable({ extractions, editCallback }: Props) {
 
   return (
     <>
-      <Table>
+      <Table data-cy="extraction-table">
         <TableHead>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHeaderCell key={header.id}>
+                <TableHeaderCell key={header.id} data-cy={`extraction-header-${header.column.id}`}>
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext()
@@ -229,9 +232,11 @@ export default function ExtractionsTable({ extractions, editCallback }: Props) {
                 onClick={() =>
                   router.push(`/extraction/${row.original.id}/executions`)
                 }
+                data-cy="extraction-row"
+                data-cy-id={row.original.id}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} data-cy={`extraction-cell-${cell.column.id}`}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

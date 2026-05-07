@@ -56,7 +56,7 @@ export default function RunExtractionModal({ ruleId, isOpen, onClose }: Props) {
 
   return (
     <Dialog open={isOpen} onClose={clearAndClose} static={true}>
-      <DialogPanel>
+      <DialogPanel data-cy="extraction-run-modal">
         <Title className="mb-1">
           Select alert to run extraction rule against
         </Title>
@@ -66,6 +66,7 @@ export default function RunExtractionModal({ ruleId, isOpen, onClose }: Props) {
             value={selectedAlertId}
             onValueChange={setSelectedAlertId}
             placeholder="Select an alert..."
+            data-cy="extraction-run-alert-select"
           >
             {alerts.map((alert) => (
               <SelectItem key={alert.event_id} value={alert.event_id}>
@@ -83,7 +84,7 @@ export default function RunExtractionModal({ ruleId, isOpen, onClose }: Props) {
         )}
 
         <div className="flex justify-end gap-2 mt-4">
-          <Button onClick={clearAndClose} color="orange" variant="secondary">
+          <Button onClick={clearAndClose} color="orange" variant="secondary" data-cy="extraction-run-cancel-btn">
             Cancel
           </Button>
           <Button
@@ -91,6 +92,7 @@ export default function RunExtractionModal({ ruleId, isOpen, onClose }: Props) {
             color="orange"
             loading={isLoading}
             disabled={!selectedAlertId}
+            data-cy="extraction-run-confirm-btn"
           >
             Run
           </Button>

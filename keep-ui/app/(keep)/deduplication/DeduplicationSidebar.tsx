@@ -258,6 +258,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
       <form
         onSubmit={handleSubmit(onFormSubmit)}
         className="mt-4 flex flex-col h-full"
+        data-cy="dedup-sidebar"
       >
         <div className="flex-grow space-y-4">
           <Card>
@@ -276,6 +277,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
                       {...field}
                       error={!!errors.name}
                       errorMessage={errors.name?.message}
+                      data-cy="dedup-form-name-input"
                     />
                   )}
                 />
@@ -294,6 +296,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
                       {...field}
                       error={!!errors.description}
                       errorMessage={errors.description?.message}
+                      data-cy="dedup-form-description-input"
                     />
                   )}
                 />
@@ -322,6 +325,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
                   render={({ field }) => (
                     <Select
                       {...field}
+                      data-cy="dedup-form-provider-select"
                       isDisabled={
                         !!selectedDeduplicationRule?.default ||
                         selectedDeduplicationRule?.is_provisioned
@@ -402,6 +406,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
                   render={({ field }) => (
                     <Select
                       {...field}
+                      data-cy="dedup-form-fingerprint-fields-select"
                       isDisabled={!!selectedDeduplicationRule?.is_provisioned}
                       isMulti
                       options={availableFields.map((fieldName) => ({
@@ -482,6 +487,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
                     render={({ field }) => (
                       <Select
                         {...field}
+                        data-cy="dedup-form-ignore-fields-select"
                         isDisabled={!!selectedDeduplicationRule?.is_provisioned}
                         isMulti
                         options={availableFields.map((fieldName) => ({
@@ -529,6 +535,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
             onClick={handleToggle}
             type="button"
             className="border border-orange-500 text-orange-500"
+            data-cy="dedup-form-cancel-btn"
           >
             Cancel
           </Button>
@@ -536,6 +543,7 @@ const DeduplicationSidebar: React.FC<DeduplicationSidebarProps> = ({
             color="orange"
             type="submit"
             disabled={isSubmitting || selectedDeduplicationRule?.is_provisioned}
+            data-cy="dedup-form-submit-btn"
           >
             {isSubmitting ? "Saving..." : "Save"}
           </Button>

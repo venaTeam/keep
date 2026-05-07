@@ -14,9 +14,9 @@ export default function WorkflowVersionPage() {
   );
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1>Workflow Revision {revision}</h1>
-      <Card className="h-[calc(100vh-12rem)] p-0">
+    <div className="flex flex-col gap-4" data-cy="wf-version-page">
+      <h1 data-cy="wf-version-page-title">Workflow Revision {revision}</h1>
+      <Card className="h-[calc(100vh-12rem)] p-0" data-cy="wf-version-yaml-editor-card">
         <WorkflowYAMLEditor
           value={workflow?.workflow_raw ?? ""}
           readOnly={true}

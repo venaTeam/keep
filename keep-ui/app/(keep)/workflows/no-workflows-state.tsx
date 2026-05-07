@@ -17,7 +17,7 @@ export function NoWorkflowsState({}: {
   const router = useRouter();
 
   return (
-    <div data-testid="no-workflows-state">
+    <div data-testid="no-workflows-state" data-cy="no-workflows-state">
       <div className="mb-3">
         <PageTitle className="mb-3">Create your first workflow</PageTitle>
         <PageSubtitle>
@@ -37,6 +37,7 @@ export function NoWorkflowsState({}: {
                 }}
                 icon={ArrowUpOnSquareStackIcon}
                 id="uploadWorkflowButton"
+                data-cy="wf-upload-btn"
               >
                 Upload Workflows
               </Button>
@@ -46,6 +47,7 @@ export function NoWorkflowsState({}: {
                 size="xs"
                 variant="primary"
                 onClick={() => router.push("/workflows/builder")}
+                data-cy="wf-start-from-scratch-btn"
               >
                 Start from scratch
               </Button>

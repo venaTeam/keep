@@ -453,6 +453,7 @@ function KeepStepEditor({
               onValueChange={(value) => updateProperty("if", value)}
               className="mb-2.5"
               value={properties?.if || ("" as string)}
+              data-cy="wf-editor-if-input"
             />
           </div>
           <div>
@@ -941,20 +942,21 @@ function ActionOrStepEditor({
           onChange={handleInputChange}
           placeholder="e.g. my-step"
           data-testid="wf-editor-step-name-input"
+          data-cy="wf-editor-step-name-input"
         />
       </div>
-      <TabList className="px-4">
-        <Tab value="select">
+      <TabList className="px-4" data-cy="wf-editor-step-tabs">
+        <Tab value="select" data-cy="wf-editor-step-tab-setup">
           <div className="flex items-center gap-1">
             Setup {getStepIcon(setupStatus())}
           </div>
         </Tab>
-        <Tab value="configure">
+        <Tab value="configure" data-cy="wf-editor-step-tab-configure">
           <div className="flex items-center gap-1">
             Configure {getStepIcon(configureStatus())}
           </div>
         </Tab>
-        <Tab value="test">Test</Tab>
+        <Tab value="test" data-cy="wf-editor-step-tab-test">Test</Tab>
       </TabList>
       <TabPanels className="flex-1 flex flex-col">
         <TabPanel className="flex-1">
@@ -979,6 +981,7 @@ function ActionOrStepEditor({
                   setTabIndex(1);
                 }}
                 data-testid="wf-editor-setup-save-button"
+                data-cy="wf-editor-setup-save-button"
                 disabled={saveButtonDisabled}
               >
                 {saveButtonText}
@@ -1010,6 +1013,7 @@ function ActionOrStepEditor({
                   setTabIndex(2);
                 }}
                 data-testid="wf-editor-configure-save-button"
+                data-cy="wf-editor-configure-save-button"
                 disabled={saveButtonDisabled}
               >
                 {saveButtonText}

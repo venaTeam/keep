@@ -173,7 +173,7 @@ export const TableFilters: React.FC<TableFiltersProps> = ({ workflowId }) => {
 
   // TODO: maybe replace with facets?
   return (
-    <div className="relative flex flex-col md:flex-row lg:flex-row gap-4 items-center mb-2">
+    <div className="relative flex flex-col md:flex-row lg:flex-row gap-4 items-center mb-2" data-cy="wf-executions-filters">
       <div className="w-1/3 flex relative gap-2">
         <Textarea
           rows={1}
@@ -182,6 +182,7 @@ export const TableFilters: React.FC<TableFiltersProps> = ({ workflowId }) => {
           onChange={onValueChange}
           onKeyDown={handleKeyDown}
           placeholder="Filter Workflows..."
+          data-cy="wf-executions-filter-input"
         />
       </div>
       <div className="flex-1 flex gap-4">
@@ -217,6 +218,7 @@ export const TableFilters: React.FC<TableFiltersProps> = ({ workflowId }) => {
           filterRef.current = { trigger: [], status: [], execution_id: "" };
           setApply(true);
         }}
+        data-cy="wf-executions-clear-filters-btn"
       >
         Clear filters
       </Button>

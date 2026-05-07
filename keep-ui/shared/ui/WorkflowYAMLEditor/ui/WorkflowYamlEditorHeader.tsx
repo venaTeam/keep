@@ -18,9 +18,9 @@ export function WorkflowYamlEditorHeader({
   children,
 }: WorkflowYamlEditorHeaderProps) {
   return (
-    <div className="flex items-baseline justify-between p-2 border-b border-gray-200">
+    <div className="flex items-baseline justify-between p-2 border-b border-gray-200" data-cy="wf-yaml-editor-header">
       <div className="flex items-center gap-2">
-        <Title className={clsx(workflowId ? "mx-2" : "mx-0")}>
+        <Title className={clsx(workflowId ? "mx-2" : "mx-0")} data-cy="wf-yaml-editor-title">
           {workflowId ? "Edit" : "New"} Workflow
         </Title>
         <WorkflowSyncStatus

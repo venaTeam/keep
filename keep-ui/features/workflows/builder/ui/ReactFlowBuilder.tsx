@@ -83,7 +83,7 @@ export const ReactFlowBuilder = () => {
     [selectedEdge, selectedNode]
   );
   return (
-    <div className="h-full sqd-theme-light sqd-layout-desktop flex">
+    <div className="h-full sqd-theme-light sqd-layout-desktop flex" data-cy="wf-builder-canvas">
       {isLayouted ? (
         <ReactFlow
           fitView
@@ -101,6 +101,7 @@ export const ReactFlowBuilder = () => {
           onInit={(instance) => {
             reactFlowInstanceRef.current = instance;
           }}
+          data-cy="wf-builder-react-flow"
         >
           <Controls orientation="horizontal" />
           <Background />

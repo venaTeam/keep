@@ -90,11 +90,11 @@ export default function WorkflowDetailPage({
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" data-cy="wf-detail-page">
       <TabGroup index={tabIndex} onIndexChange={handleTabChange}>
-        <TabList>
-          <Tab icon={AiOutlineSwap}>Overview</Tab>
-          <Tab icon={WrenchIcon}>
+        <TabList data-cy="wf-detail-tabs">
+          <Tab icon={AiOutlineSwap} data-cy="wf-tab-overview">Overview</Tab>
+          <Tab icon={WrenchIcon} data-cy="wf-tab-builder">
             <div className="flex items-center gap-2">
               Builder{" "}
               {isUIBuilderUnsaved ? (
@@ -102,7 +102,7 @@ export default function WorkflowDetailPage({
               ) : null}
             </div>
           </Tab>
-          <Tab icon={CodeBracketIcon}>
+          <Tab icon={CodeBracketIcon} data-cy="wf-tab-yaml">
             <div className="flex items-center gap-2">
               YAML Definition{" "}
               {isYamlEditorUnsaved ? (
@@ -110,12 +110,13 @@ export default function WorkflowDetailPage({
               ) : null}
             </div>
           </Tab>
-          <Tab icon={PiClockCounterClockwise}>Versions</Tab>
-          <Tab icon={KeyIcon}>Secrets</Tab>
+          <Tab icon={PiClockCounterClockwise} data-cy="wf-tab-versions">Versions</Tab>
+          <Tab icon={KeyIcon} data-cy="wf-tab-secrets">Secrets</Tab>
           <TabNavigationLink
             href="https://www.youtube.com/@keepalerting"
             icon={ArrowUpRightIcon}
             target="_blank"
+            data-cy="wf-tab-tutorials"
           >
             Tutorials
           </TabNavigationLink>
@@ -123,18 +124,19 @@ export default function WorkflowDetailPage({
             href={`${docsUrl}/workflows`}
             icon={ArrowUpRightIcon}
             target="_blank"
+            data-cy="wf-tab-docs"
           >
             Documentation
           </TabNavigationLink>
         </TabList>
         <TabPanels>
-          <TabPanel id="overview">
+          <TabPanel id="overview" data-cy="wf-tab-panel-overview">
             <WorkflowOverview
               workflow={workflow ?? null}
               workflow_id={params.workflow_id}
             />
           </TabPanel>
-          <TabPanel id="builder">
+          <TabPanel id="builder" data-cy="wf-tab-panel-builder">
             {!workflow ? (
               <Skeleton className="w-full h-full" />
             ) : (
@@ -146,7 +148,7 @@ export default function WorkflowDetailPage({
               </Card>
             )}
           </TabPanel>
-          <TabPanel id="yaml">
+          <TabPanel id="yaml" data-cy="wf-tab-panel-yaml">
             {!workflow || !workflow.workflow_raw ? (
               <Skeleton className="w-full h-full" />
             ) : (
@@ -161,13 +163,13 @@ export default function WorkflowDetailPage({
               </Card>
             )}
           </TabPanel>
-          <TabPanel id="versions">
+          <TabPanel id="versions" data-cy="wf-tab-panel-versions">
             <WorkflowVersions
               workflowId={params.workflow_id}
               currentRevision={workflow?.revision ?? null}
             />
           </TabPanel>
-          <TabPanel id="secrets">
+          <TabPanel id="secrets" data-cy="wf-tab-panel-secrets">
             <WorkflowSecrets workflowId={params.workflow_id} />
           </TabPanel>
         </TabPanels>

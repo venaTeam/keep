@@ -52,14 +52,14 @@ export function WorkflowSyncStatus({
   };
 
   return (
-    <Tooltip content={isChangesSaved ? "Saved to Keep" : "Not saved"}>
-      <span className="flex items-center gap-1 text-sm">
+    <Tooltip content={isChangesSaved ? "Saved to Keep" : "Not saved"} data-cy="wf-sync-status-tooltip">
+      <span className="flex items-center gap-1 text-sm" data-cy="wf-sync-status">
         {isChangesSaved ? (
           <>
             <CloudIcon className="size-5 text-gray-500" />
             <span className="text-gray-500">
               {revision && (
-                <span data-testid="wf-revision">Revision {revision}</span>
+                <span data-testid="wf-revision" data-cy="wf-revision">Revision {revision}</span>
               )}
               {revision ? ", saved " : "Saved "}
               {lastSavedAt ? (

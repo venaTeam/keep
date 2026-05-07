@@ -131,6 +131,7 @@ function WorkflowNode({ id, data }: FlowNode) {
           "w-full h-full flex items-center justify-center",
           data.id === "end" && "opacity-0"
         )}
+        data-cy={`wf-node-${data?.componentType ?? "step"}-${id}`}
       >
         <DebugNodeInfo id={id} data={data} />
         <div
@@ -174,6 +175,7 @@ function WorkflowNode({ id, data }: FlowNode) {
             borderStyle: isEmptyNode ? "dashed" : "",
           }}
           data-testid="workflow-node"
+          data-cy={`wf-node-${data?.componentType ?? "step"}-${id}`}
         >
           <DebugNodeInfo id={id} data={data} />
           {isEmptyNode && (

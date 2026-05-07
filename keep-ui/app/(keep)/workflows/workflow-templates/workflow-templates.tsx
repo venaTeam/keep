@@ -73,6 +73,7 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = () => {
               color="orange"
               variant="secondary"
               onClick={() => setSearchValue("")}
+              data-cy="wf-templates-clear-search-btn"
             >
               Clear search
             </Button>
@@ -84,7 +85,10 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = () => {
     return (
       <>
         <div className="flex-1 min-h-0 overflow-y-auto p-[1px]">
-          <div className="flex-1  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full gap-4">
+          <div
+            className="flex-1  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full gap-4"
+            data-cy="wf-templates-grid"
+          >
             {cartsToRender.map((template, index: number) => (
               <WorkflowTemplateCard key={index} template={template} />
             ))}
@@ -107,7 +111,7 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = () => {
   }
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col gap-3">
+    <div className="flex-1 min-h-0 flex flex-col gap-3" data-cy="wf-templates-section">
       <SearchInput
         placeholder="Search workflows"
         value={searchValue as string}

@@ -10,19 +10,19 @@ export function WorkflowBreadcrumbs({ workflowId }: { workflowId: string }) {
   const clientParams = useParams();
 
   return (
-    <Subtitle className="text-sm">
-      <Link href="/workflows">All Workflows</Link>{" "}
+    <Subtitle className="text-sm" data-cy="wf-breadcrumbs">
+      <Link href="/workflows" data-cy="wf-breadcrumbs-all">All Workflows</Link>{" "}
       {clientParams.workflow_execution_id ? (
         <>
           <Icon icon={ArrowRightIcon} color="gray" size="xs" />{" "}
-          <Link href={`/workflows/${workflowId}`}>Workflow Details</Link>
+          <Link href={`/workflows/${workflowId}`} data-cy="wf-breadcrumbs-detail">Workflow Details</Link>
           <Icon icon={ArrowRightIcon} color="gray" size="xs" /> Workflow
           Execution Details
         </>
       ) : (
         <>
           <Icon icon={ArrowRightIcon} color="gray" size="xs" />{" "}
-          <Link href={`/workflows/${workflowId}`}>Workflow Details</Link>
+          <Link href={`/workflows/${workflowId}`} data-cy="wf-breadcrumbs-detail">Workflow Details</Link>
         </>
       )}
       {clientParams.revision && (
@@ -30,6 +30,7 @@ export function WorkflowBreadcrumbs({ workflowId }: { workflowId: string }) {
           <Icon icon={ArrowRightIcon} color="gray" size="xs" />{" "}
           <Link
             href={`/workflows/${workflowId}/versions/${clientParams.revision}`}
+            data-cy="wf-breadcrumbs-revision"
           >
             Workflow Revision {clientParams.revision}
           </Link>

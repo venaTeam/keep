@@ -113,7 +113,7 @@ export const UploadWorkflowsModal: React.FC<UploadWorkflowsModalProps> = ({
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Upload Workflow files">
+    <Modal isOpen={true} onClose={onClose} title="Upload Workflow files" data-cy="wf-upload-modal">
       <div className="bg-white rounded max-w-lg max-h-fit	 mx-auto z-20">
         <div className="space-y-2">
           <Input
@@ -128,6 +128,7 @@ export const UploadWorkflowsModal: React.FC<UploadWorkflowsModalProps> = ({
               onDrop(e);
               onClose(); // Add this line to close the modal
             }}
+            data-cy="wf-upload-file-input"
           />
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-500">
             Only .yml and .yaml files are supported.
@@ -142,6 +143,7 @@ export const UploadWorkflowsModal: React.FC<UploadWorkflowsModalProps> = ({
             }}
             name="workflowDefinition"
             className="mt-2"
+            data-cy="wf-upload-yaml-textarea"
           />
           <Button
             className="mt-2"
@@ -149,6 +151,7 @@ export const UploadWorkflowsModal: React.FC<UploadWorkflowsModalProps> = ({
             size="md"
             variant="primary"
             onClick={() => handleWorkflowDefinitionString(workflowDefinition)}
+            data-cy="wf-upload-yaml-load-btn"
           >
             Load
           </Button>
@@ -162,6 +165,7 @@ export const UploadWorkflowsModal: React.FC<UploadWorkflowsModalProps> = ({
             variant="secondary"
             icon={ArrowRightIcon}
             onClick={() => handleStaticExampleSelect("slack")}
+            data-cy="wf-upload-example-slack-btn"
           >
             Send a Slack message for every alert or manually
           </Button>
@@ -173,6 +177,7 @@ export const UploadWorkflowsModal: React.FC<UploadWorkflowsModalProps> = ({
             variant="secondary"
             icon={ArrowRightIcon}
             onClick={() => handleStaticExampleSelect("sql")}
+            data-cy="wf-upload-example-sql-btn"
           >
             Run SQL query and send the results as a Slack message
           </Button>
@@ -194,6 +199,7 @@ export const UploadWorkflowsModal: React.FC<UploadWorkflowsModalProps> = ({
             color="orange"
             variant="secondary"
             onClick={() => onClose()}
+            data-cy="wf-upload-cancel-btn"
           >
             Cancel
           </Button>

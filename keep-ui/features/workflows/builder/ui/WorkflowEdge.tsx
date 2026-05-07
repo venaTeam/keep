@@ -140,6 +140,7 @@ export const WorkflowEdge: React.FC<WorkflowEdgeProps> = ({
               pointerEvents: "none",
               opacity: isLayouted ? 1 : 0,
             }}
+            data-cy={`wf-edge-label-${id}`}
           >
             {dynamicLabel}
           </div>
@@ -158,6 +159,11 @@ export const WorkflowEdge: React.FC<WorkflowEdgeProps> = ({
               setSelectedEdge(id);
             }}
             data-testid={
+              source === "trigger_start"
+                ? "wf-add-trigger-button"
+                : "wf-add-step-button"
+            }
+            data-cy={
               source === "trigger_start"
                 ? "wf-add-trigger-button"
                 : "wf-add-step-button"

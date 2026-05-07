@@ -45,10 +45,10 @@ export function WorkflowEditorV2() {
   let renderDivider = false;
   return (
     <EditorLayout>
-      <Subtitle className="font-medium flex items-baseline justify-between">
+      <Subtitle className="font-medium flex items-baseline justify-between" data-cy="wf-editor-workflow-settings-title">
         Workflow Settings
       </Subtitle>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2" data-cy="wf-editor-workflow-settings">
         {propertyKeys.map((key, index) => {
           const isTrigger = [
             "manual",
@@ -143,6 +143,7 @@ export function WorkflowEditorV2() {
                           variant="light"
                           color="gray"
                           icon={PlusIcon}
+                          data-cy="wf-editor-add-constant-btn"
                         >
                           Add Constant
                         </Button>
@@ -156,6 +157,7 @@ export function WorkflowEditorV2() {
                         value={properties[key] || ("" as string)}
                         error={!!error}
                         errorMessage={error?.[0]}
+                        data-cy={`wf-editor-${key}-input`}
                       />
                     );
                 }

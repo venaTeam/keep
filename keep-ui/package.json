@@ -13,7 +13,8 @@
     "start": "next start",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "test:workflow-examples": "ts-node -P tsconfig.scripts.json scripts/validate-workflow-examples.ts"
+    "test:workflow-examples": "ts-node -P tsconfig.scripts.json scripts/validate-workflow-examples.ts",
+    "audit:data-cy": "ts-node -P tsconfig.scripts.json scripts/data-cy/audit.ts"
   },
   "dependencies": {
     "@auth/core": "^0.38.0",

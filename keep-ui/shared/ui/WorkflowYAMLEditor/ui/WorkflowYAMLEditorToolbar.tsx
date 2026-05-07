@@ -45,7 +45,7 @@ export function WorkflowYAMLEditorToolbar({
   };
 
   return (
-    <div className={clsx("absolute top-2 right-6 z-10 flex gap-2", className)}>
+    <div className={clsx("absolute top-2 right-6 z-10 flex gap-2", className)} data-cy="wf-yaml-toolbar">
       <Button
         color="orange"
         size="sm"
@@ -53,6 +53,7 @@ export function WorkflowYAMLEditorToolbar({
         onClick={handleCopy}
         variant="secondary"
         data-testid="copy-yaml-button"
+        data-cy="wf-yaml-copy-btn"
         disabled={!isEditorMounted}
       >
         {isCopied ? (
@@ -68,6 +69,7 @@ export function WorkflowYAMLEditorToolbar({
         onClick={onDownload}
         variant="secondary"
         data-testid="download-yaml-button"
+        data-cy="wf-yaml-download-btn"
         disabled={!isEditorMounted}
       >
         <Download className="h-4 w-4" />
@@ -80,6 +82,7 @@ export function WorkflowYAMLEditorToolbar({
           onClick={onSave}
           variant="primary"
           data-testid="save-yaml-button"
+          data-cy="wf-yaml-save-btn"
         >
           Save
         </Button>

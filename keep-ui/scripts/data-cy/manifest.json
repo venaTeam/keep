@@ -1,11 +1,33 @@
 {
-  "version": "0a03269fef5e8d94298ebb3f6b835b38bb13bc0a",
-  "generatedAt": "2026-05-06T23:49:59.150Z",
-  "totalSelectors": 7,
+  "version": "a2eb0cc11bc0979ef853dbaf5ad26854a16378e2",
+  "generatedAt": "2026-05-07T00:12:14.921Z",
+  "totalSelectors": 185,
   "byArea": {
     "(dynamic)": 5,
+    "alerts": 109,
+    "apply": 1,
+    "cancel": 2,
+    "cel": 2,
+    "column": 2,
+    "columns": 2,
+    "counter": 1,
+    "create": 2,
+    "custom": 1,
+    "delete": 2,
     "drawer": 1,
-    "modal": 1
+    "facet": 18,
+    "facets": 1,
+    "is": 1,
+    "modal": 1,
+    "no": 1,
+    "noisy": 1,
+    "panel": 5,
+    "preset": 16,
+    "reset": 1,
+    "save": 2,
+    "settings": 2,
+    "tab": 5,
+    "theme": 1
   },
   "selectors": [
     {
@@ -59,6 +81,1246 @@
       "mirrorsDataTestId": false
     },
     {
+      "selector": "alerts-facets",
+      "area": "alerts",
+      "role": "facets",
+      "dynamic": false,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-alert-facets.tsx",
+      "line": 196,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-assign-ticket-modal",
+      "area": "alerts",
+      "role": "assign",
+      "dynamic": false,
+      "file": "features/alerts/alert-assign-ticket/ui/alert-assign-ticket-modal.tsx",
+      "line": 162,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-assign-ticket-cancel-btn",
+      "area": "alerts",
+      "role": "assign",
+      "dynamic": false,
+      "file": "features/alerts/alert-assign-ticket/ui/alert-assign-ticket-modal.tsx",
+      "line": 231,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-assign-ticket-submit-btn",
+      "area": "alerts",
+      "role": "assign",
+      "dynamic": false,
+      "file": "features/alerts/alert-assign-ticket/ui/alert-assign-ticket-modal.tsx",
+      "line": 240,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-assign-modal",
+      "area": "alerts",
+      "role": "assign",
+      "dynamic": false,
+      "file": "features/alerts/alert-assign/ui/alert-assign-modal.tsx",
+      "line": 62,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-assign-cancel-btn",
+      "area": "alerts",
+      "role": "assign",
+      "dynamic": false,
+      "file": "features/alerts/alert-assign/ui/alert-assign-modal.tsx",
+      "line": 90,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-assign-submit-btn",
+      "area": "alerts",
+      "role": "assign",
+      "dynamic": false,
+      "file": "features/alerts/alert-assign/ui/alert-assign-modal.tsx",
+      "line": 93,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-associate-incident-create-new-btn",
+      "area": "alerts",
+      "role": "associate",
+      "dynamic": false,
+      "file": "features/alerts/alert-associate-to-incident/ui/alert-associate-incident-modal.tsx",
+      "line": 120,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-associate-incident-submit-btn",
+      "area": "alerts",
+      "role": "associate",
+      "dynamic": false,
+      "file": "features/alerts/alert-associate-to-incident/ui/alert-associate-incident-modal.tsx",
+      "line": 161,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-associate-incident-create-new-alt-btn",
+      "area": "alerts",
+      "role": "associate",
+      "dynamic": false,
+      "file": "features/alerts/alert-associate-to-incident/ui/alert-associate-incident-modal.tsx",
+      "line": 171,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-associate-incident-modal",
+      "area": "alerts",
+      "role": "associate",
+      "dynamic": false,
+      "file": "features/alerts/alert-associate-to-incident/ui/alert-associate-incident-modal.tsx",
+      "line": 186,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-method-modal",
+      "area": "alerts",
+      "role": "method",
+      "dynamic": false,
+      "file": "features/alerts/alert-call-provider-method/ui/alert-method-modal.tsx",
+      "line": 211,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-method-invoke-btn",
+      "area": "alerts",
+      "role": "method",
+      "dynamic": false,
+      "file": "features/alerts/alert-call-provider-method/ui/alert-method-modal.tsx",
+      "line": 226,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-method-results-table",
+      "area": "alerts",
+      "role": "method",
+      "dynamic": false,
+      "file": "features/alerts/alert-call-provider-method/ui/alert-method-results-table.tsx",
+      "line": 17,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-change-status-modal",
+      "area": "alerts",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/alerts/alert-change-status/ui/alert-change-status-modal.tsx",
+      "line": 148,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-change-status-cancel-btn",
+      "area": "alerts",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/alerts/alert-change-status/ui/alert-change-status-modal.tsx",
+      "line": 195,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-change-status-submit-btn",
+      "area": "alerts",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/alerts/alert-change-status/ui/alert-change-status-modal.tsx",
+      "line": 198,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-change-status-modal",
+      "area": "alerts",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/alerts/alert-change-status/ui/alert-change-status-modal.tsx",
+      "line": 206,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-change-status-batch-cancel-btn",
+      "area": "alerts",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/alerts/alert-change-status/ui/alert-change-status-modal.tsx",
+      "line": 253,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-change-status-batch-submit-btn",
+      "area": "alerts",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/alerts/alert-change-status/ui/alert-change-status-modal.tsx",
+      "line": 256,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-incident-ai-card",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "features/alerts/alert-create-incident-ai/ui/alert-create-incident-ai-card.tsx",
+      "line": 200,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-incident-ai-edit-btn",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "features/alerts/alert-create-incident-ai/ui/alert-create-incident-ai-card.tsx",
+      "line": 202,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-incident-ai-modal",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "features/alerts/alert-create-incident-ai/ui/alert-create-incident-ai-modal.tsx",
+      "line": 316,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-incident-ai-submit-btn",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "features/alerts/alert-create-incident-ai/ui/alert-create-incident-ai-modal.tsx",
+      "line": 367,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-incident-ai-generate-btn",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "features/alerts/alert-create-incident-ai/ui/alert-create-incident-ai-modal.tsx",
+      "line": 435,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-sidebar",
+      "area": "alerts",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "features/alerts/alert-detail-sidebar/ui/alert-sidebar.tsx",
+      "line": 149,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-sidebar-close-btn",
+      "area": "alerts",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "features/alerts/alert-detail-sidebar/ui/alert-sidebar.tsx",
+      "line": 179,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-sidebar-copy-fingerprint-btn",
+      "area": "alerts",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "features/alerts/alert-detail-sidebar/ui/alert-sidebar.tsx",
+      "line": 253,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-sidebar-copy-url-btn",
+      "area": "alerts",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "features/alerts/alert-detail-sidebar/ui/alert-sidebar.tsx",
+      "line": 280,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-timeline",
+      "area": "alerts",
+      "role": "timeline",
+      "dynamic": false,
+      "file": "features/alerts/alert-detail-sidebar/ui/alert-timeline.tsx",
+      "line": 236,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-timeline-refresh-btn",
+      "area": "alerts",
+      "role": "timeline",
+      "dynamic": false,
+      "file": "features/alerts/alert-detail-sidebar/ui/alert-timeline.tsx",
+      "line": 248,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-error-event-modal",
+      "area": "alerts",
+      "role": "error",
+      "dynamic": false,
+      "file": "features/alerts/alert-error-event-process/ui/alert-error-event-modal.tsx",
+      "line": 104,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-error-event-close-btn",
+      "area": "alerts",
+      "role": "error",
+      "dynamic": false,
+      "file": "features/alerts/alert-error-event-process/ui/alert-error-event-modal.tsx",
+      "line": 108,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-error-event-dismiss-current-btn",
+      "area": "alerts",
+      "role": "error",
+      "dynamic": false,
+      "file": "features/alerts/alert-error-event-process/ui/alert-error-event-modal.tsx",
+      "line": 162,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-error-event-dismiss-all-btn",
+      "area": "alerts",
+      "role": "error",
+      "dynamic": false,
+      "file": "features/alerts/alert-error-event-process/ui/alert-error-event-modal.tsx",
+      "line": 172,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-history-close-btn",
+      "area": "alerts",
+      "role": "history",
+      "dynamic": false,
+      "file": "features/alerts/alert-history/ui/alert-history-modal.tsx",
+      "line": 92,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-history-modal",
+      "area": "alerts",
+      "role": "history",
+      "dynamic": false,
+      "file": "features/alerts/alert-history/ui/alert-history-modal.tsx",
+      "line": 152,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-view-raw-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/alerts/alert-menu/ui/alert-menu.tsx",
+      "line": 256,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-expand-row-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/alerts/alert-menu/ui/alert-menu.tsx",
+      "line": 276,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-open-original-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/alerts/alert-menu/ui/alert-menu.tsx",
+      "line": 309,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-assign-ticket-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/alerts/alert-menu/ui/alert-menu.tsx",
+      "line": 337,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-view-playbook-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/alerts/alert-menu/ui/alert-menu.tsx",
+      "line": 352,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-note-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/alerts/alert-menu/ui/alert-menu.tsx",
+      "line": 370,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-menu",
+      "area": "alerts",
+      "role": "menu",
+      "dynamic": false,
+      "file": "features/alerts/alert-menu/ui/alert-menu.tsx",
+      "line": 597,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-note-modal",
+      "area": "alerts",
+      "role": "note",
+      "dynamic": false,
+      "file": "features/alerts/alert-note/ui/alert-note-modal.tsx",
+      "line": 79,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-note-cancel-btn",
+      "area": "alerts",
+      "role": "note",
+      "dynamic": false,
+      "file": "features/alerts/alert-note/ui/alert-note-modal.tsx",
+      "line": 95,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-note-save-btn",
+      "area": "alerts",
+      "role": "note",
+      "dynamic": false,
+      "file": "features/alerts/alert-note/ui/alert-note-modal.tsx",
+      "line": 103,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-dismiss-modal",
+      "area": "alerts",
+      "role": "dismiss",
+      "dynamic": false,
+      "file": "features/alerts/dismiss-alert/ui/alert-dismiss-modal.tsx",
+      "line": 187,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-restore-cancel-btn",
+      "area": "alerts",
+      "role": "restore",
+      "dynamic": false,
+      "file": "features/alerts/dismiss-alert/ui/alert-dismiss-modal.tsx",
+      "line": 241,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-restore-submit-btn",
+      "area": "alerts",
+      "role": "restore",
+      "dynamic": false,
+      "file": "features/alerts/dismiss-alert/ui/alert-dismiss-modal.tsx",
+      "line": 248,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-dismiss-cancel-btn",
+      "area": "alerts",
+      "role": "dismiss",
+      "dynamic": false,
+      "file": "features/alerts/dismiss-alert/ui/alert-dismiss-modal.tsx",
+      "line": 336,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-dismiss-submit-btn",
+      "area": "alerts",
+      "role": "dismiss",
+      "dynamic": false,
+      "file": "features/alerts/dismiss-alert/ui/alert-dismiss-modal.tsx",
+      "line": 343,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-enrich-panel",
+      "area": "alerts",
+      "role": "enrich",
+      "dynamic": false,
+      "file": "features/alerts/enrich-alert/ui/EnrichAlertSidePanel.tsx",
+      "line": 167,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-enrich-add-field-btn",
+      "area": "alerts",
+      "role": "enrich",
+      "dynamic": false,
+      "file": "features/alerts/enrich-alert/ui/EnrichAlertSidePanel.tsx",
+      "line": 180,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-enrich-save-btn",
+      "area": "alerts",
+      "role": "enrich",
+      "dynamic": false,
+      "file": "features/alerts/enrich-alert/ui/EnrichAlertSidePanel.tsx",
+      "line": 189,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-enrich-close-btn",
+      "area": "alerts",
+      "role": "enrich",
+      "dynamic": false,
+      "file": "features/alerts/enrich-alert/ui/EnrichAlertSidePanel.tsx",
+      "line": 193,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-simulate-modal",
+      "area": "alerts",
+      "role": "simulate",
+      "dynamic": false,
+      "file": "features/alerts/simulate-alert/ui/alert-push-alert-to-server-modal.tsx",
+      "line": 115,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-simulate-cancel-btn",
+      "area": "alerts",
+      "role": "simulate",
+      "dynamic": false,
+      "file": "features/alerts/simulate-alert/ui/alert-push-alert-to-server-modal.tsx",
+      "line": 213,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-simulate-submit-btn",
+      "area": "alerts",
+      "role": "simulate",
+      "dynamic": false,
+      "file": "features/alerts/simulate-alert/ui/alert-push-alert-to-server-modal.tsx",
+      "line": 216,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-view-raw-modal",
+      "area": "alerts",
+      "role": "view",
+      "dynamic": false,
+      "file": "features/alerts/view-raw-alert/ui/ViewAlertModal.tsx",
+      "line": 669,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-view-raw-edit-toggle-btn",
+      "area": "alerts",
+      "role": "view",
+      "dynamic": false,
+      "file": "features/alerts/view-raw-alert/ui/ViewAlertModal.tsx",
+      "line": 683,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-view-raw-save-btn",
+      "area": "alerts",
+      "role": "view",
+      "dynamic": false,
+      "file": "features/alerts/view-raw-alert/ui/ViewAlertModal.tsx",
+      "line": 710,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-view-raw-copy-btn",
+      "area": "alerts",
+      "role": "view",
+      "dynamic": false,
+      "file": "features/alerts/view-raw-alert/ui/ViewAlertModal.tsx",
+      "line": 717,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-view-raw-close-btn",
+      "area": "alerts",
+      "role": "view",
+      "dynamic": false,
+      "file": "features/alerts/view-raw-alert/ui/ViewAlertModal.tsx",
+      "line": 724,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "features/filter/pagination.tsx",
+      "line": 82,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-page-size",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "features/filter/pagination.tsx",
+      "line": 88,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-first",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "features/filter/pagination.tsx",
+      "line": 103,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-prev",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "features/filter/pagination.tsx",
+      "line": 113,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-next",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "features/filter/pagination.tsx",
+      "line": 123,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-last",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "features/filter/pagination.tsx",
+      "line": 133,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-btn-refresh",
+      "area": "alerts",
+      "role": "btn",
+      "dynamic": false,
+      "file": "features/filter/pagination.tsx",
+      "line": 151,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-search-input",
+      "area": "alerts",
+      "role": "search",
+      "dynamic": false,
+      "file": "features/filter/search-input.tsx",
+      "line": 32,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-count-badge",
+      "area": "alerts",
+      "role": "count",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/alerts-count-badge.tsx",
+      "line": 61,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "alerts-actions",
+      "area": "alerts",
+      "role": "actions",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 127,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-clear-selection-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 134,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-change-status-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 146,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-restore-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 166,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-dismiss-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 179,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-create-preset-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 190,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-associate-incident-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 200,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-action-create-incident-ai-btn",
+      "area": "alerts",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-actions.tsx",
+      "line": 211,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-group-header",
+      "area": "alerts",
+      "role": "group",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-grouped-row.tsx",
+      "line": 74,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-row",
+      "area": "alerts",
+      "role": "row",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-grouped-row.tsx",
+      "line": 126,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-cell-${cell.column.id}",
+      "area": "alerts",
+      "role": "cell",
+      "dynamic": true,
+      "file": "widgets/alerts-table/ui/alert-grouped-row.tsx",
+      "line": 147,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-row",
+      "area": "alerts",
+      "role": "row",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-grouped-row.tsx",
+      "line": 172,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-cell-${cell.column.id}",
+      "area": "alerts",
+      "role": "cell",
+      "dynamic": true,
+      "file": "widgets/alerts-table/ui/alert-grouped-row.tsx",
+      "line": 192,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-pagination.tsx",
+      "line": 50,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-page-size",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-pagination.tsx",
+      "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-first",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-pagination.tsx",
+      "line": 80,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-prev",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-pagination.tsx",
+      "line": 90,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-next",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-pagination.tsx",
+      "line": 100,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-pagination-last",
+      "area": "alerts",
+      "role": "pagination",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-pagination.tsx",
+      "line": 110,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-btn-refresh",
+      "area": "alerts",
+      "role": "btn",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-pagination.tsx",
+      "line": 128,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-header-${column.id}",
+      "area": "alerts",
+      "role": "header",
+      "dynamic": true,
+      "file": "widgets/alerts-table/ui/alert-table-headers.tsx",
+      "line": 246,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-btn-simulate",
+      "area": "alerts",
+      "role": "btn",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-table-server-side.tsx",
+      "line": 623,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-btn-connect-source",
+      "area": "alerts",
+      "role": "btn",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-table-server-side.tsx",
+      "line": 634,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-btn-reset-filter",
+      "area": "alerts",
+      "role": "btn",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-table-server-side.tsx",
+      "line": 666,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-table",
+      "area": "alerts",
+      "role": "table",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-table-server-side.tsx",
+      "line": 698,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "alerts-table-wrapper",
+      "area": "alerts",
+      "role": "table",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-table-server-side.tsx",
+      "line": 833,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-table-body",
+      "area": "alerts",
+      "role": "table",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alerts-table-body.tsx",
+      "line": 113,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-row-skeleton",
+      "area": "alerts",
+      "role": "row",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alerts-table-body.tsx",
+      "line": 117,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-table-body",
+      "area": "alerts",
+      "role": "table",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alerts-table-body.tsx",
+      "line": 155,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-row",
+      "area": "alerts",
+      "role": "row",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alerts-table-body.tsx",
+      "line": 209,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-cell-${cell.column.id}",
+      "area": "alerts",
+      "role": "cell",
+      "dynamic": true,
+      "file": "widgets/alerts-table/ui/alerts-table-body.tsx",
+      "line": 228,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-columns-save-btn",
+      "area": "alerts",
+      "role": "columns",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 295,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-preset-modal",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/create-preset-modal.tsx",
+      "line": 26,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-preset-name-input",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/create-preset-modal.tsx",
+      "line": 33,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-preset-cancel-btn",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/create-preset-modal.tsx",
+      "line": 36,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "alerts-create-preset-submit-btn",
+      "area": "alerts",
+      "role": "create",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/create-preset-modal.tsx",
+      "line": 43,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "apply-theme-button",
+      "area": "apply",
+      "role": "theme",
+      "dynamic": false,
+      "file": "features/alerts/change-alert-table-theme/ui/AlertTableThemeSelection.tsx",
+      "line": 105,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "cancel-facet-creation-btn",
+      "area": "cancel",
+      "role": "facet",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal-with-suggestions.tsx",
+      "line": 120,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "cancel-facet-creation-btn",
+      "area": "cancel",
+      "role": "facet",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal.tsx",
+      "line": 80,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "cel-input",
+      "area": "cel",
+      "role": "input",
+      "dynamic": false,
+      "file": "features/cel-input/cel-input.tsx",
+      "line": 39,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "cel-clear-btn",
+      "area": "cel",
+      "role": "clear",
+      "dynamic": false,
+      "file": "features/cel-input/cel-input.tsx",
+      "line": 71,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "column-list",
+      "area": "column",
+      "role": "list",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 254,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "column-checkbox-${column}",
+      "area": "column",
+      "role": "checkbox",
+      "dynamic": true,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 269,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "columns-loading",
+      "area": "columns",
+      "role": "loading",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 242,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "columns-searching",
+      "area": "columns",
+      "role": "searching",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 248,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "counter-shows-firing-only-switch",
+      "area": "counter",
+      "role": "shows",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/preset-controls.tsx",
+      "line": 67,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "create-facet-btn",
+      "area": "create",
+      "role": "facet",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal-with-suggestions.tsx",
+      "line": 130,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "create-facet-btn",
+      "area": "create",
+      "role": "facet",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal.tsx",
+      "line": 90,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "custom-view-indicator",
+      "area": "custom",
+      "role": "view",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 206,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "delete-facet",
+      "area": "delete",
+      "role": "facet",
+      "dynamic": false,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-facet-dynamic.tsx",
+      "line": 88,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "delete-facet",
+      "area": "delete",
+      "role": "facet",
+      "dynamic": false,
+      "file": "features/filter/facet.tsx",
+      "line": 273,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
       "selector": "drawer-close-btn",
       "area": "drawer",
       "role": "close",
@@ -69,6 +1331,206 @@
       "mirrorsDataTestId": false
     },
     {
+      "selector": "facet-add-btn",
+      "area": "facet",
+      "role": "add",
+      "dynamic": false,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-alert-facets.tsx",
+      "line": 202,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-add-modal-dynamic",
+      "area": "facet",
+      "role": "add",
+      "dynamic": false,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-facet-dynamic.tsx",
+      "line": 46,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-value",
+      "area": "facet",
+      "role": "value",
+      "dynamic": false,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-facet-value.tsx",
+      "line": 170,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-value-action",
+      "area": "facet",
+      "role": "value",
+      "dynamic": false,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-facet-value.tsx",
+      "line": 196,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-value-count",
+      "area": "facet",
+      "role": "value",
+      "dynamic": false,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-facet-value.tsx",
+      "line": 201,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-${facetKey}",
+      "area": "facet",
+      "role": "",
+      "dynamic": true,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-facet.tsx",
+      "line": 42,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-${facetKey}-filter-input",
+      "area": "facet",
+      "role": "filter",
+      "dynamic": true,
+      "file": "app/(keep)/alerts/[id]/ui/alert-table-facet.tsx",
+      "line": 63,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-add-modal-suggestions",
+      "area": "facet",
+      "role": "add",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal-with-suggestions.tsx",
+      "line": 50,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-add-modal",
+      "area": "facet",
+      "role": "add",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal.tsx",
+      "line": 45,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-add-name-input",
+      "area": "facet",
+      "role": "add",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal.tsx",
+      "line": 59,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-add-property-input",
+      "area": "facet",
+      "role": "add",
+      "dynamic": false,
+      "file": "features/filter/add-facet-modal.tsx",
+      "line": 73,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-value",
+      "area": "facet",
+      "role": "value",
+      "dynamic": false,
+      "file": "features/filter/facet-value.tsx",
+      "line": 53,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "facet-value-action",
+      "area": "facet",
+      "role": "value",
+      "dynamic": false,
+      "file": "features/filter/facet-value.tsx",
+      "line": 85,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-value-count",
+      "area": "facet",
+      "role": "value",
+      "dynamic": false,
+      "file": "features/filter/facet-value.tsx",
+      "line": 90,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "facet-${facet.id}",
+      "area": "facet",
+      "role": "",
+      "dynamic": true,
+      "file": "features/filter/facet.tsx",
+      "line": 260,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-${facet.id}-filter-input",
+      "area": "facet",
+      "role": "filter",
+      "dynamic": true,
+      "file": "features/filter/facet.tsx",
+      "line": 296,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-add-btn",
+      "area": "facet",
+      "role": "add",
+      "dynamic": false,
+      "file": "features/filter/facets-panel.tsx",
+      "line": 121,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facet-reset-btn",
+      "area": "facet",
+      "role": "reset",
+      "dynamic": false,
+      "file": "features/filter/facets-panel.tsx",
+      "line": 129,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "facets-panel",
+      "area": "facets",
+      "role": "panel",
+      "dynamic": false,
+      "file": "features/filter/facets-panel.tsx",
+      "line": 113,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "is-noisy-switch",
+      "area": "is",
+      "role": "noisy",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/preset-controls.tsx",
+      "line": 46,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
       "selector": "modal-close-btn",
       "area": "modal",
       "role": "close",
@@ -77,6 +1539,346 @@
       "line": 60,
       "description": "",
       "mirrorsDataTestId": false
+    },
+    {
+      "selector": "no-columns-found",
+      "area": "no",
+      "role": "columns",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 280,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "noisy-presets-audio-player",
+      "area": "noisy",
+      "role": "presets",
+      "dynamic": false,
+      "file": "features/presets/custom-preset-links/ui/PresetsNoise.tsx",
+      "line": 75,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "panel-columns",
+      "area": "panel",
+      "role": "columns",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 92,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "panel-theme",
+      "area": "panel",
+      "role": "theme",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 102,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "panel-row-style",
+      "area": "panel",
+      "role": "row",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 105,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "panel-action-tray",
+      "area": "panel",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 108,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "panel-font-size",
+      "area": "panel",
+      "role": "font",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 111,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "preset-form",
+      "area": "preset",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/create-or-update-preset-form.tsx",
+      "line": 158,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "preset-name-input",
+      "area": "preset",
+      "role": "name",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/create-or-update-preset-form.tsx",
+      "line": 172,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "preset-generate-ai-name-btn",
+      "area": "preset",
+      "role": "generate",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/create-or-update-preset-form.tsx",
+      "line": 193,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-form-cancel-btn",
+      "area": "preset",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/create-or-update-preset-form.tsx",
+      "line": 260,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-link",
+      "area": "preset",
+      "role": "link",
+      "dynamic": false,
+      "file": "features/presets/custom-preset-links/ui/CustomPresetAlertLinks.tsx",
+      "line": 97,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-test-alerts-btn",
+      "area": "preset",
+      "role": "test",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alert-preset-manager.tsx",
+      "line": 153,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-toggle-groups-btn",
+      "area": "preset",
+      "role": "toggle",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alert-preset-manager.tsx",
+      "line": 170,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-error-alerts-btn",
+      "area": "preset",
+      "role": "error",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alert-preset-manager.tsx",
+      "line": 184,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-form-modal",
+      "area": "preset",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alert-preset-manager.tsx",
+      "line": 198,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-import-sql-btn",
+      "area": "preset",
+      "role": "import",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alerts-rules-builder.tsx",
+      "line": 465,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-delete-btn",
+      "area": "preset",
+      "role": "delete",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alerts-rules-builder.tsx",
+      "line": 481,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-import-sql-modal",
+      "area": "preset",
+      "role": "import",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alerts-rules-builder.tsx",
+      "line": 494,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-import-sql-submit-btn",
+      "area": "preset",
+      "role": "import",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alerts-rules-builder.tsx",
+      "line": 510,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-query-builder-modal",
+      "area": "preset",
+      "role": "query",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alerts-rules-builder.tsx",
+      "line": 523,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-generate-query-btn",
+      "area": "preset",
+      "role": "generate",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alerts-rules-builder.tsx",
+      "line": 540,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "preset-page-title",
+      "area": "preset",
+      "role": "page",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/alert-table-server-side.tsx",
+      "line": 737,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "reset-to-default-button",
+      "area": "reset",
+      "role": "to",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/ColumnSelection.tsx",
+      "line": 223,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "save-preset-button",
+      "area": "save",
+      "role": "preset",
+      "dynamic": false,
+      "file": "features/presets/create-or-update-preset/ui/create-or-update-preset-form.tsx",
+      "line": 266,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "save-preset-button",
+      "area": "save",
+      "role": "preset",
+      "dynamic": false,
+      "file": "features/presets/presets-manager/ui/alerts-rules-builder.tsx",
+      "line": 446,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "settings-button",
+      "area": "settings",
+      "role": "button",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 59,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "settings-panel",
+      "area": "settings",
+      "role": "panel",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 67,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "tab-columns",
+      "area": "tab",
+      "role": "columns",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 85,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "tab-theme",
+      "area": "tab",
+      "role": "theme",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 86,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "tab-row-style",
+      "area": "tab",
+      "role": "row",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 87,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "tab-action-tray",
+      "area": "tab",
+      "role": "action",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 88,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "tab-font-size",
+      "area": "tab",
+      "role": "font",
+      "dynamic": false,
+      "file": "widgets/alerts-table/ui/SettingsSelection.tsx",
+      "line": 89,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "theme-tab-list",
+      "area": "theme",
+      "role": "tab",
+      "dynamic": false,
+      "file": "features/alerts/change-alert-table-theme/ui/AlertTableThemeSelection.tsx",
+      "line": 73,
+      "description": "",
+      "mirrorsDataTestId": true
     }
   ]
 }

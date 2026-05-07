@@ -146,7 +146,7 @@ export const AlertSidebar = ({
           leaveFrom="translate-x-0"
           leaveTo="translate-x-full"
         >
-          <Dialog.Panel className="fixed right-0 inset-y-0 w-2/4 bg-white z-30 p-6 overflow-auto flex flex-col">
+          <Dialog.Panel className="fixed right-0 inset-y-0 w-2/4 bg-white z-30 p-6 overflow-auto flex flex-col" data-cy="alerts-sidebar">
             <div className="flex justify-between mb-4">
               <div className="w-full">
                 <Dialog.Title
@@ -176,7 +176,7 @@ export const AlertSidebar = ({
                 )}
               </div>
               <div>
-                <Button onClick={toggle} variant="light">
+                <Button onClick={toggle} variant="light" data-cy="alerts-sidebar-close-btn">
                   <IoMdClose className="h-6 w-6 text-gray-500" />
                 </Button>
               </div>
@@ -250,6 +250,7 @@ export const AlertSidebar = ({
                           handleCopyFingerprint(alert.fingerprint);
                         }}
                         tooltip="Copy fingerprint"
+                        data-cy="alerts-sidebar-copy-fingerprint-btn"
                       />
                     </div>
                   </p>
@@ -276,6 +277,7 @@ export const AlertSidebar = ({
                             handleCopyUrl(alert.url);
                           }}
                           tooltip="Copy URL"
+                          data-cy="alerts-sidebar-copy-url-btn"
                         />
                       </div>
                     </p>

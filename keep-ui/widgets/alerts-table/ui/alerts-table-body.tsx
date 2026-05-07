@@ -110,10 +110,11 @@ export function AlertsTableBody({
 
   if (showSkeleton) {
     return (
-      <TableBody>
+      <TableBody data-cy="alerts-table-body">
         {Array.from({ length: pageSize || 20 }).map((_, index) => (
           <TableRow
             key={index}
+            data-cy="alerts-row-skeleton"
             className={getRowClassName(
               { id: index.toString(), original: {} as AlertDto },
               theme,
@@ -151,7 +152,7 @@ export function AlertsTableBody({
   const visitedIds = new Set<string>();
 
   return (
-    <TableBody>
+    <TableBody data-cy="alerts-table-body">
       {/* @ts-ignore */}
       <SelectableGroup
         ref={selectableGroupRef}
@@ -205,6 +206,8 @@ export function AlertsTableBody({
               onClick={(e) => handleRowClick(e, row.original)}
               isSelected={row.getIsSelected()}
               data-row-id={row.id}
+              data-cy="alerts-row"
+              data-cy-id={row.original.fingerprint}
             >
               {row.getVisibleCells().map((cell) => {
                 const { style, className } = getCommonPinningStylesAndClassNames(
@@ -222,6 +225,7 @@ export function AlertsTableBody({
                   <TableCell
                     key={cell.id}
                     data-column-id={cell.column.id}
+                    data-cy={`alerts-cell-${cell.column.id}`}
                     className={clsx(
                       getCellClassName(
                         cell,

@@ -443,6 +443,7 @@ export const AlertsRulesBuilder = ({
           {showSave && (
             <Button
               data-testid="save-preset-button"
+              data-cy="save-preset-button"
               icon={FiSave}
               color="orange"
               variant="secondary"
@@ -461,6 +462,7 @@ export const AlertsRulesBuilder = ({
               icon={TbDatabaseImport}
               size="sm"
               tooltip="Import from SQL"
+              data-cy="preset-import-sql-btn"
             ></Button>
           )}
           {isDynamic && (
@@ -476,6 +478,7 @@ export const AlertsRulesBuilder = ({
                   }
                 )
               }
+              data-cy="preset-delete-btn"
             ></Button>
           )}
         </div>
@@ -488,6 +491,7 @@ export const AlertsRulesBuilder = ({
           setSqlError(null);
         }} // Clear the error when closing the modal
         title="Import from SQL"
+        data-cy="preset-import-sql-modal"
       >
         <div className="space-y-4 pt-4">
           <Textarea
@@ -503,6 +507,7 @@ export const AlertsRulesBuilder = ({
               color="orange"
               onClick={onImportSQLSubmit}
               disabled={!(sqlQuery.length > 0)}
+              data-cy="preset-import-sql-submit-btn"
             >
               Convert to CEL
             </Button>
@@ -515,6 +520,7 @@ export const AlertsRulesBuilder = ({
         onClose={() => setIsGUIOpen(false)}
         className="w-[50%] max-w-screen-2xl max-h-[710px] transform overflow-auto ring-tremor bg-white p-6 text-left align-middle shadow-tremor transition-all rounded-xl"
         title="Query Builder"
+        data-cy="preset-query-builder-modal"
       >
         <div className="space-y-2 pt-4">
           <div className="max-h-96 overflow-auto">
@@ -531,6 +537,7 @@ export const AlertsRulesBuilder = ({
               color="orange"
               onClick={onGenerateQuery}
               disabled={!query.rules.length}
+              data-cy="preset-generate-query-btn"
             >
               Generate Query
             </Button>

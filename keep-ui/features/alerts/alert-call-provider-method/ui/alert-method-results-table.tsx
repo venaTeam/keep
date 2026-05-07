@@ -14,7 +14,7 @@ export default function AlertMethodResultsTable({
 }) {
   const resultsAreObject = results.length > 0 && typeof results[0] === "object";
   return (
-    <Table>
+    <Table data-cy="alerts-method-results-table">
       <TableHead>
         <TableRow>
           {!resultsAreObject ? (

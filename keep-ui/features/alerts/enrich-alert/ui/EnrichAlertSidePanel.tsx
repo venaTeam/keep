@@ -164,7 +164,7 @@ export const EnrichAlertSidePanel: React.FC<EnrichAlertModalProps> = ({
 
   return (
     <SidePanel isOpen={isOpen} onClose={handleClose} panelWidth={"w-1/3"}>
-      <div className="flex justify-between items-center min-w-full">
+      <div className="flex justify-between items-center min-w-full" data-cy="alerts-enrich-panel">
         <h2 className="text-lg font-semibold">Enrich Alert</h2>
       </div>
 
@@ -177,6 +177,7 @@ export const EnrichAlertSidePanel: React.FC<EnrichAlertModalProps> = ({
           onClick={addCustomField}
           className="bg-orange-500"
           variant="primary"
+          data-cy="alerts-enrich-add-field-btn"
         >
           + Add Field
         </Button>
@@ -185,10 +186,11 @@ export const EnrichAlertSidePanel: React.FC<EnrichAlertModalProps> = ({
           color="orange"
           variant="primary"
           disabled={!isDataValid}
+          data-cy="alerts-enrich-save-btn"
         >
           Save
         </Button>
-        <Button onClick={handleClose} color="orange" variant="secondary">
+        <Button onClick={handleClose} color="orange" variant="secondary" data-cy="alerts-enrich-close-btn">
           Close
         </Button>
       </div>

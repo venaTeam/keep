@@ -620,6 +620,7 @@ export function AlertTableServerSide({
                     icon={GrTest}
                     variant="secondary"
                     onClick={handleModalOpen}
+                    data-cy="alerts-btn-simulate"
                   >
                     Simulate Alert
                   </Button>
@@ -630,6 +631,7 @@ export function AlertTableServerSide({
                     onClick={() => {
                       router.push("/providers?labels=alert");
                     }}
+                    data-cy="alerts-btn-connect-source"
                   >
                     Connect Data Source
                   </Button>
@@ -661,6 +663,7 @@ export function AlertTableServerSide({
                     color="orange"
                     variant="secondary"
                     onClick={() => setClearFiltersToken(uuidV4())}
+                    data-cy="alerts-btn-reset-filter"
                   >
                     Reset filter
                   </Button>
@@ -692,6 +695,7 @@ export function AlertTableServerSide({
       <Table
         className="[&>table]:table-fixed [&>table]:w-full"
         data-testid="alerts-table"
+        data-cy="alerts-table"
       >
         <AlertsTableHeaders
           columns={columns}
@@ -730,7 +734,7 @@ export function AlertTableServerSide({
     <div className="flex flex-col gap-4">
       <div className="flex-none">
         <div className="flex justify-between">
-          <div className="flex flex-col" data-testid="preset-page-title">
+          <div className="flex flex-col" data-testid="preset-page-title" data-cy="preset-page-title">
             <PageTitle className="capitalize inline">{presetName}</PageTitle>
             {fromDashboard && (
               <div className="flex items-center gap-1 text-sm mt-1 text-gray-500">
@@ -826,7 +830,7 @@ export function AlertTableServerSide({
                 <div ref={a11yContainerRef} className="sr-only" />
 
                 {/* Make table wrapper scrollable */}
-                <div data-testid="alerts-table" className="flex-1">
+                <div data-testid="alerts-table" data-cy="alerts-table-wrapper" className="flex-1">
                   {renderTable()}
                 </div>
               </div>

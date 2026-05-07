@@ -9,6 +9,8 @@ interface Props {
     onClick?: (e: React.MouseEvent) => void;
     onMouseDown?: (e: React.MouseEvent) => void;
     onMouseEnter?: () => void;
+    "data-cy"?: string;
+    "data-cy-id"?: string;
 }
 
 const Row = ({
@@ -20,6 +22,8 @@ const Row = ({
     selectableRef,
     isSelecting,
     isSelected,
+    "data-cy": dataCy,
+    "data-cy-id": dataCyId,
 }: Props & TSelectableItemProps) => {
     return (
         <TableRow
@@ -32,6 +36,8 @@ const Row = ({
             onClick={onClick}
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
+            data-cy={dataCy}
+            data-cy-id={dataCyId}
         >
             {children}
         </TableRow>

@@ -145,7 +145,7 @@ export function AlertChangeStatusModal({
 
   if (!Array.isArray(alert)) {
     return (
-      <Modal onClose={handleClose} isOpen={!!alert} className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible">
+      <Modal onClose={handleClose} isOpen={!!alert} className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible" data-cy="alerts-change-status-modal">
         <Title className="text-lg font-semibold">Change Alert Status</Title>
         <div className="border-t border-gray-200 my-4" />
         <div className="flex mt-2.5 inline-flex items-center">
@@ -192,10 +192,10 @@ export function AlertChangeStatusModal({
           </div>
         </div>
         <div className="flex justify-end mt-4 gap-2">
-          <Button onClick={handleClose} color="orange" variant="secondary">
+          <Button onClick={handleClose} color="orange" variant="secondary" data-cy="alerts-change-status-cancel-btn">
             Cancel
           </Button>
-          <Button onClick={handleChangeStatus} color="orange">
+          <Button onClick={handleChangeStatus} color="orange" data-cy="alerts-change-status-submit-btn">
             Change Status
           </Button>
         </div>
@@ -203,7 +203,7 @@ export function AlertChangeStatusModal({
     );
   } else {
     return (
-      <Modal onClose={handleClose} isOpen={!!alert} className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible">
+      <Modal onClose={handleClose} isOpen={!!alert} className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible" data-cy="alerts-change-status-modal">
         <Title className="text-lg font-semibold">Change Alerts Status - Alert(s) selected: {Array.isArray(alert) ? alert.length : 1}</Title>
         <div className="border-t border-gray-200 my-4" />
         <div className="flex mt-2.5 inline-flex items-center">
@@ -250,10 +250,10 @@ export function AlertChangeStatusModal({
           </div>
         </div>
         <div className="flex justify-end mt-4 gap-2">
-          <Button onClick={handleClose} color="blue" variant="secondary">
+          <Button onClick={handleClose} color="blue" variant="secondary" data-cy="alerts-change-status-batch-cancel-btn">
             Cancel
           </Button>
-          <Button onClick={handleChangeStatusBatch} color="blue">
+          <Button onClick={handleChangeStatusBatch} color="blue" data-cy="alerts-change-status-batch-submit-btn">
             Change Status
           </Button>
         </div>

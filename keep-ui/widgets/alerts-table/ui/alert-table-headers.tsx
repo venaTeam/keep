@@ -243,6 +243,7 @@ const DraggableHeaderCell = ({
     >
       <div
         data-testid={`header-cell-${column.id}`}
+        data-cy={`alerts-header-${column.id}`}
         className={clsx(
           column.columnDef.meta?.thClassName,
           "flex items-center",

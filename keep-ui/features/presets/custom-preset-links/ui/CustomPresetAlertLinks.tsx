@@ -94,6 +94,8 @@ export const AlertPresetLink = ({
       {...listeners}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      data-cy="preset-link"
+      data-cy-id={preset.id}
     >
       <LinkWithIcon
         href={href}

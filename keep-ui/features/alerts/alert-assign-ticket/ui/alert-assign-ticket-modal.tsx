@@ -159,6 +159,7 @@ export const AlertAssignTicketModal = ({
       title="Assign Ticket"
       beforeTitle={alert?.name}
       className="w-[400px]"
+      data-cy="alerts-assign-ticket-modal"
     >
       <div className="relative bg-white rounded-lg">
         {ticketingProviders.length > 0 ? (
@@ -227,6 +228,7 @@ export const AlertAssignTicketModal = ({
                 onClick={handleModalClose}
                 variant="secondary"
                 color="orange"
+                data-cy="alerts-assign-ticket-cancel-btn"
               >
                 Cancel
               </Button>
@@ -235,6 +237,7 @@ export const AlertAssignTicketModal = ({
                 variant="primary"
                 type="submit"
                 disabled={isSubmitting}
+                data-cy="alerts-assign-ticket-submit-btn"
               >
                 Assign Ticket
               </Button>

@@ -101,10 +101,11 @@ export const AlertErrorEventModal: React.FC<AlertErrorEventModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       className="w-[80%] max-w-screen-2xl max-h-[80vh] transform overflow-auto ring-tremor bg-white p-6 text-left align-middle shadow-tremor transition-all rounded-xl"
+      data-cy="alerts-error-event-modal"
     >
       <div className="flex justify-between items-center mb-4">
         <Title>Events failed to process ({errorAlerts?.length || 0})</Title>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-500" data-cy="alerts-error-event-close-btn">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -158,6 +159,7 @@ export const AlertErrorEventModal: React.FC<AlertErrorEventModalProps> = ({
                 color="orange"
                 onClick={handleDismissSelected}
                 disabled={isDismissing || !selectedAlert}
+                data-cy="alerts-error-event-dismiss-current-btn"
               >
                 {isDismissing ? "Dismissing..." : "Dismiss current alert"}
               </Button>
@@ -167,6 +169,7 @@ export const AlertErrorEventModal: React.FC<AlertErrorEventModalProps> = ({
                 variant="secondary"
                 onClick={handleDismissAll}
                 disabled={isDismissing}
+                data-cy="alerts-error-event-dismiss-all-btn"
               >
                 {isDismissing ? "Dismissing..." : "Dismiss All"}
               </Button>

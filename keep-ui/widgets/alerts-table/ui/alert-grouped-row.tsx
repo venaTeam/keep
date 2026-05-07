@@ -71,6 +71,8 @@ export const GroupedRow = ({
         <TableRow
           className="bg-orange-100 hover:bg-orange-200 cursor-pointer border-t border-orange-300"
           onClick={() => onToggleExpanded?.(groupKey)}
+          data-cy="alerts-group-header"
+          data-cy-id={groupKey}
         >
           {/* Render a single cell that spans the entire width */}
           <TableCell
@@ -121,6 +123,8 @@ export const GroupedRow = ({
                   rowStyle
                 )}
                 onClick={(e) => onRowClick?.(e, subRow.original)}
+                data-cy="alerts-row"
+                data-cy-id={subRow.original.fingerprint}
               >
                 {subRow.getVisibleCells().map((cell) => {
                   const { style, className } =
@@ -140,6 +144,7 @@ export const GroupedRow = ({
                         isLastViewed
                       )}
                       style={style}
+                      data-cy={`alerts-cell-${cell.column.id}`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -164,6 +169,8 @@ export const GroupedRow = ({
       key={row.id}
       className={getRowClassName(row, theme, lastViewedAlert, rowStyle)}
       onClick={(e) => onRowClick?.(e, row.original)}
+      data-cy="alerts-row"
+      data-cy-id={row.original.fingerprint}
     >
       {row.getVisibleCells().map((cell) => {
         const { style, className } = getCommonPinningStylesAndClassNames(
@@ -182,6 +189,7 @@ export const GroupedRow = ({
               isLastViewed
             )}
             style={style}
+            data-cy={`alerts-cell-${cell.column.id}`}
           >
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </TableCell>

@@ -43,6 +43,7 @@ export const AddFacetModal: React.FC<AddFacetModalProps> = ({
       onClose={onClose}
       title="Add New Facet"
       className="w-[400px]"
+      data-cy="facet-add-modal-dynamic"
     >
       <div className="p-6">
         <TextInput
@@ -84,6 +85,7 @@ export const DynamicFacetWrapper: React.FC<DynamicFacetProps> = ({
       <button
         onClick={onDelete}
         className="absolute right-2 top-2 p-1 text-gray-400 hover:text-gray-600"
+        data-cy="delete-facet"
       >
         <TrashIcon className="h-4 w-4" />
       </button>

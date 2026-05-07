@@ -124,13 +124,14 @@ export default function AlertActions({
   };
 
   return (
-    <div className="w-full flex gap-2.5 justify-end items-center">
+    <div className="w-full flex gap-2.5 justify-end items-center" data-cy="alerts-actions">
       <Button
         icon={XMarkIcon}
         size="xs"
         color="slate"
         title="Clear Selection"
         onClick={clearRowSelection}
+        data-cy="alerts-action-clear-selection-btn"
       >
         Clear Selection
       </Button>
@@ -142,6 +143,7 @@ export default function AlertActions({
         onClick={() => {
           setModalAlert(selectedAlerts);
         }}
+        data-cy="alerts-action-change-status-btn"
       >
         Change status of {selectedAlertsFingerprints.length} alert(s)
       </Button>
@@ -161,6 +163,7 @@ export default function AlertActions({
           color="orange"
           title="Restore"
           onClick={() => setDismissModalAlert?.(dismissedAlerts)}
+          data-cy="alerts-action-restore-btn"
         >
           Restore {dismissedAlerts.length} alert(s)
         </Button>
@@ -173,6 +176,7 @@ export default function AlertActions({
           color="red"
           title="Dismiss"
           onClick={() => setDismissModalAlert?.(activeAlerts)}
+          data-cy="alerts-action-dismiss-btn"
         >
           Dismiss {activeAlerts.length} alert(s)
         </Button>
@@ -183,6 +187,7 @@ export default function AlertActions({
         color="orange"
         onClick={() => setIsCreatePresetModalOpen(true)}
         tooltip="Save current filter as a view"
+        data-cy="alerts-action-create-preset-btn"
       >
         Create Preset
       </Button>
@@ -192,6 +197,7 @@ export default function AlertActions({
         color="orange"
         onClick={showIncidentSelector}
         tooltip="Associate events with incident"
+        data-cy="alerts-action-associate-incident-btn"
       >
         Associate with incident
       </Button>
@@ -202,6 +208,7 @@ export default function AlertActions({
           color="orange"
           onClick={showCreateIncidentWithAI}
           tooltip="Create incidents with AI"
+          data-cy="alerts-action-create-incident-ai-btn"
         >
           Create incidents with AI
         </Button>

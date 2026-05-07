@@ -197,9 +197,9 @@ const IncidentCard: React.FC<IncidentCardProps> = ({
   if (!editedIncident) return null;
 
   return (
-    <Card key={incident.id} className="mb-6 relative">
+    <Card key={incident.id} className="mb-6 relative" data-cy="alerts-create-incident-ai-card" data-cy-id={incident.id}>
       <div className="absolute top-4 right-4">
-        <Button onClick={handleEditToggle}>
+        <Button onClick={handleEditToggle} data-cy="alerts-create-incident-ai-edit-btn">
           {isEditing ? "Save Changes" : "Edit Incident"}
         </Button>
       </div>

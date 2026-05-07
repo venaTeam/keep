@@ -193,12 +193,13 @@ export const AlertFacets: React.FC<AlertFacetsProps> = ({
   };
 
   return (
-    <div className={className}>
+    <div className={className} data-cy="alerts-facets">
       <div className="space-y-2">
         {/* Facet button */}
         <button
           onClick={() => setIsModalOpen(true)}
           className="w-full mt-2 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded flex items-center gap-2"
+          data-cy="facet-add-btn"
         >
           <PlusIcon className="h-4 w-4" />
           Add Facet

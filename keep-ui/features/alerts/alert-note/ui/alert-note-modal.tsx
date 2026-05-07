@@ -76,6 +76,7 @@ export const AlertNoteModal = ({
       onClose={handleClose}
       beforeTitle={alert?.name}
       title="Add Note"
+      data-cy="alerts-note-modal"
     >
       <div className="mt-4">
         <Textarea
@@ -91,6 +92,7 @@ export const AlertNoteModal = ({
           onClick={handleNoteClose}
           variant="secondary"
           color="orange"
+          data-cy="alerts-note-cancel-btn"
         >
           {readOnly ? "Close" : "Cancel"}
         </Button>
@@ -98,6 +100,7 @@ export const AlertNoteModal = ({
           <Button // Use Tremor button for Save
             onClick={saveNote}
             color="orange"
+            data-cy="alerts-note-save-btn"
           >
             Save
           </Button>

@@ -253,6 +253,7 @@ export function AlertMenu({
             )}`
             : "View Alert Payload"
         }
+        data-cy="alerts-action-view-raw-btn"
       />
       {/* Expand button */}
       <Button
@@ -272,6 +273,7 @@ export function AlertMenu({
           />
         )}
         tooltip={expanded ? "Collapse Row" : "Expand Row"}
+        data-cy="alerts-action-expand-row-btn"
       />
       {imageUrl && !imageError && (
         <div
@@ -304,6 +306,7 @@ export function AlertMenu({
           icon={() => (
             <Icon icon={LinkIcon} className="w-4 h-4 text-gray-500" />
           )}
+          data-cy="alerts-action-open-original-btn"
         />
       )}
       {setTicketModalAlert && (
@@ -331,6 +334,7 @@ export function AlertMenu({
                 }`}
             />
           )}
+          data-cy="alerts-action-assign-ticket-btn"
         />
       )}
       {playbook_url && (
@@ -345,6 +349,7 @@ export function AlertMenu({
           icon={() => (
             <Icon icon={BookOpenIcon} className="w-4 h-4 text-gray-500" />
           )}
+          data-cy="alerts-action-view-playbook-btn"
         />
       )}
       {setNoteModalAlert && (
@@ -362,6 +367,7 @@ export function AlertMenu({
               className={`w-4 h-4 ${note ? "text-green-500" : "text-gray-500"}`}
             />
           )}
+          data-cy="alerts-action-note-btn"
         />
       )}
       {relevantWorkflowExecution && (
@@ -588,7 +594,7 @@ export function AlertMenu({
   }
 
   return (
-    <div className="flex items-center justify-end relative group">
+    <div className="flex items-center justify-end relative group" data-cy="alerts-menu" data-cy-id={alert.fingerprint}>
       {quickActions}
       <DropdownMenu.Menu
         icon={EllipsisHorizontalIcon}

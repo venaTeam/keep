@@ -16,6 +16,12 @@ import { INCIDENT_PAGINATION_OPTIONS } from "@/entities/incidents/model/models";
 
 type Props = {
   table: Table<any>;
+  /**
+   * Optional namespace for data-cy values. When provided, prev/next/page-size
+   * become e.g. "alerts-pagination-prev". Defaults to the cross-cutting
+   * "pagination-*" form.
+   */
+  dataCyPrefix?: string;
   // TODO: Add refresh button
   // allowRefresh?: boolean;
 };
@@ -35,9 +41,13 @@ const SingleValue = ({
   </components.SingleValue>
 );
 
-export function TablePagination({ table }: Props) {
+export function TablePagination({ table, dataCyPrefix }: Props) {
   const pageIndex = table.getState().pagination.pageIndex;
   const pageCount = table.getPageCount();
+
+  // When dataCyPrefix is supplied, namespace per consumer; otherwise use the
+  // cross-cutting "pagination-*" form.
+  const cyPrefix = dataCyPrefix ? `${dataCyPrefix}-pagination` : "pagination";
 
   return (
     <div className="flex justify-between items-center">
@@ -49,18 +59,20 @@ export function TablePagination({ table }: Props) {
         ) : null}
       </Text>
       <div className="flex gap-1">
-        <Select
-          components={{ SingleValue }}
-          value={{
-            value: table.getState().pagination.pageSize.toString(),
-            label: table.getState().pagination.pageSize.toString(),
-          }}
-          onChange={(selectedOption) =>
-            table.setPageSize(Number(selectedOption!.value))
-          }
-          options={INCIDENT_PAGINATION_OPTIONS}
-          menuPlacement="top"
-        />
+        <div data-cy={`${cyPrefix}-page-size`}>
+          <Select
+            components={{ SingleValue }}
+            value={{
+              value: table.getState().pagination.pageSize.toString(),
+              label: table.getState().pagination.pageSize.toString(),
+            }}
+            onChange={(selectedOption) =>
+              table.setPageSize(Number(selectedOption!.value))
+            }
+            options={INCIDENT_PAGINATION_OPTIONS}
+            menuPlacement="top"
+          />
+        </div>
         <div className="flex">
           <Button
             className="pagination-button"
@@ -70,6 +82,7 @@ export function TablePagination({ table }: Props) {
             size="xs"
             color="gray"
             variant="secondary"
+            data-cy={`${cyPrefix}-first`}
           />
           <Button
             className="pagination-button"
@@ -79,6 +92,7 @@ export function TablePagination({ table }: Props) {
             size="xs"
             color="gray"
             variant="secondary"
+            data-cy={`${cyPrefix}-prev`}
           />
           <Button
             className="pagination-button"
@@ -88,6 +102,7 @@ export function TablePagination({ table }: Props) {
             size="xs"
             color="gray"
             variant="secondary"
+            data-cy={`${cyPrefix}-next`}
           />
           <Button
             className="pagination-button"
@@ -97,6 +112,7 @@ export function TablePagination({ table }: Props) {
             size="xs"
             color="gray"
             variant="secondary"
+            data-cy={`${cyPrefix}-last`}
           />
         </div>
         {/* TODO: Add refresh button */}

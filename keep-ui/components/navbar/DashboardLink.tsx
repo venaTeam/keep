@@ -36,6 +36,7 @@ export const DashboardLink = ({
       icon={FiLayout}
       isDeletable={true}
       onDelete={() => deleteDashboard(dashboard.id)}
+      data-cy={`nav-link-dashboard-${dashboard.id}`}
     >
       <Subtitle
         className={clsx(

@@ -38,9 +38,16 @@ const UserDropdown = ({ session }: UserDropdownProps) => {
   const isNoAuth = configData?.AUTH_TYPE === AuthType.NOAUTH;
   return (
     <Menu as="li" ref={refs.setReference} className="w-full">
-      <Menu.Button className="flex items-center justify-between w-full text-sm pl-2.5 pr-2 py-1 text-gray-700 hover:bg-stone-200/50 font-medium rounded-lg hover:text-orange-400 focus:ring focus:ring-orange-300 group capitalize">
+      <Menu.Button
+        className="flex items-center justify-between w-full text-sm pl-2.5 pr-2 py-1 text-gray-700 hover:bg-stone-200/50 font-medium rounded-lg hover:text-orange-400 focus:ring focus:ring-orange-300 group capitalize"
+        data-cy="nav-user-avatar"
+      >
         <span className="space-x-3 flex items-center w-full">
-          <UserAvatar image={image} name={name ?? email} />{" "}
+          <UserAvatar
+            image={image}
+            name={name ?? email}
+            data-cy="nav-user-avatar-image"
+          />{" "}
           <Subtitle className="truncate">{name ?? email}</Subtitle>
         </span>
       </Menu.Button>
@@ -50,6 +57,7 @@ const UserDropdown = ({ session }: UserDropdownProps) => {
         style={floatingStyles}
         ref={refs.setFloating}
         as="ul"
+        data-cy="nav-user-menu"
       >
         <div className="px-1 py-1 ">
           {userRole !== "noc" && (
@@ -58,6 +66,7 @@ const UserDropdown = ({ session }: UserDropdownProps) => {
                 as={Link}
                 href="/settings"
                 className="ui-active:bg-orange-400 ui-active:text-white ui-not-active:text-gray-900 group flex w-full items-center rounded-md px-2 py-2 text-sm"
+                data-cy="nav-user-menu-item-settings"
               >
                 Settings
               </Menu.Item>
@@ -68,6 +77,7 @@ const UserDropdown = ({ session }: UserDropdownProps) => {
               <Menu.Item
                 as="button"
                 className="ui-active:bg-orange-400 ui-active:text-white ui-not-active:text-gray-900 group flex w-full items-center rounded-md px-2 py-2 text-sm"
+                data-cy="nav-user-menu-item-signout"
                 onClick={async () => {
                   if (configData?.AUTH_TYPE === AuthType.KEYCLOAK) {
                     try {
@@ -113,9 +123,13 @@ export const UserInfo = ({ session }: UserInfoProps) => {
 
   return (
     <>
-      <ul className="space-y-2 p-2">
+      <ul className="space-y-2 p-2" data-cy="nav-footer">
         <li>
-          <LinkWithIcon href="/providers" icon={VscDebugDisconnect}>
+          <LinkWithIcon
+            href="/providers"
+            icon={VscDebugDisconnect}
+            data-cy="nav-link-providers"
+          >
             <Subtitle className="text-xs">Providers</Subtitle>
           </LinkWithIcon>
         </li>
@@ -125,6 +139,7 @@ export const UserInfo = ({ session }: UserInfoProps) => {
             href="https://slack.keephq.dev/"
             className="w-auto pr-3.5"
             target="_blank"
+            data-cy="nav-link-slack"
           >
             Slack
           </LinkWithIcon>
@@ -134,13 +149,16 @@ export const UserInfo = ({ session }: UserInfoProps) => {
             href={docsUrl}
             className="w-auto px-3.5"
             target="_blank"
+            data-cy="nav-link-docs"
           >
             Docs
           </LinkWithIcon>
         </li>
         <div className="flex items-center justify-between">
           {session && <UserDropdown session={session} />}
-          <ThemeControl className="text-sm size-10 flex items-center justify-center font-medium rounded-lg focus:ring focus:ring-orange-300 hover:!bg-stone-200/50" />
+          <div data-cy="nav-theme-control">
+            <ThemeControl className="text-sm size-10 flex items-center justify-center font-medium rounded-lg focus:ring focus:ring-orange-300 hover:!bg-stone-200/50" />
+          </div>
         </div>
       </ul>
     </>

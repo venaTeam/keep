@@ -112,6 +112,7 @@ const DrawerHeader = React.forwardRef<
       <DrawerPrimitives.Close asChild>
         <Button
           variant="light"
+          data-cy="drawer-close-btn"
           className="aspect-square p-1 hover:bg-gray-100 hover:dark:bg-gray-400/10"
         >
           <XMarkIcon className="size-6" aria-hidden="true" />

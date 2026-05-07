@@ -83,7 +83,10 @@ export const DashboardLinks = () => {
 
   return (
     <Disclosure as="div" className="space-y-1" defaultOpen>
-      <Disclosure.Button className="w-full flex justify-between items-center px-2">
+      <Disclosure.Button
+        className="w-full flex justify-between items-center px-2"
+        data-cy="nav-group-dashboards"
+      >
         {({ open }) => (
           <>
             <div className="flex justify-between items-center w-full">
@@ -141,6 +144,7 @@ export const DashboardLinks = () => {
           className="h-5 mx-2"
           onClick={handleCreateDashboard}
           icon={PlusIcon}
+          data-cy="nav-btn-add-dashboard"
         >
           Add Dashboard
         </Button>

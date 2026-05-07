@@ -6,6 +6,7 @@ interface Props {
   name: string;
   size?: "sm" | "xs";
   email?: string;
+  "data-cy"?: string;
 }
 
 export const getInitials = (name: string) =>
@@ -20,7 +21,13 @@ const getBackgroundColor = (name: string) => {
   return `#${hash.toString(16).padStart(6, "0")}`;
 };
 
-export default function UserAvatar({ image, name, size = "sm", email }: Props) {
+export default function UserAvatar({
+  image,
+  name,
+  size = "sm",
+  email,
+  "data-cy": dataCy,
+}: Props) {
   const sizeClass = (function (size: "sm" | "xs") {
     if (size === "sm") return "w-7 h-7";
     if (size === "xs") return "w-5 h-5";
@@ -37,6 +44,7 @@ export default function UserAvatar({ image, name, size = "sm", email }: Props) {
       width={sizeValue}
       height={sizeValue}
       title={email ?? name}
+      data-cy={dataCy}
     />
   ) : (
     <span
@@ -46,6 +54,7 @@ export default function UserAvatar({ image, name, size = "sm", email }: Props) {
       )}
       style={{ backgroundColor: getBackgroundColor(name) }}
       title={email ?? name}
+      data-cy={dataCy}
     >
       <span
         className={clsx(

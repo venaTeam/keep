@@ -17,7 +17,10 @@ export default async function NavbarInner() {
     <>
       <Menu session={session}>
         <Search session={session} />
-        <div className="pt-4 space-y-4 flex-1 overflow-auto scrollable-menu-shadow">
+        <div
+          className="pt-4 space-y-4 flex-1 overflow-auto scrollable-menu-shadow"
+          data-cy="nav-sections"
+        >
           <IncidentsLinks session={session} />
           <AlertsLinks session={session} />
           <NoiseReductionLinks session={session} />

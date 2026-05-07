@@ -15,6 +15,7 @@ export const MinimizeMenuButton = () => {
       <button
         className="flex items-center justify-center"
         onClick={() => setisMenuMinimized(!isMenuMinimized)}
+        data-cy="nav-minimize-btn"
       >
         <Icon
           className="text-slate-600 p-0 opacity-50 hover:opacity-100"

@@ -12,6 +12,7 @@ type TabNavigationLinkProps = {
   icon?: ElementType;
   prefetch?: boolean;
   count?: number;
+  "data-cy"?: string;
 } & NextLinkProps &
   React.AnchorHTMLAttributes<HTMLAnchorElement>;
 
@@ -23,12 +24,14 @@ export function TabNavigationLink({
   icon: Icon,
   prefetch,
   count,
+  "data-cy": dataCy,
   ...linkProps
 }: TabNavigationLinkProps) {
   return (
     <Link
       href={href}
       prefetch={prefetch}
+      data-cy={dataCy}
       className={twMerge(
         // Base styles
         "flex items-center whitespace-nowrap outline-none",

@@ -19,7 +19,7 @@ export const IncidentsNotFoundForFiltersPlaceholder = ({
       title="No Incidents Matching the Filter"
       description="Clear filters to see all incidents"
     >
-      <Button onClick={() => onClearFilters()}>Clear filters</Button>
+      <Button onClick={() => onClearFilters()} data-cy="incidents-action-clear-filters-btn">Clear filters</Button>
     </EmptyStateCard>
   );
 };
@@ -41,6 +41,7 @@ export const IncidentsNotFoundPlaceholder = () => {
           onClick={() => {
             router.push(`/alerts/feed`);
           }}
+          data-cy="incidents-action-correlate-manually-btn"
         >
           Correlate Alerts Manually
         </Button>
@@ -52,6 +53,7 @@ export const IncidentsNotFoundPlaceholder = () => {
             onClick={() => {
               router.push(`/alerts/feed?createIncidentsFromLastAlerts=50`);
             }}
+            data-cy="incidents-action-ai-correlation-btn"
           >
             Try AI Correlation
           </Button>

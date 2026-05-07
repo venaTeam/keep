@@ -266,6 +266,7 @@ const IncidentTimelineNoAlerts: React.FC = () => {
           variant="primary"
           size="md"
           onClick={() => router.push("/alerts/feed")}
+          data-cy="incidents-action-assign-alerts-btn"
         >
           Assign Alerts
         </Button>
@@ -416,7 +417,7 @@ export default function IncidentTimeline({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" data-cy="incidents-timeline">
       <div className="flex-grow transition-all duration-300">
         <Card
           className="py-2 px-0 overflow-y-auto"

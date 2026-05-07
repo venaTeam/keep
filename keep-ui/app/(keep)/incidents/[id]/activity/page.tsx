@@ -13,7 +13,7 @@ export default async function IncidentActivityPage(props: {
 
   const incident = await getIncidentWithErrorHandling(id);
   return (
-    <Card>
+    <Card data-cy="incidents-activity-card">
       <IncidentActivity incident={incident} />
     </Card>
   );

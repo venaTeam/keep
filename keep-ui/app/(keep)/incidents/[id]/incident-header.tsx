@@ -94,6 +94,7 @@ export function IncidentHeader({
                 variant="secondary"
                 className="!py-0.5 mr-2"
                 icon={MdPlayArrow}
+                data-cy="incidents-action-run-workflow-btn"
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -108,6 +109,7 @@ export function IncidentHeader({
                 variant="secondary"
                 className="!py-0.5"
                 icon={MdModeEdit}
+                data-cy="incidents-action-edit-btn"
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -151,6 +153,7 @@ export function IncidentHeader({
                 variant="secondary"
                 title="Confirm"
                 icon={MdDone}
+                data-cy="incidents-action-confirm-btn"
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -165,6 +168,7 @@ export function IncidentHeader({
                 variant="secondary"
                 tooltip={"Discard"}
                 icon={MdBlock}
+                data-cy="incidents-action-discard-btn"
                 onClick={async (e: React.MouseEvent) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -184,6 +188,7 @@ export function IncidentHeader({
         onClose={handleCloseForm}
         className="w-[600px]"
         title="Edit Incident"
+        data-cy="incidents-edit-modal"
       >
         <CreateOrUpdateIncidentForm
           incidentToEdit={incident}

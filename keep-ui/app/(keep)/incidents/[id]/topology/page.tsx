@@ -26,7 +26,7 @@ export default async function IncidentTopologyPage(props: PageProps) {
     );
 
     return (
-      <main className="h-[calc(100vh-28rem)]">
+      <main className="h-[calc(100vh-28rem)]" data-cy="incidents-topology-main">
         <TopologySearchProvider>
           <TopologyMap
             selectedApplicationIds={[relevantApplication?.id || ""]}
@@ -37,7 +37,7 @@ export default async function IncidentTopologyPage(props: PageProps) {
     );
   } else {
     return (
-      <main className="h-[calc(100vh-28rem)]">
+      <main className="h-[calc(100vh-28rem)]" data-cy="incidents-topology-main">
         <TopologySearchProvider>
           <TopologyMap services={incident.services} />
         </TopologySearchProvider>

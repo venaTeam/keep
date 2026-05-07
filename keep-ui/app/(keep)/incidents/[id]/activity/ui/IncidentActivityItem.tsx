@@ -32,7 +32,11 @@ export function IncidentActivityItem({ activity }: { activity: IncidentActivity 
   };
 
   return (
-    <div className="relative h-full w-full flex flex-col">
+    <div
+      className="relative h-full w-full flex flex-col"
+      data-cy={`incidents-activity-item-${activity.id}`}
+      data-cy-id={activity.id}
+    >
       <div className="flex items-center gap-2">
         {activity.type === "alert" &&
           (activity.initiator as AlertDto)?.severity && (

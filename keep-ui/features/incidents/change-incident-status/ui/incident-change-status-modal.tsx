@@ -82,6 +82,7 @@ export function IncidentChangeStatusModal({
             onClose={clearAndClose}
             isOpen={isOpen}
             className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible"
+            data-cy="incidents-change-status-modal"
         >
             <Title className="text-lg font-semibold">Change Incident Status</Title>
             <div className="border-t border-gray-200 my-4" />
@@ -102,6 +103,7 @@ export function IncidentChangeStatusModal({
                             minWidth: "180px",
                         }),
                     }}
+                    data-cy="incidents-change-status-modal-select"
                 />
                 <Button
                     variant={disposeOnNewAlert ? "primary" : "secondary"}
@@ -113,6 +115,7 @@ export function IncidentChangeStatusModal({
                             ? "Dispose the status when a new alert comes in."
                             : "Keep the status when a new alert comes in."
                     }
+                    data-cy="incidents-change-status-dispose-toggle-btn"
                 >
                     {disposeOnNewAlert
                         ? "Disposing on new alerts"
@@ -127,11 +130,12 @@ export function IncidentChangeStatusModal({
                         onChange={(e) => setNoteContent(e.target.value)}
                         placeholder="Add the reason for status change here..."
                         rows={4}
+                        data-cy="incidents-change-status-note-input"
                     />
                 </div>
             </div>
             <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={clearAndClose} color="orange" variant="secondary">
+                <Button onClick={clearAndClose} color="orange" variant="secondary" data-cy="incidents-change-status-cancel-btn">
                     Cancel
                 </Button>
                 <Button
@@ -139,6 +143,7 @@ export function IncidentChangeStatusModal({
                     color="orange"
                     disabled={isSubmitting}
                     loading={isSubmitting}
+                    data-cy="incidents-change-status-submit-btn"
                 >
                     Change Status
                 </Button>

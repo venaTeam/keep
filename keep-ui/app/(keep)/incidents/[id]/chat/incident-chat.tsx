@@ -544,9 +544,9 @@ export function IncidentChat({
     );
   return (
     // using 'incident-chat' class to apply styles only to that chat component
-    <Card className="h-full incident-chat">
-      <div className="chat-container">
-        <div className="chat-messages">
+    <Card className="h-full incident-chat" data-cy="incidents-chat-card">
+      <div className="chat-container" data-cy="incidents-chat-container">
+        <div className="chat-messages" data-cy="incidents-chat-messages">
           <CopilotChat
             className="-mx-2"
             instructions={INSTRUCTIONS}

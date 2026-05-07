@@ -1,11 +1,13 @@
 {
-  "version": "0a03269fef5e8d94298ebb3f6b835b38bb13bc0a",
-  "generatedAt": "2026-05-06T23:49:59.150Z",
-  "totalSelectors": 7,
+  "version": "a2eb0cc11bc0979ef853dbaf5ad26854a16378e2",
+  "generatedAt": "2026-05-07T00:10:25.684Z",
+  "totalSelectors": 146,
   "byArea": {
     "(dynamic)": 5,
     "drawer": 1,
-    "modal": 1
+    "incidents": 138,
+    "modal": 1,
+    "sort": 1
   },
   "selectors": [
     {
@@ -69,12 +71,1402 @@
       "mirrorsDataTestId": false
     },
     {
+      "selector": "incidents-activity-card",
+      "area": "incidents",
+      "role": "activity",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/activity/page.tsx",
+      "line": 16,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-comment-form",
+      "area": "incidents",
+      "role": "comment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/activity/ui/IncidentActivityComment.tsx",
+      "line": 45,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-comment-submit-btn",
+      "area": "incidents",
+      "role": "comment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/activity/ui/IncidentActivityComment.tsx",
+      "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-activity-item-${activity.id}",
+      "area": "incidents",
+      "role": "activity",
+      "dynamic": true,
+      "file": "app/(keep)/incidents/[id]/activity/ui/IncidentActivityItem.tsx",
+      "line": 37,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-comment-input-loading",
+      "area": "incidents",
+      "role": "comment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/activity/ui/IncidentCommentInput.dynamic.tsx",
+      "line": 12,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-comment-input",
+      "area": "incidents",
+      "role": "comment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/activity/ui/IncidentCommentInput.tsx",
+      "line": 133,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alert-action-tray",
+      "area": "incidents",
+      "role": "alert",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-action-tray.tsx",
+      "line": 36,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alert-action-expand-btn",
+      "area": "incidents",
+      "role": "alert",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-action-tray.tsx",
+      "line": 63,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alert-action-view-btn",
+      "area": "incidents",
+      "role": "alert",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-action-tray.tsx",
+      "line": 76,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alert-action-unlink-btn",
+      "area": "incidents",
+      "role": "alert",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-action-tray.tsx",
+      "line": 90,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alerts-actions",
+      "area": "incidents",
+      "role": "alerts",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-actions.tsx",
+      "line": 23,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-split-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-actions.tsx",
+      "line": 28,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-unlink-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-actions.tsx",
+      "line": 40,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-view-feed-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-actions.tsx",
+      "line": 51,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alerts-table-body-skeleton",
+      "area": "incidents",
+      "role": "alerts",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-table-body-skeleton.tsx",
+      "line": 18,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alerts-skeleton-row",
+      "area": "incidents",
+      "role": "alerts",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-table-body-skeleton.tsx",
+      "line": 22,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alerts-skeleton-cell-${column.id}",
+      "area": "incidents",
+      "role": "alerts",
+      "dynamic": true,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alert-table-body-skeleton.tsx",
+      "line": 34,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-add-alerts-manually-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alerts.tsx",
+      "line": 227,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-ai-correlation-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alerts.tsx",
+      "line": 239,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alerts-row",
+      "area": "incidents",
+      "role": "alerts",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alerts.tsx",
+      "line": 270,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-alerts-cell-${cell.column.id}",
+      "area": "incidents",
+      "role": "alerts",
+      "dynamic": true,
+      "file": "app/(keep)/incidents/[id]/alerts/incident-alerts.tsx",
+      "line": 287,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-chat-card",
+      "area": "incidents",
+      "role": "chat",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/chat/incident-chat.tsx",
+      "line": 547,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-chat-container",
+      "area": "incidents",
+      "role": "chat",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/chat/incident-chat.tsx",
+      "line": 548,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-chat-messages",
+      "area": "incidents",
+      "role": "chat",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/chat/incident-chat.tsx",
+      "line": 549,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-modal",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 76,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-close-btn",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 83,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-modal",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 100,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-close-btn",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 107,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-modal",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 122,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-title-input",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 170,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-cancel-btn",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 226,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-ticket-submit-btn",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/create-ticket-modal.tsx",
+      "line": 235,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-edit",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 90,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-name-input",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 99,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-value-input",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 107,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-save-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 118,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-cancel-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 126,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-field",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 135,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-edit-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 166,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-delete-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 178,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-add",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableField.tsx",
+      "line": 186,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-form-edit-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableForm.tsx",
+      "line": 65,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-form-delete-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableForm.tsx",
+      "line": 79,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-form-modal",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableForm.tsx",
+      "line": 88,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-form-${key}-input",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": true,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableForm.tsx",
+      "line": 97,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-form-save-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableForm.tsx",
+      "line": 113,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-enrichment-form-cancel-btn",
+      "area": "incidents",
+      "role": "enrichment",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/enrichments/EnrichmentEditableForm.tsx",
+      "line": 121,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-run-workflow-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/incident-header.tsx",
+      "line": 97,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-edit-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/incident-header.tsx",
+      "line": 112,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-confirm-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/incident-header.tsx",
+      "line": 156,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-discard-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/incident-header.tsx",
+      "line": 171,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-edit-modal",
+      "area": "incidents",
+      "role": "edit",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/incident-header.tsx",
+      "line": 191,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-ai-summary-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/incident-overview.tsx",
+      "line": 153,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-tab-${tab.path}",
+      "area": "incidents",
+      "role": "tab",
+      "dynamic": true,
+      "file": "app/(keep)/incidents/[id]/incident-tabs-navigation.tsx",
+      "line": 40,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-modal",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 118,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-close-btn",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 125,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-modal",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 142,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-close-btn",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 149,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-modal",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 164,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-id-input",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 242,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-url-input",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 256,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-cancel-btn",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 265,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-link-ticket-submit-btn",
+      "area": "incidents",
+      "role": "link",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/link-ticket-modal.tsx",
+      "line": 274,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-open-ticket-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/ticketing-incident-options.tsx",
+      "line": 84,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-create-ticket-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/ticketing-incident-options.tsx",
+      "line": 97,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-link-ticket-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/ticketing-incident-options.tsx",
+      "line": 108,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-assign-alerts-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/timeline/incident-timeline.tsx",
+      "line": 269,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-timeline",
+      "area": "incidents",
+      "role": "timeline",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/timeline/incident-timeline.tsx",
+      "line": 420,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-topology-main",
+      "area": "incidents",
+      "role": "topology",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/topology/page.tsx",
+      "line": 29,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-topology-main",
+      "area": "incidents",
+      "role": "topology",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/topology/page.tsx",
+      "line": 40,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-run-workflow-empty-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/workflows/incident-workflow-empty.tsx",
+      "line": 37,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-workflow-sidebar",
+      "area": "incidents",
+      "role": "workflow",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/workflows/incident-workflow-sidebar.tsx",
+      "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-workflow-sidebar-close-btn",
+      "area": "incidents",
+      "role": "workflow",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/workflows/incident-workflow-sidebar.tsx",
+      "line": 80,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-workflow-row",
+      "area": "incidents",
+      "role": "workflow",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/[id]/workflows/incident-workflow-table.tsx",
+      "line": 233,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-workflow-cell-${cell.column.id}",
+      "area": "incidents",
+      "role": "workflow",
+      "dynamic": true,
+      "file": "app/(keep)/incidents/[id]/workflows/incident-workflow-table.tsx",
+      "line": 237,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-confirm-predicted-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/predicted-incidents-table.tsx",
+      "line": 94,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-discard-predicted-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/incidents/predicted-incidents-table.tsx",
+      "line": 107,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-severity-select",
+      "area": "incidents",
+      "role": "severity",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-severity/ui/incident-severity-select.tsx",
+      "line": 76,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-change-status-modal",
+      "area": "incidents",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-status/ui/incident-change-status-modal.tsx",
+      "line": 85,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-change-status-modal-select",
+      "area": "incidents",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-status/ui/incident-change-status-modal.tsx",
+      "line": 106,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-change-status-dispose-toggle-btn",
+      "area": "incidents",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-status/ui/incident-change-status-modal.tsx",
+      "line": 118,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-change-status-note-input",
+      "area": "incidents",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-status/ui/incident-change-status-modal.tsx",
+      "line": 133,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-change-status-cancel-btn",
+      "area": "incidents",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-status/ui/incident-change-status-modal.tsx",
+      "line": 138,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-change-status-submit-btn",
+      "area": "incidents",
+      "role": "change",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-status/ui/incident-change-status-modal.tsx",
+      "line": 146,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-status-select",
+      "area": "incidents",
+      "role": "status",
+      "dynamic": false,
+      "file": "features/incidents/change-incident-status/ui/incident-change-status-select.tsx",
+      "line": 102,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 157,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form-name-input",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 175,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form-summary-input",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 188,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form-assignee-select",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 198,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form-assignee-input",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 211,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form-resolve-on-alerts-switch",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 230,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form-cancel-btn",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 245,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-form-submit-btn",
+      "area": "incidents",
+      "role": "form",
+      "dynamic": false,
+      "file": "features/incidents/create-or-update-incident/ui/create-or-update-incident-form.tsx",
+      "line": 256,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-row-menu-btn",
+      "area": "incidents",
+      "role": "row",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-dropdown-menu.tsx",
+      "line": 25,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-row-menu-edit",
+      "area": "incidents",
+      "role": "row",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-dropdown-menu.tsx",
+      "line": 31,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-row-menu-run-workflow",
+      "area": "incidents",
+      "role": "row",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-dropdown-menu.tsx",
+      "line": 41,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-row-menu-delete",
+      "area": "incidents",
+      "role": "row",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-dropdown-menu.tsx",
+      "line": 52,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-list-placeholder",
+      "area": "incidents",
+      "role": "list",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-list-placeholder.tsx",
+      "line": 17,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-create-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-list-placeholder.tsx",
+      "line": 29,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-list-container",
+      "area": "incidents",
+      "role": "list",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-list.tsx",
+      "line": 295,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-create-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-list.tsx",
+      "line": 329,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-create-modal",
+      "area": "incidents",
+      "role": "create",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-list.tsx",
+      "line": 365,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-table",
+      "area": "incidents",
+      "role": "table",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-table-component.tsx",
+      "line": 90,
+      "description": "",
+      "mirrorsDataTestId": true
+    },
+    {
+      "selector": "incidents-row",
+      "area": "incidents",
+      "role": "row",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incident-table-component.tsx",
+      "line": 119,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-cell-${cell.column.id}",
+      "area": "incidents",
+      "role": "cell",
+      "dynamic": true,
+      "file": "features/incidents/incident-list/ui/incident-table-component.tsx",
+      "line": 136,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-clear-filters-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-not-found.tsx",
+      "line": 22,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-correlate-manually-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-not-found.tsx",
+      "line": 44,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-ai-correlation-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-not-found.tsx",
+      "line": 56,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-report-modal",
+      "area": "incidents",
+      "role": "report",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-report/generate-report-modal.tsx",
+      "line": 36,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-report-content",
+      "area": "incidents",
+      "role": "report",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-report/generate-report-modal.tsx",
+      "line": 43,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-report-print-btn",
+      "area": "incidents",
+      "role": "report",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-report/generate-report-modal.tsx",
+      "line": 54,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-report-severity-metric",
+      "area": "incidents",
+      "role": "report",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-report/incident-severity-metric.tsx",
+      "line": 47,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-report",
+      "area": "incidents",
+      "role": "report",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-report/incidents-report.tsx",
+      "line": 145,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-report-pie-chart",
+      "area": "incidents",
+      "role": "report",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-report/pie-chart.tsx",
+      "line": 34,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-selected-actions",
+      "area": "incidents",
+      "role": "selected",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-table.tsx",
+      "line": 51,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-generate-report-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-table.tsx",
+      "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-selected-count",
+      "area": "incidents",
+      "role": "selected",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-table.tsx",
+      "line": 68,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-merge-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-table.tsx",
+      "line": 78,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-action-delete-btn",
+      "area": "incidents",
+      "role": "action",
+      "dynamic": false,
+      "file": "features/incidents/incident-list/ui/incidents-table.tsx",
+      "line": 88,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-merge-modal",
+      "area": "incidents",
+      "role": "merge",
+      "dynamic": false,
+      "file": "features/incidents/merge-incidents/ui/merge-incidents-modal.tsx",
+      "line": 59,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-merge-destination-select",
+      "area": "incidents",
+      "role": "merge",
+      "dynamic": false,
+      "file": "features/incidents/merge-incidents/ui/merge-incidents-modal.tsx",
+      "line": 94,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-merge-cancel-btn",
+      "area": "incidents",
+      "role": "merge",
+      "dynamic": false,
+      "file": "features/incidents/merge-incidents/ui/merge-incidents-modal.tsx",
+      "line": 99,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-merge-confirm-btn",
+      "area": "incidents",
+      "role": "merge",
+      "dynamic": false,
+      "file": "features/incidents/merge-incidents/ui/merge-incidents-modal.tsx",
+      "line": 106,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-go-to-incidents-btn",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/change-same-incident-in-the-past-form.tsx",
+      "line": 81,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-form",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/change-same-incident-in-the-past-form.tsx",
+      "line": 95,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-select",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/change-same-incident-in-the-past-form.tsx",
+      "line": 100,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-unlink-btn",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/change-same-incident-in-the-past-form.tsx",
+      "line": 129,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-link-btn",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/change-same-incident-in-the-past-form.tsx",
+      "line": 138,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-item-${incidentId}",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": true,
+      "file": "features/incidents/same-incidents-in-the-past/ui/following-incidents.tsx",
+      "line": 21,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-following-list",
+      "area": "incidents",
+      "role": "following",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/following-incidents.tsx",
+      "line": 47,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-following-item",
+      "area": "incidents",
+      "role": "following",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/following-incidents.tsx",
+      "line": 49,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-change-btn",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/same-incident-field.tsx",
+      "line": 51,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-link-modal-btn",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/same-incident-field.tsx",
+      "line": 66,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-past-modal",
+      "area": "incidents",
+      "role": "past",
+      "dynamic": false,
+      "file": "features/incidents/same-incidents-in-the-past/ui/same-incident-field.tsx",
+      "line": 82,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-split-modal",
+      "area": "incidents",
+      "role": "split",
+      "dynamic": false,
+      "file": "features/incidents/split-incident-alerts/ui/split-incident-alerts-modal.tsx",
+      "line": 76,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-split-destination-select",
+      "area": "incidents",
+      "role": "split",
+      "dynamic": false,
+      "file": "features/incidents/split-incident-alerts/ui/split-incident-alerts-modal.tsx",
+      "line": 109,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-split-cancel-btn",
+      "area": "incidents",
+      "role": "split",
+      "dynamic": false,
+      "file": "features/incidents/split-incident-alerts/ui/split-incident-alerts-modal.tsx",
+      "line": 114,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "incidents-split-confirm-btn",
+      "area": "incidents",
+      "role": "split",
+      "dynamic": false,
+      "file": "features/incidents/split-incident-alerts/ui/split-incident-alerts-modal.tsx",
+      "line": 117,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
       "selector": "modal-close-btn",
       "area": "modal",
       "role": "close",
       "dynamic": false,
       "file": "components/ui/Modal.tsx",
       "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "sort-direction-${column.id}",
+      "area": "sort",
+      "role": "direction",
+      "dynamic": true,
+      "file": "features/incidents/incident-list/ui/incident-table-component.tsx",
+      "line": 53,
       "description": "",
       "mirrorsDataTestId": false
     }

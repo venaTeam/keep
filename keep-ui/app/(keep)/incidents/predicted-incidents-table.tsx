@@ -91,6 +91,7 @@ export default function PredictedIncidentsTable({
             tooltip="Confirm incident"
             variant="secondary"
             icon={MdDone}
+            data-cy="incidents-action-confirm-predicted-btn"
             onClick={async (e: React.MouseEvent) => {
               e.preventDefault();
               e.stopPropagation();
@@ -103,6 +104,7 @@ export default function PredictedIncidentsTable({
             variant="secondary"
             tooltip={"Discard"}
             icon={MdBlock}
+            data-cy="incidents-action-discard-predicted-btn"
             onClick={async (e: React.MouseEvent) => {
               e.preventDefault();
               e.stopPropagation();

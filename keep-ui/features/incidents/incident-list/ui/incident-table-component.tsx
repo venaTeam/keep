@@ -50,6 +50,7 @@ const SortableHeaderCell = ({
             <div className="w-px h-5 mx-2 bg-gray-400"></div>
             <Icon
               data-testid={"sort-direction-" + column.id}
+              data-cy={`sort-direction-${column.id}`}
               className="cursor-pointer"
               size="xs"
               color="neutral"
@@ -86,7 +87,7 @@ export const IncidentTableComponent = (props: Props) => {
   const { table } = props;
 
   return (
-    <Table data-testid="incidents-table">
+    <Table data-testid="incidents-table" data-cy="incidents-table">
       <TableHead>
         {table.getHeaderGroups().map((headerGroup, index) => (
           <TableRow
@@ -115,6 +116,8 @@ export const IncidentTableComponent = (props: Props) => {
           <TableRow
             key={row.id}
             className="even:bg-tremor-background-muted even:dark:bg-dark-tremor-background-muted"
+            data-cy="incidents-row"
+            data-cy-id={row.id}
           >
             {row.getVisibleCells().map((cell) => {
               const { style, className } = getCommonPinningStylesAndClassNames(
@@ -130,6 +133,7 @@ export const IncidentTableComponent = (props: Props) => {
                     "bg-white",
                     cell.column.id === "actions" ? "p-1" : ""
                   )}
+                  data-cy={`incidents-cell-${cell.column.id}`}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

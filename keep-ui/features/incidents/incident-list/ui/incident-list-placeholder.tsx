@@ -12,7 +12,10 @@ export const IncidentListPlaceholder = ({ setIsFormOpen }: Props) => {
 
   return (
     <Fragment>
-      <div className="flex flex-col items-center justify-center gap-y-8 h-full">
+      <div
+        className="flex flex-col items-center justify-center gap-y-8 h-full"
+        data-cy="incidents-list-placeholder"
+      >
         <div className="text-center space-y-3">
           <Title className="text-2xl">No Incidents Yet</Title>
           <Subtitle className="text-gray-400">
@@ -23,6 +26,7 @@ export const IncidentListPlaceholder = ({ setIsFormOpen }: Props) => {
           className="mb-10"
           color="orange"
           onClick={() => onCreateButtonClick()}
+          data-cy="incidents-action-create-btn"
         >
           Create Incident
         </Button>

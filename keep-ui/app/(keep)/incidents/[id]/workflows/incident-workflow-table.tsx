@@ -230,9 +230,11 @@ export default function IncidentWorkflowTable({ incident }: Props) {
                   key={row.id}
                   className="hover:bg-slate-100 cursor-pointer"
                   onClick={() => handleRowClick(row.original)}
+                  data-cy="incidents-workflow-row"
+                  data-cy-id={row.id}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} data-cy={`incidents-workflow-cell-${cell.column.id}`}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -262,7 +264,7 @@ export default function IncidentWorkflowTable({ incident }: Props) {
       </Card>
 
       <div className="mt-4 mb-8">
-        <TablePagination table={table} />
+        <TablePagination table={table} dataCyPrefix="incidents-workflow" />
       </div>
 
       {selectedExecution ? (

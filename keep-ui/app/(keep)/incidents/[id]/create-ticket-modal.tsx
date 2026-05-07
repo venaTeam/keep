@@ -73,13 +73,14 @@ export function CreateTicketModal({
         onClose={handleCancel}
         title="Create New Ticket"
         className="w-[450px]"
+        data-cy="incidents-create-ticket-modal"
       >
         <div className="flex flex-col gap-4">
           <Text className="text-gray-500">
             Loading ticketing providers...
           </Text>
           <div className="flex justify-end">
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button variant="secondary" onClick={handleCancel} data-cy="incidents-create-ticket-close-btn">
               Close
             </Button>
           </div>
@@ -96,13 +97,14 @@ export function CreateTicketModal({
         onClose={handleCancel}
         title="Create New Ticket"
         className="w-[450px]"
+        data-cy="incidents-create-ticket-modal"
       >
         <div className="flex flex-col gap-4">
           <Text className="text-red-500">
             No providers with ticket creation URL are configured. Please configure a ticketing creation URL first.
           </Text>
           <div className="flex justify-end">
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button variant="secondary" onClick={handleCancel} data-cy="incidents-create-ticket-close-btn">
               Close
             </Button>
           </div>
@@ -117,6 +119,7 @@ export function CreateTicketModal({
       onClose={handleCancel}
       title="Create New Ticket"
       className="w-[450px]"
+      data-cy="incidents-create-ticket-modal"
     >
       <div className="flex flex-col gap-2">
         {/* Only show Select if there are multiple providers */}
@@ -164,6 +167,7 @@ export function CreateTicketModal({
             placeholder="Enter ticket title"
             value={ticketTitle}
             onChange={(e) => setTicketTitle(e.target.value)}
+            data-cy="incidents-create-ticket-title-input"
           />
         </div>
 
@@ -219,6 +223,7 @@ export function CreateTicketModal({
           <Button
             variant="secondary"
             onClick={handleCancel}
+            data-cy="incidents-create-ticket-cancel-btn"
           >
             Cancel
           </Button>
@@ -227,6 +232,7 @@ export function CreateTicketModal({
             color="orange"
             onClick={handleCreateTicket}
             disabled={!selectedProviderId || !ticketTitle.trim()}
+            data-cy="incidents-create-ticket-submit-btn"
           >
             Create Ticket
           </Button>

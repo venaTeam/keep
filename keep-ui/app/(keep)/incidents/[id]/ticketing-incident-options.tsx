@@ -81,6 +81,7 @@ export function TicketingIncidentOptions({
           icon={MdOutlineOpenInNew}
           onClick={() => openInProvider(linkedTicket)}
           disabled={!linkedTicketUrl}
+          data-cy="incidents-action-open-ticket-btn"
         >
           Open in {linkedTicket.provider.display_name}
         </Button>
@@ -93,6 +94,7 @@ export function TicketingIncidentOptions({
             className="!py-0.5 mr-2"
             icon={MdOutlineBookmarkAdd}
             onClick={createNewTicket}
+            data-cy="incidents-action-create-ticket-btn"
           >
             Create New Ticket
           </Button>
@@ -103,6 +105,7 @@ export function TicketingIncidentOptions({
             className="!py-0.5 mr-2"
             icon={MdLink}
             onClick={linkIncidentToExistingTicket}
+            data-cy="incidents-action-link-ticket-btn"
           >
             Link to Existing Ticket
           </Button>

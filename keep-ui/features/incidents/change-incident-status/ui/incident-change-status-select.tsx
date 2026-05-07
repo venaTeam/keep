@@ -99,18 +99,20 @@ export function IncidentChangeStatusSelect({
 
   return (
     <>
-      <Select
-        instanceId={`incident-status-select-${incidentId}`}
-        className={className}
-        isSearchable={false}
-        options={statusOptions}
-        value={selectedOption}
-        onChange={handleChange}
-        placeholder="Status"
-        classNames={customClassNames}
-        menuPortalTarget={menuPortalTarget.current}
-        menuPosition="fixed"
-      />
+      <div data-cy="incidents-status-select" data-cy-id={incidentId}>
+        <Select
+          instanceId={`incident-status-select-${incidentId}`}
+          className={className}
+          isSearchable={false}
+          options={statusOptions}
+          value={selectedOption}
+          onChange={handleChange}
+          placeholder="Status"
+          classNames={customClassNames}
+          menuPortalTarget={menuPortalTarget.current}
+          menuPosition="fixed"
+        />
+      </div>
       <IncidentChangeStatusModal
         incidentId={incidentId}
         currentStatus={currentStatus}

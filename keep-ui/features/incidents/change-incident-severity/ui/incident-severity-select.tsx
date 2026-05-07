@@ -73,16 +73,18 @@ export function IncidentSeveritySelect({ value, onChange, className }: Props) {
   );
 
   return (
-    <Select
-      className={className}
-      isSearchable={false}
-      options={severityOptions}
-      value={selectedOption}
-      onChange={handleChange}
-      placeholder="Severity"
-      classNames={customClassNames}
-      menuPortalTarget={menuPortalTarget.current}
-      menuPosition="fixed"
-    />
+    <div data-cy="incidents-severity-select">
+      <Select
+        className={className}
+        isSearchable={false}
+        options={severityOptions}
+        value={selectedOption}
+        onChange={handleChange}
+        placeholder="Severity"
+        classNames={customClassNames}
+        menuPortalTarget={menuPortalTarget.current}
+        menuPosition="fixed"
+      />
+    </div>
   );
 }

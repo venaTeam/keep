@@ -34,6 +34,7 @@ export function IncidentWorkflowsEmptyState({
             e.stopPropagation();
             handleRunWorkflow();
           }}
+          data-cy="incidents-action-run-workflow-empty-btn"
         >
           Run a workflow
         </Button>

@@ -73,7 +73,7 @@ export function SplitIncidentAlertsModal({
   };
 
   return (
-    <Modal onClose={handleClose} isOpen={true}>
+    <Modal onClose={handleClose} isOpen={true} data-cy="incidents-split-modal">
       <div className="flex flex-col gap-5">
         <div>
           <Title>Split Incident Alerts</Title>
@@ -106,14 +106,15 @@ export function SplitIncidentAlertsModal({
               option && setDestinationIncidentId(option.value)
             }
             placeholder="Select destination incident"
+            data-cy="incidents-split-destination-select"
           />
         </div>
       </div>
       <div className="flex justify-end mt-4 gap-2">
-        <Button onClick={handleClose} color="orange" variant="secondary">
+        <Button onClick={handleClose} color="orange" variant="secondary" data-cy="incidents-split-cancel-btn">
           Cancel
         </Button>
-        <Button onClick={handleSplit} color="orange">
+        <Button onClick={handleSplit} color="orange" data-cy="incidents-split-confirm-btn">
           Confirm split
         </Button>
       </div>

@@ -7,7 +7,10 @@ const IncidentCommentInput = dynamic(
     ssr: false,
     // mimic the quill editor while loading
     loading: () => (
-      <div className="w-full h-11 px-[11px] py-[16px] leading-[1.42] text-tremor-default font-[Helvetica,Arial,sans-serif] text-[#0009] italic">
+      <div
+        className="w-full h-11 px-[11px] py-[16px] leading-[1.42] text-tremor-default font-[Helvetica,Arial,sans-serif] text-[#0009] italic"
+        data-cy="incidents-comment-input-loading"
+      >
         Add a comment...
       </div>
     ),

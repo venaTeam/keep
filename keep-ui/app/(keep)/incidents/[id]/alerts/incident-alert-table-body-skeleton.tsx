@@ -15,11 +15,11 @@ export function IncidentAlertsTableBodySkeleton({
   pageSize: number;
 }) {
   return (
-    <TableBody>
+    <TableBody data-cy="incidents-alerts-table-body-skeleton">
       {Array(pageSize)
         .fill("")
         .map((_, index) => (
-          <TableRow key={`row-${index}`}>
+          <TableRow key={`row-${index}`} data-cy="incidents-alerts-skeleton-row">
             {table.getVisibleFlatColumns().map((column) => {
               const { style, className } = getCommonPinningStylesAndClassNames(
                 column,
@@ -31,6 +31,7 @@ export function IncidentAlertsTableBodySkeleton({
                   key={`cell-${column.id}-${index}`}
                   className={className}
                   style={style}
+                  data-cy={`incidents-alerts-skeleton-cell-${column.id}`}
                 >
                   <Skeleton />
                 </TableCell>

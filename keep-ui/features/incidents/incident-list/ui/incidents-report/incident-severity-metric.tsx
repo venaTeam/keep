@@ -44,7 +44,7 @@ export const IncidentSeverityMetric: React.FC<IncidentSeverityMetricProps> = ({
   }
 
   return (
-    <div className="break-inside-avoid text-lg">
+    <div className="break-inside-avoid text-lg" data-cy="incidents-report-severity-metric">
       <p className="font-bold mb-2">Incidents severity:</p>
       <div className="flex items-center gap-10">
         <DonutChart

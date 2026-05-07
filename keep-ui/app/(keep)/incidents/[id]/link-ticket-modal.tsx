@@ -115,13 +115,14 @@ export function LinkTicketModal({
         onClose={handleCancel}
         title="Link to Existing Ticket"
         className="w-[500px]"
+        data-cy="incidents-link-ticket-modal"
       >
         <div className="flex flex-col gap-4">
           <Text className="text-gray-500">
             Loading ticketing providers...
           </Text>
           <div className="flex justify-end">
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button variant="secondary" onClick={handleCancel} data-cy="incidents-link-ticket-close-btn">
               Close
             </Button>
           </div>
@@ -138,13 +139,14 @@ export function LinkTicketModal({
         onClose={handleCancel}
         title="Link to Existing Ticket"
         className="w-[500px]"
+        data-cy="incidents-link-ticket-modal"
       >
         <div className="flex flex-col gap-4">
           <Text className="text-red-500">
             No ticketing providers are configured. Please configure a ticketing provider first.
           </Text>
           <div className="flex justify-end">
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button variant="secondary" onClick={handleCancel} data-cy="incidents-link-ticket-close-btn">
               Close
             </Button>
           </div>
@@ -159,6 +161,7 @@ export function LinkTicketModal({
       onClose={handleCancel}
       title="Link to Existing Ticket"
       className="w-[500px]"
+      data-cy="incidents-link-ticket-modal"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {ticketingProviders.length > 1 && (
@@ -236,6 +239,7 @@ export function LinkTicketModal({
             value={ticketId}
             onChange={(e) => setTicketId(e.target.value)}
             disabled={isLoading}
+            data-cy="incidents-link-ticket-id-input"
           />
         </div>
 
@@ -249,6 +253,7 @@ export function LinkTicketModal({
             onChange={(e) => setTicketUrl(e.target.value)}
             required
             disabled={isLoading}
+            data-cy="incidents-link-ticket-url-input"
           />
         </div>
 
@@ -257,6 +262,7 @@ export function LinkTicketModal({
             variant="secondary"
             onClick={handleCancel}
             disabled={isLoading}
+            data-cy="incidents-link-ticket-cancel-btn"
           >
             Cancel
           </Button>
@@ -265,6 +271,7 @@ export function LinkTicketModal({
             color="orange"
             type="submit"
             disabled={isLoading || !ticketUrl.trim() || (ticketingProviders.length > 1 && !selectedProviderId)}
+            data-cy="incidents-link-ticket-submit-btn"
           >
             {isLoading ? "Linking..." : "Link Ticket"}
           </Button>

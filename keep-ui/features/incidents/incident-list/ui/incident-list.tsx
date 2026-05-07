@@ -292,7 +292,7 @@ export function IncidentList({
   };
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full" data-cy="incidents-list-container">
       <div className="flex-grow min-w-0">
         {config?.AI_FEATURES_ENABLED &&
         !isPredictedLoading &&
@@ -326,6 +326,7 @@ export function IncidentList({
                 icon={PlusIcon}
                 variant="primary"
                 onClick={() => setIsFormOpen(true)}
+                data-cy="incidents-action-create-btn"
               >
                 Create Incident
               </Button>
@@ -361,6 +362,7 @@ export function IncidentList({
         onClose={handleCloseForm}
         className="w-[600px]"
         title="Add Incident"
+        data-cy="incidents-create-modal"
       >
         <CreateOrUpdateIncidentForm
           incidentToEdit={incidentToEdit}

@@ -48,7 +48,7 @@ function SelectedRowActions({
   onGenerateReport: () => void;
 }) {
   return (
-    <div className="w-full flex justify-between">
+    <div className="w-full flex justify-between" data-cy="incidents-selected-actions">
       <div>
         <Button
           color="orange"
@@ -57,6 +57,7 @@ function SelectedRowActions({
           tooltip="Generate report for currently visible incidents"
           size="md"
           onClick={onGenerateReport}
+          data-cy="incidents-action-generate-report-btn"
         >
           Generate report
         </Button>
@@ -64,7 +65,7 @@ function SelectedRowActions({
 
       <div className="flex gap-2 items-center">
         {selectedRowIds.length ? (
-          <span className="accent-dark-tremor-content text-sm px-2">
+          <span className="accent-dark-tremor-content text-sm px-2" data-cy="incidents-selected-count">
             {selectedRowIds.length} selected
           </span>
         ) : null}
@@ -74,6 +75,7 @@ function SelectedRowActions({
           size="md"
           disabled={selectedRowIds.length < 2}
           onClick={onMergeInitiated}
+          data-cy="incidents-action-merge-btn"
         >
           Merge
         </Button>
@@ -83,6 +85,7 @@ function SelectedRowActions({
           size="md"
           disabled={!selectedRowIds.length}
           onClick={onDelete}
+          data-cy="incidents-action-delete-btn"
         >
           Delete
         </Button>

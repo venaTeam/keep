@@ -31,7 +31,11 @@ export function IncidentAlertActionTray({
   );
 
   return (
-    <div className="flex items-center justify-end relative group">
+    <div
+      className="flex items-center justify-end relative group"
+      data-cy="incidents-alert-action-tray"
+      data-cy-id={alert.fingerprint}
+    >
       <div
         className={clsx("flex items-center", [
           "transition-opacity duration-100",
@@ -56,6 +60,7 @@ export function IncidentAlertActionTray({
             />
           )}
           tooltip={expanded ? "Collapse Row" : "Expand Row"}
+          data-cy="incidents-alert-action-expand-btn"
         />
         <Button
           className={actionIconButtonClassName}
@@ -68,6 +73,7 @@ export function IncidentAlertActionTray({
             <Icon icon={EyeIcon} className="w-4 h-4 text-gray-500" />
           )}
           tooltip="View Alert Details"
+          data-cy="incidents-alert-action-view-btn"
         />
         {!isCandidate && (
           <Button
@@ -81,6 +87,7 @@ export function IncidentAlertActionTray({
               <Icon icon={LinkIcon} className="rotate-45 w-4 h-4 text-gray-500" />
             )}
             tooltip="Unlink from incident"
+            data-cy="incidents-alert-action-unlink-btn"
           />
         )}
       </div>

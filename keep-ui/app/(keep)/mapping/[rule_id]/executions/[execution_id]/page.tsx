@@ -34,7 +34,7 @@ export default function MappingExecutionDetailsPage(props: {
   )}`;
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4" data-cy="mapping-execution-detail-page">
       <div>
         <Subtitle className="text-sm">
           <Link href="/mapping">All Rules</Link>{" "}

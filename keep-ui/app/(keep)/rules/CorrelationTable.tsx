@@ -127,7 +127,7 @@ export const CorrelationTable = ({ rules }: CorrelationTableProps) => {
   });
 
   return (
-    <div className="flex-1 flex flex-col h-full gap-6">
+    <div className="flex-1 flex flex-col h-full gap-6" data-cy="rules-page">
       <div className="flex items-center justify-between">
         <div>
           <PageTitle>
@@ -143,11 +143,12 @@ export const CorrelationTable = ({ rules }: CorrelationTableProps) => {
           variant="primary"
           onClick={() => setIsRuleCreation(true)}
           icon={PlusIcon}
+          data-cy="rules-create-btn"
         >
           Create correlation
         </Button>
       </div>
-      <Card className="p-0">
+      <Card className="p-0" data-cy="rules-table">
         <Table>
           <TableHead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -156,7 +157,7 @@ export const CorrelationTable = ({ rules }: CorrelationTableProps) => {
                 className="border-b border-slate-200"
               >
                 {headerGroup.headers.map((header) => (
-                  <TableHeaderCell key={header.id}>
+                  <TableHeaderCell key={header.id} data-cy={`rules-header-${header.column.id}`}>
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
@@ -171,11 +172,14 @@ export const CorrelationTable = ({ rules }: CorrelationTableProps) => {
               <TableRow
                 key={row.id}
                 className="cursor-pointer hover:bg-slate-50 group"
+                data-cy="rules-row"
+                data-cy-id={row.original.id}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}
                     onClick={() => router.push(`?id=${cell.row.original.id}`)}
+                    data-cy={`rules-cell-${cell.column.id}`}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>

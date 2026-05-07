@@ -1,11 +1,16 @@
 {
-  "version": "0a03269fef5e8d94298ebb3f6b835b38bb13bc0a",
-  "generatedAt": "2026-05-06T23:49:59.150Z",
-  "totalSelectors": 7,
+  "version": "a2eb0cc11bc0979ef853dbaf5ad26854a16378e2",
+  "generatedAt": "2026-05-07T00:07:54.651Z",
+  "totalSelectors": 98,
   "byArea": {
     "(dynamic)": 5,
+    "dedup": 14,
     "drawer": 1,
-    "modal": 1
+    "extraction": 24,
+    "maintenance": 13,
+    "mapping": 23,
+    "modal": 1,
+    "rules": 17
   },
   "selectors": [
     {
@@ -59,6 +64,146 @@
       "mirrorsDataTestId": false
     },
     {
+      "selector": "dedup-sidebar",
+      "area": "dedup",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 261,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-form-name-input",
+      "area": "dedup",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 280,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-form-description-input",
+      "area": "dedup",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 299,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-form-provider-select",
+      "area": "dedup",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 328,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-form-fingerprint-fields-select",
+      "area": "dedup",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 409,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-form-ignore-fields-select",
+      "area": "dedup",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 490,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-form-cancel-btn",
+      "area": "dedup",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 538,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-form-submit-btn",
+      "area": "dedup",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationSidebar.tsx",
+      "line": 546,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-action-delete-btn",
+      "area": "dedup",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationTable.tsx",
+      "line": 297,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-page",
+      "area": "dedup",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationTable.tsx",
+      "line": 328,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-create-btn",
+      "area": "dedup",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationTable.tsx",
+      "line": 350,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-table",
+      "area": "dedup",
+      "role": "table",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationTable.tsx",
+      "line": 355,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-row",
+      "area": "dedup",
+      "role": "row",
+      "dynamic": false,
+      "file": "app/(keep)/deduplication/DeduplicationTable.tsx",
+      "line": 415,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "dedup-cell-${cell.column.id}",
+      "area": "dedup",
+      "role": "cell",
+      "dynamic": true,
+      "file": "app/(keep)/deduplication/DeduplicationTable.tsx",
+      "line": 434,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
       "selector": "drawer-close-btn",
       "area": "drawer",
       "role": "close",
@@ -69,12 +214,782 @@
       "mirrorsDataTestId": false
     },
     {
+      "selector": "extraction-execution-detail-page",
+      "area": "extraction",
+      "role": "execution",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/[rule_id]/executions/[execution_id]/page.tsx",
+      "line": 37,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-executions-page",
+      "area": "extraction",
+      "role": "executions",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/[rule_id]/executions/page.tsx",
+      "line": 40,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-sidebar",
+      "area": "extraction",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 139,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-form-name-input",
+      "area": "extraction",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 151,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-form-description-input",
+      "area": "extraction",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 160,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-form-priority-input",
+      "area": "extraction",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 180,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-form-attribute-input",
+      "area": "extraction",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 222,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-form-regex-input",
+      "area": "extraction",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 247,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-form-cancel-btn",
+      "area": "extraction",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 302,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-form-submit-btn",
+      "area": "extraction",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/create-or-update-extraction-rule.tsx",
+      "line": 311,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-page",
+      "area": "extraction",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extraction.tsx",
+      "line": 42,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-create-btn",
+      "area": "extraction",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extraction.tsx",
+      "line": 57,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-empty-create-btn",
+      "area": "extraction",
+      "role": "empty",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extraction.tsx",
+      "line": 91,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-action-run-btn",
+      "area": "extraction",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extractions-table.tsx",
+      "line": 152,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-action-edit-btn",
+      "area": "extraction",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extractions-table.tsx",
+      "line": 164,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-action-delete-btn",
+      "area": "extraction",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extractions-table.tsx",
+      "line": 176,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-table",
+      "area": "extraction",
+      "role": "table",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extractions-table.tsx",
+      "line": 211,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-header-${header.column.id}",
+      "area": "extraction",
+      "role": "header",
+      "dynamic": true,
+      "file": "app/(keep)/extraction/extractions-table.tsx",
+      "line": 216,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-row",
+      "area": "extraction",
+      "role": "row",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/extractions-table.tsx",
+      "line": 235,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-cell-${cell.column.id}",
+      "area": "extraction",
+      "role": "cell",
+      "dynamic": true,
+      "file": "app/(keep)/extraction/extractions-table.tsx",
+      "line": 239,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-run-modal",
+      "area": "extraction",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/run-extraction-modal.tsx",
+      "line": 59,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-run-alert-select",
+      "area": "extraction",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/run-extraction-modal.tsx",
+      "line": 69,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-run-cancel-btn",
+      "area": "extraction",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/run-extraction-modal.tsx",
+      "line": 87,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "extraction-run-confirm-btn",
+      "area": "extraction",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/extraction/run-extraction-modal.tsx",
+      "line": 95,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-form-name-input",
+      "area": "maintenance",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/create-or-update-maintenance-rule.tsx",
+      "line": 235,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-form-description-input",
+      "area": "maintenance",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/create-or-update-maintenance-rule.tsx",
+      "line": 244,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-form-end-interval-input",
+      "area": "maintenance",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/create-or-update-maintenance-rule.tsx",
+      "line": 299,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-form-interval-type-select",
+      "area": "maintenance",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/create-or-update-maintenance-rule.tsx",
+      "line": 301,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-form-cancel-btn",
+      "area": "maintenance",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/create-or-update-maintenance-rule.tsx",
+      "line": 341,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-form-submit-btn",
+      "area": "maintenance",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/create-or-update-maintenance-rule.tsx",
+      "line": 351,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-action-edit-btn",
+      "area": "maintenance",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/maintenance-rules-table.tsx",
+      "line": 59,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-action-delete-btn",
+      "area": "maintenance",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/maintenance-rules-table.tsx",
+      "line": 70,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-table",
+      "area": "maintenance",
+      "role": "table",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/maintenance-rules-table.tsx",
+      "line": 143,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-header-${header.column.id}",
+      "area": "maintenance",
+      "role": "header",
+      "dynamic": true,
+      "file": "app/(keep)/maintenance/maintenance-rules-table.tsx",
+      "line": 154,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-row",
+      "area": "maintenance",
+      "role": "row",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/maintenance-rules-table.tsx",
+      "line": 172,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-cell-${cell.column.id}",
+      "area": "maintenance",
+      "role": "cell",
+      "dynamic": true,
+      "file": "app/(keep)/maintenance/maintenance-rules-table.tsx",
+      "line": 176,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "maintenance-page",
+      "area": "maintenance",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/maintenance/maintenance.tsx",
+      "line": 21,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-execution-detail-page",
+      "area": "mapping",
+      "role": "execution",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/[rule_id]/executions/[execution_id]/page.tsx",
+      "line": 37,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-executions-page",
+      "area": "mapping",
+      "role": "executions",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/[rule_id]/executions/page.tsx",
+      "line": 56,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-data-preview-table",
+      "area": "mapping",
+      "role": "data",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/[rule_id]/executions/page.tsx",
+      "line": 104,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-form-name-input",
+      "area": "mapping",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/create-or-edit-mapping.tsx",
+      "line": 290,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-form-priority-input",
+      "area": "mapping",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/create-or-edit-mapping.tsx",
+      "line": 310,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-form-description-input",
+      "area": "mapping",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/create-or-edit-mapping.tsx",
+      "line": 320,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-form-cancel-btn",
+      "area": "mapping",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/create-or-edit-mapping.tsx",
+      "line": 541,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-form-submit-btn",
+      "area": "mapping",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/create-or-edit-mapping.tsx",
+      "line": 555,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-page",
+      "area": "mapping",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/mapping.tsx",
+      "line": 39,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-create-btn",
+      "area": "mapping",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/mapping.tsx",
+      "line": 54,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-sidebar",
+      "area": "mapping",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/mapping.tsx",
+      "line": 64,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-empty-create-btn",
+      "area": "mapping",
+      "role": "empty",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/mapping.tsx",
+      "line": 98,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-action-run-btn",
+      "area": "mapping",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/rules-table.tsx",
+      "line": 143,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-action-edit-btn",
+      "area": "mapping",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/rules-table.tsx",
+      "line": 155,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-action-delete-btn",
+      "area": "mapping",
+      "role": "action",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/rules-table.tsx",
+      "line": 167,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-table",
+      "area": "mapping",
+      "role": "table",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/rules-table.tsx",
+      "line": 200,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-header-${header.column.id}",
+      "area": "mapping",
+      "role": "header",
+      "dynamic": true,
+      "file": "app/(keep)/mapping/rules-table.tsx",
+      "line": 215,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-row",
+      "area": "mapping",
+      "role": "row",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/rules-table.tsx",
+      "line": 234,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-cell-${cell.column.id}",
+      "area": "mapping",
+      "role": "cell",
+      "dynamic": true,
+      "file": "app/(keep)/mapping/rules-table.tsx",
+      "line": 245,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-run-modal",
+      "area": "mapping",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/run-mapping-modal.tsx",
+      "line": 59,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-run-alert-select",
+      "area": "mapping",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/run-mapping-modal.tsx",
+      "line": 67,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-run-cancel-btn",
+      "area": "mapping",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/run-mapping-modal.tsx",
+      "line": 85,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "mapping-run-confirm-btn",
+      "area": "mapping",
+      "role": "run",
+      "dynamic": false,
+      "file": "app/(keep)/mapping/run-mapping-modal.tsx",
+      "line": 93,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
       "selector": "modal-close-btn",
       "area": "modal",
       "role": "close",
       "dynamic": false,
       "file": "components/ui/Modal.tsx",
       "line": 60,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-create-btn",
+      "area": "rules",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationPlaceholder.tsx",
+      "line": 30,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-placeholder-sankey",
+      "area": "rules",
+      "role": "placeholder",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationPlaceholder.tsx",
+      "line": 34,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-form-name-input",
+      "area": "rules",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/CorrelationForm.tsx",
+      "line": 78,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-form-time-amount-input",
+      "area": "rules",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/CorrelationForm.tsx",
+      "line": 104,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-form-incident-name-template-input",
+      "area": "rules",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/CorrelationForm.tsx",
+      "line": 148,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-form-incident-prefix-input",
+      "area": "rules",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/CorrelationForm.tsx",
+      "line": 168,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-form-threshold-input",
+      "area": "rules",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/CorrelationForm.tsx",
+      "line": 295,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-form-cancel-btn",
+      "area": "rules",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/CorrelationSubmission.tsx",
+      "line": 27,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-form-submit-btn",
+      "area": "rules",
+      "role": "form",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/CorrelationSubmission.tsx",
+      "line": 30,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-delete-btn",
+      "area": "rules",
+      "role": "delete",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/DeleteRule.tsx",
+      "line": 38,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-sidebar",
+      "area": "rules",
+      "role": "sidebar",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationSidebar/index.tsx",
+      "line": 97,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-page",
+      "area": "rules",
+      "role": "page",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationTable.tsx",
+      "line": 130,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-create-btn",
+      "area": "rules",
+      "role": "create",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationTable.tsx",
+      "line": 146,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-table",
+      "area": "rules",
+      "role": "table",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationTable.tsx",
+      "line": 151,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-header-${header.column.id}",
+      "area": "rules",
+      "role": "header",
+      "dynamic": true,
+      "file": "app/(keep)/rules/CorrelationTable.tsx",
+      "line": 160,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-row",
+      "area": "rules",
+      "role": "row",
+      "dynamic": false,
+      "file": "app/(keep)/rules/CorrelationTable.tsx",
+      "line": 175,
+      "description": "",
+      "mirrorsDataTestId": false
+    },
+    {
+      "selector": "rules-cell-${cell.column.id}",
+      "area": "rules",
+      "role": "cell",
+      "dynamic": true,
+      "file": "app/(keep)/rules/CorrelationTable.tsx",
+      "line": 182,
       "description": "",
       "mirrorsDataTestId": false
     }

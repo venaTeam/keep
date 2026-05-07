@@ -56,6 +56,7 @@ export default function MaintenanceRulesTable({
               e.preventDefault();
               editCallback(context.row.original!);
             }}
+            data-cy="maintenance-action-edit-btn"
           />
           <Button
             color="red"
@@ -66,6 +67,7 @@ export default function MaintenanceRulesTable({
               e.preventDefault();
               deleteMaintenanceRule(context.row.original.id!);
             }}
+            data-cy="maintenance-action-delete-btn"
           />
         </div>
       ),
@@ -138,7 +140,7 @@ export default function MaintenanceRulesTable({
   };
 
   return (
-    <Table>
+    <Table data-cy="maintenance-table">
       <TableHead>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow
@@ -149,6 +151,7 @@ export default function MaintenanceRulesTable({
               <TableHeaderCell
                 className="text-tremor-content-strong dark:text-dark-tremor-content-strong"
                 key={header.id}
+                data-cy={`maintenance-header-${header.column.id}`}
               >
                 {flexRender(
                   header.column.columnDef.header,
@@ -166,9 +169,11 @@ export default function MaintenanceRulesTable({
               className="even:bg-tremor-background-muted even:dark:bg-dark-tremor-background-muted hover:bg-slate-100"
               key={row.id}
               onClick={() => row.toggleExpanded()}
+              data-cy="maintenance-row"
+              data-cy-id={row.original.id}
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell key={cell.id} data-cy={`maintenance-cell-${cell.column.id}`}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}

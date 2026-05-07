@@ -53,7 +53,7 @@ export default function MappingExecutionsPage(props: {
   }
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4" data-cy="mapping-executions-page">
       <div>
         <Subtitle className="text-sm">
           <Link href="/mapping">All Rules</Link>{" "}
@@ -101,7 +101,7 @@ export default function MappingExecutionsPage(props: {
             </div>
             {isDataPreviewExpanded && (
               <div className="mt-4 max-h-96 overflow-auto">
-                <Table>
+                <Table data-cy="mapping-data-preview-table">
                   <TableHead>
                     <TableRow>
                       {Object.keys(rule.rows[0]).map((key) => (

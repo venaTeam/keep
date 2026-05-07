@@ -27,10 +27,11 @@ export const CorrelationPlaceholder = () => {
           size="md"
           onClick={() => onCorrelationClick()}
           icon={PlusIcon}
+          data-cy="rules-create-btn"
         >
           Create Correlation
         </Button>
-        <PlaceholderSankey className="max-w-full" />
+        <PlaceholderSankey className="max-w-full" data-cy="rules-placeholder-sankey" />
       </EmptyStateCard>
       <CorrelationSidebar
         isOpen={isSidebarOpen}

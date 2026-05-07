@@ -39,7 +39,7 @@ export default function Extraction() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" data-cy="extraction-page">
       <div className="flex flex-row items-center justify-between">
         <div>
           <PageTitle>Extractions</PageTitle>
@@ -54,6 +54,7 @@ export default function Extraction() {
             type="submit"
             onClick={() => setIsSidePanelOpen(true)}
             icon={PlusIcon}
+            data-cy="extraction-create-btn"
           >
             Create Extraction
           </Button>
@@ -87,6 +88,7 @@ export default function Extraction() {
                   type="submit"
                   onClick={() => setIsSidePanelOpen(true)}
                   icon={PlusIcon}
+                  data-cy="extraction-empty-create-btn"
                 >
                   Create Extraction Rule
                 </Button>

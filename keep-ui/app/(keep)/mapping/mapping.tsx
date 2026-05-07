@@ -36,7 +36,7 @@ export default function Mapping() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" data-cy="mapping-page">
       <div className="flex flex-row items-center justify-between">
         <div>
           <PageTitle>Mapping</PageTitle>
@@ -51,6 +51,7 @@ export default function Mapping() {
             type="submit"
             onClick={() => setIsSidePanelOpen(true)}
             icon={PlusIcon}
+            data-cy="mapping-create-btn"
           >
             Create Mapping
           </Button>
@@ -60,6 +61,7 @@ export default function Mapping() {
         <Drawer
           isOpen={isSidePanelOpen}
           onClose={() => handleSidePanelExit(null)}
+          data-cy="mapping-sidebar"
         >
           <div className="p-4">
             <h2 className="text-lg">Configure</h2>
@@ -93,6 +95,7 @@ export default function Mapping() {
                 type="submit"
                 onClick={() => setIsSidePanelOpen(true)}
                 icon={PlusIcon}
+                data-cy="mapping-empty-create-btn"
               >
                 Create Mapping
               </Button>

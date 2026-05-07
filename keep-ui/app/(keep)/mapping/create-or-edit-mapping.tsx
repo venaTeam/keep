@@ -287,6 +287,7 @@ export default function CreateOrEditMapping({
             required={true}
             value={mapName}
             onValueChange={setMapName}
+            data-cy="mapping-form-name-input"
           />
         </div>
         <div className="flex-1/5">
@@ -306,6 +307,7 @@ export default function CreateOrEditMapping({
             onValueChange={setPriority}
             min={0}
             max={100}
+            data-cy="mapping-form-priority-input"
           />
         </div>
       </div>
@@ -315,6 +317,7 @@ export default function CreateOrEditMapping({
           placeholder="Map Description"
           value={mapDescription}
           onValueChange={setMapDescription}
+          data-cy="mapping-form-description-input"
         />
       </div>
       <Divider />
@@ -535,6 +538,7 @@ export default function CreateOrEditMapping({
           size="xs"
           variant="secondary"
           onClick={exitEditOrCreateMode}
+          data-cy="mapping-form-cancel-btn"
         >
           Cancel
         </Button>
@@ -548,6 +552,7 @@ export default function CreateOrEditMapping({
             !attributeGroups.flat().length ||
             (isMultiLevel && !newPropertyName)
           }
+          data-cy="mapping-form-submit-btn"
         >
           {editMode ? "Update" : "Create"}
         </Button>

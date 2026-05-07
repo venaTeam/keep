@@ -140,6 +140,7 @@ export default function RulesTable({ mappings, editCallback }: Props) {
               event.stopPropagation();
               setRunModalRule(context.row.original.id!);
             }}
+            data-cy="mapping-action-run-btn"
           />
           <Button
             color="orange"
@@ -151,6 +152,7 @@ export default function RulesTable({ mappings, editCallback }: Props) {
               event.stopPropagation();
               editCallback(context.row.original!);
             }}
+            data-cy="mapping-action-edit-btn"
           />
           <Button
             color="red"
@@ -162,6 +164,7 @@ export default function RulesTable({ mappings, editCallback }: Props) {
               event.stopPropagation();
               deleteRule(context.row.original.id!);
             }}
+            data-cy="mapping-action-delete-btn"
           />
         </div>
       ),
@@ -194,7 +197,7 @@ export default function RulesTable({ mappings, editCallback }: Props) {
 
   return (
     <>
-      <Table>
+      <Table data-cy="mapping-table">
         <TableHead>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
@@ -209,6 +212,7 @@ export default function RulesTable({ mappings, editCallback }: Props) {
                       : ""
                   }`}
                   key={header.id}
+                  data-cy={`mapping-header-${header.column.id}`}
                 >
                   {flexRender(
                     header.column.columnDef.header,
@@ -227,6 +231,8 @@ export default function RulesTable({ mappings, editCallback }: Props) {
               onClick={() =>
                 router.push(`/mapping/${row.original.id}/executions`)
               }
+              data-cy="mapping-row"
+              data-cy-id={row.original.id}
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell
@@ -236,6 +242,7 @@ export default function RulesTable({ mappings, editCallback }: Props) {
                       : ""
                   }`}
                   key={cell.id}
+                  data-cy={`mapping-cell-${cell.column.id}`}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

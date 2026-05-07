@@ -220,6 +220,7 @@ export default function CreateOrUpdateMaintenanceRule({
     <form
       className="py-2"
       onSubmit={editMode ? updateMaintenanceRule : addMaintenanceRule}
+      data-cy={editMode ? "maintenance-edit-modal" : "maintenance-create-modal"}
     >
       <Subtitle>Maintenance Rule Metadata</Subtitle>
       <div className="mt-2.5">
@@ -231,6 +232,7 @@ export default function CreateOrUpdateMaintenanceRule({
           required={true}
           value={maintenanceName}
           onValueChange={setMaintenanceName}
+          data-cy="maintenance-form-name-input"
         />
       </div>
       <div className="mt-2.5">
@@ -239,6 +241,7 @@ export default function CreateOrUpdateMaintenanceRule({
           placeholder="Maintenance Description"
           value={description}
           onValueChange={setDescription}
+          data-cy="maintenance-form-description-input"
         />
       </div>
       <div className="mt-2.5">
@@ -293,8 +296,9 @@ export default function CreateOrUpdateMaintenanceRule({
             value={endInterval}
             onValueChange={setEndInterval}
             min={1}
+            data-cy="maintenance-form-end-interval-input"
           />
-          <Select value={intervalType} onValueChange={setIntervalType}>
+          <Select value={intervalType} onValueChange={setIntervalType} data-cy="maintenance-form-interval-type-select">
             <SelectItem value="minutes">Minutes</SelectItem>
             <SelectItem value="hours">Hours</SelectItem>
             <SelectItem value="days">Days</SelectItem>
@@ -334,6 +338,7 @@ export default function CreateOrUpdateMaintenanceRule({
             size="xs"
             variant="secondary"
             onClick={exitEditMode}
+            data-cy="maintenance-form-cancel-btn"
           >
             Cancel
           </Button>
@@ -343,6 +348,7 @@ export default function CreateOrUpdateMaintenanceRule({
           color="orange"
           size="xs"
           type="submit"
+          data-cy="maintenance-form-submit-btn"
         >
           {editMode ? "Update" : "Create"}
         </Button>

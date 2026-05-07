@@ -132,6 +132,7 @@ const ProvidersTiles = ({
         title={`Connect to ${selectedProvider?.display_name}`}
         isOpen={openPanel}
         onClose={handleCloseModal}
+        data-cy="providers-connect-drawer"
       >
         {selectedProvider && (
           <ProviderForm

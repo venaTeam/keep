@@ -231,7 +231,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
         <PageTitle>SMTP Settings</PageTitle>
         <PageSubtitle>Configure your SMTP server to send emails</PageSubtitle>
       </header>
-      <Card className="p-4">
+      <Card className="p-4" data-cy="settings-smtp-form">
         <div className="mb-4">
           <label htmlFor="host" className="block text-sm font-medium mb-1">
             Host
@@ -240,6 +240,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
             type="text"
             id="host"
             name="host"
+            data-cy="settings-smtp-host-input"
             value={settings.host}
             onChange={handleChange}
             placeholder="smtp.example.com"
@@ -262,6 +263,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
             type="text"
             id="port"
             name="port"
+            data-cy="settings-smtp-port-input"
             value={settings.port.toString()}
             onChange={handleChange}
             color="orange"
@@ -286,6 +288,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
             type="text"
             id="from_email"
             name="from_email"
+            data-cy="settings-smtp-from-email-input"
             value={settings.from_email}
             onChange={handleChange}
             color="orange"
@@ -308,6 +311,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
             type="text"
             id="username"
             name="username"
+            data-cy="settings-smtp-username-input"
             value={settings.username}
             onChange={handleChange}
             color="orange"
@@ -326,6 +330,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
             type="password"
             id="password"
             name="password"
+            data-cy="settings-smtp-password-input"
             value={settings.password}
             onChange={handleChange}
             color="orange"
@@ -342,6 +347,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
               type="checkbox"
               id="secure"
               name="secure"
+              data-cy="settings-smtp-secure-input"
               className="form-checkbox"
               checked={settings.secure}
               onChange={handleChange}
@@ -352,7 +358,12 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
 
         <div className="flex flex-col justify-end space-y-2 mt-6">
           <div className="flex justify-end space-x-2">
-            <Button onClick={onSave} color="orange" className="px-4 py-2">
+            <Button
+              onClick={onSave}
+              color="orange"
+              className="px-4 py-2"
+              data-cy="settings-smtp-save-btn"
+            >
               Save
             </Button>
             <Button
@@ -360,6 +371,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
               color="orange"
               className="px-4 py-2"
               disabled={!smtpInstalled}
+              data-cy="settings-smtp-delete-btn"
             >
               Delete
             </Button>
@@ -389,6 +401,7 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
             type="text"
             id="to_email"
             name="to_email"
+            data-cy="settings-smtp-to-email-input"
             value={settings.to_email}
             onChange={handleChange}
             placeholder="recipient@example.com"
@@ -403,7 +416,12 @@ export default function SMTPSettingsForm({ selectedTab }: Props) {
           )}
         </div>
         <div className="flex justify-end space-x-2 mt-6">
-          <Button onClick={onTest} color="orange" className="px-4 py-2">
+          <Button
+            onClick={onTest}
+            color="orange"
+            className="px-4 py-2"
+            data-cy="settings-smtp-test-btn"
+          >
             Test
           </Button>
         </div>

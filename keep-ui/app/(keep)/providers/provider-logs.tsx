@@ -65,6 +65,7 @@ const ProviderLogs: React.FC<ProviderLogsProps> = ({ providerId }) => {
           variant="secondary"
           icon={ArrowPathIcon}
           onClick={() => refresh()}
+          data-cy="providers-logs-refresh-btn"
         >
           Refresh
         </Button>

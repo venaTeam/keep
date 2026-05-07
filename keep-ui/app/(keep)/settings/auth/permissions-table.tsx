@@ -39,6 +39,8 @@ export function PermissionsTable({
               transition-colors duration-200
             `}
             onClick={() => !isDisabled && onRowClick(resource)}
+            data-cy="auth-permission-row"
+            data-cy-id={resource.id}
           >
             <TableCell className="w-8/24">
               <Text className="truncate">{resource.name}</Text>

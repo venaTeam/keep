@@ -49,6 +49,8 @@ export function RolesTable({
               transition-colors duration-200 group
             `}
               onClick={() => !isDisabled && onRowClick(role)}
+              data-cy="auth-role-row"
+              data-cy-id={role.id}
             >
               <TableCell className="w-4/24">
                 <div className="flex items-center justify-between">

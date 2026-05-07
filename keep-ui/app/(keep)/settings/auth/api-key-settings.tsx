@@ -118,6 +118,7 @@ export default function ApiKeySettings({ selectedTab }: Props) {
                 ? "API Key creation is disabled because Keep is running in NO_AUTH mode."
                 : "Add user"
             }
+            data-cy="settings-create-api-key-btn"
           >
             Create API key
           </Button>
@@ -150,6 +151,8 @@ export default function ApiKeySettings({ selectedTab }: Props) {
                 <TableRow
                   key={key.reference_id}
                   className="hover:bg-gray-50 transition-colors duration-200 cursor-pointer group"
+                  data-cy="auth-api-key-row"
+                  data-cy-id={key.reference_id}
                 >
                   <TableCell>{key.reference_id}</TableCell>
                   <TableCell className="text-left">
@@ -175,6 +178,7 @@ export default function ApiKeySettings({ selectedTab }: Props) {
                         variant="light"
                         color="orange"
                         onClick={(e) => handleRegenerate(key.reference_id, e)}
+                        data-cy="auth-api-key-regenerate-btn"
                       />
                       <Button
                         tooltip="Delete key"
@@ -182,6 +186,7 @@ export default function ApiKeySettings({ selectedTab }: Props) {
                         variant="light"
                         color="orange"
                         onClick={(e) => handleDelete(key.reference_id, e)}
+                        data-cy="auth-api-key-delete-btn"
                       />
                     </div>
                   </TableCell>

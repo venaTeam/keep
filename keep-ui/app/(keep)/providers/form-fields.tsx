@@ -266,6 +266,7 @@ export function TextField({
         type={isSensitive ? "password" : "text"}
         id={id}
         name={id}
+        data-cy={`providers-form-${id}-input`}
         value={
           isSensitive && shouldHideSensitiveFields && !touched
             ? ""
@@ -307,6 +308,7 @@ export function SelectField({
       <FieldLabel id={id} config={config} />
       <Select
         name={id}
+        data-cy={`providers-form-${id}-select`}
         value={value?.toString() ?? config.default?.toString()}
         onValueChange={onChange}
         placeholder={config.placeholder || `Select ${id}`}
@@ -370,6 +372,7 @@ export function FileField({
         ref={ref}
         id={id}
         name={id}
+        data-cy={`providers-form-${id}-file-input`}
         accept={config.file_type}
         style={{ display: "none" }}
         onChange={handleChange}

@@ -19,6 +19,7 @@ export function Drawer({
   title,
   description,
   className,
+  "data-cy": dataCy,
 }: {
   children: React.ReactNode;
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function Drawer({
   title?: string;
   description?: string;
   className?: string;
+  "data-cy"?: string;
 }) {
   return (
     <TremorDrawer
@@ -39,7 +41,10 @@ export function Drawer({
       {/* <DrawerTrigger asChild>
         <Button variant="secondary">Open Drawer</Button>
       </DrawerTrigger> */}
-      <DrawerContent className="max-w-full sm:max-w-[80%] lg:max-w-[40%]">
+      <DrawerContent
+        data-cy={dataCy}
+        className="max-w-full sm:max-w-[80%] lg:max-w-[40%]"
+      >
         {/* <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription className="mt-1 text-sm">

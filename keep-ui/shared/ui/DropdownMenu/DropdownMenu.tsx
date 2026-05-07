@@ -52,12 +52,15 @@ interface MenuProps {
   nested?: boolean;
   children?: React.ReactNode;
   iconClassName?: string;
+  "data-cy"?: string;
+  // Optional data-cy applied to the floating list container.
+  listDataCy?: string;
 }
 
 const MenuComponent = React.forwardRef<
   HTMLButtonElement,
   MenuProps & React.HTMLProps<HTMLButtonElement>
->(({ icon, children, label, iconClassName, ...props }, forwardedRef) => {
+>(({ icon, children, label, iconClassName, "data-cy": dataCy, listDataCy, ...props }, forwardedRef) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [hasFocusInside, setHasFocusInside] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
@@ -159,6 +162,7 @@ const MenuComponent = React.forwardRef<
         data-nested={isNested ? "" : undefined}
         data-focus-inside={hasFocusInside ? "" : undefined}
         data-testid="dropdown-menu-button"
+        data-cy={dataCy}
         className={clsx(
           isNested ? "DropdownMenuItem" : "DropdownMenuButton",
           "group",
@@ -219,6 +223,7 @@ const MenuComponent = React.forwardRef<
                   style={floatingStyles}
                   {...getFloatingProps()}
                   data-testid="dropdown-menu-list"
+                  data-cy={listDataCy}
                 >
                   {children}
                 </div>
@@ -238,17 +243,31 @@ interface DropdownDropdownMenuItemProps {
   icon?: ElementType;
   disabled?: boolean;
   variant?: "destructive";
+  /** Optional explicit data-cy id segment. Falls back to a kebab-cased label. */
+  dataCyId?: string;
+  "data-cy"?: string;
+}
+
+function toDataCyId(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 const DropdownDropdownMenuItem = React.forwardRef<
   HTMLButtonElement,
   DropdownDropdownMenuItemProps & React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ label, icon, disabled, ...props }, forwardedRef) => {
+>(({ label, icon, disabled, dataCyId, "data-cy": dataCy, ...props }, forwardedRef) => {
   const menu = React.useContext(MenuContext);
   const item = useListItem({ label: disabled ? null : label });
   const tree = useFloatingTree();
   const isActive = item.index === menu.activeIndex;
   const Icon = icon;
+  // Stable per-item selector. Explicit data-cy wins; otherwise we compose
+  // menu-item-<id-or-kebab(label)>.
+  const resolvedDataCy =
+    dataCy ?? `menu-item-${dataCyId ?? toDataCyId(label)}`;
 
   return (
     <button
@@ -256,6 +275,7 @@ const DropdownDropdownMenuItem = React.forwardRef<
       ref={useMergeRefs([item.ref, forwardedRef])}
       type="button"
       role="DropdownMenuItem"
+      data-cy={resolvedDataCy}
       className={clsx(
         "DropdownMenuItem",
         props.variant === "destructive" && "text-red-500",

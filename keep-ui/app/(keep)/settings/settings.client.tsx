@@ -368,19 +368,32 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col h-full">
       <TabGroup index={tabIndex} className="flex-grow flex flex-col">
-        <TabList>
-          <Tab icon={UserGroupIcon} onClick={() => handleTabChange("users")}>
+        <TabList data-cy="settings-tabs">
+          <Tab
+            icon={UserGroupIcon}
+            onClick={() => handleTabChange("users")}
+            data-cy="settings-tab-auth"
+          >
             Users and Access
           </Tab>
-          <Tab icon={GlobeAltIcon} onClick={() => handleTabChange("webhook")}>
+          <Tab
+            icon={GlobeAltIcon}
+            onClick={() => handleTabChange("webhook")}
+            data-cy="settings-tab-webhook"
+          >
             Incoming Webhook
           </Tab>
-          <Tab icon={EnvelopeIcon} onClick={() => handleTabChange("smtp")}>
+          <Tab
+            icon={EnvelopeIcon}
+            onClick={() => handleTabChange("smtp")}
+            data-cy="settings-tab-smtp"
+          >
             SMTP
           </Tab>
           <Tab
             icon={PhotoIcon}
             onClick={() => handleTabChange("provider-images")}
+            data-cy="settings-tab-provider-images"
           >
             Provider Icons
           </Tab>
@@ -391,40 +404,46 @@ export default function SettingsPage() {
               index={userSubTabIndex}
               className="h-full flex flex-col gap-4"
             >
-              <TabList>
+              <TabList data-cy="auth-tabs">
                 <Tab
                   icon={UsersIcon}
                   onClick={() => handleUserSubTabChange("users")}
+                  data-cy="auth-tab-users"
                 >
                   Users
                 </Tab>
                 <Tab
                   icon={UserGroupIcon}
                   onClick={() => handleUserSubTabChange("groups")}
+                  data-cy="auth-tab-groups"
                 >
                   Groups
                 </Tab>
                 <Tab
                   icon={ShieldCheckIcon}
                   onClick={() => handleUserSubTabChange("roles")}
+                  data-cy="auth-tab-roles"
                 >
                   Roles
                 </Tab>
                 <Tab
                   icon={LockClosedIcon}
                   onClick={() => handleUserSubTabChange("permissions")}
+                  data-cy="auth-tab-permissions"
                 >
                   Permissions
                 </Tab>
                 <Tab
                   icon={KeyIcon}
                   onClick={() => handleUserSubTabChange("api-keys")}
+                  data-cy="auth-tab-api-keys"
                 >
                   API Keys
                 </Tab>
                 <Tab
                   icon={MdOutlineSecurity}
                   onClick={() => handleUserSubTabChange("sso")}
+                  data-cy="auth-tab-sso"
                 >
                   SSO
                 </Tab>

@@ -86,7 +86,12 @@ export function ProviderImagesList() {
         </TableHead>
         <TableBody>
           {customImages.map((image) => (
-            <TableRow key={image.id} className="group">
+            <TableRow
+              key={image.id}
+              className="group"
+              data-cy="settings-provider-images-row"
+              data-cy-id={image.id}
+            >
               <TableCell>{image.provider_name}</TableCell>
               <TableCell>
                 <div className="w-8 h-8 flex items-center justify-center">

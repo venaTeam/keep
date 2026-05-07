@@ -162,6 +162,7 @@ export default function ProviderTile({ provider, onClick }: Props) {
   };
   return (
     <button
+      data-cy={`providers-tile-${provider.type}`}
       className={
         "min-h-36 tile-basis text-left min-w-0 py-4 px-4 relative group flex justify-around items-center bg-white rounded-lg shadow hover:grayscale-0 gap-3" +
         // Add fixed height only if provider card doesn't have much content

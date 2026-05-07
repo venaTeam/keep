@@ -134,6 +134,7 @@ export default function UsersSettings({
                 ? "Users are managed externally and cannot be created from Keep"
                 : undefined
             }
+            data-cy="auth-add-user-btn"
           >
             Add User
           </Button>
@@ -144,6 +145,7 @@ export default function UsersSettings({
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         className="mb-4"
+        data-cy="auth-users-search-input"
       />
       <Card className="overflow-auto p-0">
         <div className="h-full w-full overflow-auto">

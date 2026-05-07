@@ -62,6 +62,8 @@ export function APIKeysTable({
           <TableRow
             key={key.reference_id}
             className="hover:bg-gray-50 transition-colors duration-200 cursor-pointer group"
+            data-cy="auth-api-key-row"
+            data-cy-id={key.reference_id}
           >
             <TableCell>{key.reference_id}</TableCell>
             <TableCell className="text-left">

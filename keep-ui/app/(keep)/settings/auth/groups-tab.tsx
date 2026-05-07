@@ -113,6 +113,7 @@ export default function GroupsTab() {
             size="md"
             onClick={handleAddGroupClick}
             icon={MdGroupAdd}
+            data-cy="auth-add-group-btn"
           >
             Add Group
           </Button>
@@ -123,6 +124,7 @@ export default function GroupsTab() {
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         className="mb-4"
+        data-cy="auth-groups-search-input"
       />
       <Card className="overflow-auto p-0">
         <div className="h-full w-full overflow-auto">
@@ -141,6 +143,8 @@ export default function GroupsTab() {
                   key={group.id}
                   className="hover:bg-gray-50 transition-colors duration-200 cursor-pointer group"
                   onClick={() => handleRowClick(group)}
+                  data-cy="auth-group-row"
+                  data-cy-id={group.id}
                 >
                   <TableCell className="w-2/12">{group.name}</TableCell>
                   <TableCell className="w-4/12">
@@ -178,6 +182,7 @@ export default function GroupsTab() {
                       color="orange"
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={(e) => handleDeleteGroup(group.name, e)}
+                      data-cy="auth-group-delete-btn"
                     />
                   </TableCell>
                 </TableRow>

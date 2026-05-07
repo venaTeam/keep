@@ -136,7 +136,10 @@ const PermissionSidebar = ({
           leaveFrom="translate-x-0"
           leaveTo="translate-x-full"
         >
-          <Dialog.Panel className="fixed right-0 inset-y-0 w-3/4 bg-white z-30 p-6 overflow-auto flex flex-col">
+          <Dialog.Panel
+            className="fixed right-0 inset-y-0 w-3/4 bg-white z-30 p-6 overflow-auto flex flex-col"
+            data-cy="auth-permission-sidebar"
+          >
             <div className="flex justify-between mb-4">
               <Dialog.Title className="text-3xl font-bold" as={Text}>
                 Manage Permissions
@@ -208,11 +211,17 @@ const PermissionSidebar = ({
                   variant="secondary"
                   onClick={handleClose}
                   className="border border-orange-500 text-orange-500"
+                  data-cy="auth-permission-cancel-btn"
                 >
                   Cancel
                 </Button>
                 {!isDisabled && (
-                  <Button color="orange" type="submit" disabled={!isDirty}>
+                  <Button
+                    color="orange"
+                    type="submit"
+                    disabled={!isDirty}
+                    data-cy="auth-permission-submit-btn"
+                  >
                     Save Changes
                   </Button>
                 )}

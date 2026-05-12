@@ -13,6 +13,7 @@ import {
 import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { Select, showErrorToast, Tooltip } from "@/shared/ui";
+import { recordAction, recordError } from "@/utils/metrics";
 
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
 
@@ -73,75 +74,84 @@ export function AlertChangeStatusModal({
     handleClose();
   };
 
-  const handleChangeStatus = async () => {
-    if (!selectedStatus) {
-      showErrorToast(new Error("Please select a new status."));
-      return;
-    }
-    if (Array.isArray(alert)) {
-      showErrorToast(new Error("Batch status change should use batch handler."));
-      return;
-    }
-    try {
-      await api.post(
-        `/alerts/enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
-        {
-          enrichments: {
-            status: selectedStatus,
-            ...(selectedStatus !== Status.Suppressed && {
-              dismissed: false,
-              dismissUntil: "",
-            }),
-            ...(noteContent && noteContent.trim() !== "" && {
-              note: noteContent.trim(),
-            }),
-          },
-          fingerprint: alert.fingerprint,
-        }
-      );
+const handleChangeStatus = async () => {
+  if (!selectedStatus) {
+    showErrorToast(new Error("Please select a new status."));
+    return;
+  }
+  
+  if (Array.isArray(alert)) {
+    showErrorToast(new Error("Batch status change should use batch handler."));
+    return;
+  }
 
-      toast.success("Alert status changed successfully!");
-      clearAndClose();
-      onSuccess?.();
-      await alertsMutator();
-      await presetsMutator();
-    } catch (error) {
-      showErrorToast(error, "Failed to change alert status.");
-    }
-  };
+  const start = performance.now();
+  try {
+    await api.post(
+      `/alerts/enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
+      {
+        enrichments: {
+          status: selectedStatus,
+          ...(selectedStatus !== Status.Suppressed && {
+            dismissed: false,
+            dismissUntil: "",
+          }),
+          ...(noteContent && noteContent.trim() !== "" && {
+            note: noteContent.trim(),
+          }),
+        },
+        fingerprint: alert.fingerprint,
+      }
+    );
 
-  const handleChangeStatusBatch = async () => {
-    let fingerprints = new Set<string>();
-    if (Array.isArray(alert)) {
-      alert.forEach((a) => fingerprints.add(a.fingerprint));
-    }
-    try {
-      await api.post(
-        `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
-        {
-          enrichments: {
-            status: selectedStatus,
-            ...(selectedStatus !== Status.Suppressed && {
-              dismissed: false,
-              dismissUntil: "",
-            }),
-            ...(noteContent && noteContent.trim() !== "" && {
-              note: noteContent.trim(),
-            }),
-          },
-          fingerprints: Array.from(fingerprints),
-        }
-      );
+    toast.success("Alert status changed successfully!");
+    recordAction("change_status", (performance.now() - start) / 1000);
+    clearAndClose();
+    onSuccess?.();
+    await alertsMutator();
+    await presetsMutator();
+  } catch (error) {
+    recordError("change_status");
+    showErrorToast(error, "Failed to change alert status.");
+  }
+};
 
-      toast.success("Alert(s) status changed successfully!");
-      clearAndClose();
-      onSuccess?.();
-      await alertsMutator();
-      await presetsMutator();
-    } catch (error) {
-      showErrorToast(error, "Failed to change alert(s) status.");
-    }
-  };
+const handleChangeStatusBatch = async () => {
+  let fingerprints = new Set<string>();
+  if (Array.isArray(alert)) {
+    alert.forEach((a) => fingerprints.add(a.fingerprint));
+  }
+
+  const start = performance.now();
+  try {
+    await api.post(
+      `/alerts/batch_enrich?dispose_on_new_alert=${disposeOnNewAlert}`,
+      {
+        enrichments: {
+          status: selectedStatus,
+          ...(selectedStatus !== Status.Suppressed && {
+            dismissed: false,
+            dismissUntil: "",
+          }),
+          ...(noteContent && noteContent.trim() !== "" && {
+            note: noteContent.trim(),
+          }),
+        },
+        fingerprints: Array.from(fingerprints),
+      }
+    );
+
+    toast.success("Alert(s) status changed successfully!");
+    recordAction("change_status", (performance.now() - start) / 1000);
+    clearAndClose();
+    onSuccess?.();
+    await alertsMutator();
+    await presetsMutator();
+  } catch (error) {
+    recordError("change_status");
+    showErrorToast(error, "Failed to change alert(s) status.");
+  }
+};
 
   if (!Array.isArray(alert)) {
     return (

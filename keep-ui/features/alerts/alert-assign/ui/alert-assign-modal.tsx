@@ -7,6 +7,7 @@ import { useAlerts } from "@/entities/alerts/model/useAlerts";
 import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
 import { useRevalidateMultiple } from "@/shared/lib/state-utils";
+import { recordAction, recordError } from "@/utils/metrics";
 
 interface Props {
     alert: AlertDto | null | undefined;
@@ -33,30 +34,32 @@ export function AlertAssignModal({
         setDisposeOnNewAlert(false);
         handleClose();
     };
+const handleAssign = async () => {
+  const start = performance.now();
+  try {
+    const lastReceived = 
+      typeof alert.lastReceived === "string"
+        ? alert.lastReceived
+        : alert.lastReceived.toISOString();
 
-    const handleAssign = async () => {
-        try {
-            const lastReceived =
-                typeof alert.lastReceived === "string"
-                    ? alert.lastReceived
-                    : alert.lastReceived.toISOString();
+    await api.post(
+      `/alerts/${alert.fingerprint}/assign/${lastReceived}`,
+      {
+        dispose_on_new_alert: disposeOnNewAlert,
+        note: noteContent && noteContent.trim() !== "" ? noteContent.trim() : null,
+      }
+    );
 
-            await api.post(
-                `/alerts/${alert.fingerprint}/assign/${lastReceived}`,
-                {
-                    dispose_on_new_alert: disposeOnNewAlert,
-                    note: noteContent && noteContent.trim() !== "" ? noteContent.trim() : null,
-                }
-            );
-
-            toast.success("Alert assigned successfully!");
-            clearAndClose();
-            await alertsMutator();
-            await presetsMutator();
-        } catch (error) {
-            showErrorToast(error, "Failed to assign alert.");
-        }
-    };
+    toast.success("Alert assigned successfully!");
+    recordAction("self_assign", (performance.now() - start) / 1000);
+    clearAndClose();
+    await alertsMutator();
+    await presetsMutator();
+  } catch (error) {
+    recordError("self_assign");
+    showErrorToast(error, "Failed to assign alert.");
+  }
+};
 
     return (
         <Modal onClose={handleClose} isOpen={!!alert} className="!max-w-none !w-auto inline-block whitespace-nowrap overflow-visible">

@@ -21,6 +21,7 @@ import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { IncidentSeveritySelect } from "@/features/incidents/change-incident-severity";
 import { Severity } from "@/entities/incidents/model/models";
+import { recordAction, recordError } from "@/utils/metrics";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
@@ -83,45 +84,45 @@ export function CreateOrUpdateIncidentForm({
     clearForm();
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (isSubmittingRef.current || isSubmitting) return;
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  if (isSubmittingRef.current || isSubmitting) return;
 
-    isSubmittingRef.current = true;
-    setIsSubmitting(true);
-    try {
-      if (editMode) {
-        await updateIncident(
-          incidentToEdit!.id,
-          {
-            user_generated_name: incidentName,
-            user_summary: incidentUserSummary,
-            assignee: incidentAssignee,
-            resolve_on: resolveOnAlertsResolved,
-            same_incident_in_the_past_id:
-              incidentToEdit!.same_incident_in_the_past_id,
-          },
-          false
-        );
-        exitEditMode();
-      } else {
-        const newIncident = await addIncident({
-          user_generated_name: incidentName,
-          user_summary: incidentUserSummary,
-          assignee: incidentAssignee,
-          resolve_on: resolveOnAlertsResolved,
-          severity: incidentSeverity,
-        });
-        createCallback?.(newIncident.id);
-        exitEditMode();
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isSubmittingRef.current = false;
-      setIsSubmitting(false);
+  isSubmittingRef.current = true;
+  setIsSubmitting(true);
+  const start = performance.now();
+
+  try {
+    if (editMode) {
+      await updateIncident(incidentToEdit!.id, {
+        user_generated_name: incidentName,
+        user_summary: incidentUserSummary,
+        assignee: incidentAssignee,
+        resolve_on: resolveOnAlertsResolved,
+        same_incident_in_the_past_id: incidentToEdit!.same_incident_in_the_past_id,
+      }, false);
+      exitEditMode();
+    } else {
+      const newIncident = await addIncident({
+        user_generated_name: incidentName,
+        user_summary: incidentUserSummary,
+        assignee: incidentAssignee,
+        resolve_on: resolveOnAlertsResolved,
+        severity: incidentSeverity,
+      });
+
+      recordAction("create_incident", (performance.now() - start) / 1000);
+      createCallback?.(newIncident.id);
+      exitEditMode();
     }
-  };
+  } catch (error) {
+    recordError("create_incident");
+    console.error(error);
+  } finally {
+    isSubmittingRef.current = false;
+    setIsSubmitting(false);
+  }
+};
 
   const submitEnabled = (): boolean => {
     return !!incidentName;

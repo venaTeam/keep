@@ -1,8 +1,8 @@
-import { CSSProperties, useCallback, useState } from "react";
+import { CSSProperties, useState } from "react";
 import { usePresets } from "@/entities/presets/model/usePresets";
 import { AiOutlineSwap } from "react-icons/ai";
 import { usePathname, useRouter } from "next/navigation";
-import { Icon, Subtitle } from "@tremor/react";
+import { Subtitle } from "@tremor/react";
 import { LinkWithIcon } from "@/components/LinkWithIcon";
 import {
   DndContext,
@@ -22,8 +22,7 @@ import clsx from "clsx";
 import { Preset } from "@/entities/presets/model/types";
 import { usePresetActions } from "@/entities/presets/model/usePresetActions";
 import { usePresetPolling } from "@/entities/presets/model/usePresetPolling";
-import { usePresetAlertsCount } from "../model/usePresetAlertsCount";
-import { FireIcon } from "@heroicons/react/24/outline";
+
 import { PresetsNoise } from "./PresetsNoise";
 
 type AlertPresetLinkProps = {
@@ -43,14 +42,7 @@ export const AlertPresetLink = ({
   const isActive = decodeURIComponent(pathname?.toLowerCase() || "") === href;
   const [isHovered, setIsHovered] = useState(false);
 
-  const { totalCount } = usePresetAlertsCount(
-    preset.options.find((option) => option.label === "CEL")?.value || "",
-    preset.counter_shows_firing_only,
-    0,
-    0,
-    undefined,
-    isActive || isHovered
-  );
+
 
   const { listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({
@@ -74,17 +66,7 @@ export const AlertPresetLink = ({
     }
   };
 
-  const renderBeforeCount = useCallback(() => {
-    if (preset.counter_shows_firing_only) {
-      return (
-        <Icon
-          className="p-0 relative top-[1px]"
-          size={"xs"}
-          icon={FireIcon}
-        ></Icon>
-      );
-    }
-  }, [preset]);
+
 
   return (
     <li
@@ -98,12 +80,12 @@ export const AlertPresetLink = ({
       <LinkWithIcon
         href={href}
         icon={getIcon()}
-        count={totalCount}
+
         isDeletable={isDeletable}
         onDelete={() => deletePreset && deletePreset(preset.id, preset.name)}
         isExact={true}
         testId="preset"
-        renderBeforeCount={renderBeforeCount}
+
         className={clsx(
           "flex items-center space-x-2 p-1 text-slate-400 font-medium rounded-lg",
           {

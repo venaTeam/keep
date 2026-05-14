@@ -6,6 +6,7 @@ import { STATUS_ICONS } from "@/entities/incidents/ui";
 import { useIncidentActions } from "@/entities/incidents/model";
 import { Select, showErrorToast } from "@/shared/ui";
 import { capitalize } from "@/utils/helpers";
+import { recordAction, recordError } from "@/utils/metrics";
 
 interface Props {
     incidentId: string;
@@ -60,6 +61,8 @@ export function IncidentChangeStatusModal({
             showErrorToast(new Error("Please select a new status."));
             return;
         }
+        
+        const start = performance.now();
         try {
             setIsSubmitting(true);
             await changeStatus(
@@ -68,9 +71,13 @@ export function IncidentChangeStatusModal({
                 noteContent?.trim() || undefined,
                 disposeOnNewAlert
             );
+
+            recordAction("change_status", (performance.now() - start) / 1000);
+            
             onSuccess?.(selectedStatus);
             clearAndClose();
         } catch (error) {
+            recordError("change_status");
             showErrorToast(error, "Failed to change incident status.");
         } finally {
             setIsSubmitting(false);

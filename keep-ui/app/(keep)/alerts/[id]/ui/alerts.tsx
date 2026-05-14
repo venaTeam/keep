@@ -24,6 +24,7 @@ import {
   useAlertsTableData,
   AlertsTableDataQuery,
 } from "@/widgets/alerts-table/ui/useAlertsTableData";
+import { recordPageLoad } from "@/utils/metrics";
 
 const defaultPresets: Preset[] = [
   {
@@ -46,6 +47,12 @@ type AlertsProps = {
 
 export default function Alerts({ presetName, initialFacets }: AlertsProps) {
   const api = useApi();
+
+  // Record page load time - call directly since useEffect may not fire reliably in Next.js
+  if (typeof window !== "undefined") {
+    const pageLabel = presetName === "feed" ? "alerts_feed" : `preset:${presetName}`;
+    recordPageLoad(pageLabel, 0);
+  }
   const [alertsQueryState, setAlertsQueryState] = useState<
     AlertsQuery | undefined
   >();

@@ -24,6 +24,7 @@ import { useApi } from "@/shared/lib/hooks/useApi";
 import { showErrorToast } from "@/shared/ui";
 import "../styles.css";
 import { Preset } from "@/entities/presets/model/types";
+import { recordAction, recordPageLoad, recordError } from "@/utils/metrics";
 
 const DASHBOARD_FILTERS = [
   {
@@ -35,6 +36,11 @@ const DASHBOARD_FILTERS = [
 ];
 
 const DashboardPage = () => {
+
+  // Record page load time - call directly since useEffect may not fire reliably in Next.js React 19
+  if (typeof window !== "undefined") {
+    recordPageLoad("dashboard_detail", 0);
+  }
   const api = useApi();
   const allPresets = useDashboardPreset();
   const { id }: any = useParams();
@@ -123,10 +129,14 @@ const DashboardPage = () => {
       let dashboard = dashboards?.find(
         (d) => d.dashboard_name === decodeURIComponent(id)
       );
+
       const method = dashboard ? "PUT" : "POST";
       const endpoint = `/dashboard${
         dashboard ? `/${encodeURIComponent(dashboard.id)}` : ""
       }`;
+
+      const isNewDashboard = method === "POST";
+      const start = isNewDashboard ? performance.now() : 0;
 
       const result = await api.post(
         endpoint,
@@ -142,10 +152,15 @@ const DashboardPage = () => {
         }
       );
 
+      if (isNewDashboard) {
+        recordAction("create_dashboard", (performance.now() - start) / 1000);
+      }
+
       console.log("Dashboard saved successfully", result);
       mutateDashboard();
       toast.success("Dashboard saved successfully");
     } catch (error) {
+      recordError("create_dashboard");
       showErrorToast(error, "Failed to save dashboard");
     }
   };

@@ -86,7 +86,7 @@ export const ViewAlertModal: React.FC<ViewAlertModalProps> = ({
       const displayValue = showHighlightedOnly
         ? JSON.stringify(
             Object.fromEntries(
-              alert.enriched_fields.map((key) => [
+              (alert.enriched_fields ?? []).map((key) => [
                 key,
                 alertData[key as keyof typeof alertData],
               ])

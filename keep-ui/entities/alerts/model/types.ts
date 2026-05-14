@@ -61,7 +61,7 @@ export interface AlertDto {
   group?: boolean;
   note?: string;
   isNoisy?: boolean;
-  enriched_fields: string[];
+  enriched_fields?: string[];
   incident?: string;
   incident_dto?: any[];
   alert_query?: string;

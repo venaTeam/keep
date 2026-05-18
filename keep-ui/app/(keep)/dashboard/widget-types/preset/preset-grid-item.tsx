@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { WidgetData, WidgetType, PresetPanelType } from "../../types";
-import { usePresetAlertsCount } from "@/features/presets/custom-preset-links";
 import { useDashboardPreset } from "@/utils/hooks/useDashboardPresets";
 import { Button, Icon } from "@tremor/react";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -12,6 +11,7 @@ import { useSearchParams } from "next/navigation";
 import WidgetAlertsTable from "./widget-alerts-table";
 import WidgetAlertCountPanel from "./widget-alert-count-panel";
 import CelInput from "@/features/cel-input/cel-input";
+import { useAlerts } from "@/entities/alerts/model/useAlerts";
 
 interface GridItemProps {
   item: WidgetData;
@@ -42,17 +42,13 @@ const PresetGridItem: React.FC<GridItemProps> = ({ item }) => {
     [presetCel, timeRangeCel]
   );
 
+  const { useLastAlerts } = useAlerts();
+
   const {
-    alerts,
+    data: alerts,
     totalCount: presetAlertsCount,
     isLoading,
-  } = usePresetAlertsCount(
-    filterCel,
-    false,
-    countOfLastAlerts,
-    0,
-    10000 // refresh interval
-  );
+  } = useLastAlerts({cel: filterCel, limit: countOfLastAlerts});
   const router = useRouter();
   const params = useParams();
   const dashboardId = params?.id as string | undefined;

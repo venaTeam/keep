@@ -9,7 +9,7 @@ export const usePresetAlertsCount = (
   refreshInterval: number | undefined = undefined,
   enabled: boolean = true
 ) => {
-  const { useLastAlerts } = useAlerts();
+  const { useLastAlertsCount } = useAlerts();
 
   const celList = [];
 
@@ -30,7 +30,7 @@ export const usePresetAlertsCount = (
       }
     : undefined;
 
-  const { data, totalCount, isLoading, mutate } = useLastAlerts(query);
+  const { totalCount, isLoading, mutate } = useLastAlertsCount(query);
 
   useEffect(() => {
     if (!refreshInterval) {
@@ -41,5 +41,5 @@ export const usePresetAlertsCount = (
     return () => clearInterval(intervalId);
   }, [refreshInterval]);
 
-  return { alerts: data, totalCount, isLoading };
+  return { totalCount, isLoading };
 };

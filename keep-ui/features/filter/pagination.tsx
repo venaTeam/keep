@@ -63,13 +63,15 @@ export function Pagination({
     [pageSizeOptionsMemoized]
   );
 
-  const pagesCount = useMemo(
-    () => Math.ceil(totalCount / state.limit),
-    [totalCount, state]
-  );
+
   const pageIndex = useMemo(() => {
     return Math.ceil(state.offset / state.limit);
   }, [state]);
+
+    const ReachedLimit = useMemo(
+    () => Math.floor(totalCount / state.limit) != 0 && totalCount != 0,
+    [totalCount, state]
+  );
 
   function setPageIndex(pageIndex: number): void {
     onStateChange({
@@ -81,7 +83,7 @@ export function Pagination({
   return (
     <div className="flex justify-between items-center">
       <Text>
-        Showing {pagesCount === 0 ? 0 : pageIndex + 1} of {pagesCount}
+        Showing {pageIndex + 1} of {ReachedLimit ? `${pageIndex + 1}+` : pageIndex + 1}
       </Text>
       <div className="flex gap-1">
         <Select
@@ -119,16 +121,7 @@ export function Pagination({
             className="pagination-button"
             icon={ChevronRightIcon}
             onClick={() => setPageIndex(pageIndex + 1)}
-            disabled={pageIndex == pagesCount - 1}
-            size="xs"
-            color="gray"
-            variant="secondary"
-          />
-          <Button
-            className="pagination-button"
-            icon={ChevronDoubleRightIcon}
-            onClick={() => setPageIndex(pagesCount - 1)}
-            disabled={pageIndex == pagesCount - 1}
+            disabled={!ReachedLimit}
             size="xs"
             color="gray"
             variant="secondary"

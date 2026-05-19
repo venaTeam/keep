@@ -286,7 +286,6 @@ export const RuleFields = ({
     : 0;
 
   const {
-    data: alertsFound = [],
     totalCount: totalAlertsFound,
     isLoading,
   } = useMatchingAlerts({ combinator: "and", rules: ruleFields });
@@ -354,7 +353,6 @@ export const RuleFields = ({
 
         <AlertsFoundBadge
           totalAlertsFound={totalAlertsFound}
-          alertsFound={alertsFound}
           isLoading={isLoading}
           role={"ruleCondition"}
         />

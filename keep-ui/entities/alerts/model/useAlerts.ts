@@ -143,6 +143,61 @@ export const useAlerts = () => {
     };
   };
 
+
+const useLastAlertsCount = (
+  query: AlertsQuery | undefined,
+  options: SWRConfiguration = { revalidateOnFocus: false }
+) => {
+  const queryToPost: { [key: string]: any } = {};
+
+  if (query?.cel) {
+    queryToPost.cel = query.cel;
+  }
+
+  const requestUrl = `/alerts/query/count`;
+  const swrKey = () =>
+    // adding "/alerts/query/count" so global revalidation works
+    api.isReady() && query
+      ? requestUrl +
+        Object.entries(queryToPost)
+          .sort(([fstKey], [scdKey]) => fstKey.localeCompare(scdKey))
+          .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+          .join("&")
+      : null;
+
+  const swrValue = useSWR<any>(
+    swrKey,
+    async () => {
+      const date = new Date();
+      const queryResult = await api.post(requestUrl, queryToPost);
+      const queryTimeInSeconds =
+        (new Date().getTime() - date.getTime()) / 1000;
+      return {
+        queryResult,
+        queryTimeInSeconds,
+      };
+    },
+    options
+  );
+
+  const [results, setResults] = useState<number>(0);
+
+  useEffect(() => {
+    if (swrValue.isLoading) {
+      return;
+    }
+
+    setResults(swrValue.data?.queryResult ?? 0);
+  }, [swrValue.data, swrValue.isLoading]);
+
+  return {
+    ...swrValue,
+    totalCount: results,
+    queryTimeInSeconds: swrValue.data?.queryTimeInSeconds,
+    isLoading: swrValue.isLoading || !swrValue.data?.queryResult,
+  };
+};
+
   const useLastAlerts = (
     query: AlertsQuery | undefined,
     options: SWRConfiguration = { revalidateOnFocus: false }
@@ -223,6 +278,7 @@ export const useAlerts = () => {
     useMultipleFingerprintsAlertAudit,
     useErrorAlerts,
     useLastAlerts,
+    useLastAlertsCount,
     alertsMutator,
   };
 };

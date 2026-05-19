@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { Table, Card, Button } from "@tremor/react";
+import { Table, Card, Button, Badge } from "@tremor/react";
 import { AlertsTableBody } from "@/widgets/alerts-table/ui/alerts-table-body";
 import {
   AlertDto,
@@ -51,10 +51,12 @@ import { Icon } from "@tremor/react";
 import {
   BellIcon,
   BellSlashIcon,
+  FireIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { FacetDto, Pagination } from "@/features/filter";
+import { ShortNumber } from "@/components/ui";
 import { GroupingState, getGroupedRowModel } from "@tanstack/react-table";
 import { v4 as uuidV4 } from "uuid";
 import { FacetsConfig } from "@/features/filter/models";
@@ -103,6 +105,7 @@ interface Props {
   isAsyncLoading?: boolean;
   presetName: string;
   presetId?: string;
+  counterShowsFiringOnly?: boolean;
   presetTabs?: PresetTab[];
   isRefreshAllowed?: boolean;
   isMenuColDisplayed?: boolean;
@@ -127,6 +130,7 @@ export function AlertTableServerSide({
   isAsyncLoading = false,
   presetName,
   presetId,
+  counterShowsFiringOnly = false,
   facetsCel,
   facetsPanelRefreshToken,
   isRefreshAllowed = true,
@@ -730,20 +734,24 @@ export function AlertTableServerSide({
     <div className="flex flex-col gap-4">
       <div className="flex-none">
         <div className="flex justify-between">
-          <div className="flex flex-col" data-testid="preset-page-title">
+          <span className="flex items-center gap-2" data-testid="preset-page-title">
             <PageTitle className="capitalize inline">{presetName}</PageTitle>
-            {fromDashboard && (
-              <div className="flex items-center gap-1 text-sm mt-1 text-gray-500">
-                <span className="text-gray-400">from</span>
-                <a
-                  href={`/dashboard/${encodeURIComponent(fromDashboard)}`}
-                  className="text-gray-500 hover:text-orange-500 transition-colors cursor-pointer underline underline-offset-2"
-                >
-                  {fromDashboard}
-                </a>
-              </div>
+            {presetName !== "feed" && (
+              <Badge
+                size="md"
+                color={alertsTotalCount === 0 ? "green" : alertsTotalCount == paginationState.limit ? "red" : "orange"}
+                data-testid="preset-count-badge"
+                className="px-1.5 min-w-6"
+              >
+                <div className="flex gap-1 items-center">
+                  {counterShowsFiringOnly && (
+                    <Icon className="p-0 relative top-[1px]" size="xs" icon={FireIcon} color={alertsTotalCount === 0 ? "green" : alertsTotalCount == paginationState.limit ? "red" : "orange"} />
+                  )}
+                  {paginationState.limit == alertsTotalCount ? <div>{`${paginationState.limit}+`}</div> : <ShortNumber value={alertsTotalCount} />}
+                </div>
+              </Badge>
             )}
-          </div>
+          </span>
           <div className="grid grid-cols-[auto_auto] grid-rows-[auto_auto] gap-4">
             {timeFrame && (
               <EnhancedDateRangePickerV2

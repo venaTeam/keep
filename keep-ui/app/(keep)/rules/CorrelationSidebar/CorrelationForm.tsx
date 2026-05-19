@@ -10,7 +10,6 @@ import {
   TextInput,
 } from "@tremor/react";
 import { Controller, get, useFormContext } from "react-hook-form";
-import { AlertDto } from "@/entities/alerts/model";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { CorrelationFormType } from "./types";
@@ -19,12 +18,31 @@ import { useUsers } from "@/entities/users/model/useUsers";
 import { Input } from "@/shared/ui";
 
 type CorrelationFormProps = {
-  alertsFound: AlertDto[];
   isLoading: boolean;
 };
 
+const ALERT_ATTRIBUTE_KEYS = [
+  "fingerprint",
+  "alert_id",
+  "tenant_id",
+  "timestamp",
+  "first_timestamp",
+  "alert_hash",
+  "status",
+  "status_disposable",
+  "dismiss_mode",
+  "dismissed_until",
+  "assignee",
+  "note",
+  "last_received",
+  "firing_counter",
+  "unresolved_counter",
+  "started_at",
+  "firing_start_time",
+  "firing_start_time_time_since_last_resolved",
+];
+
 export const CorrelationForm = ({
-  alertsFound = [],
   isLoading,
 }: CorrelationFormProps) => {
   const {
@@ -37,29 +55,7 @@ export const CorrelationForm = ({
   const { data: tenantConfiguration } = useTenantConfiguration();
   const { data: users = [] } = useUsers();
 
-  const getNestedKeys = (obj: any, prefix = ""): string[] => {
-    return Object.entries(obj).reduce<string[]>((acc, [key, value]) => {
-      const newKey = prefix ? `${prefix}.${key}` : key;
-      if (value && typeof value === "object" && !Array.isArray(value)) {
-        return [...acc, newKey, ...getNestedKeys(value, newKey)];
-      }
-      return [...acc, newKey];
-    }, []);
-  };
-
-  const getMultiLevelKeys = (obj: AlertDto, groupBy: string): string[] => {
-    if (!obj || !groupBy) return [];
-    const objAsAny = obj as any;
-    const key = Object.keys(objAsAny[groupBy])[0];
-    return Object.keys(objAsAny[groupBy][key]);
-  };
-
-  const keys = [
-    ...alertsFound.reduce<Set<string>>((acc, alert) => {
-      const alertKeys = getNestedKeys(alert);
-      return new Set([...acc, ...alertKeys]);
-    }, new Set<string>()),
-  ];
+  const keys = ALERT_ATTRIBUTE_KEYS;
 
   return (
     <div className="flex flex-col gap-y-4 flex-1">
@@ -394,15 +390,13 @@ export const CorrelationForm = ({
             control={control}
             name="multiLevelPropertyName"
             render={({ field: { value, onChange } }) => (
-              <Select value={value} onValueChange={onChange} className="mt-2">
-                {getMultiLevelKeys(
-                  alertsFound[0],
-                  watch("groupedAttributes")[0]
-                ).map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {key}
-                  </SelectItem>
-                ))}
+              <Select
+                value={value}
+                onValueChange={onChange}
+                className="mt-2"
+                disabled
+              >
+                <SelectItem value="">No property names available</SelectItem>
               </Select>
             )}
           />

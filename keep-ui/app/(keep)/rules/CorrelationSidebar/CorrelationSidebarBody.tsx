@@ -47,7 +47,6 @@ export const CorrelationSidebarBody = ({
   const selectedId = searchParams ? searchParams.get("id") : null;
 
   const {
-    data: alertsFound = [],
     totalCount: totalAlertsFound,
     isLoading,
   } = useMatchingAlerts(methods.watch("query"));
@@ -167,7 +166,6 @@ export const CorrelationSidebarBody = ({
           <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="mb-10">
               <CorrelationForm
-                alertsFound={alertsFound}
                 isLoading={isLoading}
               />
             </div>
@@ -177,7 +175,6 @@ export const CorrelationSidebarBody = ({
             {totalAlertsFound > 0 && (
               <AlertsFoundBadge
                 totalAlertsFound={totalAlertsFound}
-                alertsFound={alertsFound}
                 isLoading={false}
                 role={"correlationRuleConditions"}
               />

@@ -739,15 +739,15 @@ export function AlertTableServerSide({
             {presetName !== "feed" && (
               <Badge
                 size="md"
-                color={alertsTotalCount === 0 ? "green" : "orange"}
+                color={alertsTotalCount === 0 ? "green" : alertsTotalCount == paginationState.limit ? "red" : "orange"}
                 data-testid="preset-count-badge"
                 className="px-1.5 min-w-6"
               >
                 <div className="flex gap-1 items-center">
                   {counterShowsFiringOnly && (
-                    <Icon className="p-0 relative top-[1px]" size="xs" icon={FireIcon} color={alertsTotalCount === 0 ? "green" : "orange"} />
+                    <Icon className="p-0 relative top-[1px]" size="xs" icon={FireIcon} color={alertsTotalCount === 0 ? "green" : alertsTotalCount == paginationState.limit ? "red" : "orange"} />
                   )}
-                  <ShortNumber value={alertsTotalCount} />
+                  {paginationState.limit == alertsTotalCount ? <div>{`${paginationState.limit}+`}</div> : <ShortNumber value={alertsTotalCount} />}
                 </div>
               </Badge>
             )}

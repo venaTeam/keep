@@ -194,7 +194,7 @@ const useLastAlertsCount = (
     ...swrValue,
     totalCount: results,
     queryTimeInSeconds: swrValue.data?.queryTimeInSeconds,
-    isLoading: swrValue.isLoading || !swrValue.data?.queryResult,
+    isLoading: swrValue.isLoading
   };
 };
 

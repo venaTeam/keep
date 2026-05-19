@@ -75,7 +75,8 @@ export default function SignInForm({
         }
       } else if (providers.keycloak) {
         console.log("Signing in with keycloak provider");
-        signIn("keycloak", { callbackUrl: "/" });
+        const callbackUrl = (searchParams?.callbackUrl as string) || "/";
+        signIn("keycloak", { callbackUrl: callbackUrl });
       } else if (providers.okta) {
         console.log("Signing in with Okta provider");
         signIn("okta", { callbackUrl: "/" });
@@ -144,7 +145,8 @@ export default function SignInForm({
 
       // Add a small delay before redirect to ensure state update
       await new Promise((resolve) => setTimeout(resolve, 100));
-      router.replace("/incidents");
+      const redirectUrl = (searchParams?.callbackUrl as string) || "/incidents";
+      router.replace(redirectUrl);
 
       // Disable form interactions during redirect
       await revalidateAfterAuth();

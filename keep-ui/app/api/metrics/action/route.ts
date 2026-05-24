@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { pageloadLatency, pageloads } from "@/metrics/metrics";
+import { actionLatency, actionExecutions } from "@/metrics/metrics";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  pageloadLatency.observe({ page: label }, latency);
-  pageloads.inc({ page: label });
+  actionLatency.observe({ action: label }, latency);
+  actionExecutions.inc({ action: label });
 
   return NextResponse.json({ ok: true });
 }

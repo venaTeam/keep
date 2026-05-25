@@ -100,7 +100,7 @@ const WidgetAlertCountPanel: React.FC<WidgetAlertCountPanelProps> = ({
 
   const getColor = (count: number) => {
     let color = "#1f2937"; // Default dark gray instead of black
-    if (thresholds && thresholds.length > 0) {
+    if (thresholds && thresholds.length > 0 && !isLoading) {
       for (let i = thresholds.length - 1; i >= 0; i--) {
         if (count >= thresholds[i].value) {
           color = thresholds[i].color;

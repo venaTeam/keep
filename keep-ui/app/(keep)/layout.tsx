@@ -16,7 +16,7 @@ import { WorkflowModalProvider } from "@/features/workflows/manual-run-workflow"
 import ScreenWakeLock from "@/components/ui/ScreenWakeLock";
 import { SSEProvider } from "@/app/sse-provider";
 import { FontSizeInitializer } from "@/components/FontSizeInitializer";
-
+import ActiveUsersTracker from "@/components/ActiveUsersTracker"
 
 
 type RootLayoutProps = {
@@ -45,7 +45,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                   <main className="page-container flex flex-col col-start-3 overflow-auto">
                     {/* Add the banner here, before the navbar */}
                     {config.READ_ONLY && <ReadOnlyBanner />}
-                    <div className="flex-1">{children}</div>
+                    <div className="flex-1">
+                      <ActiveUsersTracker />
+                      {children}
+                    </div>
                     {/** footer */}
                     {process.env.GIT_COMMIT_HASH &&
                       process.env.SHOW_BUILD_INFO !== "false" && (
